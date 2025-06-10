@@ -1,6 +1,13 @@
 import { Link } from 'react-router-dom';
 import { Linkedin, Youtube, Instagram, Facebook } from 'lucide-react';
 import { FaTiktok, FaXTwitter } from 'react-icons/fa6'; // Assuming these are from react-icons
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/clerk-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -58,17 +65,21 @@ export function Footer() {
               <li><Link to="/company/youtube-channel" className="hover:underline">YouTube Channel</Link></li>
               <li><Link to="/company/request-feature" className="hover:underline">Request a Feature</Link></li>
               <li><Link to="/company/update-tool" className="hover:underline">Update a Tool</Link></li>
-              <li><Link to="/company/skill-leap" className="hover:underline">Skill Leap</Link></li>
-              <li><Link to="/company/create-account" className="hover:underline">Create an account</Link></li>
-              <li><Link to="/company/login" className="hover:underline">Login</Link></li>
             </ul>
           </div>
 
           {/* Section 5: Sign up & Social */}
           <div className="flex flex-col items-end">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mb-6">
-              Sign up for free
-            </button>
+            <SignedOut>
+              <SignUpButton mode="modal" afterSignInUrl="/" afterSignUpUrl="/">
+                <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mb-6">
+                  Sign up for free
+                </button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
             <div className="flex space-x-4">
               <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-white"><Linkedin size={24} /></a>
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-white"><FaXTwitter size={24} /></a>
