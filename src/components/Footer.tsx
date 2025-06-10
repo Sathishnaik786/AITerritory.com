@@ -11,10 +11,10 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Section 1: Futurepedia Info */}
           <div className="col-span-1 md:col-span-2 lg:col-span-1">
-            <a href="/" className="flex items-center space-x-2 mb-4">
+            <Link to="/" className="flex items-center space-x-2 mb-4">
               <img src="/logo.jpg" alt="Viralai Logo" className="h-[50px] w-[50px] rounded-full object-cover" />
               <span className="text-xl font-bold text-white">Viralai</span>
-            </a>
+            </Link>
             <p className="text-sm leading-relaxed max-w-xs">
               Advertiser Disclosure: Viralai is committed to rigorous editorial standards to provide our users with accurate and helpful content. To keep our site free, we may receive compensation when you click some links on our site.
             </p>
@@ -24,13 +24,13 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Categories</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="/categories/productivity-tools" className="hover:underline">Productivity Tools</a></li>
-              <li><a href="/categories/image-generators" className="hover:underline">Image Generators</a></li>
-              <li><a href="/categories/text-generators" className="hover:underline">Text Generators</a></li>
-              <li><a href="/categories/video-tools" className="hover:underline">Video Tools</a></li>
-              <li><a href="/categories/art-generators" className="hover:underline">Art Generators</a></li>
-              <li><a href="/categories/audio-generators" className="hover:underline">Audio Generators</a></li>
-              <li><a href="/all-ai-tools" className="hover:underline">All AI Tools</a></li>
+              <li><Link to="/categories/productivity-tools" className="hover:underline">Productivity Tools</Link></li>
+              <li><Link to="/categories/image-generators" className="hover:underline">Image Generators</Link></li>
+              <li><Link to="/categories/text-generators" className="hover:underline">Text Generators</Link></li>
+              <li><Link to="/categories/video-tools" className="hover:underline">Video Tools</Link></li>
+              <li><Link to="/categories/art-generators" className="hover:underline">Art Generators</Link></li>
+              <li><Link to="/categories/audio-generators" className="hover:underline">Audio Generators</Link></li>
+              <li><Link to="/all-ai-tools" className="hover:underline">All AI Tools</Link></li>
             </ul>
           </div>
 
@@ -38,13 +38,13 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Resources</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="/resources/best-ai-art-generators" className="hover:underline">Best AI Art Generators</a></li>
-              <li><a href="/resources/best-ai-image-generators" className="hover:underline">Best AI Image Generators</a></li>
-              <li><a href="/resources/best-ai-chatbots" className="hover:underline">Best AI Chatbots</a></li>
-              <li><a href="/resources/best-ai-text-generators" className="hover:underline">Best AI Text Generators</a></li>
-              <li><a href="/resources/best-ai-3d-generators" className="hover:underline">Best AI 3D Generators</a></li>
-              <li><a href="/categories/productivity-tools" className="hover:underline">Productivity Tools</a></li>
-              <li><a href="/resources/all-resources" className="hover:underline">All Resources</a></li>
+              <li><Link to="/resources/best-ai-art-generators" className="hover:underline">Best AI Art Generators</Link></li>
+              <li><Link to="/resources/best-ai-image-generators" className="hover:underline">Best AI Image Generators</Link></li>
+              <li><Link to="/resources/best-ai-chatbots" className="hover:underline">Best AI Chatbots</Link></li>
+              <li><Link to="/resources/best-ai-text-generators" className="hover:underline">Best AI Text Generators</Link></li>
+              <li><Link to="/resources/best-ai-3d-generators" className="hover:underline">Best AI 3D Generators</Link></li>
+              <li><Link to="/categories/productivity-tools" className="hover:underline">Productivity Tools</Link></li>
+              <li><Link to="/resources/all-resources" className="hover:underline">All Resources</Link></li>
             </ul>
           </div>
 
@@ -52,15 +52,15 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="/company/contact-us" className="hover:underline">Contact Us</a></li>
-              <li><a href="/company/advertise" className="hover:underline">Advertise</a></li>
-              <li><a href="/company/submit-tool" className="hover:underline">Submit a Tool</a></li>
-              <li><a href="/company/youtube-channel" className="hover:underline">YouTube Channel</a></li>
-              <li><a href="/company/request-feature" className="hover:underline">Request a Feature</a></li>
-              <li><a href="/company/update-tool" className="hover:underline">Update a Tool</a></li>
-              <li><a href="/company/skill-leap" className="hover:underline">Skill Leap</a></li>
-              <li><a href="/company/create-account" className="hover:underline">Create an account</a></li>
-              <li><a href="/company/login" className="hover:underline">Login</a></li>
+              <li><Link to="/company/contact-us" className="hover:underline">Contact Us</Link></li>
+              <li><Link to="/company/advertise" className="hover:underline">Advertise</Link></li>
+              <li><Link to="/company/submit-tool" className="hover:underline">Submit a Tool</Link></li>
+              <li><Link to="/company/youtube-channel" className="hover:underline">YouTube Channel</Link></li>
+              <li><Link to="/company/request-feature" className="hover:underline">Request a Feature</Link></li>
+              <li><Link to="/company/update-tool" className="hover:underline">Update a Tool</Link></li>
+              <li><Link to="/company/skill-leap" className="hover:underline">Skill Leap</Link></li>
+              <li><Link to="/company/create-account" className="hover:underline">Create an account</Link></li>
+              <li><Link to="/company/login" className="hover:underline">Login</Link></li>
             </ul>
           </div>
 
@@ -83,8 +83,8 @@ export function Footer() {
         <div className="border-t border-gray-700 mt-12 pt-8 text-center text-sm">
           <p>© {currentYear} Viralai All rights reserved.</p>
           <div className="mt-2 space-x-4">
-            <a href="/legal/privacy-policy" className="hover:underline">Privacy Policy</a>
-            <a href="/legal/terms-of-service" className="hover:underline">Terms of Service</a>
+            <Link to="/legal/privacy-policy" className="hover:underline">Privacy Policy</Link>
+            <Link to="/legal/terms-of-service" className="hover:underline">Terms of Service</Link>
           </div>
         </div>
       </div>
