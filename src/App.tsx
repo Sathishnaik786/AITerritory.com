@@ -36,6 +36,13 @@ import { ThemeProvider } from './context/ThemeContext';
 import ScrollToTopButton from './components/ScrollToTopButton';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/clerk-react";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +63,15 @@ function App() {
             <Toaster />
             <div className="min-h-screen bg-background text-foreground antialiased">
               <div className="relative min-h-screen flex flex-col">
+                <header className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-2 flex justify-end items-center">
+                  <SignedOut>
+                    <SignInButton />
+                    <SignUpButton />
+                  </SignedOut>
+                  <SignedIn>
+                    <UserButton />
+                  </SignedIn>
+                </header>
                 <Navbar />
                 <ScrollToTop />
                 <main className="flex-1 w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
