@@ -9,6 +9,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/clerk-react";
 
 export function Navbar() {
   const { theme, toggleTheme } = useTheme();
@@ -105,11 +112,17 @@ export function Navbar() {
                 <Moon className="h-4 w-4" />
               )}
             </Button>
-            <Link to="/signup">
-              <Button size="sm" className="rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 px-5 py-2">
-                Sign up for free
-              </Button>
-            </Link>
+            {/* Clerk Integration: Desktop Sign-up/Login Button */}
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button size="sm" className="rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 px-5 py-2">
+                  Sign up for free
+                </Button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
           </div>
 
           {/* Mobile Menu Button */}
@@ -180,6 +193,7 @@ export function Navbar() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              {/* Clerk Integration: Mobile Sign-up/Login Button */}
               <div className="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <Button
                   variant="outline"
@@ -193,11 +207,16 @@ export function Navbar() {
                     <Moon className="h-4 w-4" />
                   )}
                 </Button>
-                <Link to="/signup" onClick={() => setIsMenuOpen(false)} className="flex-1">
-                  <Button size="sm" className="w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300">
-                    Sign up for free
-                  </Button>
-                </Link>
+                <SignedOut>
+                  <SignInButton mode="modal" afterSignInUrl="/" afterSignUpUrl="/">
+                    <Button size="sm" className="w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300">
+                      Sign up for free
+                    </Button>
+                  </SignInButton>
+                </SignedOut>
+                <SignedIn>
+                  <UserButton afterSignOutUrl="/" />
+                </SignedIn>
               </div>
             </div>
           </div>
