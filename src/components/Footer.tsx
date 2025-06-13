@@ -20,7 +20,7 @@ export function Footer() {
           <div className="col-span-1 md:col-span-2 lg:col-span-1">
             <Link to="/" className="flex items-center space-x-2 mb-4">
               <img src="/logo.jpg" alt="Viralai Logo" className="h-[50px] w-[50px] rounded-full object-cover" />
-              <span className="text-xl font-bold text-white">Viralai</span>
+              <span className="text-xl font-bold text-white">AI Territory</span>
             </Link>
             <p className="text-sm leading-relaxed max-w-xs">
               Advertiser Disclosure: Viralai is committed to rigorous editorial standards to provide our users with accurate and helpful content. To keep our site free, we may receive compensation when you click some links on our site.
