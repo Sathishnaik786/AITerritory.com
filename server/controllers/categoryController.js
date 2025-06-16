@@ -1,163 +1,79 @@
-import { Category } from '../models/Category.js';
-import { validationResult } from 'express-validator';
+const Category = require('../models/Category');
 
-export const categoryController = {
+const categoryController = {
   // Get all categories
-  async getAllCategories(req, res) {
+  async getAllCategories(req, res, next) {
     try {
-      const withCount = req.query.withCount === 'true';
-      
-      const categories = withCount 
-        ? await Category.getWithToolCount()
-        : await Category.getAll();
-
-      res.json({
-        success: true,
-        data: categories
-      });
+      const categories = await Category.findAll();
+      res.json(categories);
     } catch (error) {
-      console.error('Error fetching categories:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch categories',
-        error: error.message
-      });
+      next(error);
     }
   },
 
-  // Get category by ID
-  async getCategoryById(req, res) {
+  // Get single category by ID
+  async getCategoryById(req, res, next) {
     try {
       const { id } = req.params;
-      const category = await Category.getById(id);
+      const category = await Category.findById(id);
       
       if (!category) {
-        return res.status(404).json({
-          success: false,
-          message: 'Category not found'
-        });
+        return res.status(404).json({ error: 'Category not found' });
       }
-
-      res.json({
-        success: true,
-        data: category
-      });
+      
+      res.json(category);
     } catch (error) {
-      console.error('Error fetching category:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch category',
-        error: error.message
-      });
+      next(error);
     }
   },
 
   // Get category by slug
-  async getCategoryBySlug(req, res) {
+  async getCategoryBySlug(req, res, next) {
     try {
       const { slug } = req.params;
-      const category = await Category.getBySlug(slug);
+      const category = await Category.findBySlug(slug);
       
       if (!category) {
-        return res.status(404).json({
-          success: false,
-          message: 'Category not found'
-        });
+        return res.status(404).json({ error: 'Category not found' });
       }
-
-      res.json({
-        success: true,
-        data: category
-      });
+      
+      res.json(category);
     } catch (error) {
-      console.error('Error fetching category:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch category',
-        error: error.message
-      });
+      next(error);
     }
   },
 
   // Create new category
-  async createCategory(req, res) {
+  async createCategory(req, res, next) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({
-          success: false,
-          message: 'Validation errors',
-          errors: errors.array()
-        });
-      }
-
-      const categoryData = req.body;
-      const category = await Category.create(categoryData);
-
-      res.status(201).json({
-        success: true,
-        data: category,
-        message: 'Category created successfully'
-      });
+      const category = await Category.create(req.body);
+      res.status(201).json(category);
     } catch (error) {
-      console.error('Error creating category:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to create category',
-        error: error.message
-      });
+      next(error);
     }
   },
 
   // Update category
-  async updateCategory(req, res) {
+  async updateCategory(req, res, next) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({
-          success: false,
-          message: 'Validation errors',
-          errors: errors.array()
-        });
-      }
-
       const { id } = req.params;
-      const categoryData = req.body;
-      
-      const category = await Category.update(id, categoryData);
-
-      res.json({
-        success: true,
-        data: category,
-        message: 'Category updated successfully'
-      });
+      const category = await Category.update(id, req.body);
+      res.json(category);
     } catch (error) {
-      console.error('Error updating category:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to update category',
-        error: error.message
-      });
+      next(error);
     }
   },
 
   // Delete category
-  async deleteCategory(req, res) {
+  async deleteCategory(req, res, next) {
     try {
       const { id } = req.params;
       await Category.delete(id);
-
-      res.json({
-        success: true,
-        message: 'Category deleted successfully'
-      });
+      res.status(204).send();
     } catch (error) {
-      console.error('Error deleting category:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to delete category',
-        error: error.message
-      });
+      next(error);
     }
   }
 };
+
+module.exports = categoryController;

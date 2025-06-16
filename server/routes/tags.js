@@ -1,25 +1,23 @@
-import express from 'express';
-import { body } from 'express-validator';
-import { tagController } from '../controllers/tagController.js';
-
+const express = require('express');
 const router = express.Router();
-
-// Validation rules for tag creation
-const tagValidation = [
-  body('name').notEmpty().withMessage('Tag name is required'),
-  body('slug').notEmpty().withMessage('Tag slug is required')
-];
+const tagController = require('../controllers/tagController');
 
 // GET /api/tags - Get all tags
 router.get('/', tagController.getAllTags);
 
-// GET /api/tags/popular - Get popular tags
-router.get('/popular', tagController.getPopularTags);
-
-// GET /api/tags/:id - Get tag by ID
+// GET /api/tags/:id - Get single tag by ID
 router.get('/:id', tagController.getTagById);
 
-// POST /api/tags - Create new tag
-router.post('/', tagValidation, tagController.createTag);
+// GET /api/tags/slug/:slug - Get tag by slug
+router.get('/slug/:slug', tagController.getTagBySlug);
 
-export default router;
+// POST /api/tags - Create new tag
+router.post('/', tagController.createTag);
+
+// PUT /api/tags/:id - Update tag
+router.put('/:id', tagController.updateTag);
+
+// DELETE /api/tags/:id - Delete tag
+router.delete('/:id', tagController.deleteTag);
+
+module.exports = router;

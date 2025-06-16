@@ -1,100 +1,79 @@
-import { Tag } from '../models/Tag.js';
-import { validationResult } from 'express-validator';
+const Tag = require('../models/Tag');
 
-export const tagController = {
+const tagController = {
   // Get all tags
-  async getAllTags(req, res) {
+  async getAllTags(req, res, next) {
     try {
-      const tags = await Tag.getAll();
-
-      res.json({
-        success: true,
-        data: tags
-      });
+      const tags = await Tag.findAll();
+      res.json(tags);
     } catch (error) {
-      console.error('Error fetching tags:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch tags',
-        error: error.message
-      });
+      next(error);
     }
   },
 
-  // Get popular tags
-  async getPopularTags(req, res) {
-    try {
-      const limit = parseInt(req.query.limit) || 20;
-      const tags = await Tag.getPopular(limit);
-
-      res.json({
-        success: true,
-        data: tags
-      });
-    } catch (error) {
-      console.error('Error fetching popular tags:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch popular tags',
-        error: error.message
-      });
-    }
-  },
-
-  // Get tag by ID
-  async getTagById(req, res) {
+  // Get single tag by ID
+  async getTagById(req, res, next) {
     try {
       const { id } = req.params;
-      const tag = await Tag.getById(id);
+      const tag = await Tag.findById(id);
       
       if (!tag) {
-        return res.status(404).json({
-          success: false,
-          message: 'Tag not found'
-        });
+        return res.status(404).json({ error: 'Tag not found' });
       }
-
-      res.json({
-        success: true,
-        data: tag
-      });
+      
+      res.json(tag);
     } catch (error) {
-      console.error('Error fetching tag:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch tag',
-        error: error.message
-      });
+      next(error);
+    }
+  },
+
+  // Get tag by slug
+  async getTagBySlug(req, res, next) {
+    try {
+      const { slug } = req.params;
+      const tag = await Tag.findBySlug(slug);
+      
+      if (!tag) {
+        return res.status(404).json({ error: 'Tag not found' });
+      }
+      
+      res.json(tag);
+    } catch (error) {
+      next(error);
     }
   },
 
   // Create new tag
-  async createTag(req, res) {
+  async createTag(req, res, next) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({
-          success: false,
-          message: 'Validation errors',
-          errors: errors.array()
-        });
-      }
-
-      const tagData = req.body;
-      const tag = await Tag.create(tagData);
-
-      res.status(201).json({
-        success: true,
-        data: tag,
-        message: 'Tag created successfully'
-      });
+      const tag = await Tag.create(req.body);
+      res.status(201).json(tag);
     } catch (error) {
-      console.error('Error creating tag:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to create tag',
-        error: error.message
-      });
+      next(error);
+    }
+  },
+
+  // Update tag
+  async updateTag(req, res, next) {
+    try {
+      const { id } = req.params;
+      const tag = await Tag.update(id, req.body);
+      res.json(tag);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // Delete tag
+  async deleteTag(req, res, next) {
+    try {
+      const { id } = req.params;
+      await Tag.delete(id);
+      res.status(204).send();
+    } catch (error) {
+      next(error);
     }
   }
 };
+
+module.exports = tagController;

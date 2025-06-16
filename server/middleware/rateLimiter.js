@@ -1,19 +1,33 @@
-import rateLimit from 'express-rate-limit';
+const rateLimit = require('express-rate-limit');
 
-export const createRateLimiter = (windowMs, max, message) => {
+// Create different rate limiters for different endpoints
+const createRateLimiter = (windowMs, max, message) => {
   return rateLimit({
-    windowMs: windowMs || 15 * 60 * 1000, // 15 minutes
-    max: max || 100, // limit each IP to 100 requests per windowMs
+    windowMs,
+    max,
     message: {
-      success: false,
-      message: message || 'Too many requests from this IP, please try again later.'
+      error: message || 'Too many requests, please try again later.'
     },
     standardHeaders: true,
     legacyHeaders: false,
   });
 };
 
-// Different rate limits for different endpoints
-export const generalLimiter = createRateLimiter(15 * 60 * 1000, 100);
-export const searchLimiter = createRateLimiter(1 * 60 * 1000, 30);
-export const createLimiter = createRateLimiter(60 * 60 * 1000, 10);
+// General API rate limiter
+const generalLimiter = createRateLimiter(
+  15 * 60 * 1000, // 15 minutes
+  100, // limit each IP to 100 requests per windowMs
+  'Too many requests from this IP, please try again after 15 minutes.'
+);
+
+// Strict rate limiter for write operations
+const strictLimiter = createRateLimiter(
+  15 * 60 * 1000, // 15 minutes
+  10, // limit each IP to 10 requests per windowMs
+  'Too many write requests from this IP, please try again after 15 minutes.'
+);
+
+module.exports = {
+  generalLimiter,
+  strictLimiter
+};

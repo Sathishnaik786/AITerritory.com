@@ -1,109 +1,52 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import compression from 'compression';
-import morgan from 'morgan';
-import dotenv from 'dotenv';
-import { createClient } from '@supabase/supabase-js';
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+require('dotenv').config();
 
-// Load environment variables
-dotenv.config();
+const toolRoutes = require('./routes/tools');
+const categoryRoutes = require('./routes/categories');
+const tagRoutes = require('./routes/tags');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
-
-// Middleware
+// Security middleware
 app.use(helmet());
 app.use(cors());
-app.use(compression());
-app.use(morgan('combined'));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
+
+// Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Routes
+app.use('/api/tools', toolRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/tags', tagRoutes);
+
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-// API routes
-app.get('/api/tools', async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from('tools')
-      .select(`
-        *,
-        categories (
-          id,
-          name,
-          slug
-        ),
-        tool_tags (
-          tags (
-            id,
-            name,
-            slug
-          )
-        )
-      `);
-
-    if (error) throw error;
-
-    res.json(data);
-  } catch (error) {
-    console.error('Error fetching tools:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-app.get('/api/categories', async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name');
-
-    if (error) throw error;
-
-    res.json(data);
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-app.get('/api/tags', async (req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from('tags')
-      .select('*')
-      .order('name');
-
-    if (error) throw error;
-
-    res.json(data);
-  } catch (error) {
-    console.error('Error fetching tags:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
+app.use(errorHandler);
 
 // 404 handler
-app.use((req, res) => {
+app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = app;

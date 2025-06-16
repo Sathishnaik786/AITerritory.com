@@ -1,7 +1,7 @@
-import { supabase } from '../config/database.js';
+const supabase = require('../config/database');
 
-export class Tag {
-  static async getAll() {
+class Tag {
+  static async findAll() {
     const { data, error } = await supabase
       .from('tags')
       .select('*')
@@ -11,7 +11,7 @@ export class Tag {
     return data;
   }
 
-  static async getById(id) {
+  static async findById(id) {
     const { data, error } = await supabase
       .from('tags')
       .select('*')
@@ -22,7 +22,7 @@ export class Tag {
     return data;
   }
 
-  static async getBySlug(slug) {
+  static async findBySlug(slug) {
     const { data, error } = await supabase
       .from('tags')
       .select('*')
@@ -36,7 +36,7 @@ export class Tag {
   static async create(tagData) {
     const { data, error } = await supabase
       .from('tags')
-      .insert([tagData])
+      .insert(tagData)
       .select()
       .single();
 
@@ -44,43 +44,27 @@ export class Tag {
     return data;
   }
 
-  static async findOrCreate(tagName) {
-    const slug = tagName.toLowerCase().replace(/\s+/g, '-');
-    
-    // Try to find existing tag
-    let { data, error } = await supabase
-      .from('tags')
-      .select('*')
-      .eq('slug', slug)
-      .single();
-
-    if (error && error.code === 'PGRST116') {
-      // Tag doesn't exist, create it
-      const { data: newTag, error: createError } = await supabase
-        .from('tags')
-        .insert([{ name: tagName, slug }])
-        .select()
-        .single();
-
-      if (createError) throw createError;
-      return newTag;
-    }
-
-    if (error) throw error;
-    return data;
-  }
-
-  static async getPopular(limit = 20) {
+  static async update(id, tagData) {
     const { data, error } = await supabase
       .from('tags')
-      .select(`
-        *,
-        tool_tags(count)
-      `)
-      .order('tool_tags.count', { ascending: false })
-      .limit(limit);
+      .update(tagData)
+      .eq('id', id)
+      .select()
+      .single();
 
     if (error) throw error;
     return data;
   }
+
+  static async delete(id) {
+    const { error } = await supabase
+      .from('tags')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    return true;
+  }
 }
+
+module.exports = Tag;

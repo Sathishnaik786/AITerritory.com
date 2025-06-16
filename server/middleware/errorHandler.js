@@ -1,39 +1,36 @@
-export const errorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
-
-  // Default error
-  let error = {
-    message: err.message || 'Internal Server Error',
-    status: err.status || 500
-  };
+const errorHandler = (err, req, res, next) => {
+  console.error(err.stack);
 
   // Supabase specific errors
   if (err.code) {
     switch (err.code) {
       case '23505': // Unique violation
-        error.message = 'Resource already exists';
-        error.status = 409;
-        break;
+        return res.status(409).json({
+          error: 'Resource already exists',
+          details: err.details
+        });
       case '23503': // Foreign key violation
-        error.message = 'Referenced resource not found';
-        error.status = 400;
-        break;
-      case 'PGRST116': // Not found
-        error.message = 'Resource not found';
-        error.status = 404;
-        break;
+        return res.status(400).json({
+          error: 'Invalid reference',
+          details: err.details
+        });
+      case '42P01': // Undefined table
+        return res.status(500).json({
+          error: 'Database configuration error'
+        });
+      default:
+        return res.status(500).json({
+          error: 'Database error',
+          details: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
     }
   }
 
-  res.status(error.status).json({
-    success: false,
-    message: error.message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  // Default error response
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal server error',
+    details: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
 };
 
-export const notFound = (req, res, next) => {
-  const error = new Error(`Not Found - ${req.originalUrl}`);
-  error.status = 404;
-  next(error);
-};
+module.exports = errorHandler;

@@ -1,7 +1,7 @@
-import { supabase } from '../config/database.js';
+const supabase = require('../config/database');
 
-export class Category {
-  static async getAll() {
+class Category {
+  static async findAll() {
     const { data, error } = await supabase
       .from('categories')
       .select('*')
@@ -11,7 +11,7 @@ export class Category {
     return data;
   }
 
-  static async getById(id) {
+  static async findById(id) {
     const { data, error } = await supabase
       .from('categories')
       .select('*')
@@ -22,7 +22,7 @@ export class Category {
     return data;
   }
 
-  static async getBySlug(slug) {
+  static async findBySlug(slug) {
     const { data, error } = await supabase
       .from('categories')
       .select('*')
@@ -36,7 +36,7 @@ export class Category {
   static async create(categoryData) {
     const { data, error } = await supabase
       .from('categories')
-      .insert([categoryData])
+      .insert(categoryData)
       .select()
       .single();
 
@@ -65,17 +65,6 @@ export class Category {
     if (error) throw error;
     return true;
   }
-
-  static async getWithToolCount() {
-    const { data, error } = await supabase
-      .from('categories')
-      .select(`
-        *,
-        tools(count)
-      `)
-      .order('name');
-
-    if (error) throw error;
-    return data;
-  }
 }
+
+module.exports = Category;
