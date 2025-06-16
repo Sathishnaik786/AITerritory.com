@@ -1,7 +1,7 @@
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Index from "./pages/Index";
+import { HomePage } from "./pages/HomePage";
 import NotFound from "./pages/NotFound";
 import AIBusiness from "./pages/AIBusiness";
 // Import placeholder components for Resources sub-pages
@@ -30,6 +30,7 @@ import ArtGeneratorsPage from "./pages/ArtGeneratorsPage";
 import AudioGeneratorsPage from "./pages/AudioGeneratorsPage";
 import NewsletterPage from "./pages/NewsletterPage";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from './components/ui/tooltip';
 import { ThemeProvider } from './context/ThemeContext';
@@ -44,7 +45,14 @@ import {
   UserButton,
 } from "@clerk/clerk-react";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -67,7 +75,7 @@ function App() {
                 <ScrollToTop />
                 <main className="flex-1 w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
                   <Routes>
-                    <Route path="/" element={<Index />} />
+                    <Route path="/" element={<HomePage />} />
                     <Route path="/ai-for-business" element={<AIBusiness />} />
                     {/* Routes for Resources dropdown */}
                     <Route path="/resources/ai-agents" element={<AIAgents />} />
@@ -114,6 +122,7 @@ function App() {
                 <ScrollToTopButton />
               </div>
             </div>
+            <ReactQueryDevtools initialIsOpen={false} />
           </TooltipProvider>
         </QueryClientProvider>
       </ThemeProvider>
