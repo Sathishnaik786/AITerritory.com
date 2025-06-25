@@ -25,4 +25,4 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, placeholder = "S
   );
 };
 
-export default SearchBar;
+export { SearchBar };
