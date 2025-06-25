@@ -11,7 +11,7 @@ const YouTubeChannelPage: React.FC = () => {
       <div className="space-y-4">
         <p className="text-md">
           Visit our channel here:
-          <a href="https://www.youtube.com/futurepedia" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-2">
+          <a href="https://www.youtube.com/@sathish_ai" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline ml-2">
             Futurepedia on YouTube
           </a>
         </p>
