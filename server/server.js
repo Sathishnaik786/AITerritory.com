@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-// const helmet = require('helmet'); // Temporarily disable helmet for CORS debugging
+const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
@@ -18,6 +18,39 @@ const submissionRoutes = require('./routes/submissions');
 
 const app = express();
 
+// --- START: Security and CORS Configuration ---
+
+// 1. Set security headers with Helmet, but allow cross-origin requests
+app.use(
+  helmet({
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
+  })
+);
+
+// 2. Configure CORS to allow your Netlify frontend
+const allowedOrigins = [
+  'https://aiterritory.netlify.app',
+  'https://www.aiterritory.netlify.app'
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+    credentials: true,
+  })
+);
+
+// --- END: Security and CORS Configuration ---
+
 // Function to find available port
 const findAvailablePort = (startPort) => {
   return new Promise((resolve) => {
@@ -29,10 +62,6 @@ const findAvailablePort = (startPort) => {
     });
   });
 };
-
-// Security middleware
-// app.use(helmet()); // Temporarily disable helmet for CORS debugging
-app.use(cors());
 
 // Rate limiting
 const limiter = rateLimit({
