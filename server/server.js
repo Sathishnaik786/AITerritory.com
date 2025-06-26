@@ -28,19 +28,24 @@ app.use(
   })
 );
 
-// 2. Configure CORS to allow your Netlify frontend
+// 2. Configure CORS to allow your Netlify frontend and local development
 const allowedOrigins = [
   'https://aiterritory.netlify.app',
-  'https://www.aiterritory.netlify.app'
+  'https://www.aiterritory.netlify.app',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:8080'
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
+      console.log('CORS request from origin:', origin);
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        const msg = 'The CORS policy for this site does not allow access from the specified Origin: ' + origin;
         return callback(new Error(msg), false);
       }
       return callback(null, true);
