@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
+// const helmet = require('helmet'); // Temporarily disable helmet for CORS debugging
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
@@ -31,7 +31,7 @@ const findAvailablePort = (startPort) => {
 };
 
 // Security middleware
-app.use(helmet());
+// app.use(helmet()); // Temporarily disable helmet for CORS debugging
 app.use(cors());
 
 // Rate limiting
