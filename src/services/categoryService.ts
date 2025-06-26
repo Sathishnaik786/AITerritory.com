@@ -1,6 +1,11 @@
 import api from './api';
 import { Category } from '../types/category';
 
+export interface CategoryToolCount {
+  name: string;
+  count: number;
+}
+
 export const categoryService = {
   // Get all categories
   async getCategories(): Promise<Category[]> {
@@ -35,5 +40,11 @@ export const categoryService = {
   // Delete category
   async deleteCategory(id: string): Promise<void> {
     await api.delete(`/categories/${id}`);
+  },
+
+  // Get category tool counts
+  async getCategoryToolCounts(): Promise<CategoryToolCount[]> {
+    const response = await api.get('/categories/tool-counts');
+    return response.data;
   }
 };

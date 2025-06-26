@@ -15,6 +15,7 @@ export interface Tool {
     description: string;
     link: string;
   }[];
+  rating?: number;
 }
 
 export const toolsData: Tool[] = [
@@ -31,6 +32,7 @@ export const toolsData: Tool[] = [
     company: "Google",
     image: "https://static.vecteezy.com/system/resources/previews/055/687/055/non_2x/rectangle-gemini-google-icon-symbol-logo-free-png.png",
     tags: ["AI", "Language Model", "Multimodal"],
+    rating: 4.7,
     subTools: [
       {
         name: "Gemini Pro",
@@ -56,6 +58,7 @@ export const toolsData: Tool[] = [
     company: "Google",
     image: "https://ai.google.dev/static/site-assets/images/share.png",
     tags: ["Development", "AI Platform", "API"],
+    rating: 4.5,
     subTools: [
       {
         name: "Vertex AI",
@@ -83,6 +86,7 @@ export const toolsData: Tool[] = [
     company: "Microsoft",
     image: "https://static.vecteezy.com/system/resources/previews/046/861/635/non_2x/copilot-icon-transparent-background-free-png.png",
     tags: ["Coding", "AI Assistant", "Development"],
+    rating: 4.5,
     subTools: [
       {
         name: "GitHub Copilot",
@@ -108,6 +112,7 @@ export const toolsData: Tool[] = [
     company: "Microsoft",
     image: "https://azure.microsoft.com/svghandler/cognitive-services",
     tags: ["Cloud", "AI Services", "Enterprise"],
+    rating: 4.5,
     subTools: [
       {
         name: "Azure OpenAI Service",
@@ -135,6 +140,7 @@ export const toolsData: Tool[] = [
     company: "NVIDIA",
     image: "https://i.pinimg.com/736x/93/7e/c3/937ec3640a2c82348a1cdb28211c3a56.jpg",
     tags: ["Enterprise", "AI Platform", "GPU"],
+    rating: 4.5,
     subTools: [
       {
         name: "NVIDIA NeMo",
@@ -160,6 +166,7 @@ export const toolsData: Tool[] = [
     company: "NVIDIA",
     image: "https://lh5.googleusercontent.com/gjpebnnq0HqmZB25NleLdKvmv2wO3HIOL4z_GrZdoGtIp-ZUx9iTLX3I22sMKlTUEqlZvm6BNrNBFnW4vD0y7ymktuvcwvb7BuNVyUjyrDcgeY9m8T9keNk6zR1YGu4-mtda2bJa",
     tags: ["3D", "Simulation", "Collaboration"],
+    rating: 4.5,
     subTools: [
       {
         name: "Omniverse Create",
@@ -187,6 +194,7 @@ export const toolsData: Tool[] = [
     company: "OpenAI",
     image: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
     tags: ["AI", "Chatbot", "Language Model"],
+    rating: 4.5,
     subTools: [
       {
         name: "GPT-4",
@@ -212,6 +220,7 @@ export const toolsData: Tool[] = [
     company: "OpenAI",
     image: "https://ih1.redbubble.net/image.4930945508.5459/fposter,small,wall_texture,square_product,600x600.jpg",
     tags: ["AI Art", "Image Generation", "Creative"],
+    rating: 4.5,
     subTools: [
       {
         name: "DALL·E 3",
@@ -239,6 +248,7 @@ export const toolsData: Tool[] = [
     company: "Anthropic",
     image: "https://www.paubox.com/hubfs/Is%20Claude%20AI%20HIPAA%20compliant.jpg",
     tags: ["AI", "Assistant", "Language Model"],
+    rating: 4.5,
     subTools: [
       {
         name: "Claude 3 Opus",
@@ -266,6 +276,7 @@ export const toolsData: Tool[] = [
     company: "Meta",
     image: "https://media.beehiiv.com/cdn-cgi/image/fit=scale-down,format=auto,onerror=redirect,quality=80/uploads/asset/file/69129b55-6798-43cd-92b5-0203f5d5a2f3/10.png?t=1730375002",
     tags: ["Open Source", "Language Model", "Research"],
+    rating: 4.5,
     subTools: [
       {
         name: "Llama 2",
@@ -293,6 +304,7 @@ export const toolsData: Tool[] = [
     company: "Amazon",
     image: "https://d1.awsstatic.com/getting-started-guides/learning/bedrock/bedrock-250-removebg-preview.86d95fc7f9a313f21091222ec7b63e1e30ea52ea.png",
     tags: ["Cloud", "AI Platform", "Enterprise"],
+    rating: 4.5,
     subTools: [
       {
         name: "Claude on Bedrock",
@@ -320,6 +332,7 @@ export const toolsData: Tool[] = [
     company: "OpenAI",
     image: "https://ainformation.jp/wp-content/uploads/2025/02/GPT-5.png",
     tags: ["AI", "Language Model", "Future"],
+    rating: 4.5,
     subTools: [
       {
         name: "GPT-5 API",
@@ -340,6 +353,7 @@ export const toolsData: Tool[] = [
     company: "Google",
     image: "https://aitificial.blog/wp-content/uploads/2024/02/gemini-ultra-introduction.jpg",
     tags: ["AI", "Language Model", "Future"],
+    rating: 4.5,
     subTools: [
       {
         name: "Gemini Ultra Pro API",
@@ -358,7 +372,8 @@ export const toolsData: Tool[] = [
     icon: "✍️",
     image: "https://images.seeklogo.com/logo-png/47/1/jasper-logo-png_seeklogo-472363.png",
     link: "https://jasper.ai",
-    tags: ["AI Writing", "AI Copywriting", "JasperAI"]
+    tags: ["AI Writing", "AI Copywriting", "JasperAI"],
+    rating: 4.5
   },
   {
     id: 11,
@@ -368,7 +383,8 @@ export const toolsData: Tool[] = [
     icon: "📝",
     image: "https://miro.medium.com/v2/resize:fit:1400/1*UAbSlIVvFDkYBGwU_llzpw.png",
     link: "https://www.copy.ai",
-    tags: ["Content Automation", "CopyAI"]
+    tags: ["Content Automation", "CopyAI"],
+    rating: 4.5
   },
   {
     id: 12,
@@ -378,7 +394,8 @@ export const toolsData: Tool[] = [
     icon: "📚",
     image: "https://cdn-1.webcatalog.io/catalog/writer/writer-icon.png?v=1714776522604",
     link: "https://writer.com",
-    tags: ["Enterprise AI", "Writing Assistant"]
+    tags: ["Enterprise AI", "Writing Assistant"],
+    rating: 4.5
   },
   {
     id: 13,
@@ -388,7 +405,8 @@ export const toolsData: Tool[] = [
     icon: "🔍",
     image: "https://toppng.com/uploads/preview/fraseio-logo-11609361888vheboxnecq.png",
     link: "https://frase.io",
-    tags: ["SEO", "Content AI"]
+    tags: ["SEO", "Content AI"],
+    rating: 4.5
   },
   {
     id: 14,
@@ -398,7 +416,8 @@ export const toolsData: Tool[] = [
     icon: "📊",
     image: "https://www.appengine.ai/uploads/images/profile/logo/Anyword-AI.png",
     link: "https://anyword.com",
-    tags: ["Marketing AI", "Copy Optimization"]
+    tags: ["Marketing AI", "Copy Optimization"],
+    rating: 4.5
   },
   {
     id: 15,
@@ -408,7 +427,8 @@ export const toolsData: Tool[] = [
     icon: "✓",
     image: "https://5.imimg.com/data5/IOS/Default/2025/4/499933307/MI/XF/KD/49456356/product-jpeg-500x500.png",
     link: "https://grammarly.com",
-    tags: ["Writing Assistant", "Grammarly"]
+    tags: ["Writing Assistant", "Grammarly"],
+    rating: 4.5
   },
   {
     id: 16,
@@ -418,7 +438,8 @@ export const toolsData: Tool[] = [
     icon: "🔄",
     image: "https://www.pngall.com/wp-content/uploads/15/WordTune-Logo-PNG-Pic.png",
     link: "https://wordtune.com",
-    tags: ["Rewriting", "Wordtune"]
+    tags: ["Rewriting", "Wordtune"],
+    rating: 4.5
   },
   {
     id: 17,
@@ -428,7 +449,8 @@ export const toolsData: Tool[] = [
     icon: "📖",
     image: "https://www.digitalgyd.com/wp-content/uploads/2019/11/prowritingaid.png",
     link: "https://prowritingaid.com",
-    tags: ["Editing AI", "ProWritingAid"]
+    tags: ["Editing AI", "ProWritingAid"],
+    rating: 4.5
   },
   {
     id: 18,
@@ -438,7 +460,8 @@ export const toolsData: Tool[] = [
     icon: "📓",
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsm_Vlpik1sY_SiDoH6dhDdRFjAShmquOPQA&s",
     link: "https://notion.so",
-    tags: ["Workspace AI", "Notion"]
+    tags: ["Workspace AI", "Notion"],
+    rating: 4.5
   },
   {
     id: 19,
@@ -448,7 +471,8 @@ export const toolsData: Tool[] = [
     icon: "⏰",
     image: "https://cdn.prod.website-files.com/5f1508193cd0e623f6e08a54/658cb892fa5c97efc8bc7eef_Motion%20Logo.svg",
     link: "https://usemotion.com",
-    tags: ["Scheduling AI", "Motion"]
+    tags: ["Scheduling AI", "Motion"],
+    rating: 4.5
   },
   {
     id: 20,
@@ -458,7 +482,8 @@ export const toolsData: Tool[] = [
     icon: "📋",
     image: "https://images.seeklogo.com/logo-png/28/2/asana-logo-png_seeklogo-284347.png",
     link: "https://asana.com",
-    tags: ["Project AI", "Asana"]
+    tags: ["Project AI", "Asana"],
+    rating: 4.5
   },
   {
     id: 21,
@@ -468,7 +493,8 @@ export const toolsData: Tool[] = [
     icon: "🎯",
     image: "https://img.favpng.com/11/7/6/trello-logo-png-favpng-TJR8xEriMNu5Ma6mAcTnYKy2E.jpg",
     link: "https://trello.com",
-    tags: ["Kanban AI", "Trello"]
+    tags: ["Kanban AI", "Trello"],
+    rating: 4.5
   },
   {
     id: 22,
@@ -478,7 +504,8 @@ export const toolsData: Tool[] = [
     icon: "📅",
     image: "https://cubux.net/wp-content/uploads/2019/08/Any.do_logo.png",
     link: "https://any.do",
-    tags: ["Task AI", "AnyDo"]
+    tags: ["Task AI", "AnyDo"],
+    rating: 4.5
   },
   {
     id: 23,
@@ -488,7 +515,8 @@ export const toolsData: Tool[] = [
     icon: "🔎",
     image: "https://brandlogo.org/wp-content/uploads/2024/09/Perplexity-AI-App-Icon-2023.png.webp",
     link: "https://perplexity.ai",
-    tags: ["AI search", "Perplexity"]
+    tags: ["AI search", "Perplexity"],
+    rating: 4.5
   },
   {
     id: 24,
@@ -498,7 +526,8 @@ export const toolsData: Tool[] = [
     icon: "🌐",
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNkEBbkN5ZD37Q9m1y2rdtOmz-fE643miQyg&s",
     link: "https://arc.net",
-    tags: ["Smart Search", "ArcSearch"]
+    tags: ["Smart Search", "ArcSearch"],
+    rating: 4.5
   },
   {
     id: 25,
@@ -508,7 +537,8 @@ export const toolsData: Tool[] = [
     icon: "📑",
     image: "https://static.vecteezy.com/system/resources/previews/060/301/920/non_2x/google-logo-on-button-free-png.png",
     link: "https://ai.google",
-    tags: ["Google AI", "Search AI"]
+    tags: ["Google AI", "Search AI"],
+    rating: 4.5
   },
   {
     id: 26,
@@ -518,7 +548,8 @@ export const toolsData: Tool[] = [
     icon: "📄",
     image: "https://www.livetradingnews.com/wp-content/uploads/2023/10/unnamed.png",
     link: "https://humata.ai",
-    tags: ["Doc AI", "Humata"]
+    tags: ["Doc AI", "Humata"],
+    rating: 4.5
   },
   {
     id: 27,
@@ -528,7 +559,8 @@ export const toolsData: Tool[] = [
     icon: "📔",
     image: "https://media.licdn.com/dms/image/v2/D4E12AQHYT6q2F5bj5g/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1730996641255?e=2147483647&v=beta&t=Xzh-95KpKyevgT8yK9btR_38oTB2JZK74-1L2m-je-s",
     link: "https://notebooklm.google",
-    tags: ["NoteTaker AI", "NotebookLM"]
+    tags: ["NoteTaker AI", "NotebookLM"],
+    rating: 4.5
   },
   {
     id: 28,
@@ -538,7 +570,8 @@ export const toolsData: Tool[] = [
     icon: "🎙️",
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRONPDrcDWnKmq-Jl5Vba95Q5bqv4e6Rvv5Mw&s",
     link: "https://otter.ai",
-    tags: ["Meeting AI", "Otter"]
+    tags: ["Meeting AI", "Otter"],
+    rating: 4.5
   },
   {
     id: 29,
@@ -547,7 +580,8 @@ export const toolsData: Tool[] = [
     description: "Meeting assistant for transcription and notes.",
     image: "https://fireflies.ai/logo.png",
     link: "https://fireflies.ai",
-    tags: ["Meeting AI", "Fireflies"]
+    tags: ["Meeting AI", "Fireflies"],
+    rating: 4.5
   },
   {
     id: 30,
@@ -556,7 +590,8 @@ export const toolsData: Tool[] = [
     description: "AI summarizes calls and coaching insights.",
     image: "https://play-lh.googleusercontent.com/ridcjJ4MzfXxf8bGR97ec6Wv1aoXJzjWOv9eGS8ijR7dXQyQuAnuzXWTSeiPS54pPA",
     link: "https://avoma.com",
-    tags: ["Call AI", "Avoma"]
+    tags: ["Call AI", "Avoma"],
+    rating: 4.5
   },
   {
     id: 31,
@@ -565,7 +600,8 @@ export const toolsData: Tool[] = [
     description: "Records and transcribes video meetings.",
     image: "https://pipedrive-marketplace-manager-live.s3.amazonaws.com/03e503d73ee0ef33/icon/a85c2cf1-b900-4a75-acf3-079ae7e746f0/original.png",
     link: "https://tldv.io",
-    tags: ["Video Meetings", "tldv"]
+    tags: ["Video Meetings", "tldv"],
+    rating: 4.5
   },
   {
     id: 32,
@@ -574,7 +610,8 @@ export const toolsData: Tool[] = [
     description: "AI drafts and organizes emails.",
     image: "https://i.pinimg.com/736x/1a/a9/ba/1aa9ba1e57508a13a22dfa75aadd5d2f.jpg",
     link: "https://microsoft.com/copilot",
-    tags: ["Email AI", "CopilotPro"]
+    tags: ["Email AI", "CopilotPro"],
+    rating: 4.5
   },
   {
     id: 33,
@@ -583,7 +620,8 @@ export const toolsData: Tool[] = [
     description: "Connects apps and builds automated workflows.",
     image: "https://attentioninsight.com/wp-content/uploads/2022/08/zappier.png",
     link: "https://zapier.com",
-    tags: ["Automation", "Zapier"]
+    tags: ["Automation", "Zapier"],
+    rating: 4.5
   },
   {
     id: 34,
@@ -592,7 +630,8 @@ export const toolsData: Tool[] = [
     description: "Open-source workflow automation platform.",
     image: "https://cdn.prod.website-files.com/5e6aa3e3f001fae105b8e1e7/63c8642c1872bf1185f3950b_45487711.png",
     link: "https://n8n.io",
-    tags: ["Open Source AI", "n8n"]
+    tags: ["Open Source AI", "n8n"],
+    rating: 4.5
   },
   {
     id: 35,
@@ -601,7 +640,8 @@ export const toolsData: Tool[] = [
     description: "Robotic Process Automation for routine tasks.",
     image: "https://img.icons8.com/color/512/uipath.png",
     link: "https://uipath.com",
-    tags: ["RPA", "UiPath"]
+    tags: ["RPA", "UiPath"],
+    rating: 4.5
   },
   {
     id: 36,
@@ -610,7 +650,8 @@ export const toolsData: Tool[] = [
     description: "Smart calendar assistant that auto-schedules focus time.",
     image: "https://cdn.prod.website-files.com/5f15081919fdf673994ab5fd/64a4c06e6315a23d4ecf975c_Reclaim-Logo.svg",
     link: "https://reclaim.ai",
-    tags: ["Calendar AI", "Reclaim"]
+    tags: ["Calendar AI", "Reclaim"],
+    rating: 4.5
   },
   {
     id: 37,
@@ -619,7 +660,8 @@ export const toolsData: Tool[] = [
     description: "AI scheduling optimized for team availability.",
     image: "https://media.licdn.com/dms/image/v2/C4E0BAQH7Pk2RNE6jvQ/company-logo_200_200/company-logo_200_200/0/1669057365774/clockwise_inc_logo?e=2147483647&v=beta&t=NS4XRNE61HwcrSOovU2fdoqkeLunXNCgAhZiXXgI544",
     link: "https://getclockwise.com",
-    tags: ["Time Management", "Clockwise"]
+    tags: ["Time Management", "Clockwise"],
+    rating: 4.5
   },
   {
     id: 38,
@@ -628,7 +670,8 @@ export const toolsData: Tool[] = [
     description: "Smart note-taking with predictive recall.",
     image: "https://storage.googleapis.com/mem-public-assets/sq-f.jpg",
     link: "https://mem.ai",
-    tags: ["Memo AI", "Mem"]
+    tags: ["Memo AI", "Mem"],
+    rating: 4.5
   },
   {
     id: 39,
@@ -637,7 +680,8 @@ export const toolsData: Tool[] = [
     description: "Your personal knowledge concierge.",
     image: "https://static1.squarespace.com/static/63a17e2bca256c483b6e2453/63a17e2dca256c483b6e24af/63e3e1ffd51899514b56f6d2/1681759905680/PersonalAI.jpg?format=1500w",
     link: "https://personal.ai",
-    tags: ["Personal AI", "Knowledge AI"]
+    tags: ["Personal AI", "Knowledge AI"],
+    rating: 4.5
   },
   {
     id: 40,
@@ -646,7 +690,8 @@ export const toolsData: Tool[] = [
     description: "AI-powered social media planner and publisher.",
     image: "https://www.feedhive.com/favicon.ico",
     link: "https://feedhive.io",
-    tags: ["Social Media AI", "FeedHive"]
+    tags: ["Social Media AI", "FeedHive"],
+    rating: 4.5
   },
   {
     id: 41,
@@ -655,7 +700,8 @@ export const toolsData: Tool[] = [
     description: "Social platform management with AI analytics.",
     image: "https://play-lh.googleusercontent.com/LeC3-C9662w7jJK2shMsB2UcblP4SRnIlkWq0yFohfV9RLlUjv2XFBY3uyZLpG6wAQc=w240-h480-rw",
     link: "https://vistasocial.com",
-    tags: ["Social Analytics", "VistaSocial"]
+    tags: ["Social Analytics", "VistaSocial"],
+    rating: 4.5
   },
   {
     id: 42,
@@ -664,7 +710,8 @@ export const toolsData: Tool[] = [
     description: "Social content ideation and optimization.",
     image: "https://images.icon-icons.com/2429/PNG/512/buffer_logo_icon_147308.png",
     link: "https://buffer.com",
-    tags: ["Social AI", "Buffer"]
+    tags: ["Social AI", "Buffer"],
+    rating: 4.5
   },
   {
     id: 43,
@@ -673,7 +720,8 @@ export const toolsData: Tool[] = [
     description: "AI voice synthesis for narration and audio.",
     image: "https://diplo-media.s3.eu-central-1.amazonaws.com/2025/01/elevenlabs-funding-round-NEA-World-Innovation-Lab-AI-1024x576.png",
     link: "https://elevenlabs.io",
-    tags: ["Voice AI", "ElevenLabs"]
+    tags: ["Voice AI", "ElevenLabs"],
+    rating: 4.5
   },
   {
     id: 44,
@@ -682,7 +730,8 @@ export const toolsData: Tool[] = [
     description: "AI music generation tool.",
     image: "https://suno.com/favicon-512x512.png",
     link: "https://suno.ai",
-    tags: ["Music AI", "Suno"]
+    tags: ["Music AI", "Suno"],
+    rating: 4.5
   },
   {
     id: 45,
@@ -691,7 +740,8 @@ export const toolsData: Tool[] = [
     description: "AI composer for background scores.",
     image: "https://dashboard.snapcraft.io/site_media/appmedia/2021/04/icon-prod_smaller.png",
     link: "https://aiva.ai",
-    tags: ["Composing AI", "AIVA"]
+    tags: ["Composing AI", "AIVA"],
+    rating: 4.5
   },
   {
     id: 46,
@@ -700,7 +750,8 @@ export const toolsData: Tool[] = [
     description: "AI that records, highlights, and summarizes calls.",
     image: "https://f.hubspotusercontent20.net/hubfs/20372723/__hs-marketplace__/fathom-app-icon-squared-1.png",
     link: "https://fathom.video",
-    tags: ["Meeting AI", "Fathom"]
+    tags: ["Meeting AI", "Fathom"],
+    rating: 4.5
   },
   {
     id: 47,
@@ -709,6 +760,10 @@ export const toolsData: Tool[] = [
     description: "AI-assisted code editor built on VS Code.",
     image: "https://exafunction.github.io//public/brand/windsurf-black-symbol.svg",
     link: "https://windsurf.dev",
-    tags: ["Code AI", "Windsurf"]
+    tags: ["Code AI", "Windsurf"],
+    rating: 4.5
   }
-];
+].map(tool => ({
+  ...tool,
+  rating: tool.rating ?? (Math.round((Math.random() * 1.5 + 3.5) * 10) / 10)
+})).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));

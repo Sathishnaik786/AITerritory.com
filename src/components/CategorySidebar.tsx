@@ -1,41 +1,50 @@
 import React from 'react';
-import { Home, Headset, Briefcase, Settings, BarChart, Edit, Tablet, Palette, Workflow } from 'lucide-react';
 
 interface CategorySidebarProps {
+  categories: { name: string; count: number }[];
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
+  loading?: boolean;
 }
 
-const categories = [
-  { name: 'All Tools', icon: Home },
-  { name: 'Customer Service & Support', icon: Headset },
-  { name: 'Sales', icon: Briefcase },
-  { name: 'Back Office', icon: Settings },
-  { name: 'Operations', icon: Workflow },
-  { name: 'Growth & Marketing', icon: BarChart },
-  { name: 'Writing & Editing', icon: Edit },
-  { name: 'Technology & IT', icon: Tablet },
-  { name: 'Design & Creative', icon: Palette },
-  { name: 'Workflow Automation', icon: Workflow },
-];
+const CategorySidebar: React.FC<CategorySidebarProps> = ({ categories, selectedCategory, onSelectCategory, loading }) => {
+  // Calculate total count for 'All Categories'
+  const totalCount = categories.reduce((sum, cat) => sum + cat.count, 0);
 
-const CategorySidebar: React.FC<CategorySidebarProps> = ({ selectedCategory, onSelectCategory }) => {
   return (
-    <div className="w-64 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-      <h2 className="text-lg font-bold mb-6 text-gray-900 dark:text-white">Most Popular Categories</h2>
-      <ul className="space-y-3">
+    <div className="w-full p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <h2 className="text-lg font-bold mb-6 text-gray-900 dark:text-white">Filters</h2>
+      <div className="text-xs font-bold text-gray-500 mb-3">CATEGORIES</div>
+      <ul className="space-y-2">
+        <li>
+          <button
+            onClick={() => onSelectCategory('All Categories')}
+            className={`flex items-center w-full text-left px-4 py-2 rounded-md font-medium transition-colors
+              ${selectedCategory === 'All Categories'
+                ? 'bg-black text-white'
+                : 'text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}
+            `}
+          >
+            <span className="flex-1">All Categories</span>
+            <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-100 text-gray-800 text-xs font-semibold">
+              {loading ? <span className="inline-block w-4 h-4 bg-gray-200 animate-pulse rounded" /> : totalCount}
+            </span>
+          </button>
+        </li>
         {categories.map((category) => (
           <li key={category.name}>
             <button
               onClick={() => onSelectCategory(category.name)}
-              className={`flex items-center w-full text-left p-3 rounded-md transition-colors
+              className={`flex items-center w-full text-left px-4 py-2 rounded-md font-medium transition-colors
                 ${selectedCategory === category.name
-                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-                }`}
+                  ? 'bg-gray-100 text-black'
+                  : 'text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}
+              `}
             >
-              <category.icon className="w-5 h-5 mr-3" />
-              <span className="text-sm font-medium">{category.name}</span>
+              <span className="flex-1">{category.name}</span>
+              <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-100 text-gray-800 text-xs font-semibold">
+                {loading ? <span className="inline-block w-4 h-4 bg-gray-200 animate-pulse rounded" /> : category.count}
+              </span>
             </button>
           </li>
         ))}

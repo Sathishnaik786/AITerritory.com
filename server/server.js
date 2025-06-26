@@ -8,6 +8,13 @@ const toolRoutes = require('./routes/tools');
 const categoryRoutes = require('./routes/categories');
 const tagRoutes = require('./routes/tags');
 const errorHandler = require('./middleware/errorHandler');
+const businessRoutes = require('./routes/business');
+const aiAgentsRoutes = require('./routes/ai-agents');
+const aiInnovationsRoutes = require('./routes/ai-innovations');
+const aiTutorialsRoutes = require('./routes/ai-tutorials');
+const aiAutomationRoutes = require('./routes/ai-automation');
+const youtubeRoutes = require('./routes/youtube');
+const submissionRoutes = require('./routes/submissions');
 
 const app = express();
 
@@ -28,7 +35,12 @@ app.use(helmet());
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://your-frontend-domain.com'] 
-    : ['http://localhost:8080', 'http://localhost:3000', 'http://127.0.0.1:8080'],
+    : [
+        'http://localhost:8080',
+        'http://localhost:3000',
+        'http://127.0.0.1:8080',
+        'http://localhost:5173',
+      ],
   credentials: true
 }));
 
@@ -50,6 +62,13 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api/tools', toolRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/tags', tagRoutes);
+app.use('/api/business-functions', businessRoutes);
+app.use('/api/ai-agents', aiAgentsRoutes);
+app.use('/api/ai-innovations', aiInnovationsRoutes);
+app.use('/api/ai-tutorials', aiTutorialsRoutes);
+app.use('/api/ai-automation', aiAutomationRoutes);
+app.use('/api/youtube', youtubeRoutes);
+app.use('/api/submissions', submissionRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

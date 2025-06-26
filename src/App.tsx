@@ -44,6 +44,17 @@ import {
   SignUpButton,
   UserButton,
 } from "@clerk/clerk-react";
+import AdminDashboard from './admin/AdminDashboard';
+import BusinessFunctionsAdmin from './admin/BusinessFunctionsAdmin';
+import AIAgentsAdmin from './admin/AIAgentsAdmin';
+import AIInnovationsAdmin from './admin/AIInnovationsAdmin';
+import AITutorialsAdmin from './admin/AITutorialsAdmin';
+import AIAutomationAdmin from './admin/AIAutomationAdmin';
+import ContactSubmissionsAdmin from './admin/ContactSubmissionsAdmin';
+import AdvertiseSubmissionsAdmin from './admin/AdvertiseSubmissionsAdmin';
+import ToolSubmissionsAdmin from './admin/ToolSubmissionsAdmin';
+import FeatureRequestsAdmin from './admin/FeatureRequestsAdmin';
+import AdminLayout from './admin/AdminLayout';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -113,6 +124,32 @@ function App() {
                     <Route path="/legal/terms-of-service" element={<TermsOfServicePage />} />
 
                     <Route path="/newsletter" element={<NewsletterPage />} />
+
+                    {/* Routes for Admin */}
+                    <Route path="/admin/*" element={
+                      <AdminLayout>
+                        <Routes>
+                          <Route path="/" element={<AdminDashboard />} />
+                          <Route path="business-functions" element={<BusinessFunctionsAdmin />} />
+                          <Route path="ai-agents" element={<AIAgentsAdmin />} />
+                          <Route path="ai-innovations" element={<AIInnovationsAdmin />} />
+                          <Route path="ai-tutorials" element={<AITutorialsAdmin />} />
+                          <Route path="ai-automation" element={<AIAutomationAdmin />} />
+                          <Route path="submissions/contact" element={<ContactSubmissionsAdmin />} />
+                          <Route path="submissions/advertise" element={<AdvertiseSubmissionsAdmin />} />
+                          <Route path="submissions/tools" element={<ToolSubmissionsAdmin />} />
+                          <Route path="submissions/features" element={<FeatureRequestsAdmin />} />
+                        </Routes>
+                      </AdminLayout>
+                    } />
+
+                    {/* General Pages */}
+                    <Route path="/company/contact-us" element={<ContactUsPage />} />
+                    <Route path="/company/advertise" element={<AdvertisePage />} />
+                    <Route path="/company/submit-tool" element={<SubmitToolPage />} />
+                    <Route path="/company/youtube-channel" element={<YouTubeChannelPage />} />
+                    <Route path="/company/request-feature" element={<RequestFeaturePage />} />
+                    <Route path="/company/login" element={<LoginPage />} />
 
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />

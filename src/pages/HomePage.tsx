@@ -1,13 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTools, useFeaturedTools, useTrendingTools } from '../hooks/useTools';
 import { useCategories } from '../hooks/useCategories';
 import { ToolGrid } from '../components/ToolGrid';
 import { CategoryFilter } from '../components/CategoryFilter';
-import { SearchBar } from '../components/SearchBar';
+import SearchBar from '../components/SearchBar';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { TrendingUp, Star, Search, Filter } from 'lucide-react';
+import { Tool } from '../types/tool';
+
+// Carousel component for featured/trending tools
+const ToolCarousel = ({ tools, loading, variant }: { tools: Tool[]; loading: boolean; variant: 'featured' | 'compact'; }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const interval = 5000; // 0.5 seconds
+  const [direction, setDirection] = useState<'left' | 'right'>('left');
+
+  useEffect(() => {
+    if (!tools || tools.length === 0) return;
+    const timer = setInterval(() => {
+      setDirection('left');
+      setCurrentIndex((prev) => (prev + 1) % tools.length);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [tools]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  if (!tools || tools.length === 0) {
+    return <div>No tools found.</div>;
+  }
+
+  const goTo = (idx: number, dir: 'left' | 'right') => {
+    setDirection(dir);
+    setCurrentIndex(idx);
+  };
+
+  const goToPrev = () => {
+    setDirection('right');
+    setCurrentIndex((prev) => (prev - 1 + tools.length) % tools.length);
+  };
+
+  const goToNext = () => {
+    setDirection('left');
+    setCurrentIndex((prev) => (prev + 1) % tools.length);
+  };
+
+  return (
+    <div className="w-full flex flex-col items-center">
+      <div className="relative w-full flex items-center justify-center">
+        {/* Carousel Content with swipe animation */}
+        <div className="w-full transition-transform duration-500" style={{ transform: `translateX(${direction === 'left' ? '0' : '0'})` }}>
+          <ToolGrid tools={[tools[currentIndex]]} loading={false} variant={variant} columns={1} />
+        </div>
+      </div>
+      {/* Pagination Dots */}
+      <div className="flex justify-center mt-4 space-x-2">
+        {tools.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => goTo(idx, idx > currentIndex ? 'left' : 'right')}
+            className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
+              idx === currentIndex
+                ? 'bg-blue-600 scale-125'
+                : 'bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600'
+            }`}
+            aria-label={`Go to slide ${idx + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export const HomePage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
@@ -38,7 +103,7 @@ export const HomePage: React.FC = () => {
         <div className="max-w-2xl mx-auto mb-8">
           <SearchBar
             value={searchQuery}
-            onChange={setSearchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
             placeholder="Search AI tools..."
             className="w-full"
           />
@@ -59,11 +124,10 @@ export const HomePage: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ToolGrid
-              tools={featuredTools?.slice(0, 3) || []}
+            <ToolCarousel
+              tools={featuredTools || []}
               loading={featuredLoading}
               variant="featured"
-              columns={1}
             />
           </CardContent>
         </Card>
@@ -80,11 +144,10 @@ export const HomePage: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ToolGrid
-              tools={trendingTools?.slice(0, 3) || []}
+            <ToolCarousel
+              tools={trendingTools || []}
               loading={trendingLoading}
               variant="compact"
-              columns={1}
             />
           </CardContent>
         </Card>

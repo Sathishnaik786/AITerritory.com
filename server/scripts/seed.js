@@ -30,6 +30,37 @@ async function seedDatabase() {
         name: 'Audio Generators',
         description: 'AI audio and music generation tools',
         slug: 'audio-generators'
+      },
+      // Business-related categories
+      {
+        name: 'Business',
+        description: 'AI tools for business, sales, marketing, and operations',
+        slug: 'business'
+      },
+      {
+        name: 'Productivity Tools',
+        description: 'AI tools for productivity, writing, and organization',
+        slug: 'productivity-tools'
+      },
+      {
+        name: 'Automation & Integration',
+        description: 'AI tools for workflow automation and integration',
+        slug: 'automation-integration'
+      },
+      {
+        name: 'Enterprise AI',
+        description: 'AI platforms and tools for enterprise use',
+        slug: 'enterprise-ai'
+      },
+      {
+        name: 'Cloud AI Services',
+        description: 'Cloud-based AI services and APIs',
+        slug: 'cloud-ai-services'
+      },
+      {
+        name: 'Communication & Meetings',
+        description: 'AI tools for communication, meetings, and collaboration',
+        slug: 'communication-meetings'
       }
     ];
 

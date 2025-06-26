@@ -40,4 +40,17 @@ api.interceptors.response.use(
   }
 );
 
+// AI Innovations
+export const fetchAIInnovations = async (type?: string) => {
+  const url = type ? `/ai-innovations?type=${type}` : '/ai-innovations';
+  const res = await api.get(url);
+  return res.data;
+};
+
+// Research Papers
+export const fetchAIResearchPapers = async () => {
+  const res = await api.get('/ai-innovations/papers/all');
+  return res.data;
+};
+
 export default api;

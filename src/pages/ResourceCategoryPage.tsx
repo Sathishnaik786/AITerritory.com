@@ -1,6 +1,6 @@
 import React from 'react';
-import { toolsData, Tool } from '../data/tools';
 import SimpleToolCard from '../components/SimpleToolCard';
+import { useTools } from '../hooks/useTools';
 
 interface ResourceCategoryPageProps {
   title: string;
@@ -9,15 +9,12 @@ interface ResourceCategoryPageProps {
 }
 
 const ResourceCategoryPage: React.FC<ResourceCategoryPageProps> = ({ title, filterCategory, filterTag }) => {
-  const filteredTools = toolsData.filter((tool: Tool) => {
-    if (filterCategory && tool.category !== filterCategory) {
-      return false;
-    }
-    if (filterTag && (!tool.tags || !tool.tags.includes(filterTag))) {
-      return false;
-    }
-    return true;
-  });
+  // Prepare filters for the API
+  const filters: any = {};
+  if (filterCategory) filters.category = filterCategory;
+  if (filterTag) filters.tag = filterTag;
+
+  const { data: tools = [], isLoading, isError } = useTools(filters);
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -30,15 +27,21 @@ const ResourceCategoryPage: React.FC<ResourceCategoryPageProps> = ({ title, filt
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredTools.length > 0 ? (
-          filteredTools.map((tool: Tool) => (
-            <SimpleToolCard key={tool.id} tool={tool} />
-          ))
-        ) : (
-          <p className="text-center text-lg col-span-full">No tools found for this category.</p>
-        )}
-      </div>
+      {isLoading ? (
+        <p className="text-center text-lg col-span-full">Loading...</p>
+      ) : isError ? (
+        <p className="text-center text-lg col-span-full text-red-500">Failed to load tools.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {tools.length > 0 ? (
+            tools.map((tool: any) => (
+              <SimpleToolCard key={tool.id} tool={tool} />
+            ))
+          ) : (
+            <p className="text-center text-lg col-span-full">No tools found for this category.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

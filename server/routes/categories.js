@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const categoryController = require('../controllers/categoryController');
+const { getCategoryToolCounts } = require('../controllers/categoryStatsController');
 
 // GET /api/categories - Get all categories
 router.get('/', categoryController.getAllCategories);
@@ -19,5 +20,8 @@ router.put('/:id', categoryController.updateCategory);
 
 // DELETE /api/categories/:id - Delete category
 router.delete('/:id', categoryController.deleteCategory);
+
+// GET /api/categories/tool-counts - Get category tool counts
+router.get('/tool-counts', getCategoryToolCounts);
 
 module.exports = router;

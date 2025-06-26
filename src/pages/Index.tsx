@@ -5,11 +5,13 @@ import ToolCarousel from '../components/ToolCarousel';
 import { toolsData } from '../data/tools';
 import { ExternalLink, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ToolCard } from '../components/ToolCard';
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Tools');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('popular');
+  const [visibleCount, setVisibleCount] = useState(12);
 
   const getCategoryFilter = (categoryName: string) => {
     switch (categoryName) {
@@ -56,6 +58,9 @@ const Index = () => {
 
     return filtered;
   }, [selectedCategory, searchQuery, activeTab]);
+
+  const visibleTools = filteredTools.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredTools.length;
 
   return (
     <div>
@@ -158,62 +163,27 @@ const Index = () => {
 
             {/* Tools Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredTools.length === 0 ? (
+              {visibleTools.length === 0 ? (
                 <div className="text-center py-20 text-muted-foreground col-span-full bg-gray-50 dark:bg-gray-700 rounded-lg p-8 shadow-inner">
                   <p className="text-lg font-medium">No tools found for the selected criteria.</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Try adjusting your search or category filters.</p>
                 </div>
               ) : (
-                filteredTools.map((tool) => (
-                  <div key={tool.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 flex flex-col h-full transition-all duration-300 hover:shadow-xl hover:scale-[1.01] border border-gray-100 dark:border-gray-700">
-                    <div className="flex items-center mb-3">
-                      {tool.image ? (
-                        <img src={tool.image} alt={tool.name} className="w-14 h-14 object-contain rounded-full mr-3 border border-gray-200 dark:border-gray-600 p-1" />
-                      ) : (
-                        <div className="w-14 h-14 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 text-xl font-bold border border-gray-200 dark:border-gray-600">
-                          {tool.name.charAt(0)}
-                        </div>
-                      )}
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                          {tool.name}
-                          <img src="/verified-sticker.svg" alt="Verified" className="w-4 h-4 inline-block" />
-                        </h3>
-                      </div>
-                    </div>
-
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 line-clamp-3 flex-grow">
-                      {tool.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {tool.tags?.map(tag => (
-                        <span key={tag} className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium">
-                          #{tag.toLowerCase().replace(/ /g, '')}
-                        </span>
-                      ))}
-                      {!tool.tags?.includes(tool.category) && (
-                        <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium">
-                          #{tool.category.toLowerCase().replace(/ /g, '')}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                      <a
-                        href={tool.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-blue-600 text-white font-medium py-2 px-5 rounded-full inline-flex items-center justify-center transition-colors hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 shadow-md hover:shadow-lg"
-                      >
-                        Visit Tool
-                        <ExternalLink className="w-4 h-4 ml-2" />
-                      </a>
-                    </div>
-                  </div>
+                visibleTools.map((tool) => (
+                  <ToolCard key={tool.id} tool={tool} />
                 ))
               )}
             </div>
+            {hasMore && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={() => setVisibleCount(visibleCount + 12)}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-full font-semibold shadow hover:bg-blue-700 transition"
+                >
+                  More
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

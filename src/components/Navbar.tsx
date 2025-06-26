@@ -35,29 +35,29 @@ export function Navbar() {
   }, []);
 
   return (
-    <nav className={`w-full z-50 transition-all duration-300 ${
-      isScrolled 
-        ? 'fixed top-0 left-0 right-0 bg-white dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-md' 
-        : 'bg-white dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700'
-    }`}>
-      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav className={`w-full z-50 transition-all duration-300` +
+      (isScrolled
+        ? ' fixed top-0 left-0 right-0 mt-0'
+        : ' mt-[15px]')
+    }>
+      <div className="max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-lg px-6 py-1 flex flex-col">
+        <div className="flex items-center justify-between h-12">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <img 
               src="/logo.jpg" 
               alt="Viralai Logo" 
-              className="h-[50px] w-[50px] rounded-full object-cover"
+              className="h-10 w-10 rounded-full object-cover"
             />
           </Link>
 
           {/* Mobile centered text */}
           <div className="absolute left-1/2 -translate-x-1/2 md:hidden">
-            <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">You're in AI Territory</span>
+            <span className="text-base font-semibold text-gray-700 dark:text-gray-300">You're in AI Territory</span>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             <Link to="/resources/all-resources" className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
               AI Tools
             </Link>
@@ -92,14 +92,7 @@ export function Navbar() {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-full"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
+          <div className="hidden md:flex items-center gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -114,7 +107,7 @@ export function Navbar() {
             </Button>
             {/* Clerk Integration: Desktop Sign-up/Login Button */}
             <SignedOut>
-              <SignInButton mode="modal">
+              <SignInButton mode="modal" afterSignInUrl="/" afterSignUpUrl="/">
                 <Button size="sm" className="rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 px-5 py-2">
                   Sign up for free
                 </Button>
@@ -126,14 +119,7 @@ export function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex md:hidden items-center gap-4 ml-auto">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-full"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
+          <div className="flex md:hidden items-center gap-3 ml-auto">
             <Button
               variant="ghost"
               size="icon"
@@ -151,50 +137,50 @@ export function Navbar() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-            <div className="flex flex-col gap-4 px-4">
+          <div className="md:hidden py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+            <div className="flex flex-col gap-2 px-2">
               <Link
                 to="/resources/all-resources"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 py-2"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors py-2 px-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 AI Tools
               </Link>
               <Link
                 to="/ai-for-business"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 py-2"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors py-2 px-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 AI for Business
               </Link>
               <Link
                 to="/newsletter"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-left w-full py-2"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors text-left w-full py-2 px-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Newsletter
               </Link>
               <DropdownMenu onOpenChange={setIsMobileDropdownOpen}>
-                <DropdownMenuTrigger className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none text-left w-full py-2 flex items-center justify-between">
+                <DropdownMenuTrigger className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors focus:outline-none text-left w-full py-2 px-2 flex items-center justify-between">
                   Resources <ChevronDown className={`h-4 w-4 transition-transform ${isMobileDropdownOpen ? 'rotate-180' : 'rotate-0'}`} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md">
-                  <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 cursor-pointer">
+                  <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 rounded cursor-pointer transition-colors">
                     <Link to="/resources/ai-agents" onClick={() => setIsMenuOpen(false)}>AI Agents</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 cursor-pointer">
+                  <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 rounded cursor-pointer transition-colors">
                     <Link to="/resources/ai-innovation" onClick={() => setIsMenuOpen(false)}>AI Innovation</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 cursor-pointer">
+                  <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 rounded cursor-pointer transition-colors">
                     <Link to="/resources/ai-tutorials" onClick={() => setIsMenuOpen(false)}>AI Tutorials</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 cursor-pointer">
+                  <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700 rounded cursor-pointer transition-colors">
                     <Link to="/resources/ai-automation" onClick={() => setIsMenuOpen(false)}>AI Automation</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               {/* Clerk Integration: Mobile Sign-up/Login Button */}
-              <div className="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                 <Button
                   variant="outline"
                   size="sm"
@@ -207,13 +193,11 @@ export function Navbar() {
                     <Moon className="h-4 w-4" />
                   )}
                 </Button>
-                <SignedOut>
-                  <SignInButton mode="modal" afterSignInUrl="/" afterSignUpUrl="/">
-                    <Button size="sm" className="w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300">
-                      Sign up for free
-                    </Button>
-                  </SignInButton>
-                </SignedOut>
+                <SignInButton mode="modal" afterSignInUrl="/" afterSignUpUrl="/">
+                  <Button size="sm" className="w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300">
+                    Sign up for free
+                  </Button>
+                </SignInButton>
                 <SignedIn>
                   <UserButton afterSignOutUrl="/" />
                 </SignedIn>
