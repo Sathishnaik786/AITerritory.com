@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-awesome-reveal": "^4.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.1"
+  }
+}
