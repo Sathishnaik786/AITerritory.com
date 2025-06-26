@@ -32,13 +32,7 @@ const findAvailablePort = (startPort) => {
 
 // Security middleware
 app.use(helmet());
-app.use(cors({
-  origin: [
-    'https://aiterritory.netlify.app',
-    'https://www.aiterritory.netlify.app'
-  ],
-  credentials: true
-}));
+app.use(cors());
 
 // Rate limiting
 const limiter = rateLimit({
