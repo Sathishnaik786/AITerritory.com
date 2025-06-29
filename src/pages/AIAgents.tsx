@@ -97,8 +97,10 @@ const AIAgents = () => {
               <CardFooter>
                 <Button asChild className="w-full">
                   <a href={agent.link} target="_blank" rel="noopener noreferrer">
-                    <Github className="mr-2 h-4 w-4" />
-                    View on GitHub
+                    <div className="flex items-center">
+                      <Github className="mr-2 h-4 w-4" />
+                      <span>View on GitHub</span>
+                    </div>
                   </a>
                 </Button>
               </CardFooter>
@@ -134,8 +136,10 @@ const AIAgents = () => {
               <CardFooter>
                 <Button asChild className="w-full">
                   <a href={agent.link} target="_blank" rel="noopener noreferrer">
-                    <Globe className="mr-2 h-4 w-4" />
-                    Learn More
+                    <div className="flex items-center">
+                      <Globe className="mr-2 h-4 w-4" />
+                      <span>Learn More</span>
+                    </div>
                   </a>
                 </Button>
               </CardFooter>

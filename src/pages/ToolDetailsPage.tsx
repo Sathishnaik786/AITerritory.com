@@ -267,7 +267,7 @@ const ToolDetailsPage: React.FC = () => {
             </form>
           ) : (
             <div className="mb-6 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 flex flex-col items-center">
-              <span className="mb-2">Please <SignInButton mode='modal'><span className='text-blue-600 underline cursor-pointer'>sign in</span></SignInButton> to leave a review.</span>
+              <span className="mb-2">Please <SignInButton mode='modal'><div className='text-blue-600 underline cursor-pointer'>sign in</div></SignInButton> to leave a review.</span>
             </div>
           )}
           {/* Review List */}

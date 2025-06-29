@@ -98,7 +98,10 @@ const AIAutomation = () => {
               <CardFooter>
                 <Button asChild className="w-full">
                   <a href={tool.link} target="_blank" rel="noopener noreferrer">
-                    Learn More
+                    <div className="flex items-center">
+                      <Code className="mr-2 h-4 w-4" />
+                      <span>View Tool</span>
+                    </div>
                   </a>
                 </Button>
               </CardFooter>

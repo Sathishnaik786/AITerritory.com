@@ -207,8 +207,10 @@ const AITutorials = () => {
               <CardFooter>
                 <Button asChild className="w-full">
                   <a href="#" className="group">
-                    Start Learning
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    <div className="flex items-center">
+                      <span>Start Learning</span>
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </a>
                 </Button>
               </CardFooter>
@@ -252,9 +254,13 @@ const AITutorials = () => {
           <p className="mb-6">
             Get notified when we release new tutorials and learning resources.
           </p>
-          <Button variant="secondary" size="lg" className="group">
-            Subscribe to Updates
-            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          <Button asChild variant="secondary" size="lg" className="group">
+            <a href="#newsletter">
+              <div className="flex items-center">
+                <span>Subscribe to Newsletter</span>
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </a>
           </Button>
         </div>
       </div>

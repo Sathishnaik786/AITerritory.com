@@ -60,7 +60,8 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, rounded, asChild = false, loading = false, loadingText, children, disabled, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+    // Temporarily disable asChild to fix React.Children.only error
+    const Comp = "button" // asChild ? Slot : "button"
     
     // When asChild is true, we can't render loading state as it would break the single child requirement
     if (asChild && loading) {

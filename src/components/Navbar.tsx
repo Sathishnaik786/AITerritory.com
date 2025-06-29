@@ -145,16 +145,16 @@ export function Navbar() {
                 </motion.div>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-xl rounded-xl p-2">
-                <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 cursor-pointer rounded-lg transition-colors">
+                <DropdownMenuItem className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 cursor-pointer rounded-lg transition-colors">
                   <Link to="/resources/ai-agents">AI Agents</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 cursor-pointer rounded-lg transition-colors">
+                <DropdownMenuItem className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 cursor-pointer rounded-lg transition-colors">
                   <Link to="/resources/ai-innovation">AI Innovation</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 cursor-pointer rounded-lg transition-colors">
+                <DropdownMenuItem className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 cursor-pointer rounded-lg transition-colors">
                   <Link to="/resources/ai-tutorials">AI Tutorials</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 cursor-pointer rounded-lg transition-colors">
+                <DropdownMenuItem className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 cursor-pointer rounded-lg transition-colors">
                   <Link to="/resources/ai-automation">AI Automation</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -302,16 +302,16 @@ export function Navbar() {
                       </motion.div>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-xl rounded-xl p-2">
-                      <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 rounded-lg cursor-pointer transition-colors">
+                      <DropdownMenuItem className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 rounded-lg cursor-pointer transition-colors">
                         <Link to="/resources/ai-agents" onClick={() => setIsMenuOpen(false)}>AI Agents</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 rounded-lg cursor-pointer transition-colors">
+                      <DropdownMenuItem className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 rounded-lg cursor-pointer transition-colors">
                         <Link to="/resources/ai-innovation" onClick={() => setIsMenuOpen(false)}>AI Innovation</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 rounded-lg cursor-pointer transition-colors">
+                      <DropdownMenuItem className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 rounded-lg cursor-pointer transition-colors">
                         <Link to="/resources/ai-tutorials" onClick={() => setIsMenuOpen(false)}>AI Tutorials</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 rounded-lg cursor-pointer transition-colors">
+                      <DropdownMenuItem className="text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 rounded-lg cursor-pointer transition-colors">
                         <Link to="/resources/ai-automation" onClick={() => setIsMenuOpen(false)}>AI Automation</Link>
                       </DropdownMenuItem>
                     </DropdownMenuContent>

@@ -58,8 +58,10 @@ const AIInnovation = () => {
                 <CardFooter>
                   <Button asChild className="w-full">
                     <a href={innovation.link} target="_blank" rel="noopener noreferrer">
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      Learn More
+                      <div className="flex items-center">
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        <span>Learn More</span>
+                      </div>
                     </a>
                   </Button>
                 </CardFooter>
@@ -101,8 +103,10 @@ const AIInnovation = () => {
                 <CardFooter>
                   <Button asChild className="w-full">
                     <a href={research.link} target="_blank" rel="noopener noreferrer">
-                      <TrendingUp className="mr-2 h-4 w-4" />
-                      Read Research
+                      <div className="flex items-center">
+                        <TrendingUp className="mr-2 h-4 w-4" />
+                        <span>Read Research</span>
+                      </div>
                     </a>
                   </Button>
                 </CardFooter>
@@ -154,7 +158,9 @@ const AIInnovation = () => {
                   <p className="text-sm text-muted-foreground mb-4">{paper.abstract}</p>
                   <Button asChild variant="outline">
                     <a href={paper.link} target="_blank" rel="noopener noreferrer">
-                      Read Paper
+                      <div>
+                        <span>Read Paper</span>
+                      </div>
                     </a>
                   </Button>
                 </CardContent>
