@@ -295,7 +295,20 @@ export function Navbar() {
                     Newsletter
                   </Link>
                 </motion.div>
-                
+                {/* Prompts link for mobile */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.35 }}
+                >
+                  <Link
+                    to="/prompts"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-left w-full py-2 px-3 block"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Prompts
+                  </Link>
+                </motion.div>
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
