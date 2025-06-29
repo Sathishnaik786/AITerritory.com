@@ -3,7 +3,7 @@ import axios from 'axios';
 // API Configuration - Force Render URL in production
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 const API_BASE_URL = isProduction 
-  ? 'https://aiterritory-backend.onrender.com/api'
+  ? 'https://aiterritory-com.onrender.com/api'
   : '/api';
 
 console.log('Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
