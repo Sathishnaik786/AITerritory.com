@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { Star } from 'lucide-react';
+import { testimonialsService, TestimonialSubmission } from '../services/testimonialsService';
 
 interface TestimonialFormProps {
   open: boolean;
@@ -50,7 +51,7 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
     setError('');
     setSuccess(false);
     
-    const requestData = {
+    const requestData: TestimonialSubmission = {
       user_id: user?.id,
       user_name: user?.name,
       user_avatar: user?.avatar,
@@ -63,19 +64,9 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
     console.log('Submitting testimonial with data:', requestData);
     
     try {
-      const res = await fetch('/api/testimonials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestData),
-      });
+      const data = await testimonialsService.submitTestimonial(requestData);
       
-      console.log('Response status:', res.status);
-      const responseData = await res.text();
-      console.log('Response body:', responseData);
-      
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${responseData}`);
-      }
+      console.log('Testimonial submitted successfully:', data);
       
       setSuccess(true);
       setContent('');

@@ -1,4 +1,4 @@
-const supabase = require('../lib/supabase');
+const supabase = require('../config/database');
 
 // POST /api/testimonials - User submits testimonial
 exports.submitTestimonial = async (req, res) => {

@@ -2,16 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { Star } from 'lucide-react';
-
-interface Testimonial {
-  id: string;
-  user_name: string;
-  user_role: string;
-  user_avatar?: string;
-  content: string;
-  rating?: number;
-  company_name?: string;
-}
+import { testimonialsService, Testimonial } from '../services/testimonialsService';
 
 const Testimonials: React.FC = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -20,8 +11,7 @@ const Testimonials: React.FC = () => {
   const borderColor = theme === 'dark' ? 'border-gray-800' : 'border-gray-200';
 
   useEffect(() => {
-    fetch('/api/testimonials')
-      .then(res => res.json())
+    testimonialsService.getTestimonials()
       .then(data => {
         setTestimonials(data);
         setLoading(false);
