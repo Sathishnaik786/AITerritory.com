@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Authentication & Likes API</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { color: green; }
+        .error { color: red; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Authentication & Likes API Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test API Health</h2>
+        <button onclick="testAPIHealth()">Test API Health</button>
+        <div id="apiHealth"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Likes API</h2>
+        <button onclick="testLikesAPI()">Test Likes API</button>
+        <div id="likesTest"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Authentication Flow</h2>
+        <p>Click the buttons below to test the authentication flow:</p>
+        <button onclick="window.open('/login', '_blank')">Open Login Page</button>
+        <button onclick="window.open('/signup', '_blank')">Open Signup Page</button>
+        <button onclick="window.open('/dashboard', '_blank')">Open Dashboard (Protected)</button>
+    </div>
+
+    <script>
+        async function testAPIHealth() {
+            const resultDiv = document.getElementById('apiHealth');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('/api/likes/4f324c61-709c-4da4-aab9-f5c1be65281c/count');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h3>✅ API Health Check Passed</h3>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Response:</strong> ${JSON.stringify(data, null, 2)}</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ API Health Check Failed</h3>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testLikesAPI() {
+            const resultDiv = document.getElementById('likesTest');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('/api/likes/4f324c61-709c-4da4-aab9-f5c1be65281c/count');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h3>✅ Likes API Test Passed</h3>
+                        <p><strong>Like Count:</strong> ${data.count}</p>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Response:</strong> ${JSON.stringify(data, null, 2)}</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Likes API Test Failed</h3>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 
