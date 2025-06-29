@@ -1,8 +1,8 @@
-# 🚀 Entaiar - AI-Powered Content Creation & Management Platform
+# 🚀 AITerritory.com - AI-Powered Content Creation & Management Platform
 
 ## 📋 Project Overview
 
-**Entaiar** is a comprehensive AI-powered content creation and management platform that helps creators, marketers, and businesses generate, optimize, and manage high-quality content across multiple channels. The platform leverages advanced AI models to automate content creation, SEO optimization, social media management, and analytics.
+**AITerritory.com** is a comprehensive AI-powered content creation and management platform that helps creators, marketers, and businesses generate, optimize, and manage high-quality content across multiple channels. The platform leverages advanced AI models to automate content creation, SEO optimization, social media management, and analytics.
 
 ## 🎯 Core Features
 
@@ -36,7 +36,7 @@
 ## 🏗️ Project Structure
 
 ```
-entaiar/
+aiterritory.com/
 ├── 📁 frontend/                          # React/Next.js Frontend
 │   ├── 📁 src/
 │   │   ├── 📁 components/                # Reusable UI components
@@ -205,8 +205,8 @@ entaiar/
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/your-username/entaiar.git
-cd entaiar
+git clone https://github.com/your-username/AITerritory.com.git
+cd AITerritory.com
 ```
 
 2. **Install dependencies**
@@ -283,7 +283,7 @@ kubectl apply -f infrastructure/kubernetes/
 ### Environment Variables
 ```bash
 # Required environment variables
-DATABASE_URL=postgresql://user:password@localhost:5432/entaiar
+DATABASE_URL=postgresql://user:password@localhost:5432/aiterritory
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=your-jwt-secret
 OPENAI_API_KEY=your-openai-key
@@ -305,10 +305,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-- **Documentation**: [docs.entaiar.com](https://docs.entaiar.com)
-- **Issues**: [GitHub Issues](https://github.com/your-username/entaiar/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/entaiar/discussions)
-- **Email**: support@entaiar.com
+- **Documentation**: [docs.aiterritory.com](https://docs.aiterritory.com)
+- **Issues**: [GitHub Issues](https://github.com/your-username/AITerritory.com/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-username/AITerritory.com/discussions)
+- **Email**: support@aiterritory.com
 
 ## 🏆 Features Roadmap
 
@@ -338,4 +338,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ by the Entaiar Team**
+**Built with ❤️ by the AITerritory.com Team**
