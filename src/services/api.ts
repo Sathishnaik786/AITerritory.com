@@ -1,10 +1,13 @@
 import axios from 'axios';
 
-// API Configuration - Use Render URL in production, relative URL in development
-const API_BASE_URL = import.meta.env.PROD 
+// API Configuration - Force Render URL in production
+const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+const API_BASE_URL = isProduction 
   ? 'https://aiterritory-backend.onrender.com/api'
   : '/api';
 
+console.log('Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
+console.log('Hostname:', window.location.hostname);
 console.log('API Base URL:', API_BASE_URL);
 
 // Create axios instance with default config

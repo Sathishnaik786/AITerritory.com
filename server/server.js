@@ -41,23 +41,45 @@ const allowedOrigins = [
   'http://127.0.0.1:5173',
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  'http://localhost:8080'
+  'http://localhost:8080',
+  'https://aiterritory-backend.onrender.com'
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      console.log('CORS request from origin:', origin);
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = 'The CORS policy for this site does not allow access from the specified Origin: ' + origin;
-        return callback(new Error(msg), false);
+      console.log('🔄 CORS request from origin:', origin);
+      
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) {
+        console.log('✅ Allowing request with no origin');
+        return callback(null, true);
       }
-      return callback(null, true);
+      
+      // Check if origin is in allowed list
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        console.log('✅ Origin allowed:', origin);
+        return callback(null, true);
+      }
+      
+      // For debugging, allow all origins in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('⚠️  Development mode: allowing origin:', origin);
+        return callback(null, true);
+      }
+      
+      console.log('❌ Origin not allowed:', origin);
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin: ' + origin;
+      return callback(new Error(msg), false);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   })
 );
+
+// Handle preflight requests
+app.options('*', cors());
 
 // --- END: Security and CORS Configuration ---
 
