@@ -6,6 +6,12 @@ const reviewsController = require('../controllers/reviewsController');
 // GET /api/tools - Get all tools with optional filters
 router.get('/', toolController.getAllTools);
 
+// GET /api/tools/featured - Get featured tools
+router.get('/featured', toolController.getFeaturedTools);
+
+// GET /api/tools/trending - Get trending tools
+router.get('/trending', toolController.getTrendingTools);
+
 // GET /api/tools/all - Get all AI tools (active)
 router.get('/all', toolController.getAllAITools);
 

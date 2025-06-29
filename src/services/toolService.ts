@@ -43,12 +43,14 @@ export const toolService = {
 
   // Get featured tools
   async getFeaturedTools(): Promise<Tool[]> {
-    return this.getTools({ is_featured: true });
+    const response = await api.get('/tools/featured');
+    return response.data;
   },
 
   // Get trending tools
   async getTrendingTools(): Promise<Tool[]> {
-    return this.getTools({ is_trending: true });
+    const response = await api.get('/tools/trending');
+    return response.data;
   },
 
   // Search tools

@@ -200,10 +200,42 @@ const toolController = {
     }
   },
 
+  // Get featured tools
+  async getFeaturedTools(req, res, next) {
+    try {
+      console.log('Fetching featured tools...');
+      const filters = { is_featured: true, status: true };
+      const tools = await Tool.findAll(filters);
+      console.log('Featured tools fetched. Count:', Array.isArray(tools) ? tools.length : (tools ? 1 : 0));
+      res.json(tools);
+    } catch (err) {
+      console.error('Featured tools controller error:', err, err.stack);
+      err.status = 500;
+      err.message = 'Internal server error: ' + (err.message || '');
+      return next(err);
+    }
+  },
+
+  // Get trending tools
+  async getTrendingTools(req, res, next) {
+    try {
+      console.log('Fetching trending tools...');
+      const filters = { is_trending: true, status: true };
+      const tools = await Tool.findAll(filters);
+      console.log('Trending tools fetched. Count:', Array.isArray(tools) ? tools.length : (tools ? 1 : 0));
+      res.json(tools);
+    } catch (err) {
+      console.error('Trending tools controller error:', err, err.stack);
+      err.status = 500;
+      err.message = 'Internal server error: ' + (err.message || '');
+      return next(err);
+    }
+  },
+
   // All AI Tools (all active tools)
   async getAllAITools(req, res, next) {
     try {
-      const filters = { status: 'Active' };
+      const filters = { status: true };
       const tools = await Tool.findAll(filters);
       res.json(tools);
     } catch (error) {
@@ -257,7 +289,7 @@ const toolController = {
         error.status = 404;
         return next(error);
       }
-      const filters = { category_id: categoryObj.id, status: 'Active' };
+      const filters = { category_id: categoryObj.id, status: true };
       const tools = await Tool.findAll(filters);
       res.json(tools);
     } catch (error) {

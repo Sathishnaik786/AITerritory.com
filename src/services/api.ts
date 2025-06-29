@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// API Configuration - Use relative URL for Vite proxy in development
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://aiterritory-backend.onrender.com/api';
+// API Configuration - Use relative URL for Vite proxy in development, Render URL in production
+const API_BASE_URL = import.meta.env.PROD 
+  ? (import.meta.env.VITE_API_BASE_URL || 'https://aiterritory-backend.onrender.com/api')
+  : '/api';
 
 // Create axios instance with default config
 const api = axios.create({
