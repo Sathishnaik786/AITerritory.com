@@ -20,6 +20,7 @@ const bookmarksRouter = require('./routes/bookmarks');
 const likesRoutes = require('./routes/likes');
 const sharesRoutes = require('./routes/shares');
 const testimonialsRoutes = require('./routes/testimonials');
+const promptsRoutes = require('./routes/prompts');
 
 const app = express();
 
@@ -131,6 +132,7 @@ app.use('/api/bookmarks', bookmarksRouter);
 app.use('/api/likes', likesRoutes);
 app.use('/api/shares', sharesRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
+app.use('/api/prompts', promptsRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

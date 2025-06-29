@@ -65,6 +65,7 @@ import ToolDetailsPage from './pages/ToolDetailsPage';
 import MyBookmarksPage from './pages/MyBookmarksPage';
 import UserDashboardPage from './pages/UserDashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import Prompts from './components/Prompts';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -95,6 +96,7 @@ function ThemedAppContent() {
             {/* Public Routes */}
             <Route path="/" element={<HomePage />} />
             <Route path="/ai-for-business" element={<AIBusiness />} />
+            <Route path="/prompts" element={<Prompts />} />
             
             {/* Authentication Routes */}
             <Route path="/login" element={<LoginPage />} />

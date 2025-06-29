@@ -72,8 +72,8 @@ export function Navbar() {
     >
       <div className={`max-w-6xl mx-auto rounded-2xl shadow-lg px-6 py-1 flex flex-col transition-all duration-500 ${
         isScrolled 
-          ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-white/20 dark:border-gray-800/20' 
-          : 'bg-white dark:bg-gray-900'
+          ? 'bg-green-50/80 dark:bg-gray-900/80 backdrop-blur-md border border-green-200/20 dark:border-gray-800/20' 
+          : 'bg-green-50 dark:bg-gray-900'
       }`}>
         <div className="flex items-center justify-between h-12">
           {/* Logo */}
@@ -134,6 +134,16 @@ export function Navbar() {
               </Link>
             </motion.div>
             
+            <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
+              <Link
+                to="/prompts"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors relative group"
+              >
+                Prompts
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </motion.div>
+            
             <DropdownMenu onOpenChange={setIsDesktopDropdownOpen}>
               <DropdownMenuTrigger className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none flex items-center gap-1 group">
                 Resources 
@@ -168,7 +178,7 @@ export function Navbar() {
                 variant="outline"
                 size="sm"
                 onClick={toggleTheme}
-                className="rounded-full border-gray-300 dark:border-gray-600 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200"
+                className="rounded-full border-green-300 dark:border-gray-600 bg-green-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm hover:bg-green-100 dark:hover:bg-gray-600 transition-colors"
               >
                 <motion.div
                   animate={{ rotate: theme === 'dark' ? 180 : 0 }}
@@ -216,7 +226,7 @@ export function Navbar() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="md:hidden text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-full"
+                className="md:hidden text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 transition-colors rounded-full"
               >
                 <motion.div
                   animate={{ rotate: isMenuOpen ? 180 : 0 }}
@@ -241,7 +251,7 @@ export function Navbar() {
               initial="closed"
               animate="open"
               exit="closed"
-              className="md:hidden py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+              className="md:hidden py-3 border-t border-green-200 dark:border-gray-700 bg-green-50 dark:bg-gray-900"
             >
               <div className="flex flex-col gap-2 px-2">
                 <motion.div
@@ -251,7 +261,7 @@ export function Navbar() {
                 >
                   <Link
                     to="/resources/all-resources"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors py-2 px-3 block"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 rounded-lg transition-colors py-2 px-3 block"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     AI Tools
@@ -265,7 +275,7 @@ export function Navbar() {
                 >
                   <Link
                     to="/ai-for-business"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors py-2 px-3 block"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 rounded-lg transition-colors py-2 px-3 block"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     AI for Business
@@ -279,7 +289,7 @@ export function Navbar() {
                 >
                   <Link
                     to="/newsletter"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-left w-full py-2 px-3 block"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-left w-full py-2 px-3 block"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Newsletter
@@ -292,7 +302,7 @@ export function Navbar() {
                   transition={{ delay: 0.4 }}
                 >
                   <DropdownMenu onOpenChange={setIsMobileDropdownOpen}>
-                    <DropdownMenuTrigger className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors focus:outline-none text-left w-full py-2 px-3 flex items-center justify-between">
+                    <DropdownMenuTrigger className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 rounded-lg transition-colors focus:outline-none text-left w-full py-2 px-3 flex items-center justify-between">
                       Resources 
                       <motion.div
                         animate={{ rotate: isMobileDropdownOpen ? 180 : 0 }}
@@ -323,14 +333,14 @@ export function Navbar() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="flex items-center gap-3 pt-3 border-t border-gray-200 dark:border-gray-700"
+                  className="flex items-center gap-3 pt-3 border-t border-green-200 dark:border-gray-700"
                 >
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={toggleTheme}
-                      className="rounded-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                      className="rounded-full border-green-300 dark:border-gray-600 bg-green-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm hover:bg-green-100 dark:hover:bg-gray-600 transition-colors"
                     >
                       <motion.div
                         animate={{ rotate: theme === 'dark' ? 180 : 0 }}
