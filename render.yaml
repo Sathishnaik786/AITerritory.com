@@ -1,5 +1,5 @@
 services:
-  # Frontend Service (React/Vite)
+  # Frontend Service (React/Vite) - Static Site
   - type: web
     name: aiterritory-frontend
     buildCommand: npm install && npm run build
