@@ -9,13 +9,33 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/clerk-react";
+
+// Check if Clerk is configured
+const isClerkConfigured = 
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY && 
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY !== 'your_clerk_publishable_key' &&
+  !import.meta.env.VITE_CLERK_PUBLISHABLE_KEY.includes('REPLACE_WITH_YOUR_ACTUAL');
+
+// Conditionally import Clerk components
+let SignedIn = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+let SignedOut = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+let SignInButton = ({ children, mode, afterSignInUrl, afterSignUpUrl }: any) => <>{children}</>;
+let SignUpButton = ({ children, mode, afterSignInUrl, afterSignUpUrl }: any) => <>{children}</>;
+let UserButton = ({ afterSignOutUrl }: any) => <></>;
+
+// Only import Clerk if configured
+if (isClerkConfigured) {
+  try {
+    const clerk = require("@clerk/clerk-react");
+    SignedIn = clerk.SignedIn;
+    SignedOut = clerk.SignedOut;
+    SignInButton = clerk.SignInButton;
+    SignUpButton = clerk.SignUpButton;
+    UserButton = clerk.UserButton;
+  } catch (error) {
+    console.warn("Clerk components could not be loaded", error);
+  }
+}
 
 export function Navbar() {
   const { theme, toggleTheme } = useTheme();
@@ -106,16 +126,24 @@ export function Navbar() {
               )}
             </Button>
             {/* Clerk Integration: Desktop Sign-up/Login Button */}
-            <SignedOut>
-              <SignInButton mode="modal" afterSignInUrl="/" afterSignUpUrl="/">
-                <Button size="sm" className="rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 px-5 py-2">
-                  Sign up for free
-                </Button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
+            {isClerkConfigured ? (
+              <>
+                <SignedOut>
+                  <SignInButton mode="modal" afterSignInUrl="/" afterSignUpUrl="/">
+                    <Button size="sm" className="rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 px-5 py-2">
+                      Sign up for free
+                    </Button>
+                  </SignInButton>
+                </SignedOut>
+                <SignedIn>
+                  <UserButton />
+                </SignedIn>
+              </>
+            ) : (
+              <Button size="sm" className="rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 px-5 py-2">
+                Sign up for free
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -179,7 +207,7 @@ export function Navbar() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              {/* Clerk Integration: Mobile Sign-up/Login Button */}
+              {/* Mobile Sign-up/Login Button */}
               <div className="flex items-center gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                 <Button
                   variant="outline"
@@ -193,14 +221,22 @@ export function Navbar() {
                     <Moon className="h-4 w-4" />
                   )}
                 </Button>
-                <SignInButton mode="modal" afterSignInUrl="/" afterSignUpUrl="/">
+                {isClerkConfigured ? (
+                  <>
+                    <SignInButton mode="modal" afterSignInUrl="/" afterSignUpUrl="/">
+                      <Button size="sm" className="w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300">
+                        Sign up for free
+                      </Button>
+                    </SignInButton>
+                    <SignedIn>
+                      <UserButton afterSignOutUrl="/" />
+                    </SignedIn>
+                  </>
+                ) : (
                   <Button size="sm" className="w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300">
                     Sign up for free
                   </Button>
-                </SignInButton>
-                <SignedIn>
-                  <UserButton afterSignOutUrl="/" />
-                </SignedIn>
+                )}
               </div>
             </div>
           </div>
@@ -208,4 +244,4 @@ export function Navbar() {
       </div>
     </nav>
   );
-} 
+}
