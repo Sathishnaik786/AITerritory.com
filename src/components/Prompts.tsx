@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from './ui/dialog';
 import { useTheme } from '../context/ThemeContext';
-import { FaRegCommentDots, FaRegFileAlt, FaRegCopy, FaBars } from 'react-icons/fa';
+import { FaRegCommentDots, FaRegFileAlt, FaRegCopy, FaBars, FaArrowRight } from 'react-icons/fa';
 import { getPrompts } from '../services/promptsService';
 
 const promptCategories = [
@@ -34,6 +34,22 @@ const platforms = [
   'Meta',
 ];
 
+const categoryDescriptions: Record<string, string> = {
+  'Ethereum Developer': 'Prompts for smart contracts, dApps, and blockchain devs.',
+  'Linux Terminal': 'Terminal command prompts for automation and scripting.',
+  'JavaScript Console': 'JS console prompts for debugging and code generation.',
+  'Excel Sheet': 'Prompts for spreadsheet formulas, analysis, and automation.',
+  'UX/UI Developer': 'Prompts for user experience and interface design.',
+  'Cyber Security Specialist': 'Prompts for security, pentesting, and best practices.',
+  'Web Design Consultant': 'Prompts for web design, layout, and consulting.',
+  'Smart Domain Name Generator': 'Prompts for creative and smart domain ideas.',
+  'Tech Reviewer': 'Prompts for reviewing and analyzing tech products.',
+  'Developer Relations Consultant': 'Prompts for DevRel, advocacy, and community.',
+  'IT Architect': 'Prompts for IT architecture and system design.',
+  'Scientific Data Visualizer': 'Prompts for data visualization and science.',
+  'Tech Writer': 'Prompts for technical writing and documentation.',
+};
+
 export default function Prompts() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -43,6 +59,7 @@ export default function Prompts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { theme } = useTheme();
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -64,7 +81,7 @@ export default function Prompts() {
         (p.description && p.description.toLowerCase().includes(search.toLowerCase())))
   );
 
-  const bgMain = theme === 'dark' ? 'bg-black' : 'bg-white';
+  const bgMain = theme === 'dark' ? 'bg-charcoal' : 'bg-white';
   const textMain = theme === 'dark' ? 'text-white' : 'text-gray-900';
   const bgSidebar = theme === 'dark' ? 'bg-[#23272a]' : 'bg-gray-100';
   const textSidebar = theme === 'dark' ? 'text-white' : 'text-gray-900';
@@ -83,8 +100,30 @@ export default function Prompts() {
   const greenIcon = 'text-[#1abc8c]';
   const authorBg = 'bg-[#1abc8c]/10 text-[#1abc8c] px-3 py-1 rounded-full text-xs font-semibold';
 
+  // If a category is selected in the sidebar, only show that category section
+  const categoriesToShow = selectedCategory
+    ? [selectedCategory]
+    : expandedCategory
+      ? [expandedCategory]
+      : promptCategories;
+
+  // Scroll to category section when expanded
+  useEffect(() => {
+    if (expandedCategory && !selectedCategory) {
+      const el = document.getElementById(`cat-section-${expandedCategory}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }, [expandedCategory, selectedCategory]);
+
   return (
     <div className={`flex flex-col min-h-[90vh] ${bgMain} ${textMain} rounded-lg shadow-lg overflow-hidden pt-8`}> 
+      {/* Main Title and Description */}
+      <div className="w-full px-4 sm:px-8 pt-4 pb-2 text-center">
+        <h1 className="text-3xl sm:text-4xl font-extrabold mb-2">AI Prompts Directory</h1>
+        <p className="text-base sm:text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">Discover, search, and use the best prompts for developers, creators, and AI enthusiasts. Browse by category or platform and boost your productivity!</p>
+      </div>
       {/* Top Bar */}
       <div className="w-full px-4 sm:px-8 pt-6 pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[#222]/40">
         <div>
@@ -151,27 +190,55 @@ export default function Prompts() {
           ) : error ? (
             <div className="text-center py-12 text-red-500">{error}</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {filteredPrompts.map((prompt, idx) => (
-                <Card key={prompt.id || idx} className={`w-full ${cardBg} ${cardText} ${cardBorder} relative rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200`}>
-                  <CardContent className="p-5">
-                    <div className="flex flex-col h-full justify-between min-h-[180px]">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="text-lg font-bold leading-tight">{prompt.title}</div>
-                        <div className="flex gap-2">
-                          <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Comment"><FaRegCommentDots size={20} /></button>
-                          <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Document"><FaRegFileAlt size={20} /></button>
-                          <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Copy"><FaRegCopy size={20} /></button>
+            <div className="space-y-12">
+              {categoriesToShow.map((cat) => {
+                const catPrompts = filteredPrompts.filter((p) => p.category === cat);
+                const showAll = expandedCategory === cat;
+                return (
+                  <div key={cat} id={`cat-section-${cat}`} className="relative">
+                    <div className="mb-2 flex items-center justify-between">
+                      <div>
+                        <h2 className="text-2xl sm:text-3xl font-bold mb-1">{cat}</h2>
+                        <div className="text-gray-500 dark:text-gray-300 mb-4 text-base sm:text-lg">
+                          {categoryDescriptions[cat] || 'Prompts for this category.'}
                         </div>
                       </div>
-                      <div className={`text-base ${cardDesc} mb-6`}>{prompt.description}</div>
-                      <div className="flex items-end justify-between mt-auto">
-                        <span className={authorBg}>{prompt.author}</span>
-                      </div>
+                      {catPrompts.length > 3 && !showAll && (
+                        <Button onClick={() => setExpandedCategory(cat)} className="flex items-center gap-2 bg-[#1abc8c] text-white px-6 py-2 rounded-full font-semibold">
+                          More <FaArrowRight className="ml-1" />
+                        </Button>
+                      )}
+                      {showAll && catPrompts.length > 3 && (
+                        <Button onClick={() => setExpandedCategory(null)} className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-2 rounded-full font-semibold">
+                          Show Less
+                        </Button>
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                      {(showAll ? catPrompts : catPrompts.slice(0, 3)).map((prompt, idx) => (
+                        <Card key={prompt.id || idx} className={`w-full ${cardBg} ${cardText} ${cardBorder} relative rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200`}>
+                          <CardContent className="p-5">
+                            <div className="flex flex-col h-full justify-between min-h-[180px]">
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="text-lg font-bold leading-tight">{prompt.title}</div>
+                                <div className="flex gap-2">
+                                  <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Comment"><FaRegCommentDots size={20} /></button>
+                                  <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Document"><FaRegFileAlt size={20} /></button>
+                                  <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Copy"><FaRegCopy size={20} /></button>
+                                </div>
+                              </div>
+                              <div className={`text-base ${cardDesc} mb-6`}>{prompt.description}</div>
+                              <div className="flex items-end justify-between mt-auto">
+                                <span className={authorBg}>{prompt.author}</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

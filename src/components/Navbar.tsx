@@ -2,7 +2,7 @@ import { Menu, X, Sun, Moon, Search, ChevronDown, Sparkles } from 'lucide-react'
 import { Button } from './ui/button';
 import { useTheme } from '../context/ThemeContext';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DropdownMenu,
@@ -26,6 +26,7 @@ export function Navbar() {
   const [isDesktopDropdownOpen, setIsDesktopDropdownOpen] = useState(false);
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
   const { user } = useUser();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -70,10 +71,10 @@ export function Navbar() {
           : 'mt-[15px]'
       }`}
     >
-      <div className={`max-w-6xl mx-auto rounded-2xl shadow-lg px-6 py-1 flex flex-col transition-all duration-500 ${
-        isScrolled 
-          ? 'bg-green-50/80 dark:bg-gray-900/80 backdrop-blur-md border border-green-200/20 dark:border-gray-800/20' 
-          : 'bg-green-50 dark:bg-gray-900'
+      <div className={`max-w-6xl mx-auto rounded-2xl shadow-lg px-6 py-1 flex flex-col transition-all duration-500 border ${
+        theme === 'dark'
+          ? 'border-white bg-charcoal dark:bg-charcoal backdrop-blur-md'
+          : 'border-black bg-white dark:bg-charcoal'
       }`}>
         <div className="flex items-center justify-between h-12">
           {/* Logo */}
@@ -107,40 +108,64 @@ export function Navbar() {
             <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
               <Link 
                 to="/resources/all-resources" 
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors relative group"
+                className={`text-sm font-medium transition-colors relative group px-2 py-1 rounded-md ${
+                  location.pathname === '/resources/all-resources'
+                    ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-md'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                }`}
               >
                 AI Tools
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 ${
+                  location.pathname === '/resources/all-resources' ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}></span>
               </Link>
             </motion.div>
             
             <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
               <Link 
                 to="/ai-for-business" 
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors relative group"
+                className={`text-sm font-medium transition-colors relative group px-2 py-1 rounded-md ${
+                  location.pathname === '/ai-for-business'
+                    ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-md'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                }`}
               >
                 AI for Business
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 ${
+                  location.pathname === '/ai-for-business' ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}></span>
               </Link>
             </motion.div>
             
             <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
               <Link
                 to="/newsletter"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors relative group"
+                className={`text-sm font-medium transition-colors relative group px-2 py-1 rounded-md ${
+                  location.pathname === '/newsletter'
+                    ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-md'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                }`}
               >
                 Newsletter
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 ${
+                  location.pathname === '/newsletter' ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}></span>
               </Link>
             </motion.div>
             
             <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
               <Link
                 to="/prompts"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors relative group"
+                className={`text-sm font-medium transition-colors relative group px-2 py-1 rounded-md ${
+                  location.pathname === '/prompts'
+                    ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 shadow-md'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                }`}
               >
                 Prompts
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300 ${
+                  location.pathname === '/prompts' ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}></span>
               </Link>
             </motion.div>
             
@@ -178,7 +203,11 @@ export function Navbar() {
                 variant="outline"
                 size="sm"
                 onClick={toggleTheme}
-                className="rounded-full border-green-300 dark:border-gray-600 bg-green-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm hover:bg-green-100 dark:hover:bg-gray-600 transition-colors"
+                className={`rounded-full border transition-colors shadow-sm px-2 py-1 ${
+                  theme === 'dark'
+                    ? 'border-white bg-red-500 text-white hover:bg-red-600'
+                    : 'border-black bg-white text-gray-700 hover:bg-gray-100'
+                }`}
               >
                 <motion.div
                   animate={{ rotate: theme === 'dark' ? 180 : 0 }}
@@ -353,7 +382,11 @@ export function Navbar() {
                       variant="outline"
                       size="sm"
                       onClick={toggleTheme}
-                      className="rounded-full border-green-300 dark:border-gray-600 bg-green-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 shadow-sm hover:bg-green-100 dark:hover:bg-gray-600 transition-colors"
+                      className={`rounded-full border transition-colors shadow-sm px-2 py-1 ${
+                        theme === 'dark'
+                          ? 'border-white bg-red-500 text-white hover:bg-red-600'
+                          : 'border-black bg-white text-gray-700 hover:bg-gray-100'
+                      }`}
                     >
                       <motion.div
                         animate={{ rotate: theme === 'dark' ? 180 : 0 }}

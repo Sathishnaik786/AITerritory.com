@@ -62,7 +62,14 @@ const config = {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				charcoal: {
+					DEFAULT: '#023020',
+					40: 'rgba(2,48,32,0.4)',
+					50: 'rgba(2,48,32,0.5)',
+					60: 'rgba(2,48,32,0.6)',
+					80: 'rgba(2,48,32,0.8)',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
