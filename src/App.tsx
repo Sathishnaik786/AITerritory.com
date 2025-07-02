@@ -90,25 +90,29 @@ function SEO() {
   const canonicalUrl = `https://aiterritory.org${location.pathname}`;
   return (
     <Helmet>
-      <title>AI Territory</title>
-      <meta name="description" content="Where AI Resources Live, Explore Now" />
-      <meta name="robots" content="index, follow" />
-      {/* Open Graph */}
-      <meta property="og:title" content="AI Territory" />
-      <meta property="og:description" content="Where AI Resources Live, Explore Now" />
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content={canonicalUrl} />
-      <meta property="og:image" content="https://opengraph.b-cdn.net/production/images/cdd868e7-ea27-4c33-9870-36abb94bd75a.jpg?token=AZQS4d5VuYFpJ5iGEI5QKWff_3eSadPeW1E01KHy8oA&height=357&width=382&expires=33287474670" />
-      {/* Twitter Card */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta property="twitter:domain" content="aiterritory.org" />
-      <meta property="twitter:url" content={canonicalUrl} />
-      <meta name="twitter:title" content="AI Territory" />
-      <meta name="twitter:description" content="Where AI Resources Live, Explore Now" />
-      <meta name="twitter:image" content="https://opengraph.b-cdn.net/production/images/cdd868e7-ea27-4c33-9870-36abb94bd75a.jpg?token=AZQS4d5VuYFpJ5iGEI5QKWff_3eSadPeW1E01KHy8oA&height=357&width=382&expires=33287474670" />
-      {/* Canonical */}
-      <link rel="canonical" href={canonicalUrl} />
-    </Helmet>
+    <title>AI Territory</title>
+    <meta name="description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
+    <meta name="robots" content="index, follow" />
+    
+    {/* Open Graph */}
+    <meta property="og:title" content="AI Territory" />
+    <meta property="og:description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content="https://aiterritory.org/og-image.png" />
+    <meta property="og:site_name" content="AITerritory" />
+    
+    {/* Twitter Card */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:domain" content="aiterritory.org" />
+    <meta property="twitter:url" content={canonicalUrl} />
+    <meta name="twitter:title" content="AI Territory" />
+    <meta name="twitter:description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
+    <meta name="twitter:image" content="https://aiterritory.org/og-image.png" />
+    
+    {/* Canonical */}
+    <link rel="canonical" href={canonicalUrl} />
+  </Helmet>  
   );
 }
 
