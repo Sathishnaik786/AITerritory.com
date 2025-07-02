@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { PlayCircle, X } from 'lucide-react';
 import { useYouTubeContent } from '@/hooks/useYouTubeContent';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { YouTubeEmbed } from '@/components/YouTubeEmbed';
 
 const YouTubeChannelPage: React.FC = () => {
@@ -19,6 +19,9 @@ const YouTubeChannelPage: React.FC = () => {
     }
     return `https://www.youtube.com/shorts/${item.video_id}`;
   };
+
+  const getThumbnailUrl = (videoId: string) => `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+  const getFallbackThumbnailUrl = (videoId: string) => `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
   if (error) {
     return <div className="text-center py-12">Failed to load YouTube content.</div>;
@@ -61,18 +64,28 @@ const YouTubeChannelPage: React.FC = () => {
               videos.map((video) => (
                 <Card 
                   key={video.id} 
-                  className="overflow-hidden group hover:shadow-lg transition-shadow cursor-pointer"
+                  className="overflow-hidden group hover:shadow-2xl transition-shadow cursor-pointer rounded-xl border-0 bg-gradient-to-br from-white to-gray-100 dark:from-gray-900 dark:to-gray-800"
                   onClick={() => setSelectedVideo({ id: video.video_id, title: video.title })}
                 >
                   <CardContent className="p-0">
-                    <div className="relative">
-                      <img src={video.thumbnail_url || '/placeholder.svg'} alt={video.title} className="w-full h-48 object-cover" />
-                      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="relative aspect-video">
+                      <img 
+                        src={getThumbnailUrl(video.video_id)} 
+                        alt={video.title} 
+                        className="w-full h-48 object-cover rounded-t-xl transition-transform group-hover:scale-105 duration-300"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          if (target.src !== getFallbackThumbnailUrl(video.video_id)) {
+                            target.src = getFallbackThumbnailUrl(video.video_id);
+                          }
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-t-xl">
                         <PlayCircle className="w-16 h-16 text-white" />
                       </div>
                     </div>
                     <div className="p-4">
-                      <h3 className="font-semibold text-lg">{video.title}</h3>
+                      <h3 className="font-semibold text-lg line-clamp-2 min-h-[48px]">{video.title}</h3>
                     </div>
                   </CardContent>
                 </Card>
@@ -98,18 +111,28 @@ const YouTubeChannelPage: React.FC = () => {
               shorts.map((short) => (
                 <Card 
                   key={short.id}
-                  className="overflow-hidden group hover:shadow-lg transition-shadow cursor-pointer"
+                  className="overflow-hidden group hover:shadow-2xl transition-shadow cursor-pointer rounded-xl border-0 bg-gradient-to-br from-white to-gray-100 dark:from-gray-900 dark:to-gray-800"
                   onClick={() => setSelectedVideo({ id: short.video_id, title: short.title })}
                 >
                   <CardContent className="p-0">
-                    <div className="relative">
-                      <img src={short.thumbnail_url || '/placeholder.svg'} alt={short.title} className="w-full h-64 object-cover" />
-                       <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="relative aspect-[9/16] w-full">
+                      <img 
+                        src={getThumbnailUrl(short.video_id)} 
+                        alt={short.title} 
+                        className="absolute inset-0 w-full h-full object-cover rounded-t-xl transition-transform group-hover:scale-105 duration-300"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          if (target.src !== getFallbackThumbnailUrl(short.video_id)) {
+                            target.src = getFallbackThumbnailUrl(short.video_id);
+                          }
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-t-xl">
                         <PlayCircle className="w-12 h-12 text-white" />
                       </div>
                     </div>
-                     <div className="p-3">
-                      <h3 className="font-semibold text-md truncate">{short.title}</h3>
+                    <div className="p-3">
+                      <h3 className="font-semibold text-md truncate min-h-[32px]">{short.title}</h3>
                     </div>
                   </CardContent>
                 </Card>
@@ -120,12 +143,17 @@ const YouTubeChannelPage: React.FC = () => {
       </div>
       
       <Dialog open={!!selectedVideo} onOpenChange={(open) => !open && setSelectedVideo(null)}>
-        <DialogContent className="max-w-4xl p-0">
-          <DialogHeader className="p-4 pb-0">
-            <DialogTitle>{selectedVideo?.title}</DialogTitle>
-          </DialogHeader>
-          <div className="p-4 pt-2">
-            {selectedVideo && <YouTubeEmbed videoId={selectedVideo.id} title={selectedVideo.title} />}
+        <DialogContent className="max-w-4xl p-0 flex flex-col items-center justify-center">
+          <div className="p-4 pt-2 w-full flex justify-center">
+            {selectedVideo && (
+              <div className={
+                shorts.some((s) => s.video_id === selectedVideo.id)
+                  ? 'aspect-[9/16] w-[360px] max-w-full' // Portrait for Shorts
+                  : 'aspect-video w-full'
+              }>
+                <YouTubeEmbed videoId={selectedVideo.id} title={selectedVideo.title} className="w-full h-full" />
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

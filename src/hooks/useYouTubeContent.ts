@@ -6,7 +6,6 @@ export interface YouTubeVideo {
   video_id: string;
   title: string;
   description?: string;
-  thumbnail_url?: string;
   video_type: 'video' | 'short';
   created_at?: string;
 }

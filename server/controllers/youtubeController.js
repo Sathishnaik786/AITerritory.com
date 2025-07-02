@@ -4,7 +4,7 @@ const getYouTubeContent = async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('youtube_videos')
-      .select('*')
+      .select('id, video_id, title, description, video_type, created_at')
       .order('created_at', { ascending: false });
 
     if (error) {
