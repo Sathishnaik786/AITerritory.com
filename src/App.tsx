@@ -90,20 +90,22 @@ function SEO() {
   const canonicalUrl = `https://aiterritory.org${location.pathname}`;
   return (
     <Helmet>
-      <title>AI Territory - Discover the Best AI Tools & Resources</title>
-      <meta name="description" content="Explore the top AI tools, resources, and innovations at AITerritory.org. Stay ahead with the latest in artificial intelligence for business, productivity, and creativity." />
+      <title>AI Territory</title>
+      <meta name="description" content="Where AI Resources Live, Explore Now" />
       <meta name="robots" content="index, follow" />
       {/* Open Graph */}
-      <meta property="og:title" content="AI Territory - Discover the Best AI Tools & Resources" />
-      <meta property="og:description" content="Explore the top AI tools, resources, and innovations at AITerritory.org. Stay ahead with the latest in artificial intelligence for business, productivity, and creativity." />
+      <meta property="og:title" content="AI Territory" />
+      <meta property="og:description" content="Where AI Resources Live, Explore Now" />
       <meta property="og:type" content="website" />
       <meta property="og:url" content={canonicalUrl} />
-      <meta property="og:image" content="https://aiterritory.org/logo.png" />
+      <meta property="og:image" content="https://opengraph.b-cdn.net/production/images/cdd868e7-ea27-4c33-9870-36abb94bd75a.jpg?token=AZQS4d5VuYFpJ5iGEI5QKWff_3eSadPeW1E01KHy8oA&height=357&width=382&expires=33287474670" />
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="AI Territory - Discover the Best AI Tools & Resources" />
-      <meta name="twitter:description" content="Explore the top AI tools, resources, and innovations at AITerritory.org. Stay ahead with the latest in artificial intelligence for business, productivity, and creativity." />
-      <meta name="twitter:image" content="https://aiterritory.org/logo.png" />
+      <meta property="twitter:domain" content="aiterritory.org" />
+      <meta property="twitter:url" content={canonicalUrl} />
+      <meta name="twitter:title" content="AI Territory" />
+      <meta name="twitter:description" content="Where AI Resources Live, Explore Now" />
+      <meta name="twitter:image" content="https://opengraph.b-cdn.net/production/images/cdd868e7-ea27-4c33-9870-36abb94bd75a.jpg?token=AZQS4d5VuYFpJ5iGEI5QKWff_3eSadPeW1E01KHy8oA&height=357&width=382&expires=33287474670" />
       {/* Canonical */}
       <link rel="canonical" href={canonicalUrl} />
     </Helmet>
