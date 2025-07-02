@@ -98,12 +98,12 @@ function SEO() {
       <meta property="og:description" content="Explore the top AI tools, resources, and innovations at AITerritory.org. Stay ahead with the latest in artificial intelligence for business, productivity, and creativity." />
       <meta property="og:type" content="website" />
       <meta property="og:url" content={canonicalUrl} />
-      <meta property="og:image" content="https://aiterritory.org/og-cover.png" />
+      <meta property="og:image" content="https://aiterritory.org/logo.png" />
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="AI Territory - Discover the Best AI Tools & Resources" />
       <meta name="twitter:description" content="Explore the top AI tools, resources, and innovations at AITerritory.org. Stay ahead with the latest in artificial intelligence for business, productivity, and creativity." />
-      <meta name="twitter:image" content="https://aiterritory.org/og-cover.png" />
+      <meta name="twitter:image" content="https://aiterritory.org/logo.png" />
       {/* Canonical */}
       <link rel="canonical" href={canonicalUrl} />
     </Helmet>
