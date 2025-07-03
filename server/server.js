@@ -21,6 +21,7 @@ const likesRoutes = require('./routes/likes');
 const sharesRoutes = require('./routes/shares');
 const testimonialsRoutes = require('./routes/testimonials');
 const promptsRoutes = require('./routes/prompts');
+const promptActionsRoutes = require('./routes/promptActions');
 
 const app = express();
 
@@ -133,6 +134,7 @@ app.use('/api/likes', likesRoutes);
 app.use('/api/shares', sharesRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
 app.use('/api/prompts', promptsRoutes);
+app.use('/api/prompt-actions', promptActionsRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

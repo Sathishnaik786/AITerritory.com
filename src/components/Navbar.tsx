@@ -73,8 +73,8 @@ export function Navbar() {
     >
       <div className={`max-w-6xl mx-auto rounded-2xl shadow-lg px-6 py-1 flex flex-col transition-all duration-500 border ${
         theme === 'dark'
-          ? 'border-white bg-charcoal dark:bg-charcoal backdrop-blur-md'
-          : 'border-black bg-white dark:bg-charcoal'
+          ? 'border-white bg-black dark:bg-black backdrop-blur-md'
+          : 'border-black bg-white dark:bg-black'
       }`}>
         <div className="flex items-center justify-between h-12">
           {/* Logo */}
