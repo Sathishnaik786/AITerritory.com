@@ -26,6 +26,7 @@ const feedbackRouter = require('./routes/feedback');
 const reviewsRoutes = require('./routes/reviews');
 const aiLearningPathCoursesRoutes = require('./routes/ai-learning-path-courses');
 const aiAgentLearningResourcesRoutes = require('./routes/ai-agent-learning-resources');
+const repurposeRoutes = require('./routes/repurpose');
 
 const app = express();
 
@@ -143,6 +144,7 @@ app.use('/api/feedback', feedbackRouter);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/ai-learning-path-courses', aiLearningPathCoursesRoutes);
 app.use('/api/ai-agent-learning-resources', aiAgentLearningResourcesRoutes);
+app.use('/api/repurpose', repurposeRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

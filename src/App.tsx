@@ -68,6 +68,7 @@ import Prompts from './components/Prompts';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import React, { Suspense } from 'react';
 import FeedbackAdmin from './admin/FeedbackAdmin';
+import SmartRepurposeToolPage from './pages/SmartRepurposeToolPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -248,6 +249,8 @@ function ThemedAppContent() {
               <Route path="/tools/ai-text-generators" element={<BestAITextGeneratorsPage />} />
               <Route path="/tools/:toolId" element={<ToolDetailsPage />} />
               
+              <Route path="/repurpose" element={<SmartRepurposeToolPage />} />
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

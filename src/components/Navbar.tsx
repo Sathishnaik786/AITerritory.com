@@ -18,6 +18,7 @@ import {
   UserButton,
   useUser,
 } from "@clerk/clerk-react";
+import { RepurposeModal } from './ui/RepurposeModal';
 
 export function Navbar() {
   const { theme, toggleTheme } = useTheme();
@@ -169,6 +170,8 @@ export function Navbar() {
                 }`}></span>
               </Link>
             </motion.div>
+            
+            <RepurposeModal />
             
             <DropdownMenu onOpenChange={setIsDesktopDropdownOpen}>
               <DropdownMenuTrigger className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none flex items-center gap-1 group">
