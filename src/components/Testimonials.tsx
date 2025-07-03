@@ -86,6 +86,7 @@ const Testimonials: React.FC = () => {
                       className={`w-12 h-12 rounded-full object-cover border-2 ${
                         theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
                       }`} 
+                      loading="lazy"
                     />
                   ) : (
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${
@@ -148,6 +149,7 @@ const Testimonials: React.FC = () => {
                       className={`w-12 h-12 rounded-full object-cover border-2 ${
                         theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
                       }`} 
+                      loading="lazy"
                     />
                   ) : (
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${

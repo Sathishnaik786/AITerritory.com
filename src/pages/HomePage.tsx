@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useTools, useFeaturedTools, useTrendingTools } from '../hooks/useTools';
 import { useCategories } from '../hooks/useCategories';
 import { ToolGrid } from '../components/ToolGrid';
@@ -10,65 +10,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { TrendingUp, Star, Search, Filter } from 'lucide-react';
 import { Tool } from '../types/tool';
-import Testimonials from '../components/Testimonials';
+import { lazy } from 'react';
+
+// Lazy-load Testimonials component
+const Testimonials = lazy(() => import('../components/Testimonials'));
 
 // Carousel component for featured/trending tools
-const ToolCarousel = ({ tools, loading, variant }: { tools: Tool[]; loading: boolean; variant: 'featured' | 'compact'; }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [cardsToShow, setCardsToShow] = useState(2);
-  const interval = 5000; // 5 seconds
-
-  // Responsive cardsToShow
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) {
-        setCardsToShow(1);
-      } else {
-        setCardsToShow(2);
-      }
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (!tools || tools.length === 0) return;
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % (tools.length > cardsToShow ? tools.length : 1));
-    }, interval);
-    return () => clearInterval(timer);
-  }, [tools, cardsToShow]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-  if (!tools || tools.length === 0) {
-    return <div>No tools found.</div>;
-  }
-
-  // Get N tools to display, wrap around if needed
-  const getDisplayedTools = () => {
-    const displayed = [];
-    for (let i = 0; i < cardsToShow; i++) {
-      displayed.push(tools[(currentIndex + i) % tools.length]);
-    }
-    return displayed;
-  };
-
-  return (
-    <div className="w-full flex flex-row gap-4 justify-center items-stretch">
-      {getDisplayedTools().map((tool, idx) => (
-        <div
-          key={tool.id || idx}
-          className="flex-1 min-w-0 flex-shrink-0"
-        >
-          <ToolGrid tools={[tool]} loading={false} variant={variant} columns={1} />
-        </div>
-      ))}
-    </div>
-  );
-};
+const ToolCarousel = React.lazy(() => import('../components/ToolCarousel'));
 
 export const HomePage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
@@ -120,11 +68,13 @@ export const HomePage: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ToolCarousel
-              tools={featuredTools || []}
-              loading={featuredLoading}
-              variant="compact"
-            />
+            <Suspense fallback={null}>
+              <ToolCarousel
+                tools={featuredTools || []}
+                loading={featuredLoading}
+                variant="compact"
+              />
+            </Suspense>
           </CardContent>
         </Card>
 
@@ -140,11 +90,13 @@ export const HomePage: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ToolCarousel
-              tools={trendingTools || []}
-              loading={trendingLoading}
-              variant="compact"
-            />
+            <Suspense fallback={null}>
+              <ToolCarousel
+                tools={trendingTools || []}
+                loading={trendingLoading}
+                variant="compact"
+              />
+            </Suspense>
           </CardContent>
         </Card>
       </div>
@@ -206,7 +158,9 @@ export const HomePage: React.FC = () => {
         </div>
       </div>
       {/* Testimonials Section */}
-      <Testimonials />
+      <Suspense fallback={null}>
+        <Testimonials />
+      </Suspense>
     </div>
   );
 };

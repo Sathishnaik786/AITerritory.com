@@ -1,11 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, Suspense } from 'react';
 import SearchBar from '../components/SearchBar';
 import CategorySidebar from '../components/CategorySidebar';
-import ToolCarousel from '../components/ToolCarousel';
-import { toolsData } from '../data/tools';
-import { ExternalLink, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ToolCard } from '../components/ToolCard';
+
+const ToolCarousel = React.lazy(() => import('../components/ToolCarousel'));
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Tools');
@@ -111,7 +110,9 @@ const Index = () => {
       <section className="py-16 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Featured AI Tools</h2>
-          <ToolCarousel />
+          <Suspense fallback={null}>
+            <ToolCarousel />
+          </Suspense>
         </div>
       </section>
 

@@ -66,6 +66,7 @@ import UserDashboardPage from './pages/UserDashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Prompts from './components/Prompts';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
+import React, { Suspense } from 'react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -111,6 +112,10 @@ function SEO() {
     
     {/* Canonical */}
     <link rel="canonical" href={canonicalUrl} />
+    <link rel="preconnect" href="https://aiterritory-com.onrender.com" />
+    <link rel="dns-prefetch" href="https://aiterritory-com.onrender.com" />
+    <link rel="preconnect" href="https://api.openai.com" />
+    <link rel="dns-prefetch" href="https://api.openai.com" />
   </Helmet>  
   );
 }
@@ -214,7 +219,11 @@ function ThemedAppContent() {
                 <ProtectedRoute>
                   <AdminLayout>
                     <Routes>
-                      <Route path="/" element={<AdminDashboard />} />
+                      <Route path="/" element={
+                        <Suspense fallback={null}>
+                          <AdminDashboard />
+                        </Suspense>
+                      } />
                       <Route path="business-functions" element={<BusinessFunctionsAdmin />} />
                       <Route path="ai-agents" element={<AIAgentsAdmin />} />
                       <Route path="ai-innovations" element={<AIInnovationsAdmin />} />
