@@ -20,28 +20,45 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { useNavigate } from 'react-router-dom';
 import { bookmarkService } from '../services/bookmarkService';
 import { Tool } from '../types/tool';
+import { LikesService } from '../services/likesService';
+import { SharesService } from '../services/sharesService';
+import { getReviewsForUser } from '../services/reviewsService';
 
 const UserDashboardPage: React.FC = () => {
   const { user, signOut } = useUser();
   const navigate = useNavigate();
   const [bookmarks, setBookmarks] = useState<Tool[]>([]);
+  const [likes, setLikes] = useState<any[]>([]);
+  const [shares, setShares] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBookmarks = async () => {
+    const fetchData = async () => {
       if (user?.id) {
+        setLoading(true);
         try {
-          const userBookmarks = await bookmarkService.getUserBookmarks(user.id);
-          setBookmarks(userBookmarks);
+          const [userBookmarks, userLikes, userShares, userReviews] = await Promise.all([
+            bookmarkService.getBookmarksForUser(user.id),
+            LikesService.getLikesForUser(user.id),
+            SharesService.getSharesForUser(user.id),
+            getReviewsForUser(user.id),
+          ]);
+          setBookmarks(userBookmarks || []);
+          setLikes(userLikes || []);
+          setShares(userShares || []);
+          setReviews(userReviews || []);
         } catch (error) {
-          console.error('Error fetching bookmarks:', error);
+          setLikes([]);
+          setShares([]);
+          setReviews([]);
+          console.error('Error fetching user dashboard data:', error);
         } finally {
           setLoading(false);
         }
       }
     };
-
-    fetchBookmarks();
+    fetchData();
   }, [user?.id]);
 
   const handleSignOut = async () => {
@@ -109,7 +126,7 @@ const UserDashboardPage: React.FC = () => {
               <div className="flex items-center">
                 <Heart className="w-8 h-8 text-red-600 mr-4" />
                 <div>
-                  <p className="text-2xl font-bold">0</p>
+                  <p className="text-2xl font-bold">{likes.length}</p>
                   <p className="text-gray-600 dark:text-gray-400">Likes</p>
                 </div>
               </div>
@@ -121,7 +138,7 @@ const UserDashboardPage: React.FC = () => {
               <div className="flex items-center">
                 <Share2 className="w-8 h-8 text-green-600 mr-4" />
                 <div>
-                  <p className="text-2xl font-bold">0</p>
+                  <p className="text-2xl font-bold">{shares.length}</p>
                   <p className="text-gray-600 dark:text-gray-400">Shares</p>
                 </div>
               </div>
@@ -133,7 +150,7 @@ const UserDashboardPage: React.FC = () => {
               <div className="flex items-center">
                 <Star className="w-8 h-8 text-yellow-600 mr-4" />
                 <div>
-                  <p className="text-2xl font-bold">0</p>
+                  <p className="text-2xl font-bold">{reviews.length}</p>
                   <p className="text-gray-600 dark:text-gray-400">Reviews</p>
                 </div>
               </div>
@@ -148,7 +165,7 @@ const UserDashboardPage: React.FC = () => {
           transition={{ delay: 0.2 }}
         >
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="profile" className="flex items-center gap-2">
                 <User className="w-4 h-4" />
                 Profile
@@ -156,6 +173,18 @@ const UserDashboardPage: React.FC = () => {
               <TabsTrigger value="bookmarks" className="flex items-center gap-2">
                 <Bookmark className="w-4 h-4" />
                 Bookmarks
+              </TabsTrigger>
+              <TabsTrigger value="likes" className="flex items-center gap-2">
+                <Heart className="w-4 h-4" />
+                Likes
+              </TabsTrigger>
+              <TabsTrigger value="shares" className="flex items-center gap-2">
+                <Share2 className="w-4 h-4" />
+                Shares
+              </TabsTrigger>
+              <TabsTrigger value="reviews" className="flex items-center gap-2">
+                <Star className="w-4 h-4" />
+                Reviews
               </TabsTrigger>
               <TabsTrigger value="activity" className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
@@ -213,7 +242,7 @@ const UserDashboardPage: React.FC = () => {
                   ) : bookmarks.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {bookmarks.map((tool) => (
-                        <Card key={tool.id} className="hover:shadow-lg transition-shadow">
+                        <Card key={tool.id || tool.link} className="hover:shadow-lg transition-shadow">
                           <CardContent className="p-4">
                             <div className="flex items-start space-x-3">
                               <img
@@ -251,6 +280,122 @@ const UserDashboardPage: React.FC = () => {
                       <Button onClick={() => navigate('/resources/all-resources')}>
                         Explore Tools
                       </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Likes Tab */}
+            <TabsContent value="likes" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your Likes</CardTitle>
+                  <CardDescription>Tools you've liked</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loading ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
+                      <p className="mt-2 text-gray-600">Loading likes...</p>
+                    </div>
+                  ) : likes.length > 0 ? (
+                    <ul className="space-y-4">
+                      {likes.map((like) => (
+                        <li key={like.id || like.tool_id} className="border rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+                          <div>
+                            <span className="font-semibold">Tool ID:</span> {like.tool_id}
+                            {/* To show tool name/image, fetch tool details by tool_id here */}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-2 md:mt-0">Liked on {new Date(like.created_at).toLocaleString()}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Heart className="w-12 h-12 text-red-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No likes yet</h3>
+                      <p className="text-gray-600 mb-4">Like some tools to see them here</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Shares Tab */}
+            <TabsContent value="shares" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your Shares</CardTitle>
+                  <CardDescription>Tools you've shared</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loading ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+                      <p className="mt-2 text-gray-600">Loading shares...</p>
+                    </div>
+                  ) : shares.length > 0 ? (
+                    <ul className="space-y-4">
+                      {shares.map((share) => (
+                        <li key={share.id || share.tool_id + share.platform + share.created_at} className="border rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+                          <div>
+                            <span className="font-semibold">Tool ID:</span> {share.tool_id}
+                            {share.tool_name && <span className="ml-2">({share.tool_name})</span>}
+                            {share.platform && <span className="ml-2 text-xs text-gray-500">[{share.platform}]</span>}
+                            {/* To show tool name/image, fetch tool details by tool_id here */}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-2 md:mt-0">Shared on {new Date(share.created_at).toLocaleString()}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Share2 className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No shares yet</h3>
+                      <p className="text-gray-600 mb-4">Share some tools to see them here</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Reviews Tab */}
+            <TabsContent value="reviews" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your Reviews</CardTitle>
+                  <CardDescription>Reviews you've written</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {loading ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-600 mx-auto"></div>
+                      <p className="mt-2 text-gray-600">Loading reviews...</p>
+                    </div>
+                  ) : reviews.length > 0 ? (
+                    <ul className="space-y-4">
+                      {reviews.map((review) => (
+                        <li key={review.id || review.tool_id + review.created_at} className="border rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+                          <div>
+                            <span className="font-semibold">Tool ID:</span> {review.tool_id}
+                            {/* To show tool name/image, fetch tool details by tool_id here */}
+                            <div className="mt-1">
+                              <span className="font-semibold">Rating:</span> {review.rating} / 5
+                            </div>
+                            <div className="mt-1">
+                              <span className="font-semibold">Comment:</span> {review.comment}
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-500 mt-2 md:mt-0">Reviewed on {new Date(review.created_at).toLocaleString()}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Star className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No reviews yet</h3>
+                      <p className="text-gray-600 mb-4">Write a review to see it here</p>
                     </div>
                   )}
                 </CardContent>

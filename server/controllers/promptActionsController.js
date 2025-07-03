@@ -1,4 +1,4 @@
-const supabase = require('../lib/supabase');
+const { supabase } = require('../lib/supabase');
 
 // Like a prompt
 exports.likePrompt = async (req, res) => {

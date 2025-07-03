@@ -22,6 +22,10 @@ const sharesRoutes = require('./routes/shares');
 const testimonialsRoutes = require('./routes/testimonials');
 const promptsRoutes = require('./routes/prompts');
 const promptActionsRoutes = require('./routes/promptActions');
+const feedbackRouter = require('./routes/feedback');
+const reviewsRoutes = require('./routes/reviews');
+const aiLearningPathCoursesRoutes = require('./routes/ai-learning-path-courses');
+const aiAgentLearningResourcesRoutes = require('./routes/ai-agent-learning-resources');
 
 const app = express();
 
@@ -135,6 +139,10 @@ app.use('/api/shares', sharesRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
 app.use('/api/prompts', promptsRoutes);
 app.use('/api/prompt-actions', promptActionsRoutes);
+app.use('/api/feedback', feedbackRouter);
+app.use('/api/reviews', reviewsRoutes);
+app.use('/api/ai-learning-path-courses', aiLearningPathCoursesRoutes);
+app.use('/api/ai-agent-learning-resources', aiAgentLearningResourcesRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

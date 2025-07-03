@@ -17,4 +17,7 @@ router.post('/:toolId/urls', sharesController.getShareUrls);
 // Get share counts for multiple tools
 router.post('/counts', sharesController.getShareCounts);
 
+// Get all shares for a user
+router.get('/', sharesController.getSharesByUser);
+
 module.exports = router; 

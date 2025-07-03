@@ -1,4 +1,4 @@
-const supabase = require('../lib/supabase');
+const { supabase } = require('../lib/supabase');
 
 // Get like count for a tool
 exports.getLikeCount = async (req, res) => {
@@ -141,6 +141,29 @@ exports.checkUserLike = async (req, res) => {
     res.json({ hasLiked: !!data });
   } catch (error) {
     console.error('Error in checkUserLike:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Get all likes for a user
+exports.getLikesByUser = async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    if (!user_id) {
+      return res.status(400).json({ error: 'user_id is required' });
+    }
+    const { data, error } = await supabase
+      .from('likes')
+      .select('*')
+      .eq('user_id', user_id)
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.error('Error fetching likes by user:', error);
+      return res.status(500).json({ error: error.message });
+    }
+    res.json({ likes: data || [] });
+  } catch (error) {
+    console.error('Error in getLikesByUser:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }; 

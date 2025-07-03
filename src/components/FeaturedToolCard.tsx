@@ -13,12 +13,15 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
   const bookmarkCount = Math.floor(Math.random() * 5000) + 100;
   const pricing = tool.status === 'Free' ? 'Free' : (Math.random() > 0.7 ? 'Active deal' : 'Freemium');
 
+  // Use image_url from Supabase, fallback to image for legacy support
+  const imageSrc = tool.image_url || tool.image;
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 flex flex-col h-full p-3 sm:p-5">
       {/* Top Row: Logo, Verified, Name, Rating */}
       <div className="flex items-center gap-2 sm:gap-3 mb-2">
-        {tool.image ? (
-          <img src={tool.image} alt={tool.name} className="w-12 h-12 object-contain rounded-lg flex-shrink-0" />
+        {imageSrc ? (
+          <img loading="lazy" src={imageSrc} alt={tool.name} className="w-12 h-12 object-contain rounded-lg flex-shrink-0" />
         ) : (
           <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 text-xl font-bold">
             {tool.name.charAt(0)}

@@ -3,6 +3,7 @@ import { ArrowRight, PlayCircle, Github, Globe, BookOpen, Code, Brain } from 'lu
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { YouTubeVideoPlayer } from '../components/YouTubeVideoPlayer';
+import { AIAgentLearningResources } from '../components/AIAgentLearningResources';
 
 const AIAgents = () => {
   const featuredAgents = [
@@ -55,6 +56,9 @@ const AIAgents = () => {
       category: "Framework"
     }
   ];
+
+  // Replace with your actual AI Agents learning path UUID from Supabase
+  const AI_AGENTS_LEARNING_PATH_ID = 'YOUR_AI_AGENTS_LEARNING_PATH_ID';
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -151,38 +155,7 @@ const AIAgents = () => {
       {/* Resources Section */}
       <div className="mb-16">
         <h2 className="text-3xl font-bold mb-8">Learning Resources</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Getting Started with AI Agents</CardTitle>
-              <CardDescription>
-                Learn the basics of AI agents and how to use them effectively
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <YouTubeVideoPlayer
-                videoId="8tLwvHvXWbY"
-                title="Getting Started with AI Agents"
-                className="w-full h-full rounded-lg"
-              />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Building Your First AI Agent</CardTitle>
-              <CardDescription>
-                Step-by-step guide to creating your own AI agent
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <YouTubeVideoPlayer
-                videoId="3f7Uw3d3f64"
-                title="Building Your First AI Agent"
-                className="w-full h-full rounded-lg"
-              />
-            </CardContent>
-          </Card>
-        </div>
+        <AIAgentLearningResources learningPathId={AI_AGENTS_LEARNING_PATH_ID} />
       </div>
 
       {/* Newsletter Section */}

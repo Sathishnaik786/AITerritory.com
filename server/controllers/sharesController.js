@@ -1,4 +1,4 @@
-const supabase = require('../lib/supabase');
+const { supabase } = require('../lib/supabase');
 
 // Get share count for a tool
 exports.getShareCount = async (req, res) => {
@@ -160,6 +160,29 @@ exports.getShareCounts = async (req, res) => {
     res.json(shareCounts);
   } catch (error) {
     console.error('Error in getShareCounts:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Get all shares for a user
+exports.getSharesByUser = async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    if (!user_id) {
+      return res.status(400).json({ error: 'user_id is required' });
+    }
+    const { data, error } = await supabase
+      .from('shares')
+      .select('*')
+      .eq('user_id', user_id)
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.error('Error fetching shares by user:', error);
+      return res.status(500).json({ error: error.message });
+    }
+    res.json({ shares: data || [] });
+  } catch (error) {
+    console.error('Error in getSharesByUser:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }; 

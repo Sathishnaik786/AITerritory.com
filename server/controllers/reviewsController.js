@@ -99,10 +99,25 @@ async function moderateReview(req, res, next) {
   }
 }
 
+// GET /api/reviews?user_id=...
+async function getReviewsByUser(req, res, next) {
+  try {
+    const { user_id } = req.query;
+    if (!user_id) {
+      return res.status(400).json({ error: 'user_id is required' });
+    }
+    const reviews = await Review.getReviewsByUserId(user_id);
+    res.json({ reviews });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   getReviews,
   addReview,
   editReview,
   deleteReview,
   moderateReview,
+  getReviewsByUser,
 }; 

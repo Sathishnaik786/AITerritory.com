@@ -88,6 +88,7 @@ export function Navbar() {
                   src="/logo.jpg" 
                   alt="Viralai Logo" 
                   className="h-10 w-10 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900"
+                  loading="lazy"
                 />
                 <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-0.5">
                   <Sparkles className="w-3 h-3 text-white" />

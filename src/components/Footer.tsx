@@ -14,6 +14,7 @@ import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 import TestimonialForm from './TestimonialForm';
 import { useState } from 'react';
+import FeedbackModal from './FeedbackModal';
 
 // Add scrollToTop utility
 function scrollToTop() {
@@ -34,7 +35,7 @@ export function Footer() {
           {/* Brand & Social */}
           <div className="flex-1 min-w-[220px] flex flex-col gap-4">
             <Link to="/" className="flex items-center space-x-3 mb-2" onClick={scrollToTop}>
-              <img src="/logo.jpg" alt="AI Territory Logo" className="h-10 w-10 rounded-full object-cover border-2 border-blue-600" />
+              <img src="/logo.jpg" alt="AI Territory Logo" className="h-10 w-10 rounded-full object-cover border-2 border-blue-600" loading="lazy" />
               <span className="text-xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">AI Territory</span>
             </Link>
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs mb-2">
@@ -131,6 +132,10 @@ export function Footer() {
                 <Moon className="h-4 w-4" />
               )}
             </button>
+            {/* Feedback Modal Trigger Button */}
+            <div className="ml-4">
+              <FeedbackModal />
+            </div>
             {/* Submit Testimonial Button: opens sign-in modal if not logged in, else opens testimonial form */}
             {!user ? (
               <SignInButton mode="modal">

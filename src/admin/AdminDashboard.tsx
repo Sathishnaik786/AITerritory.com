@@ -127,6 +127,10 @@ const AdminDashboard: React.FC = () => {
                <CardContent><p className="text-sm text-muted-foreground">Manage tutorials</p></CardContent>
             </Card>
           </Link>
+          <Link to="/admin/feedback" className="block p-6 bg-white dark:bg-gray-900 rounded-lg shadow hover:shadow-md transition-all border border-gray-200 dark:border-gray-700">
+            <h2 className="text-lg font-bold mb-2">Feedback</h2>
+            <p className="text-gray-600 dark:text-gray-300">View and manage user feedback submissions.</p>
+          </Link>
         </div>
       </section>
     </div>

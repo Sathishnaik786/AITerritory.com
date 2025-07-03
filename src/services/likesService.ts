@@ -183,4 +183,9 @@ export class LikesService {
 
     return subscription;
   }
+
+  static async getLikesForUser(user_id: string) {
+    const res = await axios.get('/likes', { params: { user_id } });
+    return res.data.likes;
+  }
 } 

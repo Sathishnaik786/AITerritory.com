@@ -14,4 +14,7 @@ router.delete('/:toolId', likesController.removeLike);
 // Check if user has liked a tool
 router.get('/:toolId/user/:userId', likesController.checkUserLike);
 
+// Get all likes for a user
+router.get('/', likesController.getLikesByUser);
+
 module.exports = router; 

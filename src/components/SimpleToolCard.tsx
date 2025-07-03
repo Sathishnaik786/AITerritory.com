@@ -12,7 +12,7 @@ const SimpleToolCard: React.FC<SimpleToolCardProps> = ({ tool }) => {
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5 flex flex-col h-full border border-gray-100 dark:border-gray-700">
       <div className="flex items-center mb-3">
         {imageSrc ? (
-          <img src={imageSrc} alt={tool.name} className="w-12 h-12 object-contain rounded-full mr-3" />
+          <img loading="lazy" src={imageSrc} alt={tool.name} className="w-12 h-12 object-contain rounded-full mr-3" />
         ) : (
           <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 text-lg font-bold">
             {tool.name.charAt(0)}

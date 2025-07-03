@@ -137,7 +137,7 @@ const AIAutomationAdmin = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {tools && tools.map((item: any) => (
             <div key={item.id} className="bg-white dark:bg-gray-900 rounded-lg shadow p-4 flex flex-col gap-2 border relative">
-              <img src={item.image} alt={item.title} className="w-full h-32 object-cover rounded mb-2" />
+              <img src={item.image} alt={item.title} className="w-full h-32 object-cover rounded mb-2" loading="lazy" />
               <span className="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-800 mb-1 w-fit">{item.category}</span>
               <h3 className="font-bold text-lg mb-1">{item.title}</h3>
               <p className="text-sm text-gray-700 dark:text-gray-300 mb-1 line-clamp-2">{item.description}</p>
@@ -166,7 +166,7 @@ const AIAutomationAdmin = () => {
             <div className="mb-3">
               <label className="block mb-1 font-semibold">Image URL</label>
               <input className="w-full border p-2 rounded" value={toolForm.image} onChange={e => setToolForm({ ...toolForm, image: e.target.value })} required />
-              {toolForm.image && <img src={toolForm.image} alt="Preview" className="w-full h-24 object-cover rounded mt-2" />}
+              {toolForm.image && <img src={toolForm.image} alt="Preview" className="w-full h-24 object-cover rounded mt-2" loading="lazy" />}
             </div>
             <div className="mb-3">
               <label className="block mb-1 font-semibold">Link</label>
@@ -193,7 +193,7 @@ const AIAutomationAdmin = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {useCases && useCases.map((item: any) => (
             <div key={item.id} className="bg-white dark:bg-gray-900 rounded-lg shadow p-4 flex flex-col gap-2 border relative">
-              <img src={item.image} alt={item.title} className="w-full h-32 object-cover rounded mb-2" />
+              <img src={item.image} alt={item.title} className="w-full h-32 object-cover rounded mb-2" loading="lazy" />
               <div className="flex gap-2 mb-1">
                 <span className="px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-800">{item.level}</span>
                 <span className="px-2 py-1 rounded text-xs font-semibold bg-gray-200 text-gray-900">{item.duration}</span>
@@ -225,7 +225,7 @@ const AIAutomationAdmin = () => {
             <div className="mb-3">
               <label className="block mb-1 font-semibold">Image URL</label>
               <input className="w-full border p-2 rounded" value={useCaseForm.image} onChange={e => setUseCaseForm({ ...useCaseForm, image: e.target.value })} required />
-              {useCaseForm.image && <img src={useCaseForm.image} alt="Preview" className="w-full h-24 object-cover rounded mt-2" />}
+              {useCaseForm.image && <img src={useCaseForm.image} alt="Preview" className="w-full h-24 object-cover rounded mt-2" loading="lazy" />}
             </div>
             <div className="mb-3 flex gap-2">
               <div className="flex-1">

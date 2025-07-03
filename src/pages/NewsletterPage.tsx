@@ -3,7 +3,7 @@ import React from 'react';
 const NewsletterPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12 text-center">
-      <img src="https://via.placeholder.com/150" alt="Newsletter" className="mx-auto mb-6 rounded-lg" />
+      <img src="https://via.placeholder.com/150" alt="Newsletter" className="mx-auto mb-6 rounded-lg" loading="lazy" />
       <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Subscribe to Our Newsletter</h1>
       <p className="text-lg text-muted-foreground mb-6">
         Get the latest AI tool updates, news, and exclusive insights directly to your inbox.

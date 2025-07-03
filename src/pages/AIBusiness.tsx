@@ -120,18 +120,6 @@ const AIBusiness = () => {
         </p>
       </div>
 
-      {/* Business Tools Carousel */}
-      <div className="mb-12">
-        <h2 className="text-3xl font-bold mb-4">Featured Business Tools</h2>
-        <ToolCarousel tools={businessTools || []} loading={toolsLoading} variant="featured" />
-      </div>
-
-      {/* Business Tools Grid */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">All Business Tools</h2>
-        <ToolGrid tools={businessTools || []} loading={toolsLoading} variant="default" />
-      </div>
-
       <div className="space-y-12">
         {businessFunctions.map((func: any) => {
           const Icon = iconMap[func.icon] || Edit;
@@ -166,7 +154,7 @@ const AIBusiness = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {func.trendingCourses.map((course: any) => (
                     <Link to={course.link} target="_blank" rel="noopener noreferrer" key={course.id} className="block border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group">
-                      <img src={course.image} alt={course.title} className="w-full h-50 object-cover" style={{ width: '360px', height: '200px' }} />
+                      <img src={course.image} alt={course.title} className="w-full h-50 object-cover" style={{ width: '360px', height: '200px' }} loading="lazy" />
                       <div className="p-4">
                         <h4 className="text-md font-semibold text-gray-800 dark:text-gray-100 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                           {course.title}

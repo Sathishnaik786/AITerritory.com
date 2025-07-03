@@ -158,4 +158,9 @@ export class SharesService {
 
     return subscription;
   }
+
+  static async getSharesForUser(user_id: string) {
+    const res = await axios.get('/shares', { params: { user_id } });
+    return res.data.shares;
+  }
 } 

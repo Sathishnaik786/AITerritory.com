@@ -68,7 +68,7 @@ const AIAgentsAdmin = () => {
                 <td className="p-2 border">{item.type}</td>
                 <td className="p-2 border">{item.title}</td>
                 <td className="p-2 border">{item.description}</td>
-                <td className="p-2 border"><img src={item.image} alt={item.title} className="w-12 h-12 object-cover" /></td>
+                <td className="p-2 border"><img src={item.image} alt={item.title} className="w-12 h-12 object-cover" loading="lazy" /></td>
                 <td className="p-2 border"><a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Link</a></td>
                 <td className="p-2 border">{item.category}</td>
                 <td className="p-2 border">{item.stars}</td>

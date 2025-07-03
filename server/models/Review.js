@@ -150,6 +150,24 @@ async function getReviewById(reviewId) {
   }
 }
 
+async function getReviewsByUserId(user_id) {
+  try {
+    const { data, error } = await supabase
+      .from(TABLE)
+      .select('*')
+      .eq('user_id', user_id)
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.error('Review getReviewsByUserId error:', error);
+      throw error;
+    }
+    return data || [];
+  } catch (error) {
+    console.error('Review getReviewsByUserId error:', error);
+    return [];
+  }
+}
+
 module.exports = {
   getReviewsByToolId,
   addReview,
@@ -158,4 +176,5 @@ module.exports = {
   updateReview,
   deleteReview,
   getReviewById,
+  getReviewsByUserId,
 }; 

@@ -79,6 +79,7 @@ const YouTubeChannelPage: React.FC = () => {
                             target.src = getFallbackThumbnailUrl(video.video_id);
                           }
                         }}
+                        loading="lazy"
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-t-xl">
                         <PlayCircle className="w-16 h-16 text-white" />
@@ -123,6 +124,7 @@ const YouTubeChannelPage: React.FC = () => {
                             target.src = getFallbackThumbnailUrl(short.video_id);
                           }
                         }}
+                        loading="lazy"
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-t-xl">
                         <PlayCircle className="w-12 h-12 text-white" />

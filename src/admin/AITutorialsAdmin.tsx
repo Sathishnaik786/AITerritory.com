@@ -153,7 +153,7 @@ const AITutorialsAdmin = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {tutorials && tutorials.map((item: any) => (
             <div key={item.id} className="bg-white dark:bg-gray-900 rounded-lg shadow p-4 flex flex-col gap-2 border relative">
-              <img src={item.image} alt={item.title} className="w-full h-40 object-cover rounded mb-2" />
+              <img src={item.image} alt={item.title} className="w-full h-40 object-cover rounded mb-2" loading="lazy" />
               <div className="flex gap-2 mb-1">
                 <span className={`px-2 py-1 rounded text-xs font-semibold ${item.type === 'featured' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>{item.type}</span>
                 <span className={`px-2 py-1 rounded text-xs font-semibold ${item.level === 'Beginner' ? 'bg-yellow-100 text-yellow-800' : item.level === 'Intermediate' ? 'bg-orange-100 text-orange-800' : 'bg-purple-100 text-purple-800'}`}>{item.level}</span>
@@ -195,7 +195,7 @@ const AITutorialsAdmin = () => {
             <div className="mb-3">
               <label className="block mb-1 font-semibold">Image URL</label>
               <input className="w-full border p-2 rounded" value={tutorialForm.image} onChange={e => setTutorialForm({ ...tutorialForm, image: e.target.value })} required />
-              {tutorialForm.image && <img src={tutorialForm.image} alt="Preview" className="w-full h-32 object-cover rounded mt-2" />}
+              {tutorialForm.image && <img src={tutorialForm.image} alt="Preview" className="w-full h-32 object-cover rounded mt-2" loading="lazy" />}
             </div>
             <div className="mb-3 flex gap-2">
               <div className="flex-1">
@@ -239,7 +239,7 @@ const AITutorialsAdmin = () => {
               <tr key={item.id} className="border-b">
                 <td className="p-2 border cursor-pointer text-blue-600 underline" onClick={() => setSelectedPathId(item.id)}>{item.title}</td>
                 <td className="p-2 border">{item.description}</td>
-                <td className="p-2 border"><img src={item.image} alt={item.title} className="w-12 h-12 object-cover" /></td>
+                <td className="p-2 border"><img src={item.image} alt={item.title} className="w-12 h-12 object-cover" loading="lazy" /></td>
                 <td className="p-2 border">
                   <button className="text-blue-600 mr-2" onClick={() => handleEditPath(item)}>Edit</button>
                   <button className="text-red-600" onClick={() => handleDeletePath(item.id)}>Delete</button>
@@ -300,7 +300,7 @@ const AITutorialsAdmin = () => {
                   <tr key={item.id} className="border-b">
                     <td className="p-2 border">{item.title}</td>
                     <td className="p-2 border">{item.description}</td>
-                    <td className="p-2 border"><img src={item.image} alt={item.title} className="w-12 h-12 object-cover" /></td>
+                    <td className="p-2 border"><img src={item.image} alt={item.title} className="w-12 h-12 object-cover" loading="lazy" /></td>
                     <td className="p-2 border">{item.duration}</td>
                     <td className="p-2 border">{item.level}</td>
                     <td className="p-2 border"><a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Link</a></td>

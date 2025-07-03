@@ -67,6 +67,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Prompts from './components/Prompts';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import React, { Suspense } from 'react';
+import FeedbackAdmin from './admin/FeedbackAdmin';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -233,6 +234,7 @@ function ThemedAppContent() {
                       <Route path="submissions/advertise" element={<AdvertiseSubmissionsAdmin />} />
                       <Route path="submissions/tools" element={<ToolSubmissionsAdmin />} />
                       <Route path="submissions/features" element={<FeatureRequestsAdmin />} />
+                      <Route path="feedback" element={<FeedbackAdmin />} />
                     </Routes>
                   </AdminLayout>
                 </ProtectedRoute>

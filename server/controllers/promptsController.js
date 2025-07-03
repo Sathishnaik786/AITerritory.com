@@ -1,4 +1,4 @@
-const supabase = require('../lib/supabase');
+const { supabase } = require('../lib/supabase');
 
 // GET /api/prompts
 exports.getAllPrompts = async (req, res) => {
