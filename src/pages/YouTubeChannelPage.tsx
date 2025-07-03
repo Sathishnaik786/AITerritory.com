@@ -84,9 +84,6 @@ const YouTubeChannelPage: React.FC = () => {
                         <PlayCircle className="w-16 h-16 text-white" />
                       </div>
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg line-clamp-2 min-h-[48px]">{video.title}</h3>
-                    </div>
                   </CardContent>
                 </Card>
               ))
@@ -130,9 +127,6 @@ const YouTubeChannelPage: React.FC = () => {
                       <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-t-xl">
                         <PlayCircle className="w-12 h-12 text-white" />
                       </div>
-                    </div>
-                    <div className="p-3">
-                      <h3 className="font-semibold text-md truncate min-h-[32px]">{short.title}</h3>
                     </div>
                   </CardContent>
                 </Card>

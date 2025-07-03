@@ -27,7 +27,7 @@ const MyBookmarksPage: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Please sign in to view your bookmarks</h2>
-          <Button onClick={() => navigate('/login')}>Sign In</Button>
+          <Button onClick={() => window.Clerk?.openSignIn?.() || window.location.reload()}>Sign In</Button>
         </div>
       </div>
     );

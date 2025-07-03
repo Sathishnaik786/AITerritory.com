@@ -19,7 +19,6 @@ import RequestFeaturePage from "./pages/RequestFeaturePage";
 import UpdateToolPage from "./pages/UpdateToolPage";
 import SkillLeapPage from "./pages/SkillLeapPage";
 import CreateAccountPage from "./pages/CreateAccountPage";
-import LoginPage from "./pages/LoginPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import ProductivityToolsPage from "./pages/ProductivityToolsPage";
@@ -133,7 +132,6 @@ function ThemedAppContent() {
               <Route path="/prompts" element={<Prompts />} />
               
               {/* Authentication Routes */}
-              <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<CreateAccountPage />} />
               
               {/* Routes for Resources dropdown */}
@@ -188,7 +186,6 @@ function ThemedAppContent() {
               
               {/* Legacy routes for backward compatibility */}
               <Route path="/company/create-account" element={<CreateAccountPage />} />
-              <Route path="/company/login" element={<LoginPage />} />
 
               {/* Routes for Categories */}
               <Route path="/categories/productivity-tools" element={<ProductivityToolsPage />} />

@@ -181,9 +181,7 @@ const CreateAccountPage: React.FC = () => {
         >
           <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
-            <Link to="/login" className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 font-medium">
-              Sign in here
-            </Link>
+            <span className="text-purple-600 font-medium cursor-pointer" onClick={() => window.Clerk?.openSignIn?.() || window.location.reload()}>Sign in here</span>
           </p>
         </motion.div>
       </motion.div>

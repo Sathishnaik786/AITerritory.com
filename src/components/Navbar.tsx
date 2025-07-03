@@ -255,7 +255,7 @@ export function Navbar() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="md:hidden text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 transition-colors rounded-full"
+                className="md:hidden text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-charcoal transition-colors rounded-full"
               >
                 <motion.div
                   animate={{ rotate: isMenuOpen ? 180 : 0 }}
@@ -280,7 +280,7 @@ export function Navbar() {
               initial="closed"
               animate="open"
               exit="closed"
-              className="md:hidden py-3 border-t border-green-200 dark:border-gray-700 bg-green-50 dark:bg-gray-900"
+              className="md:hidden py-3 border-t border-green-200 dark:border-charcoal bg-green-50 dark:bg-charcoal"
             >
               <div className="flex flex-col gap-2 px-2">
                 <motion.div
@@ -290,7 +290,7 @@ export function Navbar() {
                 >
                   <Link
                     to="/resources/all-resources"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 rounded-lg transition-colors py-2 px-3 block"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-charcoal rounded-lg transition-colors py-2 px-3 block"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     AI Tools
@@ -304,7 +304,7 @@ export function Navbar() {
                 >
                   <Link
                     to="/ai-for-business"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 rounded-lg transition-colors py-2 px-3 block"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-charcoal rounded-lg transition-colors py-2 px-3 block"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     AI for Business
@@ -318,7 +318,7 @@ export function Navbar() {
                 >
                   <Link
                     to="/newsletter"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-left w-full py-2 px-3 block"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-charcoal rounded-lg transition-colors text-left w-full py-2 px-3 block"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Newsletter
@@ -332,7 +332,7 @@ export function Navbar() {
                 >
                   <Link
                     to="/prompts"
-                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-left w-full py-2 px-3 block"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-charcoal rounded-lg transition-colors text-left w-full py-2 px-3 block"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Prompts
@@ -344,7 +344,7 @@ export function Navbar() {
                   transition={{ delay: 0.4 }}
                 >
                   <DropdownMenu onOpenChange={setIsMobileDropdownOpen}>
-                    <DropdownMenuTrigger className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-800 rounded-lg transition-colors focus:outline-none text-left w-full py-2 px-3 flex items-center justify-between">
+                    <DropdownMenuTrigger className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-charcoal rounded-lg transition-colors focus:outline-none text-left w-full py-2 px-3 flex items-center justify-between">
                       Resources 
                       <motion.div
                         animate={{ rotate: isMobileDropdownOpen ? 180 : 0 }}
@@ -375,7 +375,7 @@ export function Navbar() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="flex items-center gap-3 pt-3 border-t border-green-200 dark:border-gray-700"
+                  className="flex items-center gap-3 pt-3 border-t border-green-200 dark:border-charcoal"
                 >
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button

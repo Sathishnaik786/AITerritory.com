@@ -53,7 +53,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             
             <div className="space-y-3">
               <Button 
-                onClick={() => window.location.href = redirectTo}
+                onClick={() => window.Clerk?.openSignIn?.() || window.location.reload()}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 <LogIn className="w-4 h-4 mr-2" />
