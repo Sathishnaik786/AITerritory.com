@@ -69,6 +69,7 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import React, { Suspense } from 'react';
 import FeedbackAdmin from './admin/FeedbackAdmin';
 import SmartRepurposeToolPage from './pages/SmartRepurposeToolPage';
+import BackgroundAnimation from './components/ui/BackgroundAnimation';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -267,6 +268,7 @@ function App() {
       enableSystem
       disableTransitionOnChange
     >
+      <BackgroundAnimation />
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <TooltipProvider>

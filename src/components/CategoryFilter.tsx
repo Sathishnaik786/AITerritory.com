@@ -3,6 +3,7 @@ import { useCategories } from '../hooks/useCategories';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Skeleton } from './ui/skeleton';
+import { motion } from 'framer-motion';
 
 interface CategoryFilterProps {
   selectedCategory?: string;
@@ -42,20 +43,27 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
         All Categories
       </Button>
 
-      {categories?.map((category) => (
-        <Button
+      {categories?.map((category, i) => (
+        <motion.div
           key={category.id}
-          variant={selectedCategory === category.id ? "default" : "ghost"}
-          className="w-full justify-start"
-          onClick={() => onCategoryChange(category.id)}
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.4, delay: i * 0.07, ease: 'easeOut' }}
         >
-          <span className="flex-1 text-left">{category.name}</span>
-          {showCounts && (
-            <Badge variant="secondary" className="ml-2">
-              0
-            </Badge>
-          )}
-        </Button>
+          <Button
+            variant={selectedCategory === category.id ? "default" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => onCategoryChange(category.id)}
+          >
+            <span className="flex-1 text-left">{category.name}</span>
+            {showCounts && (
+              <Badge variant="secondary" className="ml-2">
+                0
+              </Badge>
+            )}
+          </Button>
+        </motion.div>
       ))}
     </div>
   );

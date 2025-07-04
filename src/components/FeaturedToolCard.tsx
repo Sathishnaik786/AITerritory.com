@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tool } from '../data/tools';
 import { Star, Bookmark, ExternalLink, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface FeaturedToolCardProps {
   tool: Tool;
@@ -17,7 +18,16 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
   const imageSrc = tool.image_url || tool.image;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 flex flex-col h-full p-2 xs:p-3 sm:p-5 w-full max-w-full">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.98 }}
+      whileFocus={{ border: '2px solid #007bff' }}
+      className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 flex flex-col h-full p-2 xs:p-3 sm:p-5 w-full max-w-full"
+    >
       {/* Top Row: Logo, Verified, Name, Rating */}
       <div className="flex items-center gap-2 sm:gap-3 mb-2">
         {imageSrc ? (
@@ -71,7 +81,7 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
           Visit <ExternalLink className="w-4 h-4 ml-1" />
         </a>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

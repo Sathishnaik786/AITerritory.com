@@ -9,6 +9,7 @@ import { getPrompts } from '../services/promptsService';
 import { useToast } from './ui/use-toast';
 import { useUser } from '@clerk/clerk-react';
 import * as promptActions from '../services/promptActionsService';
+import { motion } from 'framer-motion';
 
 const promptCategories = [
   'Ethereum Developer',
@@ -314,27 +315,35 @@ export default function Prompts() {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                       {(showAll ? catPrompts : catPrompts.slice(0, 3)).map((prompt, idx) => (
-                        <Card key={prompt.id || idx} className={`w-full ${cardBg} ${cardText} ${cardBorder} relative rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200`}>
-                          <CardContent className="p-5">
-                            <div className="flex flex-col h-full justify-between min-h-[180px]">
-                              <div className="flex items-start justify-between mb-2">
-                                <div className="text-lg font-bold leading-tight">{prompt.title}</div>
-                                <div className="flex gap-2">
-                                  <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Chat" onClick={() => setOpenPrompt({ id: prompt.id, title: prompt.title, description: prompt.description, author: prompt.author })}><FaRegCommentDots size={20} /></button>
-                                  <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Read" onClick={() => setOpenRead(prompt)}><FaRegFileAlt size={20} /></button>
-                                  <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Copy" onClick={() => {
-                                    navigator.clipboard.writeText(prompt.description || '');
-                                    toast({ title: 'Copied!', description: 'Prompt copied to clipboard.' });
-                                  }}><FaRegCopy size={20} /></button>
+                        <motion.div
+                          key={prompt.id || idx}
+                          initial={{ opacity: 0, y: 30 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, amount: 0.2 }}
+                          transition={{ duration: 0.5, delay: idx * 0.07, ease: 'easeOut' }}
+                        >
+                          <Card className={`w-full ${cardBg} ${cardText} ${cardBorder} relative rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200`}>
+                            <CardContent className="p-5">
+                              <div className="flex flex-col h-full justify-between min-h-[180px]">
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="text-lg font-bold leading-tight">{prompt.title}</div>
+                                  <div className="flex gap-2">
+                                    <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Chat" onClick={() => setOpenPrompt({ id: prompt.id, title: prompt.title, description: prompt.description, author: prompt.author })}><FaRegCommentDots size={20} /></button>
+                                    <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Read" onClick={() => setOpenRead(prompt)}><FaRegFileAlt size={20} /></button>
+                                    <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Copy" onClick={() => {
+                                      navigator.clipboard.writeText(prompt.description || '');
+                                      toast({ title: 'Copied!', description: 'Prompt copied to clipboard.' });
+                                    }}><FaRegCopy size={20} /></button>
+                                  </div>
+                                </div>
+                                <div className={`text-base ${cardDesc} mb-6`}>{prompt.description}</div>
+                                <div className="flex items-end justify-between mt-auto">
+                                  <span className={authorBg}>{prompt.author}</span>
                                 </div>
                               </div>
-                              <div className={`text-base ${cardDesc} mb-6`}>{prompt.description}</div>
-                              <div className="flex items-end justify-between mt-auto">
-                                <span className={authorBg}>{prompt.author}</span>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
                       ))}
                     </div>
                   </div>

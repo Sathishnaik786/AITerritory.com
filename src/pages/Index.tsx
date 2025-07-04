@@ -71,14 +71,14 @@ const Index = () => {
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <section className="relative py-16 sm:py-24 md:py-32 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent animate-gradient">
+            <h1 className="font-bold tracking-tight text-balance text-3xl sm:text-4xl md:text-5xl text-gray-900 dark:text-white mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent animate-gradient">
               Discover the Future of AI Tools
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+            <p className="prose prose-neutral prose-lg max-w-2xl mx-auto text-base sm:text-lg text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
               Explore our curated collection of cutting-edge AI tools that transform how you work, create, and innovate. From productivity to creativity, find the perfect AI solution for your needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -90,7 +90,8 @@ const Index = () => {
               />
               <button
                 onClick={() => setActiveTab('new')}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl"
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg shadow-xl hover:shadow-2xl transition duration-300 flex items-center gap-2"
+                style={{ fontWeight: 600 }}
               >
                 <span>Explore New Tools</span>
                 <ArrowRight className="w-5 h-5" />
@@ -102,7 +103,7 @@ const Index = () => {
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategoryId(category.id)}
-                  className="text-sm px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+                  className="text-sm px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 font-semibold"
                 >
                   {category.name}
                 </button>
@@ -114,16 +115,16 @@ const Index = () => {
       </section>
 
       {/* Tool Carousel Section */}
-      <section className="py-16 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+      <section className="py-16 sm:py-24 md:py-32 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Featured AI Tools</h2>
+          <h2 className="font-bold tracking-tight text-balance text-3xl sm:text-4xl md:text-5xl text-gray-900 dark:text-white mb-8 text-center">Featured AI Tools</h2>
           <Suspense fallback={null}>
             <ToolCarousel />
           </Suspense>
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-16 bg-white dark:bg-gray-800 rounded-lg shadow-inner mt-8">
+      <div className="container mx-auto px-4 py-16 sm:py-24 md:py-32 bg-white dark:bg-gray-800 rounded-lg shadow-inner mt-8">
         <div className="flex flex-col md:flex-row gap-12">
           {/* Left Sidebar - Categories */}
           <div className="md:w-1/4 lg:w-1/5">
@@ -158,7 +159,7 @@ const Index = () => {
             <div className="flex border-b border-gray-200 dark:border-gray-700 mb-8">
               <button
                 onClick={() => setActiveTab('popular')}
-                className={`px-6 py-3 text-lg font-semibold transition-colors duration-200 ${
+                className={`px-6 py-3 text-lg font-semibold tracking-tight transition-colors duration-200 ${
                   activeTab === 'popular' 
                     ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400' 
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
@@ -168,7 +169,7 @@ const Index = () => {
               </button>
               <button
                 onClick={() => setActiveTab('recentlyAdded')}
-                className={`px-6 py-3 text-lg font-semibold transition-colors duration-200 ${
+                className={`px-6 py-3 text-lg font-semibold tracking-tight transition-colors duration-200 ${
                   activeTab === 'recentlyAdded' 
                     ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400' 
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
@@ -179,7 +180,7 @@ const Index = () => {
             </div>
 
             {/* Tools Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 place-items-center">
               {loadingTools ? (
                 <div className="text-center py-20 text-muted-foreground col-span-full bg-gray-50 dark:bg-gray-700 rounded-lg p-8 shadow-inner">
                   <p className="text-lg font-medium">Loading tools...</p>

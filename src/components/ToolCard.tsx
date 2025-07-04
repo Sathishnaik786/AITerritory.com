@@ -121,12 +121,13 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={{ scale: 1.04, boxShadow: '0 10px 40px rgba(0,0,0,0.12)', y: -6 }}
+        whileTap={{ scale: 0.98, rotate: -2 }}
+        className="transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
       >
         <Card 
           variant={getCardVariant()}
-          className={`group cursor-pointer overflow-hidden flex flex-col p-3 sm:p-5 bg-transparent border ${borderColor} shadow-sm`}
+          className={`group cursor-pointer overflow-hidden flex flex-col p-3 sm:p-5 bg-white/80 dark:bg-gray-900/80 border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80 relative`}
           onClick={() => navigate(`/tools/${tool.id}`)}
         >
           <CardContent className="p-3 sm:p-4">
@@ -135,7 +136,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
                 <img
                   src={imageError ? '/placeholder.svg' : (tool.image_url || tool.image || '/placeholder.svg')}
                   alt={tool.name}
-                  className="w-12 h-12 rounded-xl object-cover flex-shrink-0 ring-2 ring-gray-100 dark:ring-gray-800"
+                  className="w-12 h-12 rounded-xl object-cover flex-shrink-0 ring-2 ring-purple-200 dark:ring-purple-700 shadow-lg"
                   onError={() => setImageError(true)}
                 />
                 {tool.verified && (
@@ -155,16 +156,16 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
                   {typeof tool.rating === 'number' && tool.rating > 0 && (
                     <div>{renderRating(tool.rating)}</div>
                   )}
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="rounded-full w-full sm:w-auto"
+                  <Button
+                    size="sm"
+                    variant="gradient"
+                    className="rounded-full w-full sm:w-auto bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-500 text-white shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 inner-shadow-[inset_0_2px_8px_rgba(236,72,153,0.10)]"
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(tool.link, '_blank', 'noopener,noreferrer');
                     }}
                   >
-                    Visit Tool <ExternalLink className="w-3 h-3 ml-1" />
+                    Visit Tool <motion.span whileTap={{ scale: 1.2, rotate: 12 }} className="inline-block align-middle"><ExternalLink className="w-3 h-3 ml-1 drop-shadow-[0_2px_8px_rgba(236,72,153,0.25)]" /></motion.span>
                   </Button>
                 </div>
               </div>
@@ -180,13 +181,15 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      whileHover={{ y: -5 }}
+      whileHover={{ y: -8, scale: 1.03, boxShadow: '0 16px 48px rgba(0,0,0,0.13)' }}
+      whileTap={{ scale: 0.98, rotate: 1 }}
+      className="transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
     >
       <Card 
         variant={getCardVariant()}
-        className={`group cursor-pointer overflow-hidden relative flex flex-col p-3 sm:p-5 bg-transparent border ${borderColor} shadow-sm`}
+        className={`group cursor-pointer overflow-hidden relative flex flex-col p-3 sm:p-5 bg-white/80 dark:bg-gray-900/80 border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80`}
         onClick={() => navigate(`/tools/${tool.id}`)}
       >
         {/* Featured Badge */}

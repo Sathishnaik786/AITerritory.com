@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { TrendingUp, Star, Search, Filter } from 'lucide-react';
 import { Tool } from '../types/tool';
 import { lazy } from 'react';
+import { motion } from 'framer-motion';
 
 // Lazy-load Testimonials component
 const Testimonials = lazy(() => import('../components/Testimonials'));
@@ -35,7 +36,13 @@ export const HomePage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Hero Section */}
-      <div className="text-center mb-12">
+      <motion.div
+        className="text-center mb-12"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+      >
         <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
           Discover AI Tools
         </h1>
@@ -52,59 +59,91 @@ export const HomePage: React.FC = () => {
             className="w-full"
           />
         </div>
-      </div>
+      </motion.div>
 
       {/* Featured and Trending Tools - Side by Side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <motion.div
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      >
         {/* Featured Tools - Left Side */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Star className="w-5 h-5 text-yellow-500" />
-              Featured Tools
-            </CardTitle>
-            <CardDescription>
-              Hand-picked tools that stand out from the crowd
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Suspense fallback={null}>
-              <ToolCarousel
-                tools={featuredTools || []}
-                loading={featuredLoading}
-                variant="compact"
-              />
-            </Suspense>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Star className="w-5 h-5 text-yellow-500" />
+                Featured Tools
+              </CardTitle>
+              <CardDescription>
+                Hand-picked tools that stand out from the crowd
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Suspense fallback={null}>
+                <ToolCarousel
+                  tools={featuredTools || []}
+                  loading={featuredLoading}
+                  variant="compact"
+                />
+              </Suspense>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Trending Tools - Right Side */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-green-500" />
-              Trending Tools
-            </CardTitle>
-            <CardDescription>
-              Popular tools that are gaining momentum
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Suspense fallback={null}>
-              <ToolCarousel
-                tools={trendingTools || []}
-                loading={trendingLoading}
-                variant="compact"
-              />
-            </Suspense>
-          </CardContent>
-        </Card>
-      </div>
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-green-500" />
+                Trending Tools
+              </CardTitle>
+              <CardDescription>
+                Popular tools that are gaining momentum
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Suspense fallback={null}>
+                <ToolCarousel
+                  tools={trendingTools || []}
+                  loading={trendingLoading}
+                  variant="compact"
+                />
+              </Suspense>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <motion.div
+        className="grid grid-cols-1 lg:grid-cols-4 gap-8"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      >
         {/* Sidebar - Filters */}
-        <div className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+        <motion.div
+          className={`lg:col-span-1 ${showFilters ? 'block' : 'hidden lg:block'}`}
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+        >
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Filters</CardTitle>
@@ -117,7 +156,7 @@ export const HomePage: React.FC = () => {
               />
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
 
         {/* Main Content Area */}
         <div className="lg:col-span-3">
@@ -156,7 +195,7 @@ export const HomePage: React.FC = () => {
             />
           </div>
         </div>
-      </div>
+      </motion.div>
       {/* Testimonials Section */}
       <Suspense fallback={null}>
         <Testimonials />
