@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
 import sitemap from 'vite-plugin-sitemap';
 import viteCompression from 'vite-plugin-compression';
 
@@ -16,8 +15,6 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === 'development' &&
-    componentTagger(),
     sitemap({
       hostname: 'https://aiterritory.org',
       exclude: ['/auth/**', '/dashboard/**', '/settings/**'],
