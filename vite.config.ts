@@ -18,10 +18,6 @@ export default defineConfig(({ mode }) => ({
     sitemap({
       hostname: 'https://aiterritory.org',
       exclude: ['/auth/**', '/dashboard/**', '/settings/**'],
-      defaults: {
-        changefreq: 'weekly',
-        priority: 0.7,
-      },
     }),
     viteCompression({ algorithm: 'brotliCompress' }),
   ].filter(Boolean),
