@@ -163,6 +163,7 @@ app.get('/', (req, res) => {
     endpoints: {
       tools: '/api/tools',
       categories: '/api/categories',
+      prompts: '/api/prompts',
       tags: '/api/tags',
       health: '/health'
     }
