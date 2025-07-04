@@ -1,5 +1,5 @@
-const OpenAI = require('openai');
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// const OpenAI = require('openai');
+// const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const PROMPT_TEMPLATES = {
   twitter: (input) => `Repurpose the following content as a Twitter thread:\n\n${input}\n\nThread:`,
@@ -7,6 +7,11 @@ const PROMPT_TEMPLATES = {
   newsletter: (input) => `Repurpose the following content as a newsletter section:\n\n${input}\n\nNewsletter:`,
   youtube: (input) => `Repurpose the following content as a YouTube video script:\n\n${input}\n\nYouTube Script:`,
   instagram: (input) => `Repurpose the following content as an Instagram caption:\n\n${input}\n\nInstagram Caption:`,
+};
+
+// Handler for repurpose (feature disabled)
+module.exports = async function repurposeHandler(req, res) {
+  return res.status(503).json({ error: 'AI repurposing is currently disabled.' });
 };
 
 exports.repurpose = async (req, res, next) => {

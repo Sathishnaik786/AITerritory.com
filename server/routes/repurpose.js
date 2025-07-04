@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const repurposeController = require('../controllers/repurposeController');
+const repurposeHandler = require('../controllers/repurposeController');
 
-router.post('/', repurposeController.repurpose);
+router.post('/', repurposeHandler);
 
 module.exports = router; 
