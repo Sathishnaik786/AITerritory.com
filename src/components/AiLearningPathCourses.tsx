@@ -11,7 +11,12 @@ export function AiLearningPathCourses() {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {courses.map((course: any) => (
         <div key={course.id} className="rounded-lg shadow bg-white p-4">
-          <YouTubeVideoPlayer videoId={course.link} title={course.title} />
+          <YouTubeVideoPlayer videoId={(function() {
+            const id = course.link;
+            if (id.includes('youtu.be/')) return id.split('youtu.be/')[1].split('?')[0];
+            if (id.includes('youtube.com/watch?v=')) return id.split('watch?v=')[1].split('&')[0];
+            return id;
+          })()} title={course.title} />
           <h3 className="font-bold mt-2">{course.title}</h3>
           <p className="text-sm text-gray-500">{course.description}</p>
           <div className="flex gap-2 text-xs mt-1">

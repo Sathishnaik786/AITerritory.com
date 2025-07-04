@@ -76,26 +76,26 @@ export const HomePage: React.FC = () => {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="w-5 h-5 text-yellow-500" />
-                Featured Tools
-              </CardTitle>
-              <CardDescription>
-                Hand-picked tools that stand out from the crowd
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Suspense fallback={null}>
-                <ToolCarousel
-                  tools={featuredTools || []}
-                  loading={featuredLoading}
-                  variant="compact"
-                />
-              </Suspense>
-            </CardContent>
-          </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Star className="w-5 h-5 text-yellow-500" />
+              Featured Tools
+            </CardTitle>
+            <CardDescription>
+              Hand-picked tools that stand out from the crowd
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={null}>
+              <ToolCarousel
+                tools={featuredTools || []}
+                loading={featuredLoading}
+                variant="compact"
+              />
+            </Suspense>
+          </CardContent>
+        </Card>
         </motion.div>
 
         {/* Trending Tools - Right Side */}
@@ -105,26 +105,26 @@ export const HomePage: React.FC = () => {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
         >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-green-500" />
-                Trending Tools
-              </CardTitle>
-              <CardDescription>
-                Popular tools that are gaining momentum
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Suspense fallback={null}>
-                <ToolCarousel
-                  tools={trendingTools || []}
-                  loading={trendingLoading}
-                  variant="compact"
-                />
-              </Suspense>
-            </CardContent>
-          </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-green-500" />
+              Trending Tools
+            </CardTitle>
+            <CardDescription>
+              Popular tools that are gaining momentum
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={null}>
+              <ToolCarousel
+                tools={trendingTools || []}
+                loading={trendingLoading}
+                variant="compact"
+              />
+            </Suspense>
+          </CardContent>
+        </Card>
         </motion.div>
       </motion.div>
 

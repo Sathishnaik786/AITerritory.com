@@ -74,15 +74,15 @@ export function SmartRepurposeTool() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <textarea
+      <textarea
             className="w-full p-3 border rounded mb-4 min-h-[120px] bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-            placeholder="Paste your blog, article, or social post here..."
-            value={input}
-            onChange={e => setInput(e.target.value)}
-          />
-          <div className="mb-4">
-            <div className="font-semibold mb-2">Repurpose as:</div>
-            <div className="flex flex-wrap gap-4">
+        placeholder="Paste your blog, article, or social post here..."
+        value={input}
+        onChange={e => setInput(e.target.value)}
+      />
+      <div className="mb-4">
+        <div className="font-semibold mb-2">Repurpose as:</div>
+        <div className="flex flex-wrap gap-4">
               {FORMAT_OPTIONS.map((opt, i) => (
                 <motion.label
                   key={opt.value}
@@ -92,29 +92,29 @@ export function SmartRepurposeTool() {
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{ duration: 0.4, delay: i * 0.08, ease: 'easeOut' }}
                 >
-                  <input
-                    type="checkbox"
-                    checked={selectedFormats.includes(opt.value)}
-                    onChange={() => handleFormatChange(opt.value)}
+              <input
+                type="checkbox"
+                checked={selectedFormats.includes(opt.value)}
+                onChange={() => handleFormatChange(opt.value)}
                     className="accent-blue-600 w-4 h-4"
-                  />
-                  {opt.label}
+              />
+              {opt.label}
                 </motion.label>
-              ))}
-            </div>
-          </div>
+          ))}
+        </div>
+      </div>
           <Button
             className="w-full font-semibold text-base py-3"
-            onClick={handleGenerate}
-            disabled={loading || !input || selectedFormats.length === 0}
+        onClick={handleGenerate}
+        disabled={loading || !input || selectedFormats.length === 0}
             variant="gradient"
             size="lg"
             rounded="xl"
-          >
-            {loading ? 'Generating...' : 'Generate'}
+      >
+        {loading ? 'Generating...' : 'Generate'}
           </Button>
-          {error && <div className="text-red-600 mt-4">{error}</div>}
-          {Object.keys(results).length > 0 && (
+      {error && <div className="text-red-600 mt-4">{error}</div>}
+      {Object.keys(results).length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -122,16 +122,16 @@ export function SmartRepurposeTool() {
               transition={{ duration: 0.5, ease: 'easeOut' }}
               className="mt-8"
             >
-              <Tabs defaultValue={selectedFormats[0]}>
-                <TabsList>
-                  {selectedFormats.map(format => (
-                    <TabsTrigger key={format} value={format}>
-                      {FORMAT_OPTIONS.find(f => f.value === format)?.label || format}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
+          <Tabs defaultValue={selectedFormats[0]}>
+            <TabsList>
+              {selectedFormats.map(format => (
+                <TabsTrigger key={format} value={format}>
+                  {FORMAT_OPTIONS.find(f => f.value === format)?.label || format}
+                </TabsTrigger>
+              ))}
+            </TabsList>
                 {selectedFormats.map((format, i) => (
-                  <TabsContent key={format} value={format}>
+              <TabsContent key={format} value={format}>
                     <motion.div
                       initial={{ opacity: 0, y: 20, scale: 0.98 }}
                       whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -139,13 +139,13 @@ export function SmartRepurposeTool() {
                       transition={{ duration: 0.4, delay: 0.1 + i * 0.08, ease: 'easeOut' }}
                       className="whitespace-pre-wrap bg-gray-50 dark:bg-gray-800 p-4 rounded shadow"
                     >
-                      {results[format] || 'No result.'}
+                  {results[format] || 'No result.'}
                     </motion.div>
-                  </TabsContent>
-                ))}
-              </Tabs>
+              </TabsContent>
+            ))}
+          </Tabs>
             </motion.div>
-          )}
+      )}
         </CardContent>
       </Card>
     </motion.div>

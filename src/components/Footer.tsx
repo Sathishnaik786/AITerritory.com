@@ -59,10 +59,7 @@ export function Footer() {
               <a href="https://chat.whatsapp.com/HggDqZGp3fSIQLL4Nqyzs9" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Community" className="hover:text-green-600 transition"><FaWhatsapp size={20} /></a>
             </div>
             <div className="mt-2">
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-50 dark:bg-charcoal text-green-700 dark:text-green-300 text-xs font-medium border border-green-200 dark:border-charcoal">
-                <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-                All systems operational
-              </span>
+              {/* Removed status circle and badge */}
             </div>
           </div>
 
@@ -121,25 +118,25 @@ export function Footer() {
           </div>
         </div>
         {/* Bottom bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 pt-6 text-sm text-gray-400 dark:text-gray-500 mt-6 border-t border-gray-200 dark:border-gray-800 w-full overflow-x-auto">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 text-sm text-gray-400 dark:text-gray-500 mt-6 border-t border-gray-200 dark:border-gray-800 w-full overflow-x-auto">
           <div className="text-center sm:text-left w-full sm:w-auto">
             <span className="font-semibold text-gray-700 dark:text-gray-200">© {currentYear} AI Territory</span> — All rights reserved.
           </div>
-          <div className="flex flex-wrap items-center justify-center space-x-0 sm:space-x-4 gap-2 sm:gap-0 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-2 sm:gap-4 w-full sm:w-auto">
             <Link to="/legal/privacy-policy" className="hover:text-blue-500 dark:hover:text-blue-400 transition px-2 py-1 rounded-md">Privacy Policy</Link>
             <Link to="/legal/terms-of-service" className="hover:text-blue-500 dark:hover:text-blue-400 transition px-2 py-1 rounded-md">Terms of Service</Link>
-            <span className="ml-0 sm:ml-2">
+            <span className="sm:ml-2">
               <ThemeToggle small />
             </span>
             {/* Feedback Modal Trigger Button */}
-            <div className="ml-0 sm:ml-4 mt-2 sm:mt-0">
+            <div className="sm:ml-4 mt-2 sm:mt-0">
               <FeedbackModal />
             </div>
             {/* Submit Testimonial Button: opens sign-in modal if not logged in, else opens testimonial form */}
             {!user ? (
               <SignInButton mode="modal">
                 <button
-                  className="ml-0 sm:ml-4 mt-2 sm:mt-0 px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition w-full sm:w-auto"
+                  className="mt-2 sm:mt-0 px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition w-full sm:w-auto"
                 >
                   Submit Testimonial
                 </button>
@@ -147,7 +144,7 @@ export function Footer() {
             ) : (
               <button
                 onClick={() => setOpenTestimonial(true)}
-                className="ml-0 sm:ml-4 mt-2 sm:mt-0 px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition w-full sm:w-auto"
+                className="mt-2 sm:mt-0 px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition w-full sm:w-auto"
               >
                 Submit Testimonial
               </button>

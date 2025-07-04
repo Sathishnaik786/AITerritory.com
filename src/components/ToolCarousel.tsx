@@ -41,7 +41,7 @@ const ToolCarousel: React.FC<ToolCarouselProps> = ({ tools = [], loading = false
       <CarouselContent className="-ml-2 sm:-ml-1 gap-x-2 sm:gap-x-4">
         {tools.map((tool, index) => (
           <CarouselItem
-            key={tool.id || index}
+              key={tool.id || index}
             className="pl-2 sm:pl-1 basis-full sm:basis-1/2 flex"
           >
             <motion.div
@@ -53,7 +53,7 @@ const ToolCarousel: React.FC<ToolCarouselProps> = ({ tools = [], loading = false
             >
               <Card className="w-full flex flex-col justify-center">
                 <CardContent className="flex items-center justify-center p-0 w-full">
-                  <FeaturedToolCard tool={tool} />
+              <FeaturedToolCard tool={tool} />
                 </CardContent>
               </Card>
             </motion.div>

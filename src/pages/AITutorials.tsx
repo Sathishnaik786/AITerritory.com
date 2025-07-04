@@ -149,7 +149,12 @@ const AITutorials = () => {
               </CardHeader>
               <CardContent>
                 <YouTubeVideoPlayer
-                  videoId={tutorial.link}
+                  videoId={(function() {
+                    const id = tutorial.link;
+                    if (id.includes('youtu.be/')) return id.split('youtu.be/')[1].split('?')[0];
+                    if (id.includes('youtube.com/watch?v=')) return id.split('watch?v=')[1].split('&')[0];
+                    return id;
+                  })()}
                   title={tutorial.title}
                   className="w-full h-full rounded-lg"
                 />
@@ -183,7 +188,12 @@ const AITutorials = () => {
               </CardHeader>
               <CardContent>
                 <YouTubeVideoPlayer
-                  videoId={tutorial.link}
+                  videoId={(function() {
+                    const id = tutorial.link;
+                    if (id.includes('youtu.be/')) return id.split('youtu.be/')[1].split('?')[0];
+                    if (id.includes('youtube.com/watch?v=')) return id.split('watch?v=')[1].split('&')[0];
+                    return id;
+                  })()}
                   title={tutorial.title}
                   className="w-full h-full rounded-lg"
                 />

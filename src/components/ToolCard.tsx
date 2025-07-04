@@ -134,12 +134,12 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
             <div className="flex items-start gap-3">
               <div className="relative">
                 <img
-                  src={imageError ? '/placeholder.svg' : (tool.image_url || tool.image || '/placeholder.svg')}
+                  src={imageError ? '/placeholder.svg' : (tool.image_url || '/placeholder.svg')}
                   alt={tool.name}
                   className="w-12 h-12 rounded-xl object-cover flex-shrink-0 ring-2 ring-purple-200 dark:ring-purple-700 shadow-lg"
                   onError={() => setImageError(true)}
                 />
-                {tool.verified && (
+                {tool.is_featured && (
                   <div className="absolute -top-1 -right-1 bg-blue-500 rounded-full p-0.5">
                     <CheckCircle className="w-3 h-3 text-white" />
                   </div>
@@ -156,8 +156,8 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
                   {typeof tool.rating === 'number' && tool.rating > 0 && (
                     <div>{renderRating(tool.rating)}</div>
                   )}
-                  <Button
-                    size="sm"
+                  <Button 
+                    size="sm" 
                     variant="gradient"
                     className="rounded-full w-full sm:w-auto bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-500 text-white shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 inner-shadow-[inset_0_2px_8px_rgba(236,72,153,0.10)]"
                     onClick={(e) => {
@@ -205,7 +205,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
         {/* Image Section */}
         <div className="relative h-48 overflow-hidden">
           <img
-            src={imageError ? '/placeholder.svg' : (tool.image_url || tool.image || '/placeholder.svg')}
+            src={imageError ? '/placeholder.svg' : (tool.image_url || '/placeholder.svg')}
             alt={tool.name}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
             onError={() => setImageError(true)}
@@ -213,7 +213,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
           {/* Verified Badge */}
-          {tool.verified && (
+          {tool.is_featured && (
             <div className="absolute bottom-4 left-4">
               <Badge className="bg-blue-500 text-white border-0">
                 <CheckCircle className="w-3 h-3 mr-1" />
@@ -285,22 +285,24 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
 
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {Array.isArray(tool.tags) && tool.tags.length > 0 ? (
-              tool.tags.slice(0, 3).map((tag) => (
+            {Array.isArray(tool.tool_tags) && tool.tool_tags.length > 0 ? (
+              tool.tool_tags.slice(0, 3).map((toolTag) => (
+                toolTag.tags && toolTag.tags.name ? (
                 <Badge 
-                  key={tag} 
+                    key={toolTag.tags.id} 
                   variant="outline" 
                   className="text-xs bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
                 >
-                  #{tag.toLowerCase().replace(/ /g, '')}
+                    #{toolTag.tags.name.toLowerCase().replace(/ /g, '')}
                 </Badge>
+                ) : null
               ))
             ) : (
               <span className="text-xs text-muted-foreground">No tags</span>
             )}
-            {Array.isArray(tool.tags) && tool.tags.length > 3 && (
+            {Array.isArray(tool.tool_tags) && tool.tool_tags.length > 3 && (
               <Badge variant="outline" className="text-xs">
-                +{tool.tags.length - 3} more
+                +{tool.tool_tags.length - 3} more
               </Badge>
             )}
           </div>

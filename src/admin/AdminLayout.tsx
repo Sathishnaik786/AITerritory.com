@@ -50,7 +50,7 @@ const AdminSidebarNav = () => {
                   <item.icon className="mr-2 h-4 w-4" />
                   {item.label}
                 </SidebarMenuButton>
-              </Link>
+      </Link>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
@@ -66,7 +66,7 @@ const AdminSidebarNav = () => {
                   <item.icon className="mr-2 h-4 w-4" />
                   {item.label}
                 </SidebarMenuButton>
-              </Link>
+      </Link>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
@@ -82,7 +82,7 @@ const AdminSidebarNav = () => {
                   <item.icon className="mr-2 h-4 w-4" />
                   {item.label}
                 </SidebarMenuButton>
-              </Link>
+      </Link>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
@@ -118,10 +118,10 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <SidebarInset className="flex flex-col flex-1 min-h-0 w-full">
           <AdminTopbar />
           <main className="flex-1 w-full p-2 sm:p-4 md:p-6 bg-background scroll-smooth overflow-y-auto">
-            {children}
-          </main>
+        {children}
+      </main>
         </SidebarInset>
-      </div>
+    </div>
     </SidebarProvider>
   );
 };

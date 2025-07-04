@@ -52,17 +52,17 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
           transition={{ duration: 0.4, delay: i * 0.07, ease: 'easeOut' }}
         >
           <Button
-            variant={selectedCategory === category.id ? "default" : "ghost"}
-            className="w-full justify-start"
-            onClick={() => onCategoryChange(category.id)}
-          >
-            <span className="flex-1 text-left">{category.name}</span>
-            {showCounts && (
-              <Badge variant="secondary" className="ml-2">
-                0
-              </Badge>
-            )}
-          </Button>
+          variant={selectedCategory === category.id ? "default" : "ghost"}
+          className="w-full justify-start"
+          onClick={() => onCategoryChange(category.id)}
+        >
+          <span className="flex-1 text-left">{category.name}</span>
+          {showCounts && (
+            <Badge variant="secondary" className="ml-2">
+              0
+            </Badge>
+          )}
+        </Button>
         </motion.div>
       ))}
     </div>

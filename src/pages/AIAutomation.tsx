@@ -122,7 +122,12 @@ const AIAutomation = () => {
               </CardHeader>
               <CardContent>
                 <YouTubeVideoPlayer
-                  videoId={useCase.link}
+                  videoId={(function() {
+                    const id = useCase.link;
+                    if (id.includes('youtu.be/')) return id.split('youtu.be/')[1].split('?')[0];
+                    if (id.includes('youtube.com/watch?v=')) return id.split('watch?v=')[1].split('&')[0];
+                    return id;
+                  })()}
                   title={useCase.title}
                   className="w-full h-full rounded-lg"
                 />
@@ -151,7 +156,7 @@ const AIAutomation = () => {
             </CardHeader>
             <CardContent>
               <YouTubeVideoPlayer
-                videoId="https://youtu.be/2GZ2SNXWK-c"
+                videoId="2GZ2SNXWK-c"
                 title="Getting Started with AI Automation"
                 className="w-full h-full rounded-lg"
               />
@@ -166,7 +171,7 @@ const AIAutomation = () => {
             </CardHeader>
             <CardContent>
               <YouTubeVideoPlayer
-                videoId="https://youtu.be/ZHH3sr234zY"
+                videoId="ZHH3sr234zY"
                 title="Best Practices for AI Automation"
                 className="w-full h-full rounded-lg"
               />

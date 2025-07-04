@@ -11,7 +11,12 @@ export function AIAgentLearningResources({ learningPathId }: { learningPathId: s
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {resources.map((resource: any) => (
         <div key={resource.id} className="rounded-lg shadow bg-white p-4">
-          <YouTubeVideoPlayer videoId={resource.link} title={resource.title} />
+          <YouTubeVideoPlayer videoId={(function() {
+            const id = resource.link;
+            if (id.includes('youtu.be/')) return id.split('youtu.be/')[1].split('?')[0];
+            if (id.includes('youtube.com/watch?v=')) return id.split('watch?v=')[1].split('&')[0];
+            return id;
+          })()} title={resource.title} />
           <h3 className="font-bold mt-2">{resource.title}</h3>
           <p className="text-sm text-gray-500">{resource.description}</p>
           <div className="flex gap-2 text-xs mt-1">
