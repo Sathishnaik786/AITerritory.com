@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from 'next-themes';
 import { Star } from 'lucide-react';
 import { testimonialsService, Testimonial } from '../services/testimonialsService';
 
 const Testimonials: React.FC = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const theme = resolvedTheme;
   const borderColor = theme === 'dark' ? 'border-gray-800' : 'border-gray-200';
 
   useEffect(() => {

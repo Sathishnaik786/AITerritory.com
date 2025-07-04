@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from 'next-themes';
 import { Star } from 'lucide-react';
 import { testimonialsService, TestimonialSubmission } from '../services/testimonialsService';
 

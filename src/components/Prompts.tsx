@@ -3,7 +3,7 @@ import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from './ui/dialog';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from 'next-themes';
 import { FaRegCommentDots, FaRegFileAlt, FaRegCopy, FaBars, FaArrowRight } from 'react-icons/fa';
 import { getPrompts } from '../services/promptsService';
 import { useToast } from './ui/use-toast';
@@ -66,12 +66,20 @@ type PromptComment = {
   created_at: string;
 };
 
+type Prompt = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  author?: string;
+};
+
 export default function Prompts() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState('GitHub Copilot');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [prompts, setPrompts] = useState([]);
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { theme } = useTheme();

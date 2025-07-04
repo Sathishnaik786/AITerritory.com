@@ -32,7 +32,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from './components/ui/tooltip';
-import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { ThemeProvider } from './components/theme-provider';
 import ScrollToTopButton from './components/ScrollToTopButton';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -123,9 +123,8 @@ function SEO() {
 }
 
 function ThemedAppContent() {
-  const { theme } = useTheme();
   return (
-    <div className={`min-h-screen antialiased ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`min-h-screen antialiased`}>
       <HelmetProvider>
         <SEO />
         <div className="relative min-h-screen flex flex-col items-center">
@@ -254,7 +253,6 @@ function ThemedAppContent() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
-          <Footer />
         </div>
       </HelmetProvider>
     </div>
@@ -263,22 +261,28 @@ function ThemedAppContent() {
 
 function App() {
   return (
-    <BrowserRouter
-      future={{
-        v7_startTransition: true,
-        v7_relativeSplatPath: true
-      }}
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
     >
-      <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
           <TooltipProvider>
-            <Toaster />
-            <ThemedAppContent />
-            <ReactQueryDevtools initialIsOpen={false} />
+            <HelmetProvider>
+              <ScrollToTop />
+              <Toaster position="top-right" richColors />
+              <Suspense fallback={<div>Loading...</div>}>
+                <ThemedAppContent />
+              </Suspense>
+              <Footer />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </HelmetProvider>
           </TooltipProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

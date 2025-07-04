@@ -1,45 +1,128 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Home, Mail, Megaphone, PlusSquare, Lightbulb } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Home, Mail, Megaphone, PlusSquare, Lightbulb, Users, Bot, Rocket, BookOpen } from 'lucide-react';
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarInset,
+  SidebarHeader,
+  SidebarSeparator,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Footer } from '@/components/Footer';
+import { cn } from '@/lib/utils';
 
-const AdminSidebar: React.FC = () => (
-  <aside className="w-64 bg-gray-50 dark:bg-gray-900 p-4 border-r border-gray-200 dark:border-gray-800">
-    <h2 className="text-xl font-bold mb-6">Admin Menu</h2>
-    <nav className="flex flex-col space-y-2">
-      <Link to="/admin" className="flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-        <Home className="w-5 h-5 mr-3" />
-        Dashboard
-      </Link>
-      <h3 className="text-sm font-semibold mt-4 mb-2 px-2 text-gray-500">Submissions</h3>
-      <Link to="/admin/submissions/contact" className="flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-        <Mail className="w-5 h-5 mr-3" />
-        Contact
-      </Link>
-      <Link to="/admin/submissions/advertise" className="flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-        <Megaphone className="w-5 h-5 mr-3" />
-        Advertise
-      </Link>
-      <Link to="/admin/submissions/tools" className="flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-        <PlusSquare className="w-5 h-5 mr-3" />
-        Tools
-      </Link>
-      <Link to="/admin/submissions/features" className="flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-        <Lightbulb className="w-5 h-5 mr-3" />
-        Features
-      </Link>
-    </nav>
-  </aside>
+const adminNav = [
+  { label: 'Dashboard', icon: Home, to: '/admin' },
+];
+const submissionsNav = [
+  { label: 'Contact', icon: Mail, to: '/admin/submissions/contact' },
+  { label: 'Advertise', icon: Megaphone, to: '/admin/submissions/advertise' },
+  { label: 'Tools', icon: PlusSquare, to: '/admin/submissions/tools' },
+  { label: 'Features', icon: Lightbulb, to: '/admin/submissions/features' },
+];
+const contentNav = [
+  { label: 'Business Functions', icon: Users, to: '/admin/business-functions' },
+  { label: 'AI Agents', icon: Bot, to: '/admin/ai-agents' },
+  { label: 'AI Innovations', icon: Rocket, to: '/admin/ai-innovations' },
+  { label: 'AI Tutorials', icon: BookOpen, to: '/admin/ai-tutorials' },
+  { label: 'Feedback', icon: Lightbulb, to: '/admin/feedback' },
+];
+
+const AdminSidebarNav = () => {
+  const location = useLocation();
+  return (
+    <SidebarContent>
+      <SidebarGroup>
+        <SidebarGroupLabel>Admin</SidebarGroupLabel>
+        <SidebarMenu>
+          {adminNav.map((item) => (
+            <SidebarMenuItem key={item.to}>
+              <Link to={item.to}>
+                <SidebarMenuButton isActive={location.pathname === item.to}>
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.label}
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+      <SidebarSeparator />
+      <SidebarGroup>
+        <SidebarGroupLabel>Submissions</SidebarGroupLabel>
+        <SidebarMenu>
+          {submissionsNav.map((item) => (
+            <SidebarMenuItem key={item.to}>
+              <Link to={item.to}>
+                <SidebarMenuButton isActive={location.pathname === item.to}>
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.label}
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+      <SidebarSeparator />
+      <SidebarGroup>
+        <SidebarGroupLabel>Content</SidebarGroupLabel>
+        <SidebarMenu>
+          {contentNav.map((item) => (
+            <SidebarMenuItem key={item.to}>
+              <Link to={item.to}>
+                <SidebarMenuButton isActive={location.pathname === item.to}>
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.label}
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+    </SidebarContent>
+  );
+};
+
+const AdminTopbar = () => (
+  <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b bg-background sticky top-0 z-20 w-full">
+    <div className="flex items-center gap-2">
+      <div className="block md:hidden">
+        <SidebarTrigger className="mr-2" />
+      </div>
+      <span className="text-lg font-bold tracking-tight">Admin Dashboard</span>
+    </div>
+    <div className="flex items-center gap-4">
+      <Avatar>
+        <AvatarFallback>AD</AvatarFallback>
+      </Avatar>
+    </div>
+  </div>
 );
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="flex h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-100">
-      <AdminSidebar />
-      <main className="flex-1 overflow-y-auto">
-        {children}
-      </main>
-    </div>
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-background text-foreground overflow-x-hidden">
+        <Sidebar className="border-r bg-card z-30" collapsible="offcanvas">
+          <SidebarHeader className="px-4 sm:px-6 py-4 text-xl font-bold">AITerritory Admin</SidebarHeader>
+          <AdminSidebarNav />
+        </Sidebar>
+        <SidebarInset className="flex flex-col flex-1 min-h-0 w-full">
+          <AdminTopbar />
+          <main className="flex-1 w-full p-2 sm:p-4 md:p-6 bg-background scroll-smooth overflow-y-auto">
+            {children}
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 };
 

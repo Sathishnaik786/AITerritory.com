@@ -1,3 +1,4 @@
+// DEPRECATED: ThemeContext is no longer used. Use next-themes' ThemeProvider and useTheme instead.
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Theme = 'light' | 'dark';

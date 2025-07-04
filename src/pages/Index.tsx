@@ -1,44 +1,48 @@
-import React, { useState, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import SearchBar from '../components/SearchBar';
 import CategorySidebar from '../components/CategorySidebar';
 import { Link } from 'react-router-dom';
 import { ToolCard } from '../components/ToolCard';
+import { categoryService } from '../services/categoryService';
+import { toolService } from '../services/toolService';
 
 const ToolCarousel = React.lazy(() => import('../components/ToolCarousel'));
 
 const Index = () => {
-  const [selectedCategory, setSelectedCategory] = useState('All Tools');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null); // null means all categories
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('popular');
   const [visibleCount, setVisibleCount] = useState(12);
+  const [categories, setCategories] = useState<{ id: string; name: string; count: number }[]>([]);
+  const [tools, setTools] = useState<any[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [loadingTools, setLoadingTools] = useState(false);
 
-  const getCategoryFilter = (categoryName: string) => {
-    switch (categoryName) {
-      case 'All Tools': return {};
-      case 'Customer Service & Support': return { category: 'Customer Service' };
-      case 'Sales': return { category: 'Sales & CRM' };
-      case 'Back Office': return { category: 'Business Operations' };
-      case 'Operations': return { category: 'Operations Management' };
-      case 'Growth & Marketing': return { tags: ['Marketing', 'Growth'] };
-      case 'Writing & Editing': return { tags: ['Writing', 'Editing'] };
-      case 'Technology & IT': return { tags: ['Development', 'IT'] };
-      case 'Design & Creative': return { tags: ['Design', 'Creative', 'AI Art', 'Image Generation'] };
-      case 'Workflow Automation': return { tags: ['Automation', 'Workflow'] };
-      default: return {};
+  // Fetch category tool counts
+  useEffect(() => {
+    setLoadingCategories(true);
+    categoryService.getCategoryToolCounts()
+      .then((data) => setCategories(data))
+      .finally(() => setLoadingCategories(false));
+  }, []);
+
+  // Fetch tools for selected category
+  useEffect(() => {
+    setLoadingTools(true);
+    let fetch;
+    if (!selectedCategoryId) {
+      fetch = toolService.getTools();
+    } else {
+      fetch = toolService.getTools({ category_id: selectedCategoryId });
     }
-  };
+    fetch
+      .then((data) => setTools(data))
+      .finally(() => setLoadingTools(false));
+  }, [selectedCategoryId, categories]);
 
+  // Filter tools by search and tab
   const filteredTools = useMemo(() => {
-    let filtered = toolsData;
-
-    const categoryFilter = getCategoryFilter(selectedCategory);
-
-    if (categoryFilter.category) {
-      filtered = filtered.filter(tool => tool.category === categoryFilter.category);
-    } else if (categoryFilter.tags) {
-      filtered = filtered.filter(tool => tool.tags && categoryFilter.tags.some(tag => tool.tags.includes(tag)));
-    }
-
+    let filtered = tools;
     if (searchQuery) {
       filtered = filtered.filter(tool =>
         tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -47,19 +51,22 @@ const Index = () => {
         tool.company?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-
     if (activeTab === 'recentlyAdded') {
-      filtered = filtered.sort((a, b) => {
+      filtered = filtered.slice().sort((a, b) => {
         if (!a.releaseDate || !b.releaseDate) return 0;
         return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
       });
     }
-
     return filtered;
-  }, [selectedCategory, searchQuery, activeTab]);
+  }, [tools, searchQuery, activeTab]);
 
   const visibleTools = filteredTools.slice(0, visibleCount);
   const hasMore = visibleCount < filteredTools.length;
+
+  // Helper for sidebar: selectedCategoryId === null means 'All Categories'
+  const selectedCategory = selectedCategoryId
+    ? categories.find((cat) => cat.id === selectedCategoryId)?.name || ''
+    : 'All Categories';
 
   return (
     <div>
@@ -91,13 +98,13 @@ const Index = () => {
             </div>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <span className="text-sm text-gray-500 dark:text-gray-400">Popular Categories:</span>
-              {['AI Writing', 'Image Generation', 'Productivity', 'Development'].map((category) => (
+              {categories.map((category) => (
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
+                  key={category.id}
+                  onClick={() => setSelectedCategoryId(category.id)}
                   className="text-sm px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
                 >
-                  {category}
+                  {category.name}
                 </button>
               ))}
             </div>
@@ -121,8 +128,17 @@ const Index = () => {
           {/* Left Sidebar - Categories */}
           <div className="md:w-1/4 lg:w-1/5">
             <CategorySidebar
+              categories={categories}
               selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
+              onSelectCategory={(catName) => {
+                if (catName === 'All Categories') {
+                  setSelectedCategoryId(null);
+                } else {
+                  const cat = categories.find((c) => c.name === catName);
+                  setSelectedCategoryId(cat ? cat.id : null);
+                }
+              }}
+              loading={loadingCategories}
             />
           </div>
 
@@ -164,7 +180,11 @@ const Index = () => {
 
             {/* Tools Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {visibleTools.length === 0 ? (
+              {loadingTools ? (
+                <div className="text-center py-20 text-muted-foreground col-span-full bg-gray-50 dark:bg-gray-700 rounded-lg p-8 shadow-inner">
+                  <p className="text-lg font-medium">Loading tools...</p>
+                </div>
+              ) : filteredTools.length === 0 ? (
                 <div className="text-center py-20 text-muted-foreground col-span-full bg-gray-50 dark:bg-gray-700 rounded-lg p-8 shadow-inner">
                   <p className="text-lg font-medium">No tools found for the selected criteria.</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Try adjusting your search or category filters.</p>

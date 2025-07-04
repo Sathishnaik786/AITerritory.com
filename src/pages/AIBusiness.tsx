@@ -153,15 +153,17 @@ const AIBusiness = () => {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Trending Courses:</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {func.trendingCourses.map((course: any) => (
-                    <Link to={course.link} target="_blank" rel="noopener noreferrer" key={course.id} className="block border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group">
-                      <img src={course.image} alt={course.title} className="w-full h-50 object-cover" style={{ width: '360px', height: '200px' }} loading="lazy" />
+                    <Link to={course.link} target="_blank" rel="noopener noreferrer" key={course.id} className="block border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group p-0">
+                      <div className="relative w-full">
+                        <img src={course.image} alt={course.title} className="w-full object-cover" style={{ aspectRatio: '16/9', display: 'block' }} loading="lazy" />
+                        <div className="absolute top-2 right-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-md flex items-center">
+                          <span className="mr-1">▶</span> View Course
+                        </div>
+                      </div>
                       <div className="p-4">
                         <h4 className="text-md font-semibold text-gray-800 dark:text-gray-100 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                           {course.title}
                         </h4>
-                      </div>
-                      <div className="absolute top-2 right-2 bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-md flex items-center">
-                        <span className="mr-1">▶</span> View Course
                       </div>
                     </Link>
                   ))}

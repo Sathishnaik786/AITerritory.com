@@ -1,36 +1,31 @@
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Sun, Moon } from 'lucide-react';
+import { useTheme } from "next-themes";
 
-const ThemeToggle: React.FC = () => {
-  const [isDark, setIsDark] = useState(true);
+interface ThemeToggleProps {
+  small?: boolean;
+}
 
-  useEffect(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved) {
-      setIsDark(saved === 'dark');
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDark]);
+const ThemeToggle: React.FC<ThemeToggleProps> = ({ small }) => {
+  const { setTheme, resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   return (
     <button
-      onClick={() => setIsDark(!isDark)}
-      className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 text-white hover:bg-white/20 transition-all duration-300 hover:scale-105"
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      className={
+        `${small ? 'p-2 w-8 h-8' : 'p-3'} rounded-xl border transition-all duration-300 hover:scale-105 focus:outline-none flex items-center justify-center ` +
+        (isDark
+          ? 'bg-black border-white/20 text-white hover:bg-white/10'
+          : 'bg-white border-black text-black hover:bg-gray-100')
+      }
       aria-label="Toggle theme"
+      type="button"
     >
       {isDark ? (
-        <Sun className="w-5 h-5" />
+        <Sun className={small ? 'w-4 h-4' : 'w-5 h-5'} />
       ) : (
-        <Moon className="w-5 h-5" />
+        <Moon className={small ? 'w-4 h-4' : 'w-5 h-5'} />
       )}
     </button>
   );

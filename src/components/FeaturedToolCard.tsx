@@ -17,7 +17,7 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
   const imageSrc = tool.image_url || tool.image;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 flex flex-col h-full p-3 sm:p-5">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 flex flex-col h-full p-2 xs:p-3 sm:p-5 w-full max-w-full">
       {/* Top Row: Logo, Verified, Name, Rating */}
       <div className="flex items-center gap-2 sm:gap-3 mb-2">
         {imageSrc ? (
@@ -30,7 +30,7 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
         <CheckCircle className="w-5 h-5 text-blue-500 ml-1" title="Verified" />
         <div className="flex flex-col flex-1 min-w-0 ml-2">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-lg text-gray-900 dark:text-white truncate">{tool.name}</span>
+            <span className="font-bold text-base sm:text-lg text-gray-900 dark:text-white truncate">{tool.name}</span>
           </div>
           <div className="flex items-center gap-1 mt-1">
             {[1,2,3,4,5].map(i => (
@@ -51,7 +51,7 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
         </div>
       </div>
       {/* Description */}
-      <div className="text-gray-700 dark:text-gray-300 text-sm mb-2 line-clamp-2 break-words">
+      <div className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm mb-2 line-clamp-2 break-words">
         {tool.description}
       </div>
       {/* Tags */}
@@ -61,12 +61,12 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
         ))}
       </div>
       {/* Bottom Row: Visit right */}
-      <div className="flex flex-col sm:flex-row items-center justify-end mt-auto pt-2 gap-2">
+      <div className="flex flex-col sm:flex-row items-center justify-end mt-auto pt-2 gap-2 w-full">
         <a
           href={tool.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-white border border-blue-400 text-blue-600 hover:bg-blue-50 hover:border-blue-600 font-semibold px-6 py-2 rounded-xl shadow-sm flex items-center gap-2 w-full sm:w-auto"
+          className="bg-white border border-blue-400 text-blue-600 hover:bg-blue-50 hover:border-blue-600 font-semibold px-4 sm:px-6 py-2 rounded-xl shadow-sm flex items-center gap-2 w-full sm:w-auto text-center justify-center"
         >
           Visit <ExternalLink className="w-4 h-4 ml-1" />
         </a>

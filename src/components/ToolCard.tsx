@@ -11,7 +11,7 @@ import { bookmarkService } from '../services/bookmarkService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLikesAndShares } from '../hooks/useLikesAndShares';
 import ShareModal from './ShareModal';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from 'next-themes';
 
 interface ToolCardProps {
   tool: Tool;
@@ -26,7 +26,8 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
 
   const navigate = useNavigate();
   const { user } = useUser();
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const theme = resolvedTheme;
 
   // Use the new likes and shares hook
   const {

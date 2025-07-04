@@ -8,14 +8,14 @@ const getCategoryToolCounts = async (req, res) => {
       .select('id, name');
     if (catError) throw catError;
 
-    // Get tool counts per category (correct grouping)
+    // Get tool counts per category (group by category ID)
     const { data: toolCounts, error: countError } = await supabase
       .from('tools')
       .select('category, count:id')
       .group('category');
     if (countError) throw countError;
 
-    // Map category names to counts
+    // Map category IDs to counts
     const countsMap = {};
     toolCounts.forEach(tc => {
       countsMap[tc.category] = tc.count;
@@ -23,8 +23,9 @@ const getCategoryToolCounts = async (req, res) => {
 
     // Build result
     const result = categories.map(cat => ({
+      id: cat.id,
       name: cat.name,
-      count: countsMap[cat.name] || 0,
+      count: countsMap[cat.id] || 0,
     }));
 
     res.status(200).json(result);
