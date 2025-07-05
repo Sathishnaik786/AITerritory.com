@@ -60,14 +60,25 @@ export function Navbar() {
               {/* Main nav links */}
               {navLinks.map((item) => (
                 <NavigationMenuItem key={item.to}>
-                  <NavigationMenuLink asChild className={navigationMenuTriggerStyle() + (location.pathname === item.to ? " bg-gradient-to-r from-blue-500 to-purple-500 text-white" : "") }>
-                    <Link to={item.to}>{item.label}</Link>
+                  <NavigationMenuLink asChild>
+                    <Link 
+                      to={item.to}
+                      className={`px-4 py-2 text-sm font-medium transition-colors hover:text-blue-500 ${
+                        location.pathname === item.to 
+                          ? "text-blue-500" 
+                          : "text-foreground"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
               ))}
               {/* Dropdown: Resources */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="px-4 py-2 text-sm font-medium transition-colors hover:text-blue-500 data-[state=open]:text-blue-500">
+                  Resources
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid gap-2 w-[280px] p-4 rounded-lg shadow-lg bg-background border">
                     <ListItem to="/resources/ai-agents" title="AI Agents">
@@ -127,7 +138,11 @@ export function Navbar() {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className={"block py-3 px-4 rounded-lg text-base font-medium hover:bg-accent transition-colors" + (location.pathname === item.to ? " bg-gradient-to-r from-blue-500 to-purple-500 text-white" : "")}
+                    className={`block py-3 px-4 text-base font-medium transition-colors hover:text-blue-500 ${
+                      location.pathname === item.to 
+                        ? "text-blue-500" 
+                        : "text-foreground"
+                    }`}
                     onClick={() => setDrawerOpen(false)}
                   >
                     {item.label}
@@ -136,10 +151,10 @@ export function Navbar() {
                 {/* Resources Dropdown as links */}
                 <div className="mt-4">
                   <div className="text-xs font-semibold text-muted-foreground mb-3 px-4">Resources</div>
-                  <Link to="/resources/ai-agents" className="block py-3 px-4 rounded-lg hover:bg-accent transition-colors" onClick={() => setDrawerOpen(false)}>AI Agents</Link>
-                  <Link to="/resources/ai-innovation" className="block py-3 px-4 rounded-lg hover:bg-accent transition-colors" onClick={() => setDrawerOpen(false)}>AI Innovation</Link>
-                  <Link to="/resources/ai-tutorials" className="block py-3 px-4 rounded-lg hover:bg-accent transition-colors" onClick={() => setDrawerOpen(false)}>AI Tutorials</Link>
-                  <Link to="/resources/ai-automation" className="block py-3 px-4 rounded-lg hover:bg-accent transition-colors" onClick={() => setDrawerOpen(false)}>AI Automation</Link>
+                  <Link to="/resources/ai-agents" className="block py-3 px-4 transition-colors hover:text-blue-500" onClick={() => setDrawerOpen(false)}>AI Agents</Link>
+                  <Link to="/resources/ai-innovation" className="block py-3 px-4 transition-colors hover:text-blue-500" onClick={() => setDrawerOpen(false)}>AI Innovation</Link>
+                  <Link to="/resources/ai-tutorials" className="block py-3 px-4 transition-colors hover:text-blue-500" onClick={() => setDrawerOpen(false)}>AI Tutorials</Link>
+                  <Link to="/resources/ai-automation" className="block py-3 px-4 transition-colors hover:text-blue-500" onClick={() => setDrawerOpen(false)}>AI Automation</Link>
                 </div>
                 {/* Divider */}
                 <hr className="my-4 border-muted" />
