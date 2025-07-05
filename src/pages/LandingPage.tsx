@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import Footer from '../components/Footer';
+import { Footer } from '../components/Footer';
 import Testimonials from '../components/Testimonials';
 import { ArrowRight, Rocket } from 'lucide-react';
 import { toolsData } from '../data/tools';

@@ -20,6 +20,7 @@ import { Menu } from 'lucide-react';
 const navLinks = [
   { label: "AI Tools", to: "/resources/all-resources" },
   { label: "AI for Business", to: "/ai-for-business" },
+  { label: "Blog", to: "/blog" },
   { label: "Newsletter", to: "/newsletter" },
   { label: "Prompts", to: "/prompts" },
 ];

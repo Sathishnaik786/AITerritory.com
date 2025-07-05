@@ -70,6 +70,9 @@ import React, { Suspense } from 'react';
 import FeedbackAdmin from './admin/FeedbackAdmin';
 import SmartRepurposeToolPage from './pages/SmartRepurposeToolPage';
 import BackgroundAnimation from './components/ui/BackgroundAnimation';
+import LandingPro from "./pages/LandingPro";
+import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -124,6 +127,8 @@ function SEO() {
 }
 
 function ThemedAppContent() {
+  const location = useLocation();
+  const isLandingPro = location.pathname === '/';
   return (
     <div className={`min-h-screen antialiased`}>
       <HelmetProvider>
@@ -134,7 +139,8 @@ function ThemedAppContent() {
           <main className="flex-1 w-full max-w-[1970px] min-h-screen mx-auto px-4 sm:px-6 lg:px-8">
             <Routes>
               {/* Public Routes */}
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<LandingPro />} />
+              <Route path="/home" element={<HomePage />} />
               <Route path="/ai-for-business" element={<AIBusiness />} />
               <Route path="/prompts" element={<Prompts />} />
               
@@ -250,11 +256,17 @@ function ThemedAppContent() {
               <Route path="/tools/:toolId" element={<ToolDetailsPage />} />
               
               <Route path="/repurpose" element={<SmartRepurposeToolPage />} />
+              
+              {/* Blog Routes */}
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogDetail />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
         </div>
+        {/* Only show Footer if not on LandingPro */}
+        {!isLandingPro && <Footer />}
       </HelmetProvider>
     </div>
   );
@@ -278,7 +290,6 @@ function App() {
               <Suspense fallback={<div>Loading...</div>}>
                 <ThemedAppContent />
               </Suspense>
-              <Footer />
               <ReactQueryDevtools initialIsOpen={false} />
             </HelmetProvider>
           </TooltipProvider>
