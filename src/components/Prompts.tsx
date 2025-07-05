@@ -130,9 +130,9 @@ export default function Prompts() {
   const inputBg = theme === 'dark' ? 'bg-[#181c1f]' : 'bg-gray-100';
   const inputText = theme === 'dark' ? 'text-white' : 'text-gray-900';
   const inputPlaceholder = theme === 'dark' ? 'placeholder:text-gray-400' : 'placeholder:text-gray-500';
-  const greenBtn = 'bg-[#1abc8c] text-white';
-  const greenIcon = 'text-[#1abc8c]';
-  const authorBg = 'bg-[#1abc8c]/10 text-[#1abc8c] px-3 py-1 rounded-full text-xs font-semibold';
+  const greenBtn = 'bg-[#3b82f6] text-white';
+  const greenIcon = 'text-[#3b82f6]';
+  const authorBg = 'bg-[#3b82f6]/10 text-[#3b82f6] px-3 py-1 rounded-full text-xs font-semibold';
 
   // If a category is selected in the sidebar, only show that category section
   const categoriesToShow = selectedCategory
@@ -227,7 +227,7 @@ export default function Prompts() {
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[#222]/40">
         <div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
-            <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1abc8c] tracking-tight">Discover Prompts</span>
+            <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#3b82f6] tracking-tight">Discover Prompts</span>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-transparent text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-700">New: Try Vibe Coding Mode!</span>
           </div>
           <div className="text-xs sm:text-sm text-gray-400 mt-1">World's First & Most Famous Prompts Directory</div>
@@ -236,7 +236,7 @@ export default function Prompts() {
           {platforms.map((platform) => (
             <button
               key={platform}
-              className={`px-2 sm:px-3 py-1 rounded-full border ${selectedPlatform === platform ? greenBtn : 'border-[#1abc8c] text-[#1abc8c] bg-transparent'} text-xs font-semibold transition-colors`}
+              className={`px-2 sm:px-3 py-1 rounded-full border ${selectedPlatform === platform ? greenBtn : 'border-[#3b82f6] text-[#3b82f6] bg-transparent'} text-xs font-semibold transition-colors`}
               onClick={() => setSelectedPlatform(platform)}
             >
               {platform}
@@ -246,7 +246,7 @@ export default function Prompts() {
       </div>
       {/* Mobile Sidebar Toggle */}
       <div className="md:hidden flex items-center px-4 py-2 border-b border-[#222]/20">
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="flex items-center gap-2 text-[#1abc8c] font-semibold focus:outline-none transition-colors">
+        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="flex items-center gap-2 text-[#3b82f6] font-semibold focus:outline-none transition-colors">
           <FaBars className="w-4 h-4 sm:w-5 sm:h-5" />
           Categories
         </button>
@@ -254,7 +254,7 @@ export default function Prompts() {
       <div className="flex-1 flex flex-col md:flex-row min-h-0">
         {/* Sidebar */}
         <div className={`
-          bg-white/60 dark:bg-white/10 backdrop-blur-md ${textSidebar} p-3 sm:p-4 w-full md:w-64 flex-col transition-all duration-300 z-20
+          bg-white/60 dark:bg-[#171717] backdrop-blur-md ${textSidebar} p-3 sm:p-4 w-full md:w-64 flex-col transition-all duration-300 z-20
           ${sidebarOpen ? 'flex absolute top-[120px] left-0 right-0 shadow-xl md:static md:flex' : 'hidden md:flex'}
         `}>
           <div className="font-semibold mb-3 sm:mb-4 flex items-center justify-between">
@@ -303,7 +303,7 @@ export default function Prompts() {
                         </div>
                       </div>
                       {catPrompts.length > 3 && !showAll && (
-                        <Button onClick={() => setExpandedCategory(cat)} className="flex items-center gap-2 bg-[#1abc8c] text-white px-4 sm:px-6 py-2 rounded-full font-semibold text-sm sm:text-base transition-colors">
+                        <Button onClick={() => setExpandedCategory(cat)} className="flex items-center gap-2 bg-[#3b82f6] text-white px-4 sm:px-6 py-2 rounded-full font-semibold text-sm sm:text-base transition-colors">
                           More <FaArrowRight className="ml-1 w-3 h-3 sm:w-4 sm:h-4" />
                         </Button>
                       )}
@@ -328,9 +328,9 @@ export default function Prompts() {
                                 <div className="flex items-start justify-between mb-2 sm:mb-3">
                                   <div className="text-base sm:text-lg font-bold leading-tight">{prompt.title}</div>
                                   <div className="flex gap-1.5 sm:gap-2">
-                                    <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#1abc8c]/10 transition-colors ${greenIcon}`} title="Chat" onClick={() => setOpenPrompt({ id: prompt.id, title: prompt.title, description: prompt.description, author: prompt.author })}><FaRegCommentDots size={18} className="sm:w-5 sm:h-5" /></button>
-                                    <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#1abc8c]/10 transition-colors ${greenIcon}`} title="Read" onClick={() => setOpenRead(prompt)}><FaRegFileAlt size={18} className="sm:w-5 sm:h-5" /></button>
-                                    <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#1abc8c]/10 transition-colors ${greenIcon}`} title="Copy" onClick={() => {
+                                    <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#3b82f6]/10 transition-colors ${greenIcon}`} title="Chat" onClick={() => setOpenPrompt({ id: prompt.id, title: prompt.title, description: prompt.description, author: prompt.author })}><FaRegCommentDots size={18} className="sm:w-5 sm:h-5" /></button>
+                                    <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#3b82f6]/10 transition-colors ${greenIcon}`} title="Read" onClick={() => setOpenRead(prompt)}><FaRegFileAlt size={18} className="sm:w-5 sm:h-5" /></button>
+                                    <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#3b82f6]/10 transition-colors ${greenIcon}`} title="Copy" onClick={() => {
                                       navigator.clipboard.writeText(prompt.description || '');
                                       toast({ title: 'Copied!', description: 'Prompt copied to clipboard.' });
                                     }}><FaRegCopy size={18} className="sm:w-5 sm:h-5" /></button>
@@ -363,7 +363,7 @@ export default function Prompts() {
               <Button
                 size="icon"
                 variant="ghost"
-                className={`rounded-full ${chatStatus?.userLiked ? 'bg-[#1abc8c] text-white' : ''}`}
+                className={`rounded-full ${chatStatus?.userLiked ? 'bg-[#3b82f6] text-white' : ''}`}
                 onClick={user ? handleLike : undefined}
                 disabled={!user || chatLoading}
                 title={user ? (chatStatus?.userLiked ? 'Unlike' : 'Like') : 'Login to like'}
