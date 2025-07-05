@@ -23,18 +23,18 @@ const categories = [
 
 // --- SUGGESTION BUTTONS DATA ---
 const suggestions = [
-  'Add a Google Sheet row',
   'On GitHub issue, create Li...',
-  'Add new Stripe customers ...',
+  'Add new Stripe customers...',
   'Webhook proxy',
+  'Send message to Slack',
+  'Brand monitoring',
   'Email categorization',
   'Tweetstorm genera...',
   'Daily calendar sum...',
-  'Brand monitoring',
-  'AI model monitori...',
   'Nike shoe drops',
-  'Taylor Swift concer...',
-  'Earnings call sum...'
+  'Taylor Swift conce...',
+  'Earnings call sum...',
+  'New user sign ups',
 ];
 
 // --- PROMPT FORM COMPONENT ---
@@ -144,86 +144,93 @@ const LandingPro: React.FC = () => {
   const theme = resolvedTheme;
   const [prompt, setPrompt] = useState('');
 
-  const handlePromptSubmit = (prompt: string) => {
+  const handlePromptSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Integrate with backend
     console.log('Prompt submitted:', prompt);
   };
 
+  // Split suggestions into two rows for desktop, stack for mobile
+  const firstRow = suggestions.slice(0, 4);
+  const secondRow = suggestions.slice(4, 8);
+  const thirdRow = suggestions.slice(8, 12);
+
   return (
-    <div 
-      className={`flex flex-col items-center justify-center w-full min-h-screen overflow-x-hidden bg-[#171717] gap-2 sm:gap-4 md:gap-6`}
-    >
-      <div className="flex flex-col items-center w-full max-w-full mx-auto gap-2 sm:gap-4 md:gap-6 px-2 sm:px-0">
-        {/* Title */}
-        <motion.h1
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className={`text-lg sm:text-2xl md:text-4xl font-black text-center leading-tight px-0 ${
-            theme === 'dark' ? 'text-white' : 'text-gray-600'
-          }`}
-        >
-          Which AI tool do you need?
-        </motion.h1>
-
-        {/* Subtitle */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
-          className={`text-xs sm:text-base font-medium text-center leading-relaxed px-0 ${
-            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-          }`}
-        >
-          Prompt, run, edit, and get AI tool suggestions in seconds
-        </motion.div>
-
-        {/* Prompt Form */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
-          className="w-full flex justify-center"
-        >
-          <AiPromptForm onSubmit={handlePromptSubmit} prompt={prompt} setPrompt={setPrompt} />
-        </motion.div>
-
-        {/* Suggestion Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5, ease: 'easeOut' }}
-          className="w-full flex justify-center"
-        >
-          <SuggestionBar onSuggestion={setPrompt} />
-        </motion.div>
-
-        {/* Category Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
-          className="w-full flex justify-center"
-        >
-          <CategoryBar />
-        </motion.div>
-
-        {/* Explore Button */}
-        <motion.button
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8, ease: 'easeOut' }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => navigate('/home')}
-          className={`w-full max-w-xs sm:max-w-sm md:max-w-md px-4 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-base font-bold mt-2 sm:mt-4 ${
-            theme === 'dark'
-              ? 'bg-[#232323] hover:bg-[#333] active:bg-[#444] text-gray-200 hover:text-white'
-              : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white'
-          }`}
-          style={{ minHeight: 44 }}
-        >
-          Explore
-        </motion.button>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#111] px-2">
+      {/* Title */}
+      <motion.h1
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+        className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center text-white mt-8 mb-4"
+      >
+        Tell me your need, <br />
+        <span className="text-blue-500">I will give a real time AI Tool.</span>
+      </motion.h1>
+      {/* Subtitle */}
+      <div className="text-base sm:text-lg md:text-xl text-gray-400 text-center mb-10">
+        Prompt, run, edit, and deploy AI agents in seconds
+      </div>
+      {/* Prompt Input */}
+      <form onSubmit={handlePromptSubmit} className="w-full max-w-xl mx-auto flex flex-col items-center mb-10">
+        <div className="relative w-full">
+          <Textarea
+            className="w-full min-h-[70px] rounded-2xl border border-gray-700 bg-[#191919] text-lg text-gray-200 px-6 py-5 pr-14 placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 resize-none shadow-none"
+            placeholder="How can String help you today"
+            value={prompt}
+            onChange={e => setPrompt(e.target.value)}
+            required
+          />
+          <button
+            type="submit"
+            className="absolute bottom-4 right-4 rounded-full p-2 bg-[#232323] hover:bg-[#333] text-gray-400 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ minHeight: 44, minWidth: 44 }}
+          >
+            <ArrowRight size={22} />
+          </button>
+        </div>
+      </form>
+      {/* Suggestion Bar - Responsive, 2 rows on desktop, stacked on mobile */}
+      <div className="w-full max-w-4xl flex flex-col items-center gap-3">
+        <div className="flex flex-wrap justify-center gap-3 w-full">
+          {firstRow.map((text, i) => (
+            <button
+              key={i}
+              onClick={() => setPrompt(text)}
+              className="h-11 px-6 rounded-full border border-gray-700 bg-[#191919] text-gray-200 text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              style={{ minWidth: 180, maxWidth: 240 }}
+              title={text}
+            >
+              <span className="truncate w-full text-center block">{text}</span>
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap justify-center gap-3 w-full">
+          {secondRow.map((text, i) => (
+            <button
+              key={i}
+              onClick={() => setPrompt(text)}
+              className="h-11 px-6 rounded-full border border-gray-700 bg-[#191919] text-gray-200 text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              style={{ minWidth: 180, maxWidth: 240 }}
+              title={text}
+            >
+              <span className="truncate w-full text-center block">{text}</span>
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap justify-center gap-3 w-full">
+          {thirdRow.map((text, i) => (
+            <button
+              key={i}
+              onClick={() => setPrompt(text)}
+              className="h-11 px-6 rounded-full border border-gray-700 bg-[#191919] text-gray-200 text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              style={{ minWidth: 180, maxWidth: 240 }}
+              title={text}
+            >
+              <span className="truncate w-full text-center block">{text}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

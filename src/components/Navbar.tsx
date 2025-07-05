@@ -12,6 +12,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
+  NavigationMenuIndicator,
+  NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
 import { CircleCheckIcon, CircleHelpIcon, CircleIcon, Sparkles } from "lucide-react";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerClose } from './ui/drawer';
@@ -32,8 +34,8 @@ export function Navbar() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   return (
-    <nav className="w-full z-50 px-0 py-0 bg-background/90 backdrop-blur border-b border-border sticky top-0 overflow-hidden">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 px-2 sm:px-4 lg:px-6 min-h-[56px]">
+    <nav className="w-full z-50 px-0 py-2 bg-background/80 backdrop-blur-md border-b border-border sticky top-0 overflow-visible">
+      <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 px-2 sm:px-4 lg:px-8">
           {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
               <div className="relative">
@@ -55,7 +57,7 @@ export function Navbar() {
         {/* Desktop Navigation Menu */}
         <div className="flex-1 justify-center hidden md:flex">
           <NavigationMenu>
-            <NavigationMenuList className="gap-1">
+            <NavigationMenuList>
               {/* Main nav links */}
               {navLinks.map((item) => (
                 <NavigationMenuItem key={item.to}>
@@ -64,16 +66,13 @@ export function Navbar() {
                   </NavigationMenuLink>
                 </NavigationMenuItem>
               ))}
-              {/* Dropdown Example: Resources */}
+              {/* Dropdown: Resources */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid gap-2 w-[300px] p-2">
+                  <ul className="grid gap-2 w-[260px] p-3 rounded-lg shadow-lg bg-background">
                     <ListItem to="/resources/ai-agents" title="AI Agents">
                       Discover and manage AI agents for your workflow.
-                    </ListItem>
-                    <ListItem to="/resources/ai-innovation" title="AI Innovation">
-                      Latest innovations in AI technology.
                     </ListItem>
                     <ListItem to="/resources/ai-tutorials" title="AI Tutorials">
                       Tutorials and guides for learning AI.
@@ -81,15 +80,20 @@ export function Navbar() {
                     <ListItem to="/resources/ai-automation" title="AI Automation">
                       Automate tasks and workflows with AI-powered tools.
                     </ListItem>
+                    <ListItem to="/resources/ai-innovation" title="AI Innovation">
+                      Latest innovations in AI technology.
+                    </ListItem>
                   </ul>
                 </NavigationMenuContent>
               </NavigationMenuItem>
             </NavigationMenuList>
+            <NavigationMenuIndicator />
+            <NavigationMenuViewport />
           </NavigationMenu>
-          </div>
+        </div>
 
         {/* Desktop Right side: Theme, Repurpose, Auth/User */}
-        <div className="hidden md:flex items-center gap-2 ml-2">
+        <div className="hidden md:flex items-center gap-2">
           <ThemeToggle small />
           <RepurposeModal />
             <SignedOut>
@@ -106,7 +110,7 @@ export function Navbar() {
         </div>
 
         {/* Mobile Hamburger Menu */}
-        <div className="md:hidden flex items-center">
+        <div className="flex md:hidden items-center">
           <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DrawerTrigger asChild>
               <button aria-label="Open menu" className="p-2 rounded-md hover:bg-accent focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
