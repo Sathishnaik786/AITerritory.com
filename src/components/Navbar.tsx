@@ -38,21 +38,21 @@ export function Navbar() {
       <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 px-2 sm:px-4 lg:px-8">
           {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
-              <div className="relative">
+              <div className="relative flex items-center gap-2">
                 <img 
                   src="/logo.jpg" 
-              alt="AI Territory Logo"
-              className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900"
+                  alt="AI Territory Logo"
+                  className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900"
                   loading="lazy"
                 />
+                <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  AI Territory
+                </span>
                 <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-0.5">
                   <Sparkles className="w-3 h-3 text-white" />
                 </div>
               </div>
-          <span className="hidden md:block font-extrabold text-lg tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            AI Territory
-            </span>
-              </Link>
+            </Link>
 
         {/* Desktop Navigation Menu */}
         <div className="flex-1 justify-center hidden md:flex">
@@ -98,11 +98,11 @@ export function Navbar() {
           <RepurposeModal />
             <SignedOut>
             <SignUpButton mode="modal">
-              <button className="text-sm font-medium px-3 py-1 rounded-md border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition">Sign Up</button>
+              <button className="text-sm font-medium px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 transition">Sign Up</button>
             </SignUpButton>
-                <SignInButton mode="modal">
+            <SignInButton mode="modal">
               <button className="text-sm font-medium px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 transition">Login</button>
-                </SignInButton>
+            </SignInButton>
             </SignedOut>
             <SignedIn>
             <UserButton afterSignOutUrl="/" />

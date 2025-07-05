@@ -191,7 +191,7 @@ const LandingPro: React.FC = () => {
         </div>
       </form>
       {/* Suggestion Bar - Responsive, 2 rows on desktop, stacked on mobile */}
-      <div className="w-full max-w-4xl flex flex-col items-center gap-3">
+      <div className="w-full max-w-4xl flex flex-col items-center gap-3 mb-8">
         <div className="flex flex-wrap justify-center gap-3 w-full">
           {firstRow.map((text, i) => (
             <button
@@ -231,6 +231,13 @@ const LandingPro: React.FC = () => {
             </button>
           ))}
         </div>
+        {/* Explore AI Tools Button */}
+        <button
+          onClick={() => navigate('/home')}
+          className="mt-6 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          Explore AI Tools
+        </button>
       </div>
     </div>
   );
