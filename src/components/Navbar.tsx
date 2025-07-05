@@ -32,30 +32,30 @@ export function Navbar() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   return (
-    <nav className="w-full z-50 px-2 py-2 bg-background/80 backdrop-blur-md border-b border-border sticky top-0">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="relative">
-            <img 
-              src="/logo.jpg" 
+    <nav className="w-full z-50 px-0 py-0 bg-background/90 backdrop-blur border-b border-border sticky top-0 overflow-hidden">
+      <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 px-2 sm:px-4 lg:px-6 min-h-[56px]">
+          {/* Logo */}
+            <Link to="/" className="flex items-center gap-2">
+              <div className="relative">
+                <img 
+                  src="/logo.jpg" 
               alt="AI Territory Logo"
-              className="h-10 w-10 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900"
-              loading="lazy"
-            />
-            <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-0.5">
-              <Sparkles className="w-3 h-3 text-white" />
-            </div>
-          </div>
-          <span className="hidden sm:block font-extrabold text-lg tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900"
+                  loading="lazy"
+                />
+                <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-0.5">
+                  <Sparkles className="w-3 h-3 text-white" />
+                </div>
+              </div>
+          <span className="hidden md:block font-extrabold text-lg tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             AI Territory
-          </span>
-        </Link>
+            </span>
+              </Link>
 
         {/* Desktop Navigation Menu */}
-        <div className="flex-1 justify-center hidden sm:flex">
+        <div className="flex-1 justify-center hidden md:flex">
           <NavigationMenu>
-            <NavigationMenuList>
+            <NavigationMenuList className="gap-1">
               {/* Main nav links */}
               {navLinks.map((item) => (
                 <NavigationMenuItem key={item.to}>
@@ -86,46 +86,46 @@ export function Navbar() {
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
-        </div>
+          </div>
 
         {/* Desktop Right side: Theme, Repurpose, Auth/User */}
-        <div className="hidden sm:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2 ml-2">
           <ThemeToggle small />
           <RepurposeModal />
-          <SignedOut>
+            <SignedOut>
             <SignUpButton mode="modal">
               <button className="text-sm font-medium px-3 py-1 rounded-md border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition">Sign Up</button>
             </SignUpButton>
-            <SignInButton mode="modal">
+                <SignInButton mode="modal">
               <button className="text-sm font-medium px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 transition">Login</button>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
+                </SignInButton>
+            </SignedOut>
+            <SignedIn>
             <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+            </SignedIn>
         </div>
 
         {/* Mobile Hamburger Menu */}
-        <div className="sm:hidden flex items-center">
+        <div className="md:hidden flex items-center">
           <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DrawerTrigger asChild>
-              <button aria-label="Open menu" className="p-2 rounded-md hover:bg-accent focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <Menu className="w-7 h-7" />
+              <button aria-label="Open menu" className="p-2 rounded-md hover:bg-accent focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                <Menu className="w-6 h-6 sm:w-7 sm:h-7" />
               </button>
             </DrawerTrigger>
-            <DrawerContent className="max-w-xs w-full rounded-t-2xl p-0">
-              <div className="flex flex-col gap-2 p-6">
+            <DrawerContent className="w-full max-w-sm mx-auto rounded-t-2xl p-0">
+              <div className="flex flex-col gap-2 p-4 sm:p-6">
                 {/* Logo in Drawer */}
                 <Link to="/" className="flex items-center gap-2 mb-6" onClick={() => setDrawerOpen(false)}>
-                  <img src="/logo.jpg" alt="AI Territory Logo" className="h-8 w-8 rounded-full object-cover" />
+                  <img src="/logo.jpg" alt="AI Territory Logo" className="h-8 w-8 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900" />
                   <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">AI Territory</span>
-                </Link>
+                  </Link>
                 {/* Nav Links */}
                 {navLinks.map((item) => (
                   <Link
                     key={item.to}
                     to={item.to}
-                    className={"block py-2 px-3 rounded-md text-base font-medium hover:bg-accent transition" + (location.pathname === item.to ? " bg-gradient-to-r from-blue-500 to-purple-500 text-white" : "")}
+                    className={"block py-3 px-4 rounded-lg text-base font-medium hover:bg-accent transition-colors" + (location.pathname === item.to ? " bg-gradient-to-r from-blue-500 to-purple-500 text-white" : "")}
                     onClick={() => setDrawerOpen(false)}
                   >
                     {item.label}
@@ -133,11 +133,11 @@ export function Navbar() {
                 ))}
                 {/* Resources Dropdown as links */}
                 <div className="mt-4">
-                  <div className="text-xs font-semibold text-muted-foreground mb-2">Resources</div>
-                  <Link to="/resources/ai-agents" className="block py-2 px-3 rounded-md hover:bg-accent" onClick={() => setDrawerOpen(false)}>AI Agents</Link>
-                  <Link to="/resources/ai-innovation" className="block py-2 px-3 rounded-md hover:bg-accent" onClick={() => setDrawerOpen(false)}>AI Innovation</Link>
-                  <Link to="/resources/ai-tutorials" className="block py-2 px-3 rounded-md hover:bg-accent" onClick={() => setDrawerOpen(false)}>AI Tutorials</Link>
-                  <Link to="/resources/ai-automation" className="block py-2 px-3 rounded-md hover:bg-accent" onClick={() => setDrawerOpen(false)}>AI Automation</Link>
+                  <div className="text-xs font-semibold text-muted-foreground mb-3 px-4">Resources</div>
+                  <Link to="/resources/ai-agents" className="block py-3 px-4 rounded-lg hover:bg-accent transition-colors" onClick={() => setDrawerOpen(false)}>AI Agents</Link>
+                  <Link to="/resources/ai-innovation" className="block py-3 px-4 rounded-lg hover:bg-accent transition-colors" onClick={() => setDrawerOpen(false)}>AI Innovation</Link>
+                  <Link to="/resources/ai-tutorials" className="block py-3 px-4 rounded-lg hover:bg-accent transition-colors" onClick={() => setDrawerOpen(false)}>AI Tutorials</Link>
+                  <Link to="/resources/ai-automation" className="block py-3 px-4 rounded-lg hover:bg-accent transition-colors" onClick={() => setDrawerOpen(false)}>AI Automation</Link>
                 </div>
                 {/* Divider */}
                 <hr className="my-4 border-muted" />
@@ -149,16 +149,16 @@ export function Navbar() {
                     <SignUpButton mode="modal">
                       <button className="w-full text-sm font-medium px-3 py-2 rounded-md border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition">Sign Up</button>
                     </SignUpButton>
-                    <SignInButton mode="modal">
+                      <SignInButton mode="modal">
                       <button className="w-full text-sm font-medium px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 transition">Login</button>
-                    </SignInButton>
+                      </SignInButton>
                   </SignedOut>
                   <SignedIn>
-                    <UserButton afterSignOutUrl="/" />
+                        <UserButton afterSignOutUrl="/" />
                   </SignedIn>
                 </div>
                 <DrawerClose asChild>
-                  <button className="mt-6 w-full py-2 rounded-md bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-300 dark:hover:bg-gray-700 transition">Close</button>
+                  <button className="mt-6 w-full py-3 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors">Close</button>
                 </DrawerClose>
               </div>
             </DrawerContent>

@@ -36,8 +36,8 @@ export function Footer() {
   }, [location.pathname]);
 
   return (
-    <footer className="w-full py-0 px-2 bg-transparent">
-      <div className={`w-full max-w-[1970px] min-h-fit mx-auto px-2 sm:px-4 py-6 sm:py-10 mt-8 mb-2 bg-transparent border ${borderColor} shadow-sm rounded-2xl`}>
+    <footer className="w-full py-0 px-0 bg-transparent">
+      <div className={`w-full max-w-[1970px] min-h-fit mx-auto px-0 sm:px-0 py-6 sm:py-10 mt-8 mb-2 bg-transparent border ${borderColor} shadow-sm rounded-2xl`}>
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 md:gap-10">
           {/* Brand & Social */}
           <div className="flex-1 min-w-[180px] flex flex-col gap-4 items-center md:items-start text-center md:text-left">

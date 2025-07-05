@@ -67,19 +67,19 @@ const Blog: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 scroll-smooth">
+    <div className="h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 scroll-smooth overflow-y-auto">
 
       {/* Filters and Categories */}
-      <section className="py-6 sm:py-8 border-b border-gray-200 dark:border-gray-700">
+      <section className="py-4 sm:py-6 md:py-8 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 items-start lg:items-center justify-between">
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6 items-start lg:items-center justify-between">
             {/* Categories */}
             <div className="flex flex-wrap gap-1.5 sm:gap-2 w-full lg:w-auto">
               <Button
                 variant={selectedCategory === 'all' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedCategory('all')}
-                className="rounded-full text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5"
+                className="rounded-full text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 transition-colors"
               >
                 All ({blogPosts.filter(p => p.published).length})
               </Button>
@@ -89,7 +89,7 @@ const Blog: React.FC = () => {
                   variant={selectedCategory === category.name ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setSelectedCategory(category.name)}
-                  className="rounded-full text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5"
+                  className="rounded-full text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 transition-colors"
                 >
                   {category.name} ({category.postCount})
                 </Button>
@@ -102,7 +102,7 @@ const Blog: React.FC = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'date' | 'readTime' | 'title')}
-                className="bg-transparent border border-gray-300 dark:border-gray-600 rounded-md px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 lg:flex-none"
+                className="bg-transparent border border-gray-300 dark:border-gray-600 rounded-md px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1 lg:flex-none transition-colors"
               >
                 <option value="date">Sort by Date</option>
                 <option value="readTime">Sort by Read Time</option>
@@ -115,19 +115,19 @@ const Blog: React.FC = () => {
 
       {/* Featured Posts */}
       {featuredPosts.length > 0 && (
-        <section className="py-12 sm:py-16">
+        <section className="py-8 sm:py-12 md:py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="text-center mb-8 sm:mb-12"
+              className="text-center mb-6 sm:mb-8 md:mb-12"
             >
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 md:mb-4">
                 Featured Articles
               </h2>
-              <p className="text-base sm:text-lg text-muted-foreground">
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground">
                 Handpicked content from our team
               </p>
             </motion.div>
@@ -137,7 +137,7 @@ const Blog: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8"
+              className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8"
             >
               {featuredPosts.map((post) => (
                 <BlogCard
@@ -152,19 +152,19 @@ const Blog: React.FC = () => {
       )}
 
       {/* All Posts */}
-      <section className="py-12 sm:py-16">
+      <section className="py-8 sm:py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-center mb-8 sm:mb-12"
+            className="text-center mb-6 sm:mb-8 md:mb-12"
           >
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 md:mb-4">
               {searchQuery || selectedCategory !== 'all' ? 'Search Results' : 'All Articles'}
             </h2>
-            <p className="text-base sm:text-lg text-muted-foreground">
+            <p className="text-sm sm:text-base md:text-lg text-muted-foreground">
               {filteredPosts.length} article{filteredPosts.length !== 1 ? 's' : ''} found
             </p>
           </motion.div>
@@ -175,7 +175,7 @@ const Blog: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8"
             >
               {regularPosts.map((post) => (
                 <BlogCard
@@ -189,27 +189,25 @@ const Blog: React.FC = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center py-12 sm:py-16"
+              className="text-center py-8 sm:py-12 md:py-16"
             >
-              <Card className="max-w-sm sm:max-w-md mx-auto p-6 sm:p-8">
+              <Card className="max-w-sm sm:max-w-md mx-auto p-4 sm:p-6 md:p-8">
                 <CardContent className="text-center">
-                  <Search className="w-12 h-12 sm:w-16 sm:h-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <Search className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2">
                     No articles found
                   </h3>
                   <p className="text-sm sm:text-base text-muted-foreground mb-4">
-                    Try adjusting your search terms or browse all categories
+                    Try adjusting your search criteria or browse all articles
                   </p>
-                  <Button
+                  <Button 
                     onClick={() => {
                       setSearchQuery('');
                       setSelectedCategory('all');
                     }}
-                    variant="outline"
-                    size="sm"
-                    className="text-sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    Clear Filters
+                    View All Articles
                   </Button>
                 </CardContent>
               </Card>

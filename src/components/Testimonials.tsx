@@ -48,7 +48,7 @@ const Testimonials: React.FC = () => {
   );
 
   return (
-    <section className="w-full py-16 px-2 md:px-8 overflow-hidden bg-transparent">
+    <section className="w-full py-16 px-0 overflow-hidden bg-transparent">
       <h2 className={`text-3xl font-bold mb-10 text-center ${
         theme === 'dark' ? 'text-white' : 'text-gray-900'
       }`}>

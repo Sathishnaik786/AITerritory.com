@@ -50,13 +50,13 @@
   }
 
   .dark {
-    --background: 0 0% 0%;
+    --background: 0 0% 9%;
     --foreground: 0 0% 98%;
 
-    --card: 0 0% 0%;
+    --card: 0 0% 9%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 0%;
+    --popover: 0 0% 9%;
     --popover-foreground: 0 0% 98%;
 
     --primary: 0 0% 98%;
@@ -118,10 +118,11 @@
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - Hidden */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 0px;
+  height: 0px;
+  display: none;
 }
 
 ::-webkit-scrollbar-track {
@@ -129,12 +130,21 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: transparent;
+}
+
+/* Hide scrollbar for Firefox */
+* {
+  scrollbar-width: none;
+}
+
+/* Hide scrollbar for IE and Edge */
+* {
+  -ms-overflow-style: none;
 }
 
 /* Ensure smooth scrolling */
@@ -173,6 +183,11 @@ body {
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
   }
+}
+
+/* Prevent horizontal scroll globally */
+body {
+  overflow-x: hidden;
 }
 
 /* Improve scroll performance */

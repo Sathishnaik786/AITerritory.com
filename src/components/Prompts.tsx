@@ -115,7 +115,7 @@ export default function Prompts() {
         (p.description && p.description.toLowerCase().includes(search.toLowerCase())))
   );
 
-  const bgMain = theme === 'dark' ? 'bg-black' : 'bg-white';
+  const bgMain = theme === 'dark' ? 'bg-[#171717]' : 'bg-white';
   const textMain = theme === 'dark' ? 'text-white' : 'text-gray-900';
   const bgSidebar = theme === 'dark' ? 'bg-[#23272a]' : 'bg-gray-100';
   const textSidebar = theme === 'dark' ? 'text-white' : 'text-gray-900';
@@ -219,24 +219,24 @@ export default function Prompts() {
   return (
     <div className={`flex flex-col min-h-[90vh] ${bgMain} ${textMain} rounded-lg shadow-lg overflow-hidden pt-8`}> 
       {/* Main Title and Description */}
-      <div className="w-full px-4 sm:px-8 pt-4 pb-2 text-center">
-        <h1 className="text-3xl sm:text-4xl font-extrabold mb-2">AI Prompts Directory</h1>
-        <p className="text-base sm:text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">Discover, search, and use the best prompts for developers, creators, and AI enthusiasts. Browse by category or platform and boost your productivity!</p>
+      <div className="w-full px-4 sm:px-6 lg:px-8 pt-4 pb-2 text-center">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2">AI Prompts Directory</h1>
+        <p className="text-sm sm:text-base md:text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">Discover, search, and use the best prompts for developers, creators, and AI enthusiasts. Browse by category or platform and boost your productivity!</p>
       </div>
       {/* Top Bar */}
-      <div className="w-full px-4 sm:px-8 pt-6 pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[#222]/40">
+      <div className="w-full px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[#222]/40">
         <div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
-            <span className="text-2xl sm:text-3xl font-bold text-[#1abc8c] tracking-tight">Discover Prompts</span>
+            <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1abc8c] tracking-tight">Discover Prompts</span>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-transparent text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-700">New: Try Vibe Coding Mode!</span>
           </div>
           <div className="text-xs sm:text-sm text-gray-400 mt-1">World's First & Most Famous Prompts Directory</div>
         </div>
-        <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 md:mt-0">
           {platforms.map((platform) => (
             <button
               key={platform}
-              className={`px-3 py-1 rounded-full border ${selectedPlatform === platform ? greenBtn : 'border-[#1abc8c] text-[#1abc8c] bg-transparent'} text-xs font-semibold transition`}
+              className={`px-2 sm:px-3 py-1 rounded-full border ${selectedPlatform === platform ? greenBtn : 'border-[#1abc8c] text-[#1abc8c] bg-transparent'} text-xs font-semibold transition-colors`}
               onClick={() => setSelectedPlatform(platform)}
             >
               {platform}
@@ -246,23 +246,23 @@ export default function Prompts() {
       </div>
       {/* Mobile Sidebar Toggle */}
       <div className="md:hidden flex items-center px-4 py-2 border-b border-[#222]/20">
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="flex items-center gap-2 text-[#1abc8c] font-semibold focus:outline-none">
-          <FaBars />
+        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="flex items-center gap-2 text-[#1abc8c] font-semibold focus:outline-none transition-colors">
+          <FaBars className="w-4 h-4 sm:w-5 sm:h-5" />
           Categories
         </button>
       </div>
       <div className="flex-1 flex flex-col md:flex-row min-h-0">
         {/* Sidebar */}
         <div className={`
-          bg-white/60 dark:bg-white/10 backdrop-blur-md ${textSidebar} p-4 w-full md:w-64 flex-col transition-all duration-300 z-20
+          bg-white/60 dark:bg-white/10 backdrop-blur-md ${textSidebar} p-3 sm:p-4 w-full md:w-64 flex-col transition-all duration-300 z-20
           ${sidebarOpen ? 'flex absolute top-[120px] left-0 right-0 shadow-xl md:static md:flex' : 'hidden md:flex'}
         `}>
-          <div className="font-semibold mb-4 flex items-center justify-between">
-            <span>Developer Prompts</span>
+          <div className="font-semibold mb-3 sm:mb-4 flex items-center justify-between">
+            <span className="text-sm sm:text-base">Developer Prompts</span>
             <span className="bg-[#1a8cff] text-xs px-2 py-0.5 rounded-full">{promptCategories.length}</span>
           </div>
           <Input
-            className={`mb-4 ${inputBg} border-none ${inputText} ${inputPlaceholder}`}
+            className={`mb-3 sm:mb-4 ${inputBg} border-none ${inputText} ${inputPlaceholder} text-sm`}
             placeholder="Search prompts..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -271,7 +271,7 @@ export default function Prompts() {
             {promptCategories.map((cat) => (
               <div
                 key={cat}
-                className={`py-2 px-2 rounded cursor-pointer border border-gray-200 dark:border-gray-700 mb-2 ${sidebarHover} ${selectedCategory === cat ? sidebarActive : ''}`}
+                className={`py-2 px-3 rounded-lg cursor-pointer border border-gray-200 dark:border-gray-700 mb-2 text-sm sm:text-base transition-colors ${sidebarHover} ${selectedCategory === cat ? sidebarActive : ''}`}
                 onClick={() => {
                   setSelectedCategory(cat);
                   setSidebarOpen(false);
@@ -283,37 +283,37 @@ export default function Prompts() {
           </div>
         </div>
         {/* Main Content */}
-        <div className="flex-1 p-2 sm:p-4 md:p-6 overflow-y-auto">
+        <div className="flex-1 p-3 sm:p-4 md:p-6 overflow-y-auto">
           {loading ? (
-            <div className="text-center py-12 text-lg">Loading prompts...</div>
+            <div className="text-center py-12 text-base sm:text-lg">Loading prompts...</div>
           ) : error ? (
             <div className="text-center py-12 text-red-500">{error}</div>
           ) : (
-            <div className="space-y-12">
+            <div className="space-y-8 sm:space-y-12">
               {categoriesToShow.map((cat) => {
                 const catPrompts = filteredPrompts.filter((p) => p.category === cat);
                 const showAll = expandedCategory === cat;
                 return (
                   <div key={cat} id={`cat-section-${cat}`} className="relative">
-                    <div className="mb-2 flex items-center justify-between">
+                    <div className="mb-3 sm:mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                       <div>
-                        <h2 className="text-2xl sm:text-3xl font-bold mb-1">{cat}</h2>
-                        <div className="text-gray-500 dark:text-gray-300 mb-4 text-base sm:text-lg">
+                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1">{cat}</h2>
+                        <div className="text-gray-500 dark:text-gray-300 mb-3 sm:mb-4 text-sm sm:text-base md:text-lg">
                           {categoryDescriptions[cat] || 'Prompts for this category.'}
                         </div>
                       </div>
                       {catPrompts.length > 3 && !showAll && (
-                        <Button onClick={() => setExpandedCategory(cat)} className="flex items-center gap-2 bg-[#1abc8c] text-white px-6 py-2 rounded-full font-semibold">
-                          More <FaArrowRight className="ml-1" />
+                        <Button onClick={() => setExpandedCategory(cat)} className="flex items-center gap-2 bg-[#1abc8c] text-white px-4 sm:px-6 py-2 rounded-full font-semibold text-sm sm:text-base transition-colors">
+                          More <FaArrowRight className="ml-1 w-3 h-3 sm:w-4 sm:h-4" />
                         </Button>
                       )}
                       {showAll && catPrompts.length > 3 && (
-                        <Button onClick={() => setExpandedCategory(null)} className="bg-blue-600 hover:bg-blue-600/70 dark:bg-blue-500 dark:hover:bg-blue-500/70 text-white px-6 py-2 rounded-full font-semibold transition-colors">
+                        <Button onClick={() => setExpandedCategory(null)} className="bg-blue-600 hover:bg-blue-600/70 dark:bg-blue-500 dark:hover:bg-blue-500/70 text-white px-4 sm:px-6 py-2 rounded-full font-semibold text-sm sm:text-base transition-colors">
                           Show Less
                         </Button>
                       )}
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                       {(showAll ? catPrompts : catPrompts.slice(0, 3)).map((prompt, idx) => (
                         <motion.div
                           key={prompt.id || idx}
@@ -322,23 +322,23 @@ export default function Prompts() {
                           viewport={{ once: true, amount: 0.2 }}
                           transition={{ duration: 0.5, delay: idx * 0.07, ease: 'easeOut' }}
                         >
-                          <Card className={`w-full ${cardBg} ${cardText} ${cardBorder} relative rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200`}>
-                            <CardContent className="p-5">
-                              <div className="flex flex-col h-full justify-between min-h-[180px]">
-                                <div className="flex items-start justify-between mb-2">
-                                  <div className="text-lg font-bold leading-tight">{prompt.title}</div>
-                                  <div className="flex gap-2">
-                                    <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Chat" onClick={() => setOpenPrompt({ id: prompt.id, title: prompt.title, description: prompt.description, author: prompt.author })}><FaRegCommentDots size={20} /></button>
-                                    <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Read" onClick={() => setOpenRead(prompt)}><FaRegFileAlt size={20} /></button>
-                                    <button className={`p-1 rounded-full hover:bg-[#1abc8c]/10 transition ${greenIcon}`} title="Copy" onClick={() => {
+                          <Card className={`w-full ${cardBg} ${cardText} ${cardBorder} relative rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200`}>
+                            <CardContent className="p-4 sm:p-5">
+                              <div className="flex flex-col h-full justify-between min-h-[160px] sm:min-h-[180px]">
+                                <div className="flex items-start justify-between mb-2 sm:mb-3">
+                                  <div className="text-base sm:text-lg font-bold leading-tight">{prompt.title}</div>
+                                  <div className="flex gap-1.5 sm:gap-2">
+                                    <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#1abc8c]/10 transition-colors ${greenIcon}`} title="Chat" onClick={() => setOpenPrompt({ id: prompt.id, title: prompt.title, description: prompt.description, author: prompt.author })}><FaRegCommentDots size={18} className="sm:w-5 sm:h-5" /></button>
+                                    <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#1abc8c]/10 transition-colors ${greenIcon}`} title="Read" onClick={() => setOpenRead(prompt)}><FaRegFileAlt size={18} className="sm:w-5 sm:h-5" /></button>
+                                    <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#1abc8c]/10 transition-colors ${greenIcon}`} title="Copy" onClick={() => {
                                       navigator.clipboard.writeText(prompt.description || '');
                                       toast({ title: 'Copied!', description: 'Prompt copied to clipboard.' });
-                                    }}><FaRegCopy size={20} /></button>
+                                    }}><FaRegCopy size={18} className="sm:w-5 sm:h-5" /></button>
                                   </div>
                                 </div>
-                                <div className={`text-base ${cardDesc} mb-6`}>{prompt.description}</div>
+                                <div className={`text-sm sm:text-base ${cardDesc} mb-4 sm:mb-6`}>{prompt.description}</div>
                                 <div className="flex items-end justify-between mt-auto">
-                                  <span className={authorBg}>{prompt.author}</span>
+                                  <span className={`${authorBg} text-xs`}>{prompt.author}</span>
                                 </div>
                               </div>
                             </CardContent>
@@ -356,10 +356,10 @@ export default function Prompts() {
       {/* Prompt Chat Dialog */}
       {openPrompt && (
         <Dialog open={!!openPrompt} onOpenChange={() => setOpenPrompt(null)}>
-          <DialogContent className={`${dialogBg} ${dialogText} max-w-lg`}>
-            <DialogTitle>{openPrompt.title}</DialogTitle>
-            <div className="mt-4 text-base whitespace-pre-line">{openPrompt.description}</div>
-            <div className="mt-4 flex items-center gap-4">
+          <DialogContent className={`${dialogBg} ${dialogText} max-w-lg w-[95vw] sm:w-auto`}>
+            <DialogTitle className="text-lg sm:text-xl">{openPrompt.title}</DialogTitle>
+            <div className="mt-4 text-sm sm:text-base whitespace-pre-line">{openPrompt.description}</div>
+            <div className="mt-4 flex items-center gap-3 sm:gap-4">
               <Button
                 size="icon"
                 variant="ghost"
@@ -368,7 +368,7 @@ export default function Prompts() {
                 disabled={!user || chatLoading}
                 title={user ? (chatStatus?.userLiked ? 'Unlike' : 'Like') : 'Login to like'}
               >
-                <FaRegCommentDots />
+                <FaRegCommentDots className="w-4 h-4" />
                 <span className="ml-2 text-sm">{chatStatus?.likeCount || 0}</span>
               </Button>
               <Button
@@ -379,12 +379,12 @@ export default function Prompts() {
                 disabled={!user || chatLoading}
                 title={user ? (chatStatus?.userBookmarked ? 'Remove Bookmark' : 'Bookmark') : 'Login to bookmark'}
               >
-                <FaRegFileAlt />
+                <FaRegFileAlt className="w-4 h-4" />
                 <span className="ml-2 text-sm">{chatStatus?.bookmarkCount || 0}</span>
               </Button>
             </div>
             <div className="mt-6">
-              <div className="font-semibold mb-2">Comments</div>
+              <div className="font-semibold mb-2 text-sm sm:text-base">Comments</div>
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {chatComments.length === 0 && <div className="text-gray-400 text-sm">No comments yet.</div>}
                 {chatComments.map((c, i) => (
@@ -399,9 +399,9 @@ export default function Prompts() {
                   onChange={e => setCommentInput(e.target.value)}
                   placeholder={user ? 'Add a comment...' : 'Login to comment'}
                   disabled={!user || chatLoading}
-                  className="flex-1"
+                  className="flex-1 text-sm"
                 />
-                <Button onClick={handleAddComment} disabled={!user || chatLoading || !commentInput.trim()}>
+                <Button onClick={handleAddComment} disabled={!user || chatLoading || !commentInput.trim()} className="text-sm">
                   Comment
                 </Button>
               </div>
@@ -414,9 +414,9 @@ export default function Prompts() {
       {/* Prompt Read Dialog */}
       {openRead && (
         <Dialog open={!!openRead} onOpenChange={() => setOpenRead(null)}>
-          <DialogContent className={`${dialogBg} ${dialogText} max-w-lg`}>
-            <DialogTitle>Read Prompt</DialogTitle>
-            <div className="mt-4 text-base whitespace-pre-line">{openRead.description}</div>
+          <DialogContent className={`${dialogBg} ${dialogText} max-w-lg w-[95vw] sm:w-auto`}>
+            <DialogTitle className="text-lg sm:text-xl">Read Prompt</DialogTitle>
+            <div className="mt-4 text-sm sm:text-base whitespace-pre-line">{openRead.description}</div>
             <div className="mt-4 text-xs text-gray-400">{openRead.author}</div>
             <Button className="mt-4" onClick={() => setOpenRead(null)}>Close</Button>
           </DialogContent>

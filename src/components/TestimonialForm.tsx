@@ -24,7 +24,7 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
   if (!user) return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
       <div className={`rounded-2xl p-8 w-full max-w-md text-center ${
-        theme === 'dark' ? 'bg-black' : 'bg-white'
+        theme === 'dark' ? 'bg-[#171717]' : 'bg-white'
       }`}>
         <div className={`text-lg mb-4 ${
           theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -85,7 +85,7 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
       <form onSubmit={handleSubmit} className={`rounded-2xl p-8 w-full max-w-md ${
-        theme === 'dark' ? 'bg-black' : 'bg-white'
+        theme === 'dark' ? 'bg-[#171717]' : 'bg-white'
       }`}>
         <h3 className={`text-xl font-bold mb-4 text-center ${
           theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -112,7 +112,7 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
             <textarea
               className={`w-full rounded-lg p-3 mb-4 min-h-[100px] border focus:outline-none ${
                 theme === 'dark' 
-                  ? 'bg-black text-white border-gray-700 focus:border-blue-500' 
+                  ? 'bg-[#171717] text-white border-gray-700 focus:border-blue-500' 
                   : 'bg-gray-50 text-gray-900 border-gray-300 focus:border-blue-500'
               }`}
               placeholder="Share your experience..."
@@ -123,7 +123,7 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
             <input
               className={`w-full rounded-lg p-3 mb-4 border focus:outline-none ${
                 theme === 'dark' 
-                  ? 'bg-black text-white border-gray-700 focus:border-blue-500' 
+                  ? 'bg-[#171717] text-white border-gray-700 focus:border-blue-500' 
                   : 'bg-gray-50 text-gray-900 border-gray-300 focus:border-blue-500'
               }`}
               placeholder="Your role (e.g. Designer, Content Creator)"
@@ -134,7 +134,7 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
             <input
               className={`w-full rounded-lg p-3 mb-4 border focus:outline-none ${
                 theme === 'dark' 
-                  ? 'bg-black text-white border-gray-700 focus:border-blue-500' 
+                  ? 'bg-[#171717] text-white border-gray-700 focus:border-blue-500' 
                   : 'bg-gray-50 text-gray-900 border-gray-300 focus:border-blue-500'
               }`}
               placeholder="Your company (optional)"

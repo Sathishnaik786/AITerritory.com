@@ -68,7 +68,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
                   </Badge>
                 )}
               </div>
-              <h3 className="font-semibold text-sm sm:text-lg mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
+              <h3 className="font-semibold text-sm sm:text-base md:text-lg mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
                 {post.title}
               </h3>
               <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
@@ -118,12 +118,12 @@ export const BlogCard: React.FC<BlogCardProps> = ({
                     Featured
                   </Badge>
                 </div>
-                <h3 className="font-bold text-lg sm:text-xl text-white line-clamp-2 group-hover:text-blue-200 transition-colors leading-tight">
+                <h3 className="font-bold text-base sm:text-lg md:text-xl text-white line-clamp-2 group-hover:text-blue-200 transition-colors leading-tight">
                   {post.title}
                 </h3>
               </div>
             </div>
-            <CardContent className="p-4 sm:p-6">
+            <CardContent className="p-4 sm:p-5 md:p-6">
               <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3 mb-4 leading-relaxed">
                 {post.summary}
               </p>
@@ -181,7 +181,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
                 </Badge>
               )}
             </div>
-            <h3 className="font-semibold text-base sm:text-lg mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
+            <h3 className="font-semibold text-sm sm:text-base md:text-lg mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
               {post.title}
             </h3>
             <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3 mb-4 leading-relaxed">

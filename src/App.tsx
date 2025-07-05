@@ -136,7 +136,7 @@ function ThemedAppContent() {
         <div className="relative min-h-screen flex flex-col items-center">
           <Navbar />
           <ScrollToTopButton />
-          <main className="flex-1 w-full max-w-[1970px] min-h-screen mx-auto px-4 sm:px-6 lg:px-8">
+          <main className={`flex-1 w-full max-w-[1970px] min-h-screen mx-auto ${isLandingPro ? 'px-0' : 'px-4 sm:px-6 lg:px-8'}`}>
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<LandingPro />} />

@@ -127,10 +127,10 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
       >
         <Card 
           variant={getCardVariant()}
-          className={`group cursor-pointer overflow-hidden flex flex-col p-3 sm:p-5 bg-white/80 dark:bg-gray-900/80 border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80 relative`}
+          className={`group cursor-pointer overflow-hidden flex flex-col p-4 sm:p-6 bg-white/80 dark:bg-gray-900/80 border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80 relative`}
           onClick={() => navigate(`/tools/${tool.id}`)}
         >
-          <CardContent className="p-3 sm:p-4">
+          <CardContent className="p-4 sm:p-5">
             <div className="flex items-start gap-3">
               <div className="relative">
                 <img
@@ -189,7 +189,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
     >
       <Card 
         variant={getCardVariant()}
-        className={`group cursor-pointer overflow-hidden relative flex flex-col p-3 sm:p-5 bg-white/80 dark:bg-gray-900/80 border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80`}
+        className={`group cursor-pointer overflow-hidden relative flex flex-col p-4 sm:p-6 bg-white/80 dark:bg-gray-900/80 border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80`}
         onClick={() => navigate(`/tools/${tool.id}`)}
       >
         {/* Featured Badge */}

@@ -21,7 +21,7 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({ categories, selectedC
             onClick={() => onSelectCategory('All Categories')}
             className={`flex items-center w-full text-left px-4 py-2 rounded-md font-medium transition-colors
               ${selectedCategory === 'All Categories'
-                ? 'bg-black text-white'
+                ? 'bg-[#171717] text-white'
                 : 'text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}
             `}
           >

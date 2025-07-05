@@ -34,7 +34,7 @@ export const HomePage: React.FC = () => {
   const { data: trendingTools, isLoading: trendingLoading } = useTrendingTools();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-0 py-8">
       {/* Hero Section */}
       <motion.div
         className="text-center mb-12"
