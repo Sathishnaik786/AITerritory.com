@@ -71,7 +71,7 @@ const AiPromptForm: React.FC<{ onSubmit: (prompt: string) => void, prompt: strin
           disabled={loading}
           className={`absolute bottom-2 right-2 rounded-full p-2 transition-all duration-200 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
             theme === 'dark'
-              ? 'bg-[#232323] hover:bg-[#333] active:bg-[#444] text-gray-400 hover:text-white'
+              ? 'bg-[#333] hover:bg-[#444] active:bg-[#555] text-gray-400 hover:text-white'
               : 'bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-600 hover:text-gray-900'
           }`}
           style={{ minHeight: 44, minWidth: 44 }}
@@ -96,7 +96,7 @@ const SuggestionBar: React.FC<{ onSuggestion: (text: string) => void }> = ({ onS
             onClick={() => onSuggestion(text)}
             className={`flex-shrink-0 flex items-center justify-center h-11 min-w-[160px] w-[160px] sm:w-[200px] rounded-full border font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-hidden text-ellipsis whitespace-nowrap px-3 sm:px-4 ${
               theme === 'dark'
-                ? 'border-gray-700 bg-[#191919] text-gray-200 hover:bg-[#232323] hover:text-white active:bg-[#333]'
+                ? 'border-gray-700 bg-[#232323] text-gray-200 hover:bg-[#333] hover:text-white active:bg-[#444]'
                 : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900 active:bg-gray-200'
             }`}
             title={text}
@@ -123,7 +123,7 @@ const CategoryBar: React.FC = () => {
             key={cat}
             className={`flex-shrink-0 flex items-center justify-center h-10 min-w-[120px] w-[120px] sm:w-[160px] rounded-full border font-medium text-xs sm:text-sm transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-hidden text-ellipsis whitespace-nowrap px-2 sm:px-4 ${
               theme === 'dark'
-                ? 'border-gray-700 bg-[#171717] text-gray-200 hover:bg-[#232323] hover:text-white active:bg-[#333]'
+                ? 'border-gray-700 bg-[#232323] text-gray-200 hover:bg-[#333] hover:text-white active:bg-[#444]'
                 : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900 active:bg-gray-200'
             }`}
             title={cat}
@@ -156,26 +156,38 @@ const LandingPro: React.FC = () => {
   const thirdRow = suggestions.slice(8, 12);
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#111] px-2">
+    <div className={`min-h-screen w-full flex flex-col items-center justify-center px-2 ${
+      theme === 'dark' 
+        ? 'bg-[#171717] text-white' 
+        : 'bg-gray-50 text-gray-900'
+    }`}>
       {/* Title */}
       <motion.h1
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: 'easeOut' }}
-        className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center text-white mt-8 mb-4"
+        className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center mt-8 mb-4 ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}
       >
         Tell me your need, <br />
         <span className="text-blue-500">I will give a real time AI Tool.</span>
       </motion.h1>
       {/* Subtitle */}
-      <div className="text-base sm:text-lg md:text-xl text-gray-400 text-center mb-10">
+      <div className={`text-base sm:text-lg md:text-xl text-center mb-10 ${
+        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+      }`}>
         Prompt, run, edit, and deploy AI agents in seconds
       </div>
       {/* Prompt Input */}
       <form onSubmit={handlePromptSubmit} className="w-full max-w-xl mx-auto flex flex-col items-center mb-10">
         <div className="relative w-full">
           <Textarea
-            className="w-full min-h-[70px] rounded-2xl border border-gray-700 bg-[#191919] text-lg text-gray-200 px-6 py-5 pr-14 placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 resize-none shadow-none"
+            className={`w-full min-h-[70px] rounded-2xl border text-lg px-6 py-5 pr-14 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 resize-none shadow-none ${
+              theme === 'dark'
+                ? 'border-gray-700 bg-[#232323] text-gray-200 placeholder:text-gray-500'
+                : 'border-gray-300 bg-white text-gray-900 placeholder:text-gray-500'
+            }`}
             placeholder="How can String help you today"
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
@@ -183,7 +195,11 @@ const LandingPro: React.FC = () => {
           />
           <button
             type="submit"
-            className="absolute bottom-4 right-4 rounded-full p-2 bg-[#232323] hover:bg-[#333] text-gray-400 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`absolute bottom-4 right-4 rounded-full p-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              theme === 'dark'
+                ? 'bg-[#333] hover:bg-[#444] text-gray-400 hover:text-white'
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900'
+            }`}
             style={{ minHeight: 44, minWidth: 44 }}
           >
             <ArrowRight size={22} />
@@ -197,7 +213,11 @@ const LandingPro: React.FC = () => {
             <button
               key={i}
               onClick={() => setPrompt(text)}
-              className="h-11 px-6 rounded-full border border-gray-700 bg-[#191919] text-gray-200 text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className={`h-11 px-6 rounded-full border text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
+                theme === 'dark'
+                  ? 'border-gray-700 bg-[#232323] text-gray-200 hover:bg-[#333] hover:text-white'
+                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              }`}
               style={{ minWidth: 180, maxWidth: 240 }}
               title={text}
             >
@@ -210,7 +230,11 @@ const LandingPro: React.FC = () => {
             <button
               key={i}
               onClick={() => setPrompt(text)}
-              className="h-11 px-6 rounded-full border border-gray-700 bg-[#191919] text-gray-200 text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className={`h-11 px-6 rounded-full border text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
+                theme === 'dark'
+                  ? 'border-gray-700 bg-[#232323] text-gray-200 hover:bg-[#333] hover:text-white'
+                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              }`}
               style={{ minWidth: 180, maxWidth: 240 }}
               title={text}
             >
@@ -223,7 +247,11 @@ const LandingPro: React.FC = () => {
             <button
               key={i}
               onClick={() => setPrompt(text)}
-              className="h-11 px-6 rounded-full border border-gray-700 bg-[#191919] text-gray-200 text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className={`h-11 px-6 rounded-full border text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
+                theme === 'dark'
+                  ? 'border-gray-700 bg-[#232323] text-gray-200 hover:bg-[#333] hover:text-white'
+                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              }`}
               style={{ minWidth: 180, maxWidth: 240 }}
               title={text}
             >

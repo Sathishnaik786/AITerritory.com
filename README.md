@@ -200,7 +200,7 @@ $ cd server && pnpm test
 - Launch on ProductHunt and Dev.to
 - Improve mobile UX and finalize React Native app
 - Add billing plans with Stripe
-- Expand AI tools (auto-meta, real-time SEO audit, smart repurpose tool)
+- Expand AI tools (auto-meta, real-time SEO audit)
 
 ---
 

@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { useUser, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
 import ThemeToggle from "./ThemeToggle";
-import { RepurposeModal } from "./ui/RepurposeModal";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -35,9 +34,9 @@ export function Navbar() {
 
   return (
     <nav className="w-full z-50 px-0 py-2 bg-background/80 backdrop-blur-md border-b border-border sticky top-0 overflow-visible">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 px-2 sm:px-4 lg:px-8">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 px-3 sm:px-4 lg:px-6 xl:px-8">
           {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2 flex-shrink-0">
               <div className="relative flex items-center gap-2">
                 <img 
                   src="/logo.jpg" 
@@ -55,9 +54,9 @@ export function Navbar() {
             </Link>
 
         {/* Desktop Navigation Menu */}
-        <div className="flex-1 justify-center hidden md:flex">
+        <div className="flex-1 justify-center hidden lg:flex">
           <NavigationMenu>
-            <NavigationMenuList>
+            <NavigationMenuList className="gap-1">
               {/* Main nav links */}
               {navLinks.map((item) => (
                 <NavigationMenuItem key={item.to}>
@@ -70,7 +69,7 @@ export function Navbar() {
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid gap-2 w-[260px] p-3 rounded-lg shadow-lg bg-background">
+                  <ul className="grid gap-2 w-[280px] p-4 rounded-lg shadow-lg bg-background border">
                     <ListItem to="/resources/ai-agents" title="AI Agents">
                       Discover and manage AI agents for your workflow.
                     </ListItem>
@@ -92,16 +91,15 @@ export function Navbar() {
           </NavigationMenu>
         </div>
 
-        {/* Desktop Right side: Theme, Repurpose, Auth/User */}
-        <div className="hidden md:flex items-center gap-2">
+        {/* Desktop Right side: Theme, Auth/User */}
+        <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
           <ThemeToggle small />
-          <RepurposeModal />
             <SignedOut>
             <SignUpButton mode="modal">
-              <button className="text-sm font-medium px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 transition">Sign Up</button>
+              <button className="text-sm font-medium px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 transition-colors">Sign Up</button>
             </SignUpButton>
             <SignInButton mode="modal">
-              <button className="text-sm font-medium px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 transition">Login</button>
+              <button className="text-sm font-medium px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 transition-colors">Login</button>
             </SignInButton>
             </SignedOut>
             <SignedIn>
@@ -110,11 +108,11 @@ export function Navbar() {
         </div>
 
         {/* Mobile Hamburger Menu */}
-        <div className="flex md:hidden items-center">
+        <div className="flex lg:hidden items-center">
           <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DrawerTrigger asChild>
               <button aria-label="Open menu" className="p-2 rounded-md hover:bg-accent focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
-                <Menu className="w-6 h-6 sm:w-7 sm:h-7" />
+                <Menu className="w-6 h-6" />
               </button>
             </DrawerTrigger>
             <DrawerContent className="w-full max-w-sm mx-auto rounded-t-2xl p-0">
@@ -146,15 +144,14 @@ export function Navbar() {
                 {/* Divider */}
                 <hr className="my-4 border-muted" />
                 {/* Right side actions */}
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-3">
                   <ThemeToggle small />
-                  <RepurposeModal />
                   <SignedOut>
                     <SignUpButton mode="modal">
-                      <button className="w-full text-sm font-medium px-3 py-2 rounded-md border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition">Sign Up</button>
+                      <button className="w-full text-sm font-medium px-4 py-3 rounded-md border border-primary bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">Sign Up</button>
                     </SignUpButton>
                       <SignInButton mode="modal">
-                      <button className="w-full text-sm font-medium px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 transition">Login</button>
+                      <button className="w-full text-sm font-medium px-4 py-3 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 transition-colors">Login</button>
                       </SignInButton>
                   </SignedOut>
                   <SignedIn>
