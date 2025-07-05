@@ -220,8 +220,8 @@ export default function Prompts() {
     <div className={`flex flex-col min-h-[90vh] ${bgMain} ${textMain} rounded-lg shadow-lg overflow-hidden pt-8`}> 
       {/* Main Title and Description */}
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-4 pb-2 text-center">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2">AI Prompts Directory</h1>
-        <p className="text-sm sm:text-base md:text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">Discover, search, and use the best prompts for developers, creators, and AI enthusiasts. Browse by category or platform and boost your productivity!</p>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2">AI Territory Prompts</h1>
+        <p className="text-sm sm:text-base md:text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">Master AI with our expert-curated prompts for developers, creators, and innovators. Boost productivity with proven prompts across all major AI platforms!</p>
       </div>
       {/* Top Bar */}
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2 border-b border-[#222]/40">
@@ -230,7 +230,7 @@ export default function Prompts() {
             <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#3b82f6] tracking-tight">Discover Prompts</span>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-transparent text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-700">New: Try Vibe Coding Mode!</span>
           </div>
-          <div className="text-xs sm:text-sm text-gray-400 mt-1">World's First & Most Famous Prompts Directory</div>
+          <div className="text-xs sm:text-sm text-gray-400 mt-1">AI Territory's Comprehensive Prompts Collection</div>
         </div>
         <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 md:mt-0">
           {platforms.map((platform) => (

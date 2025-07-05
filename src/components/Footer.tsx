@@ -46,7 +46,7 @@ export function Footer() {
               <span className="text-xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">AI Territory</span>
             </Link>
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs lg:max-w-sm mb-2 mx-auto lg:mx-0">
-              Hassle-free AI tools directory for creators, businesses, and teams.
+              Your ultimate destination for AI tools, expert prompts, tutorials, and cutting-edge innovations.
             </p>
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-2 w-full max-w-xs lg:max-w-none">
               <a href="https://taap.it/UYrKPV" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" className="hover:text-blue-500 transition-colors p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"><FaXTwitter size={20} /></a>

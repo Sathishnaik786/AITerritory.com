@@ -38,7 +38,7 @@ const SubmitToolPage: React.FC = () => {
   return (
     <div className="max-w-lg mx-auto py-12 px-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Submit a Tool</h1>
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-8 flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-[#171717] rounded-xl shadow-lg p-8 flex flex-col gap-4">
         <input
           type="text"
           name="name"

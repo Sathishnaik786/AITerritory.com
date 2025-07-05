@@ -188,7 +188,7 @@ const ToolDetailsPage: React.FC = () => {
       <Link to="/all-ai-tools" className="inline-flex items-center text-blue-600 hover:underline mb-6">
         <ArrowLeft className="w-4 h-4 mr-1" /> Back to All Tools
       </Link>
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 p-8 mb-8">
+      <div className="bg-white dark:bg-[#171717] rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800 p-8 mb-8">
         <div className="flex items-center gap-6 mb-6">
           <img
             src={tool.image_url || tool.image || '/public/placeholder.svg'}
@@ -238,7 +238,7 @@ const ToolDetailsPage: React.FC = () => {
           </div>
           {/* Review Form */}
           {user ? (
-            <form onSubmit={handleReviewSubmit} className="mb-6 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 flex flex-col gap-3">
+            <form onSubmit={handleReviewSubmit} className="mb-6 bg-gray-50 dark:bg-[#171717] rounded-lg p-4 flex flex-col gap-3">
               <div className="flex gap-3 items-center">
                 <span className="font-semibold text-gray-900 dark:text-white">{user.fullName}</span>
                 <select
@@ -266,7 +266,7 @@ const ToolDetailsPage: React.FC = () => {
               </button>
             </form>
           ) : (
-            <div className="mb-6 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 flex flex-col items-center">
+            <div className="mb-6 bg-gray-50 dark:bg-[#171717] rounded-lg p-4 flex flex-col items-center">
               <span className="mb-2">Please <SignInButton mode='modal'><div className='text-blue-600 underline cursor-pointer'>sign in</div></SignInButton> to leave a review.</span>
             </div>
           )}
@@ -280,7 +280,7 @@ const ToolDetailsPage: React.FC = () => {
           ) : (
             <ul className="space-y-4">
               {visibleReviews.map(r => (
-                <li key={r.id} className="bg-white dark:bg-gray-900 rounded-lg shadow p-4">
+                <li key={r.id} className="bg-white dark:bg-[#171717] rounded-lg shadow p-4">
                   <div className="flex items-center gap-2 mb-1">
                     <img
                       src={getClerkAvatarUrl(r.user_id) || '/public/placeholder.svg'}

@@ -49,7 +49,7 @@ const LandingPage: React.FC = () => {
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-500 z-50 origin-left"
         aria-hidden="true"
       />
-      <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen flex flex-col">
+      <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:bg-[#171717] min-h-screen flex flex-col">
         {/* Hero Section */}
         <motion.section
           ref={heroRef}
@@ -72,7 +72,7 @@ const LandingPage: React.FC = () => {
           {/* Left: Text Content */}
           <Card
             variant="glass"
-            className="w-full md:w-1/2 bg-white/70 dark:bg-gray-900/70 shadow-md hover:shadow-xl border-0 md:mr-8 mb-8 md:mb-0 backdrop-blur-md bg-opacity-80 rounded-2xl relative z-10 transition-all duration-300"
+            className="w-full md:w-1/2 bg-white/70 dark:bg-[#171717] shadow-md hover:shadow-xl border-0 md:mr-8 mb-8 md:mb-0 backdrop-blur-md bg-opacity-80 rounded-2xl relative z-10 transition-all duration-300"
           >
             <CardContent className="p-8 md:p-12 flex flex-col items-center md:items-start text-center md:text-left">
               <h1
@@ -101,7 +101,7 @@ const LandingPage: React.FC = () => {
                   size="lg"
                   rounded="2xl"
                   variant="outline"
-                  className="rounded-2xl text-base font-semibold px-6 py-3 shadow-md hover:shadow-xl transition bg-white/80 dark:bg-gray-900/80 hover:bg-gradient-to-r hover:from-purple-600 hover:to-yellow-500 hover:text-white border-0 focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 inner-shadow-[inset_0_2px_8px_rgba(236,72,153,0.10)]"
+                  className="rounded-2xl text-base font-semibold px-6 py-3 shadow-md hover:shadow-xl transition bg-white/80 dark:bg-[#171717] hover:bg-gradient-to-r hover:from-purple-600 hover:to-yellow-500 hover:text-white border-0 focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 inner-shadow-[inset_0_2px_8px_rgba(236,72,153,0.10)]"
                 >
                   <a href="/all-ai-tools">
                     Get Started
@@ -153,7 +153,7 @@ const LandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.5, delay: i * 0.12, ease: 'easeOut' }}
-                className="bg-white/70 dark:bg-gray-900/70 rounded-2xl shadow-md hover:shadow-xl backdrop-blur-md border border-gray-100 dark:border-gray-800 p-8 flex flex-col items-center text-center transition-all duration-300"
+                className="bg-white/70 dark:bg-[#171717] rounded-2xl shadow-md hover:shadow-xl backdrop-blur-md border border-gray-100 dark:border-gray-800 p-8 flex flex-col items-center text-center transition-all duration-300"
               >
                 <img
                   src={tool.image || heroImage}

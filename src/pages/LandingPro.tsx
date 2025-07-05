@@ -7,34 +7,34 @@ import { useTheme } from 'next-themes';
 
 // --- CATEGORY DATA ---
 const categories = [
-  'Text to Video',
-  'Video to Text',
-  'Voice AI',
-  'Chatbots',
-  'Email Writers',
-  'Image Generators',
+  'Video Creation',
+  'Image Generation',
+  'Text & Writing',
+  'Voice & Audio',
+  'Chatbots & AI',
   'Productivity',
-  '3D Generators',
-  'Audio Tools',
-  'Art Generators',
-  'Coding Assistants',
-  'SEO',
+  '3D & Design',
+  'Data Analysis',
+  'Marketing',
+  'Development',
+  'Business Tools',
+  'Creative Arts',
 ];
 
 // --- SUGGESTION BUTTONS DATA ---
 const suggestions = [
-  'On GitHub issue, create Li...',
-  'Add new Stripe customers...',
-  'Webhook proxy',
-  'Send message to Slack',
-  'Brand monitoring',
-  'Email categorization',
-  'Tweetstorm genera...',
-  'Daily calendar sum...',
-  'Nike shoe drops',
-  'Taylor Swift conce...',
-  'Earnings call sum...',
-  'New user sign ups',
+  'Create professional videos from text',
+  'Generate stunning AI artwork',
+  'Write compelling marketing copy',
+  'Build intelligent chatbots',
+  'Convert speech to text accurately',
+  'Design beautiful websites with AI',
+  'Generate product descriptions',
+  'Create engaging social media content',
+  'Analyze data and create reports',
+  'Generate 3D models and animations',
+  'Optimize SEO for websites',
+  'Automate customer support',
 ];
 
 // --- PROMPT FORM COMPONENT ---
@@ -61,7 +61,7 @@ const AiPromptForm: React.FC<{ onSubmit: (prompt: string) => void, prompt: strin
               ? 'border-gray-700 bg-[#232323] text-gray-100 placeholder:text-gray-400 focus:border-blue-500' 
               : 'border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 focus:border-blue-500'
           }`}
-          placeholder="e.g. I'm a content creator, I need help writing video scripts…"
+                      placeholder="e.g. I need to create professional videos from text descriptions..."
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
           required
@@ -150,13 +150,13 @@ const LandingPro: React.FC = () => {
     console.log('Prompt submitted:', prompt);
   };
 
-  // Split suggestions into two rows for desktop, stack for mobile
+  // Split suggestions into rows for better responsive layout
   const firstRow = suggestions.slice(0, 4);
   const secondRow = suggestions.slice(4, 8);
   const thirdRow = suggestions.slice(8, 12);
 
   return (
-    <div className={`min-h-screen w-full flex flex-col items-center justify-center px-2 ${
+    <div className={`min-h-screen w-full flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 ${
       theme === 'dark' 
         ? 'bg-[#171717] text-white' 
         : 'bg-gray-50 text-gray-900'
@@ -166,93 +166,93 @@ const LandingPro: React.FC = () => {
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: 'easeOut' }}
-        className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center mt-8 mb-4 ${
+        className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-center mt-8 mb-4 sm:mb-6 ${
           theme === 'dark' ? 'text-white' : 'text-gray-900'
         }`}
       >
-        Tell me your need, <br />
-        <span className="text-blue-500">I will give a real time AI Tool.</span>
+        Discover Your Perfect AI Tool <br className="hidden sm:block" />
+        <span className="text-blue-500">AI Territory's Intelligent Tool Finder</span>
       </motion.h1>
       {/* Subtitle */}
-      <div className={`text-base sm:text-lg md:text-xl text-center mb-10 ${
+      <div className={`text-sm sm:text-base md:text-lg lg:text-xl text-center mb-6 sm:mb-8 lg:mb-10 max-w-2xl mx-auto ${
         theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
       }`}>
-        Prompt, run, edit, and deploy AI agents in seconds
+        Describe your needs and get personalized AI tool recommendations instantly
       </div>
       {/* Prompt Input */}
-      <form onSubmit={handlePromptSubmit} className="w-full max-w-xl mx-auto flex flex-col items-center mb-10">
+      <form onSubmit={handlePromptSubmit} className="w-full max-w-xl mx-auto flex flex-col items-center mb-6 sm:mb-8 lg:mb-10">
         <div className="relative w-full">
           <Textarea
-            className={`w-full min-h-[70px] rounded-2xl border text-lg px-6 py-5 pr-14 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 resize-none shadow-none ${
+            className={`w-full min-h-[60px] sm:min-h-[70px] rounded-xl sm:rounded-2xl border text-sm sm:text-base lg:text-lg px-4 sm:px-6 py-3 sm:py-5 pr-12 sm:pr-14 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 resize-none shadow-none ${
               theme === 'dark'
                 ? 'border-gray-700 bg-[#232323] text-gray-200 placeholder:text-gray-500'
                 : 'border-gray-300 bg-white text-gray-900 placeholder:text-gray-500'
             }`}
-            placeholder="How can String help you today"
+            placeholder="Describe what you want to accomplish with AI..."
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
             required
           />
           <button
             type="submit"
-            className={`absolute bottom-4 right-4 rounded-full p-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`absolute bottom-3 sm:bottom-4 right-3 sm:right-4 rounded-full p-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               theme === 'dark'
                 ? 'bg-[#333] hover:bg-[#444] text-gray-400 hover:text-white'
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900'
             }`}
             style={{ minHeight: 44, minWidth: 44 }}
           >
-            <ArrowRight size={22} />
+            <ArrowRight size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
       </form>
-      {/* Suggestion Bar - Responsive, 2 rows on desktop, stacked on mobile */}
-      <div className="w-full max-w-4xl flex flex-col items-center gap-3 mb-8">
-        <div className="flex flex-wrap justify-center gap-3 w-full">
+      {/* Suggestion Bar - Responsive, multiple rows on desktop, stacked on mobile */}
+      <div className="w-full max-w-4xl flex flex-col items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 w-full">
           {firstRow.map((text, i) => (
             <button
               key={i}
               onClick={() => setPrompt(text)}
-              className={`h-11 px-6 rounded-full border text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
+              className={`h-10 sm:h-11 px-4 sm:px-6 rounded-full border text-xs sm:text-sm md:text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
                 theme === 'dark'
                   ? 'border-gray-700 bg-[#232323] text-gray-200 hover:bg-[#333] hover:text-white'
                   : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               }`}
-              style={{ minWidth: 180, maxWidth: 240 }}
+              style={{ minWidth: 140, maxWidth: 200 }}
               title={text}
             >
               <span className="truncate w-full text-center block">{text}</span>
             </button>
           ))}
         </div>
-        <div className="flex flex-wrap justify-center gap-3 w-full">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 w-full">
           {secondRow.map((text, i) => (
             <button
               key={i}
               onClick={() => setPrompt(text)}
-              className={`h-11 px-6 rounded-full border text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
+              className={`h-10 sm:h-11 px-4 sm:px-6 rounded-full border text-xs sm:text-sm md:text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
                 theme === 'dark'
                   ? 'border-gray-700 bg-[#232323] text-gray-200 hover:bg-[#333] hover:text-white'
                   : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               }`}
-              style={{ minWidth: 180, maxWidth: 240 }}
+              style={{ minWidth: 140, maxWidth: 200 }}
               title={text}
             >
               <span className="truncate w-full text-center block">{text}</span>
             </button>
           ))}
         </div>
-        <div className="flex flex-wrap justify-center gap-3 w-full">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 w-full">
           {thirdRow.map((text, i) => (
             <button
               key={i}
               onClick={() => setPrompt(text)}
-              className={`h-11 px-6 rounded-full border text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
+              className={`h-10 sm:h-11 px-4 sm:px-6 rounded-full border text-xs sm:text-sm md:text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
                 theme === 'dark'
                   ? 'border-gray-700 bg-[#232323] text-gray-200 hover:bg-[#333] hover:text-white'
                   : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               }`}
-              style={{ minWidth: 180, maxWidth: 240 }}
+              style={{ minWidth: 140, maxWidth: 200 }}
               title={text}
             >
               <span className="truncate w-full text-center block">{text}</span>
@@ -262,9 +262,9 @@ const LandingPro: React.FC = () => {
         {/* Explore AI Tools Button */}
         <button
           onClick={() => navigate('/home')}
-          className="mt-6 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="mt-4 sm:mt-6 px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white text-base sm:text-lg font-bold rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
         >
-          Explore AI Tools
+          Explore AI Territory
         </button>
       </div>
     </div>

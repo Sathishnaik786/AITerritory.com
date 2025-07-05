@@ -12,7 +12,7 @@ const NewsletterPage: React.FC = () => {
         <input
           type="email"
           placeholder="Your email address"
-          className="p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="p-3 border border-gray-300 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-[#171717] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           type="submit"

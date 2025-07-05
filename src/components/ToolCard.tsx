@@ -127,7 +127,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
       >
         <Card 
           variant={getCardVariant()}
-          className={`group cursor-pointer overflow-hidden flex flex-col p-4 sm:p-6 bg-white/80 dark:bg-gray-900/80 border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80 relative`}
+          className={`group cursor-pointer overflow-hidden flex flex-col p-4 sm:p-6 bg-white/80 dark:bg-[#171717] border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80 relative`}
           onClick={() => navigate(`/tools/${tool.id}`)}
         >
           <CardContent className="p-4 sm:p-5">
@@ -189,7 +189,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
     >
       <Card 
         variant={getCardVariant()}
-        className={`group cursor-pointer overflow-hidden relative flex flex-col p-4 sm:p-6 bg-white/80 dark:bg-gray-900/80 border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80`}
+        className={`group cursor-pointer overflow-hidden relative flex flex-col p-4 sm:p-6 bg-white/80 dark:bg-[#171717] border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80`}
         onClick={() => navigate(`/tools/${tool.id}`)}
       >
         {/* Featured Badge */}
@@ -228,7 +228,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
           <Button
             size="icon-sm"
             variant="ghost"
-            className="rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-1 px-3"
+            className="rounded-full hover:bg-gray-100 dark:hover:bg-[#171717] flex items-center gap-1 px-3"
             onClick={onLikeClick}
             disabled={likesLoading}
           >
@@ -263,7 +263,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
               <Button
                 size="icon-sm"
                 variant="ghost"
-                className="rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                className="rounded-full hover:bg-blue-50 dark:hover:bg-[#171717]"
                 onClick={handleBookmark}
                 disabled={bookmarkLoading}
               >
@@ -291,7 +291,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
                 <Badge 
                     key={toolTag.tags.id} 
                   variant="outline" 
-                  className="text-xs bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
+                  className="text-xs bg-blue-50 dark:bg-[#171717] border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
                 >
                     #{toolTag.tags.name.toLowerCase().replace(/ /g, '')}
                 </Badge>

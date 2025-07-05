@@ -33,10 +33,10 @@ export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
   const getGridCols = () => {
     switch (columns) {
       case 1: return 'grid-cols-1';
-      case 2: return 'grid-cols-1 md:grid-cols-2';
-      case 3: return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
-      case 4: return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
-      default: return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+      case 2: return 'grid-cols-1 sm:grid-cols-2';
+      case 3: return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+      case 4: return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+      default: return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
     }
   };
 
@@ -50,9 +50,9 @@ export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
 
   if (loading) {
     return (
-      <div className={`grid ${getGridCols()} gap-6`}>
+      <div className={`grid ${getGridCols()} gap-3 sm:gap-4 lg:gap-5`}>
         {Array.from({ length: initialCount }).map((_, index) => (
-          <div key={index} className="space-y-3">
+          <div key={index} className="space-y-3 h-full">
             <div className="h-48 w-full rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
             <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
             <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
@@ -82,7 +82,7 @@ export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className={`grid ${getGridCols()} gap-4 md:gap-6`}
+          className={`grid ${getGridCols()} gap-3 sm:gap-4 lg:gap-5 auto-rows-fr`}
         >
           {displayedTools.map((tool, index) => (
             <motion.div
@@ -90,6 +90,7 @@ export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
+              className="h-full flex"
             >
               <ToolCard tool={tool} variant={variant} />
             </motion.div>
@@ -109,7 +110,7 @@ export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
             disabled={isLoadingMore}
             variant="outline"
             size="lg"
-            className="group hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white transition-all duration-300"
+            className="group hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white transition-all duration-300 w-full sm:w-auto"
           >
             {isLoadingMore ? (
               <>
@@ -128,9 +129,8 @@ export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
 
       {/* Results Count */}
       {showResultsCount && (
-        <div className="text-center text-sm text-muted-foreground">
+        <div className="text-center text-sm text-muted-foreground pt-4">
           Showing {displayedTools.length} of {tools.length} tools
-          {hasMoreTools && ` • ${tools.length - displayedTools.length} more available`}
         </div>
       )}
     </div>

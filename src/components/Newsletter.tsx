@@ -36,16 +36,16 @@ export function Newsletter({ isOpen, onClose }: NewsletterProps) {
 
         {!isSubscribed ? (
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold mb-2">Join Our Newsletter</h2>
+            <h2 className="text-2xl font-bold mb-2">Stay Ahead with AI Territory</h2>
             <p className="text-muted-foreground">
-              Stay updated with the latest AI news, tools, and insights.
+              Get exclusive access to the latest AI tools, expert prompts, tutorials, and breakthrough innovations.
             </p>
           </div>
         ) : (
           <div className="text-center mb-6 flex flex-col items-center justify-center">
             <CheckCircle className="h-12 w-12 text-green-500 mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Successfully Subscribed!</h2>
-            <p className="text-muted-foreground">Thank you for joining our newsletter.</p>
+            <h2 className="text-2xl font-bold mb-2">Welcome to AI Territory!</h2>
+            <p className="text-muted-foreground">You're now part of the AI revolution. Check your inbox for exclusive content!</p>
           </div>
         )}
 

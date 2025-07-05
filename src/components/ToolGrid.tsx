@@ -19,18 +19,18 @@ export const ToolGrid: React.FC<ToolGridProps> = ({
   const getGridCols = () => {
     switch (columns) {
       case 1: return 'grid-cols-1';
-      case 2: return 'grid-cols-1 md:grid-cols-2';
-      case 3: return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
-      case 4: return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
-      default: return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+      case 2: return 'grid-cols-1 sm:grid-cols-2';
+      case 3: return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+      case 4: return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+      default: return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
     }
   };
 
   if (loading) {
     return (
-      <div className={`grid ${getGridCols()} gap-6`}>
+      <div className={`grid ${getGridCols()} gap-3 sm:gap-4 lg:gap-5`}>
         {Array.from({ length: 6 }).map((_, index) => (
-          <div key={index} className="space-y-3">
+          <div key={index} className="space-y-3 h-full">
             <Skeleton className="h-48 w-full rounded-lg" />
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-4 w-1/2" />
@@ -52,9 +52,11 @@ export const ToolGrid: React.FC<ToolGridProps> = ({
   }
 
   return (
-    <div className={`grid ${getGridCols()} gap-4 md:gap-6`}>
+    <div className={`grid ${getGridCols()} gap-3 sm:gap-4 lg:gap-5 auto-rows-fr`}>
       {tools.map((tool) => (
-        <ToolCard key={tool.id} tool={tool} variant={variant} />
+        <div key={tool.id} className="h-full flex">
+          <ToolCard tool={tool} variant={variant} />
+        </div>
       ))}
     </div>
   );

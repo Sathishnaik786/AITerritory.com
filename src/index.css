@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* stylelint-disable at-rule-no-unknown */
+/* For VSCode: add to settings.json - "css.lint.unknownAtRules": "ignore" */
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
 @layer base {
@@ -103,6 +106,7 @@
   .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -213,3 +217,5 @@ textarea:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+
+/* Add standard line-clamp property for compatibility */

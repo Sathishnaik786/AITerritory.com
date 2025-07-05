@@ -48,11 +48,11 @@ const Testimonials: React.FC = () => {
   );
 
   return (
-    <section className="w-full py-16 px-0 overflow-hidden bg-transparent">
+    <section className="w-full py-16 px-0 overflow-hidden bg-transparent dark:bg-[#171717]">
       <h2 className={`text-3xl font-bold mb-10 text-center ${
         theme === 'dark' ? 'text-white' : 'text-gray-900'
       }`}>
-        What Our Users Say
+        Trusted by AI Enthusiasts Worldwide
       </h2>
       
       <div className="space-y-8">
@@ -70,7 +70,7 @@ const Testimonials: React.FC = () => {
             {duplicatedTestimonials.map((t, idx) => (
               <div
                 key={`row1-${t.id}-${idx}`}
-                className={`rounded-2xl p-6 flex flex-col justify-between min-h-[220px] w-80 flex-shrink-0 bg-transparent border ${borderColor} shadow-sm`}
+                className={`rounded-2xl p-6 flex flex-col justify-between min-h-[220px] w-80 flex-shrink-0 bg-transparent border ${borderColor} shadow-sm dark:bg-[#171717]`}
               >
                 {/* Rating */}
                 {renderStars(t.rating)}
@@ -133,7 +133,7 @@ const Testimonials: React.FC = () => {
             {duplicatedTestimonials.map((t, idx) => (
               <div
                 key={`row2-${t.id}-${idx}`}
-                className={`rounded-2xl p-6 flex flex-col justify-between min-h-[220px] w-80 flex-shrink-0 bg-transparent border ${borderColor} shadow-sm`}
+                className={`rounded-2xl p-6 flex flex-col justify-between min-h-[220px] w-80 flex-shrink-0 bg-transparent border ${borderColor} shadow-sm dark:bg-[#171717]`}
               >
                 {/* Rating */}
                 {renderStars(t.rating)}

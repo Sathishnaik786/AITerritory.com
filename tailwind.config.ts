@@ -13,10 +13,30 @@ const config = {
 	theme: {
     	container: {
     		center: true,
-    		padding: '2rem',
+    		padding: {
+    			DEFAULT: '1rem',
+    			sm: '1.5rem',
+    			lg: '2rem',
+    			xl: '3rem',
+    			'2xl': '4rem',
+    		},
     		screens: {
-    			'2xl': '1400px'
+    			sm: '640px',
+    			md: '768px',
+    			lg: '1024px',
+    			xl: '1280px',
+    			'2xl': '1400px',
+    			'3xl': '1600px',
     		}
+    	},
+    	screens: {
+    		'xs': '475px',
+    		'sm': '640px',
+    		'md': '768px',
+    		'lg': '1024px',
+    		'xl': '1280px',
+    		'2xl': '1536px',
+    		'3xl': '1920px',
     	},
     	extend: {
     		colors: {
@@ -81,6 +101,22 @@ const config = {
     				'var(--font-sans)',
                     ...fontFamily.sans
                 ]
+    		},
+    		spacing: {
+    			'18': '4.5rem',
+    			'88': '22rem',
+    			'128': '32rem',
+    		},
+    		maxWidth: {
+    			'8xl': '88rem',
+    			'9xl': '96rem',
+    		},
+    		zIndex: {
+    			'60': '60',
+    			'70': '70',
+    			'80': '80',
+    			'90': '90',
+    			'100': '100',
     		},
     		keyframes: {
     			'accordion-down': {
