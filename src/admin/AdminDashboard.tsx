@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getContactSubmissions, getAdvertiseSubmissions, getToolSubmissions, getFeatureRequests } from '@/services/submissionService';
+import { getFeedback } from '@/services/feedbackService';
 import { Mail, Megaphone, PlusSquare, Lightbulb, Users, Bot, Rocket, BookOpen } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
@@ -25,6 +26,11 @@ const AdminDashboard: React.FC = () => {
   const { data: featureRequests, isLoading: isLoadingFeatures } = useQuery({
     queryKey: ['featureRequests'],
     queryFn: getFeatureRequests,
+  });
+
+  const { data: feedback, isLoading: isLoadingFeedback } = useQuery({
+    queryKey: ['feedback'],
+    queryFn: getFeedback,
   });
 
   const StatCard = ({ title, value, isLoading, icon: Icon, link, subtext }) => (
@@ -85,6 +91,14 @@ const AdminDashboard: React.FC = () => {
             link="/admin/submissions/features"
             subtext="New ideas"
           />
+          <StatCard
+            title="Feedback"
+            value={feedback?.length ?? 0}
+            isLoading={isLoadingFeedback}
+            icon={Lightbulb}
+            link="/admin/feedback"
+            subtext="User feedback"
+          />
         </div>
       </section>
 
@@ -126,10 +140,6 @@ const AdminDashboard: React.FC = () => {
               </CardHeader>
                <CardContent><p className="text-sm text-muted-foreground">Manage tutorials</p></CardContent>
             </Card>
-          </Link>
-          <Link to="/admin/feedback" className="block p-6 bg-white dark:bg-gray-900 rounded-lg shadow hover:shadow-md transition-all border border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-bold mb-2">Feedback</h2>
-            <p className="text-gray-600 dark:text-gray-300">View and manage user feedback submissions.</p>
           </Link>
         </div>
       </section>
