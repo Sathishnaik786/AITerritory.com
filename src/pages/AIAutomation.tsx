@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowRight, Zap, Settings, Workflow, Bot, PlayCircle, BookOpen, Code, Brain } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
-import { YouTubeVideoPlayer } from '../components/YouTubeVideoPlayer';
+import { YouTubeThumbnail } from '../components/YouTubeThumbnail';
 
 const AIAutomation = () => {
   const automationTools = [
@@ -121,7 +121,7 @@ const AIAutomation = () => {
                 <CardDescription>{useCase.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <YouTubeVideoPlayer
+                <YouTubeThumbnail
                   videoId={(function() {
                     const id = useCase.link;
                     if (id.includes('youtu.be/')) return id.split('youtu.be/')[1].split('?')[0];
@@ -155,7 +155,7 @@ const AIAutomation = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <YouTubeVideoPlayer
+              <YouTubeThumbnail
                 videoId="2GZ2SNXWK-c"
                 title="Getting Started with AI Automation"
                 className="w-full h-full rounded-lg"
@@ -170,7 +170,7 @@ const AIAutomation = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <YouTubeVideoPlayer
+              <YouTubeThumbnail
                 videoId="ZHH3sr234zY"
                 title="Best Practices for AI Automation"
                 className="w-full h-full rounded-lg"

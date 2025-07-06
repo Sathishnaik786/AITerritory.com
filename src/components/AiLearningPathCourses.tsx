@@ -1,5 +1,5 @@
 import { useAiLearningPathCourses } from '../hooks/useAiLearningPathCourses';
-import { YouTubeVideoPlayer } from './YouTubeVideoPlayer';
+import { YouTubeThumbnail } from './YouTubeThumbnail';
 import { useTheme } from 'next-themes';
 
 export function AiLearningPathCourses() {
@@ -16,7 +16,7 @@ export function AiLearningPathCourses() {
         <div key={course.id} className={`rounded-lg shadow p-6 ${
           theme === 'dark' ? 'bg-[#171717] text-white' : 'bg-white text-gray-900'
         }`}>
-          <YouTubeVideoPlayer videoId={(function() {
+          <YouTubeThumbnail videoId={(function() {
             const id = course.link;
             if (id.includes('youtu.be/')) return id.split('youtu.be/')[1].split('?')[0];
             if (id.includes('youtube.com/watch?v=')) return id.split('watch?v=')[1].split('&')[0];

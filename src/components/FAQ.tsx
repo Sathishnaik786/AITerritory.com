@@ -87,7 +87,7 @@ const FAQItem: React.FC<{ item: FAQItem; isOpen: boolean; onToggle: () => void; 
                 <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mt-1 flex-shrink-0 group-hover:text-blue-600 transition-colors" />
               </motion.div>
               <span className="group-hover:text-blue-600 transition-colors text-sm sm:text-base break-words text-wrap flex-1 min-w-0 pr-2">
-                {item.question}
+              {item.question}
               </span>
             </span>
             <motion.div

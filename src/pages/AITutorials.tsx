@@ -2,34 +2,34 @@ import React from 'react';
 import { ArrowRight, PlayCircle, BookOpen, Code, Brain } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
-import { YouTubeVideoPlayer } from '../components/YouTubeVideoPlayer';
+import { YouTubeThumbnail } from '../components/YouTubeThumbnail';
 import { AiLearningPathCourses } from '../components/AiLearningPathCourses';
 
 const AITutorials = () => {
   const featuredTutorials = [
     {
-      title: "ChatGPT Tutorial: How to Use ChatGPT for Beginners",
-      description: "Complete guide to using ChatGPT effectively for various tasks.",
-      image: "https://openai.com/content/images/2023/11/chatgpt.png",
+      title: "ChatGPT for Beginners",
+      description: "Learn the fundamentals of ChatGPT and how to use it effectively.",
+      image: "https://openai.com/content/images/2023/11/gpt-4.png",
       duration: "45 min",
       level: "Beginner",
       link: "https://www.youtube.com/watch?v=JTxsNm9IdYU"
     },
     {
-      title: "ChatGPT Advanced Tutorial: 10x Your Productivity",
-      description: "Learn advanced ChatGPT techniques to boost your productivity.",
-      image: "https://www.python.org/static/community_logos/python-logo-generic.svg",
-      duration: "2 hours",
-      level: "Intermediate",
-      link: "https://youtu.be/HGDxu3kPErs"
-    },
-    {
-      title: "ChatGPT Prompt Engineering Masterclass",
-      description: "Master the art of crafting effective prompts for ChatGPT.",
-      image: "https://openai.com/content/images/2023/11/gpt-4.png",
+      title: "Advanced ChatGPT Techniques",
+      description: "Master advanced prompting techniques and ChatGPT API integration.",
+      image: "https://openai.com/content/images/2023/11/dall-e-3.png",
       duration: "1.5 hours",
       level: "Advanced",
-      link: "https://youtu.be/5i2Hn8OG94o"
+      link: "https://youtu.be/Ndu21YMD8Jg"
+    },
+    {
+      title: "ChatGPT for Business",
+      description: "Discover how to leverage ChatGPT for business growth and productivity.",
+      image: "https://openai.com/content/images/2023/11/whisper.png",
+      duration: "1 hour",
+      level: "Intermediate",
+      link: "https://www.youtube.com/watch?v=jCoH82LPgdk"
     }
   ];
 
@@ -148,7 +148,7 @@ const AITutorials = () => {
                 <CardDescription>{tutorial.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <YouTubeVideoPlayer
+                <YouTubeThumbnail
                   videoId={(function() {
                     const id = tutorial.link;
                     if (id.includes('youtu.be/')) return id.split('youtu.be/')[1].split('?')[0];
@@ -187,7 +187,7 @@ const AITutorials = () => {
                 <CardDescription>{tutorial.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <YouTubeVideoPlayer
+                <YouTubeThumbnail
                   videoId={(function() {
                     const id = tutorial.link;
                     if (id.includes('youtu.be/')) return id.split('youtu.be/')[1].split('?')[0];

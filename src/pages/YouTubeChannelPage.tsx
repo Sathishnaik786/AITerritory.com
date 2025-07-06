@@ -4,7 +4,6 @@ import { PlayCircle, X } from 'lucide-react';
 import { useYouTubeContent } from '@/hooks/useYouTubeContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { YouTubeEmbed } from '@/components/YouTubeEmbed';
 
 const YouTubeChannelPage: React.FC = () => {
   const { data: youtubeContent, isLoading, error } = useYouTubeContent();
@@ -147,7 +146,13 @@ const YouTubeChannelPage: React.FC = () => {
                   ? 'aspect-[9/16] w-[360px] max-w-full' // Portrait for Shorts
                   : 'aspect-video w-full'
               }>
-                <YouTubeEmbed videoId={selectedVideo.id} title={selectedVideo.title} className="w-full h-full" />
+                <iframe
+                  src={`https://www.youtube.com/embed/${selectedVideo.id}?autoplay=1&rel=0`}
+                  title={selectedVideo.title}
+                  className="w-full h-full rounded-lg"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
               </div>
             )}
           </div>
