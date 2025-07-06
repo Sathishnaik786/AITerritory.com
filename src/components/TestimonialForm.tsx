@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useTheme } from 'next-themes';
 import { Star } from 'lucide-react';
 import { testimonialsService, TestimonialSubmission } from '../services/testimonialsService';
 
@@ -18,25 +17,16 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
-  const { theme } = useTheme();
 
   if (!open) return null;
   if (!user) return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <div className={`rounded-2xl p-8 w-full max-w-md text-center ${
-        theme === 'dark' ? 'bg-[#171717]' : 'bg-white'
-      }`}>
-        <div className={`text-lg mb-4 ${
-          theme === 'dark' ? 'text-white' : 'text-gray-900'
-        }`}>
+      <div className="rounded-2xl p-8 w-full max-w-md text-center bg-background border border-border">
+        <div className="text-lg mb-4 text-foreground">
           You must be logged in to submit a testimonial.
         </div>
         <button 
-          className={`mt-2 px-4 py-2 rounded ${
-            theme === 'dark' 
-              ? 'bg-blue-600 text-white hover:bg-blue-700' 
-              : 'bg-blue-600 text-white hover:bg-blue-700'
-          }`} 
+          className="mt-2 px-4 py-2 rounded bg-primary text-primary-foreground hover:bg-primary/90" 
           onClick={onClose}
         >
           Close
@@ -84,12 +74,8 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <form onSubmit={handleSubmit} className={`rounded-2xl p-8 w-full max-w-md ${
-        theme === 'dark' ? 'bg-[#171717]' : 'bg-white'
-      }`}>
-        <h3 className={`text-xl font-bold mb-4 text-center ${
-          theme === 'dark' ? 'text-white' : 'text-gray-900'
-        }`}>
+      <form onSubmit={handleSubmit} className="rounded-2xl p-8 w-full max-w-md bg-background border border-border">
+        <h3 className="text-xl font-bold mb-4 text-center text-foreground">
           Submit Your Testimonial
         </h3>
         {success ? (
@@ -105,38 +91,26 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
                   className="focus:outline-none"
                   aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
                 >
-                  <Star className={`w-6 h-6 ${rating >= star ? 'text-yellow-400 fill-yellow-400' : theme === 'dark' ? 'text-gray-700' : 'text-gray-300'}`} />
+                  <Star className={`w-6 h-6 ${rating >= star ? 'text-yellow-400 fill-yellow-400' : 'text-muted'}`} />
                 </button>
               ))}
             </div>
             <textarea
-              className={`w-full rounded-lg p-3 mb-4 min-h-[100px] border focus:outline-none ${
-                theme === 'dark' 
-                  ? 'bg-[#171717] text-white border-gray-700 focus:border-blue-500' 
-                  : 'bg-gray-50 text-gray-900 border-gray-300 focus:border-blue-500'
-              }`}
+              className="w-full rounded-lg p-3 mb-4 min-h-[100px] border border-border bg-background text-foreground focus:outline-none focus:border-primary"
               placeholder="Share your experience..."
               value={content}
               onChange={e => setContent(e.target.value)}
               required
             />
             <input
-              className={`w-full rounded-lg p-3 mb-4 border focus:outline-none ${
-                theme === 'dark' 
-                  ? 'bg-[#171717] text-white border-gray-700 focus:border-blue-500' 
-                  : 'bg-gray-50 text-gray-900 border-gray-300 focus:border-blue-500'
-              }`}
+              className="w-full rounded-lg p-3 mb-4 border border-border bg-background text-foreground focus:outline-none focus:border-primary"
               placeholder="Your role (e.g. Designer, Content Creator)"
               value={userRole}
               onChange={e => setUserRole(e.target.value)}
               required
             />
             <input
-              className={`w-full rounded-lg p-3 mb-4 border focus:outline-none ${
-                theme === 'dark' 
-                  ? 'bg-[#171717] text-white border-gray-700 focus:border-blue-500' 
-                  : 'bg-gray-50 text-gray-900 border-gray-300 focus:border-blue-500'
-              }`}
+              className="w-full rounded-lg p-3 mb-4 border border-border bg-background text-foreground focus:outline-none focus:border-primary"
               placeholder="Your company (optional)"
               value={companyName}
               onChange={e => setCompanyName(e.target.value)}
@@ -144,11 +118,7 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
             {error && <div className="text-red-400 mb-2">{error}</div>}
             <button
               type="submit"
-              className={`w-full py-2 rounded-lg font-semibold transition ${
-                theme === 'dark'
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
+              className="w-full py-2 rounded-lg font-semibold transition bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}
             >
               {loading ? 'Submitting...' : 'Submit Testimonial'}
@@ -157,11 +127,7 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ open, onClose, user, 
         )}
         <button 
           type="button" 
-          className={`w-full mt-4 py-2 rounded-lg transition ${
-            theme === 'dark'
-              ? 'bg-gray-700 text-white hover:bg-gray-600'
-              : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
-          }`} 
+          className="w-full mt-4 py-2 rounded-lg transition bg-muted text-muted-foreground hover:bg-muted/80" 
           onClick={onClose}
         >
           Cancel

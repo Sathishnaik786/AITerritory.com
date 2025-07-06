@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useTheme } from 'next-themes';
 import { Star } from 'lucide-react';
 import { testimonialsService, Testimonial } from '../services/testimonialsService';
 
 const Testimonials: React.FC = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
-  const { resolvedTheme } = useTheme();
-  const theme = resolvedTheme;
-  const borderColor = theme === 'dark' ? 'border-gray-800' : 'border-gray-200';
 
   useEffect(() => {
     testimonialsService.getTestimonials()
@@ -24,13 +20,13 @@ const Testimonials: React.FC = () => {
   }, []);
 
   if (loading) return (
-    <div className={`text-center py-8 sm:py-12 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className="text-center py-8 sm:py-12 text-foreground">
       Loading testimonials...
     </div>
   );
   
   if (!testimonials.length) return (
-    <div className={`text-center py-8 sm:py-12 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+    <div className="text-center py-8 sm:py-12 text-foreground">
       No testimonials yet.
     </div>
   );
@@ -42,16 +38,14 @@ const Testimonials: React.FC = () => {
   const renderStars = (rating: number = 5) => (
     <div className="flex items-center gap-0.5 mb-2">
       {[1,2,3,4,5].map((i) => (
-        <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${rating >= i ? 'text-yellow-400 fill-yellow-400' : theme === 'dark' ? 'text-gray-700' : 'text-gray-300'}`} />
+        <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${rating >= i ? 'text-yellow-400 fill-yellow-400' : 'text-muted'}`} />
       ))}
     </div>
   );
 
   return (
-    <section className="w-full py-8 sm:py-16 px-4 sm:px-0 overflow-hidden bg-transparent dark:bg-[#171717]">
-      <h2 className={`text-2xl sm:text-3xl font-bold mb-6 sm:mb-10 text-center ${
-        theme === 'dark' ? 'text-white' : 'text-gray-900'
-      }`}>
+    <section className="w-full py-8 sm:py-16 px-4 sm:px-0 overflow-hidden bg-muted/30">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-10 text-center text-foreground">
         Trusted by AI Enthusiasts Worldwide
       </h2>
       
@@ -70,13 +64,11 @@ const Testimonials: React.FC = () => {
             {duplicatedTestimonials.map((t, idx) => (
               <div
                 key={`row1-${t.id}-${idx}`}
-                className={`rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between min-h-[180px] sm:min-h-[220px] w-64 sm:w-80 flex-shrink-0 bg-transparent border ${borderColor} shadow-sm dark:bg-[#171717]`}
+                className="rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between min-h-[180px] sm:min-h-[220px] w-64 sm:w-80 flex-shrink-0 bg-card border border-border shadow-sm"
               >
                 {/* Rating */}
                 {renderStars(t.rating)}
-                <p className={`text-sm sm:text-base mb-4 sm:mb-6 flex-1 ${
-                  theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
-                }`}>
+                <p className="text-sm sm:text-base mb-4 sm:mb-6 flex-1 text-muted-foreground">
                   {t.content}
                 </p>
                 <div className="flex items-center gap-2 sm:gap-3 mt-auto">
@@ -84,33 +76,23 @@ const Testimonials: React.FC = () => {
                     <img 
                       src={t.user_avatar} 
                       alt={t.user_name} 
-                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 ${
-                        theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
-                      }`} 
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-border" 
                       loading="lazy"
                     />
                   ) : (
-                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold ${
-                      theme === 'dark' 
-                        ? 'bg-gray-700 text-white' 
-                        : 'bg-gray-200 text-gray-600'
-                    }`}>
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold bg-muted text-muted-foreground">
                       {t.user_name.charAt(0)}
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <div className={`font-semibold text-sm sm:text-base truncate ${
-                      theme === 'dark' ? 'text-white' : 'text-gray-900'
-                    }`}>
+                    <div className="font-semibold text-sm sm:text-base truncate text-card-foreground">
                       {t.user_name}
                     </div>
-                    <div className={`text-xs sm:text-sm truncate ${
-                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                    }`}>
+                    <div className="text-xs sm:text-sm truncate text-muted-foreground">
                       {t.user_role}
                     </div>
                     {t.company_name && (
-                      <div className={`text-xs mt-0.5 truncate ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{t.company_name}</div>
+                      <div className="text-xs mt-0.5 truncate text-muted-foreground">{t.company_name}</div>
                     )}
                   </div>
                 </div>
@@ -133,13 +115,11 @@ const Testimonials: React.FC = () => {
             {duplicatedTestimonials.map((t, idx) => (
               <div
                 key={`row2-${t.id}-${idx}`}
-                className={`rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between min-h-[180px] sm:min-h-[220px] w-64 sm:w-80 flex-shrink-0 bg-transparent border ${borderColor} shadow-sm dark:bg-[#171717]`}
+                className="rounded-xl sm:rounded-2xl p-4 sm:p-6 flex flex-col justify-between min-h-[180px] sm:min-h-[220px] w-64 sm:w-80 flex-shrink-0 bg-card border border-border shadow-sm"
               >
                 {/* Rating */}
                 {renderStars(t.rating)}
-                <p className={`text-sm sm:text-base mb-4 sm:mb-6 flex-1 ${
-                  theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
-                }`}>
+                <p className="text-sm sm:text-base mb-4 sm:mb-6 flex-1 text-muted-foreground">
                   {t.content}
                 </p>
                 <div className="flex items-center gap-2 sm:gap-3 mt-auto">
@@ -147,33 +127,23 @@ const Testimonials: React.FC = () => {
                     <img 
                       src={t.user_avatar} 
                       alt={t.user_name} 
-                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 ${
-                        theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
-                      }`} 
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-border" 
                       loading="lazy"
                     />
                   ) : (
-                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold ${
-                      theme === 'dark' 
-                        ? 'bg-gray-700 text-white' 
-                        : 'bg-gray-200 text-gray-600'
-                    }`}>
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold bg-muted text-muted-foreground">
                       {t.user_name.charAt(0)}
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <div className={`font-semibold text-sm sm:text-base truncate ${
-                      theme === 'dark' ? 'text-white' : 'text-gray-900'
-                    }`}>
+                    <div className="font-semibold text-sm sm:text-base truncate text-card-foreground">
                       {t.user_name}
                     </div>
-                    <div className={`text-xs sm:text-sm truncate ${
-                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                    }`}>
+                    <div className="text-xs sm:text-sm truncate text-muted-foreground">
                       {t.user_role}
                     </div>
                     {t.company_name && (
-                      <div className={`text-xs mt-0.5 truncate ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>{t.company_name}</div>
+                      <div className="text-xs mt-0.5 truncate text-muted-foreground">{t.company_name}</div>
                     )}
                   </div>
                 </div>

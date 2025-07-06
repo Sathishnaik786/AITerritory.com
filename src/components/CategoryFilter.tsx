@@ -100,13 +100,13 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
               className="w-full justify-start text-sm h-10 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] group"
           onClick={() => onCategoryChange(category.id)}
         >
-              <span className="flex-1 text-left truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              <span className="flex-1 text-left truncate group-hover:text-blue-600 transition-colors">
                 {category.name}
               </span>
           {showCounts && (
                 <Badge 
                   variant="secondary" 
-                  className="ml-2 flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                  className="ml-2 flex-shrink-0 bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300"
                 >
                   {category.tool_count || 0}
             </Badge>

@@ -13,11 +13,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ small }) => {
   return (
     <button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className={`p-3 rounded-full border transition-all duration-300 hover:scale-105 ${
-        isDark 
-          ? 'bg-[#171717] border-white/20 text-white hover:bg-white/10'
-          : 'bg-white border-black text-black hover:bg-gray-100'
-      }`}
+      className="p-3 rounded-full border border-border bg-background text-foreground transition-all duration-300 hover:scale-105 hover:bg-accent"
       aria-label="Toggle theme"
       type="button"
     >

@@ -71,7 +71,7 @@ const FAQItem: React.FC<{ item: FAQItem; isOpen: boolean; onToggle: () => void; 
     >
       <Card className={cn(
         "mb-4 border-l-4 border-l-blue-500 hover:shadow-lg transition-all duration-300 cursor-pointer",
-        "bg-white/50 backdrop-blur-sm hover:bg-white/80 hover:border-l-blue-600 hover:scale-[1.02] active:scale-[0.98] dark:bg-[#171717]",
+        "bg-card/50 backdrop-blur-sm hover:bg-card/80 hover:border-l-blue-600 hover:scale-[1.02] active:scale-[0.98]",
       )}>
         <CardHeader className="pb-2">
           <Button

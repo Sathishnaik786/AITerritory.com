@@ -32,7 +32,7 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="w-full overflow-x-hidden">
-      <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 to-gray-100 py-10">
+      <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-10">
         {/* Hero Section */}
         <motion.div
           className="text-center mb-12 px-4"
@@ -72,7 +72,7 @@ export const HomePage: React.FC = () => {
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
           >
-            <Card className="dark:bg-[#171717]">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-yellow-500" />
@@ -100,7 +100,7 @@ export const HomePage: React.FC = () => {
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
           >
-            <Card className="dark:bg-[#171717]">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-green-500" />
@@ -135,7 +135,7 @@ export const HomePage: React.FC = () => {
               <Filter className="w-4 h-4" />
               {selectedCategory ? 'Filter Active' : 'Show Filters'}
               {selectedCategory && (
-                <span className="ml-auto bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                <span className="ml-auto bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full">
                   Active
                 </span>
               )}
@@ -160,13 +160,13 @@ export const HomePage: React.FC = () => {
             <AnimatePresence>
               {isSidebarOpen && (
                 <motion.aside
-                  className="fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-white dark:bg-gray-900 z-50 lg:hidden shadow-2xl"
+                  className="fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-background border-r border-border z-50 lg:hidden shadow-2xl"
                   initial={{ x: '-100%' }}
                   animate={{ x: 0 }}
                   exit={{ x: '-100%' }}
                   transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                 >
-                  <div className="flex items-center justify-between p-4 border-b">
+                  <div className="flex items-center justify-between p-4 border-b border-border">
                     <h2 className="font-bold text-lg">Filters</h2>
                     <Button
                       variant="ghost"
@@ -189,7 +189,7 @@ export const HomePage: React.FC = () => {
 
             {/* Sidebar - Desktop */}
             <aside className="hidden lg:block w-[300px] flex-shrink-0">
-              <div className="bg-pink-50 rounded-xl p-6 dark:bg-[#171717] sticky top-4">
+              <div className="bg-muted/50 rounded-xl p-6 sticky top-4">
                 <h2 className="font-bold text-lg mb-6">Filters</h2>
                 <CategoryFilter
                   selectedCategory={selectedCategory}

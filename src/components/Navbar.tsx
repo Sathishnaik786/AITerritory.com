@@ -110,12 +110,12 @@ export function Navbar() {
           <ThemeToggle small />
             <SignedOut>
             <SignUpButton mode="modal">
-              <button className="navbar-link text-xs font-medium px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 hover:border-gray-400 shadow-sm hover:shadow-md whitespace-nowrap">
+              <button className="navbar-link text-xs font-medium px-3 py-2 rounded-md border border-border bg-background text-foreground hover:bg-accent hover:border-border/50 shadow-sm hover:shadow-md whitespace-nowrap">
                 Sign Up
               </button>
             </SignUpButton>
             <SignInButton mode="modal">
-              <button className="navbar-link text-xs font-medium px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 hover:border-gray-400 shadow-sm hover:shadow-md whitespace-nowrap">
+              <button className="navbar-link text-xs font-medium px-3 py-2 rounded-md border border-border bg-background text-foreground hover:bg-accent hover:border-border/50 shadow-sm hover:shadow-md whitespace-nowrap">
                 Login
               </button>
             </SignInButton>
@@ -212,7 +212,7 @@ export function Navbar() {
                       </button>
                     </SignUpButton>
                       <SignInButton mode="modal">
-                      <button className="mobile-nav-link w-full text-sm font-medium px-4 py-3 rounded-md border border-gray-300 bg-white text-gray-900 hover:bg-gray-100 hover:border-gray-400 shadow-sm hover:shadow-md">
+                      <button className="mobile-nav-link w-full text-sm font-medium px-4 py-3 rounded-md border border-border bg-background text-foreground hover:bg-accent hover:border-border/50 shadow-sm hover:shadow-md">
                         Login
                       </button>
                       </SignInButton>
@@ -222,7 +222,7 @@ export function Navbar() {
                   </SignedIn>
                 </div>
                 <DrawerClose asChild>
-                  <button className="mobile-nav-link mt-6 w-full py-3 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-300 dark:hover:bg-gray-700">
+                  <button className="mobile-nav-link mt-6 w-full py-3 rounded-lg bg-muted text-muted-foreground font-semibold hover:bg-muted/80">
                     Close
                   </button>
                 </DrawerClose>

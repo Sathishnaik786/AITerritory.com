@@ -74,26 +74,28 @@ const Blog: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6 items-start lg:items-center justify-between">
             {/* Categories */}
-            <div className="flex flex-wrap gap-1.5 sm:gap-2 w-full lg:w-auto">
-              <Button
-                variant={selectedCategory === 'all' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedCategory('all')}
-                className="rounded-full text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 transition-colors"
-              >
-                All ({blogPosts.filter(p => p.published).length})
-              </Button>
-              {blogCategories.map((category) => (
+            <div className="w-full lg:w-auto">
+              <div className="flex gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide pb-2 lg:pb-0">
                 <Button
-                  key={category.id}
-                  variant={selectedCategory === category.name ? 'default' : 'outline'}
+                  variant={selectedCategory === 'all' ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setSelectedCategory(category.name)}
-                  className="rounded-full text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 transition-colors"
+                  onClick={() => setSelectedCategory('all')}
+                  className="rounded-full text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 transition-colors whitespace-nowrap flex-shrink-0"
                 >
-                  {category.name} ({category.postCount})
+                  All ({blogPosts.filter(p => p.published).length})
                 </Button>
-              ))}
+                {blogCategories.map((category) => (
+                  <Button
+                    key={category.id}
+                    variant={selectedCategory === category.name ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedCategory(category.name)}
+                    className="rounded-full text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5 transition-colors whitespace-nowrap flex-shrink-0"
+                  >
+                    {category.name} ({category.postCount})
+                  </Button>
+                ))}
+              </div>
             </div>
 
             {/* Sort Options */}

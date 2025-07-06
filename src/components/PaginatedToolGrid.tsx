@@ -53,9 +53,9 @@ export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
       <div className={`grid ${getGridCols()} gap-6`}>
         {Array.from({ length: initialCount }).map((_, index) => (
           <div key={index} className="space-y-3 h-full">
-            <div className="h-48 w-full rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
-            <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
-            <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
+            <div className="h-48 w-full rounded-lg bg-muted animate-pulse" />
+            <div className="h-4 w-3/4 bg-muted animate-pulse rounded" />
+            <div className="h-4 w-1/2 bg-muted animate-pulse rounded" />
           </div>
         ))}
       </div>

@@ -22,7 +22,7 @@ export function SubscribeModal({ isOpen, onClose, onSubscribe }: SubscribeModalP
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="bg-background rounded-lg p-6 w-full max-w-md mx-4 relative border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+          className="bg-background rounded-lg p-6 w-full max-w-md mx-4 relative border border-border shadow-lg"
         >
         <button
           onClick={onClose}
@@ -48,7 +48,7 @@ export function SubscribeModal({ isOpen, onClose, onSubscribe }: SubscribeModalP
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-muted border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2 rounded-lg bg-muted border border-border focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>

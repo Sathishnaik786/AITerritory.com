@@ -11,7 +11,6 @@ import { bookmarkService } from '../services/bookmarkService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLikesAndShares } from '../hooks/useLikesAndShares';
 import ShareModal from './ShareModal';
-import { useTheme } from 'next-themes';
 
 interface ToolCardProps {
   tool: Tool;
@@ -26,8 +25,6 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
 
   const navigate = useNavigate();
   const { user } = useUser();
-  const { resolvedTheme } = useTheme();
-  const theme = resolvedTheme;
 
   // Use the new likes and shares hook
   const {
@@ -89,7 +86,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
               className={`w-4 h-4 ${
                 rating >= i
                   ? 'text-yellow-400 fill-yellow-400'
-                  : 'text-gray-300 dark:text-gray-600'
+                  : 'text-muted'
               }`}
             />
           ))}
@@ -113,8 +110,6 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
     }
   };
 
-  const borderColor = theme === 'dark' ? 'border-gray-800' : 'border-gray-200';
-
   if (variant === 'compact') {
     return (
       <motion.div
@@ -127,7 +122,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
       >
         <Card 
           variant={getCardVariant()}
-          className={`group cursor-pointer overflow-hidden flex flex-col p-4 sm:p-6 bg-white/80 dark:bg-[#171717] border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80 relative`}
+          className="group cursor-pointer overflow-hidden flex flex-col p-4 sm:p-6 bg-card/80 border border-border shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80 relative"
           onClick={() => navigate(`/tools/${tool.id}`)}
         >
           <CardContent className="p-4 sm:p-5">
@@ -146,7 +141,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <h3 className="font-semibold text-sm truncate group-hover:text-blue-600 transition-colors">
                   {tool.name}
                 </h3>
                 <p className="text-xs text-muted-foreground line-clamp-2 mt-1 break-words">
@@ -189,7 +184,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
     >
       <Card 
         variant={getCardVariant()}
-        className={`group cursor-pointer overflow-hidden relative flex flex-col p-4 sm:p-6 bg-white/80 dark:bg-[#171717] border ${borderColor} shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80`}
+        className="group cursor-pointer overflow-hidden relative flex flex-col p-4 sm:p-6 bg-card/80 border border-border shadow-xl rounded-2xl backdrop-blur-lg bg-opacity-80"
         onClick={() => navigate(`/tools/${tool.id}`)}
       >
         {/* Featured Badge */}
@@ -228,7 +223,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
           <Button
             size="icon-sm"
             variant="ghost"
-            className="rounded-full hover:bg-gray-100 dark:hover:bg-[#171717] flex items-center gap-1 px-3"
+            className="rounded-full hover:bg-accent flex items-center gap-1 px-3"
             onClick={onLikeClick}
             disabled={likesLoading}
           >
@@ -252,7 +247,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
           {/* Header */}
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1">
-              <h3 className="font-bold text-xl text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              <h3 className="font-bold text-xl text-card-foreground group-hover:text-blue-600 transition-colors">
                 {tool.name}
               </h3>
               {typeof tool.rating === 'number' && tool.rating > 0 && (
@@ -263,7 +258,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
               <Button
                 size="icon-sm"
                 variant="ghost"
-                className="rounded-full hover:bg-blue-50 dark:hover:bg-[#171717]"
+                className="rounded-full hover:bg-accent"
                 onClick={handleBookmark}
                 disabled={bookmarkLoading}
               >
@@ -279,7 +274,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
           </div>
 
           {/* Description */}
-          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
+          <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
             {tool.description}
           </p>
 
@@ -291,7 +286,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
                 <Badge 
                     key={toolTag.tags.id} 
                   variant="outline" 
-                  className="text-xs bg-blue-50 dark:bg-[#171717] border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
+                  className="text-xs bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
                 >
                     #{toolTag.tags.name.toLowerCase().replace(/ /g, '')}
                 </Badge>
