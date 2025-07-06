@@ -14,8 +14,8 @@ import {
   NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
 import { CircleCheckIcon, CircleHelpIcon, CircleIcon, Sparkles } from "lucide-react";
-import { Drawer, DrawerTrigger, DrawerContent, DrawerClose } from './ui/drawer';
-import { Menu } from 'lucide-react';
+import { Hamburger } from './ui/hamburger';
+import { MobileMenu } from './ui/mobile-menu';
 import { navigationMenuTriggerStyle } from './ui/navigation-menu.constants';
 
 const navLinks = [
@@ -127,108 +127,14 @@ export function Navbar() {
 
         {/* Mobile Hamburger Menu */}
         <div className="flex lg:hidden items-center">
-          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-            <DrawerTrigger asChild>
-              <button 
-                aria-label="Open menu" 
-                className="mobile-nav-link p-2 rounded-md hover:bg-accent focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-            </DrawerTrigger>
-            <DrawerContent className="w-full max-w-sm mx-auto rounded-t-2xl p-0">
-              <div className="flex flex-col gap-2 p-4 sm:p-6">
-                {/* Logo in Drawer */}
-                <Link 
-                  to="/" 
-                  className="mobile-nav-link flex items-center gap-2 mb-6 group" 
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  <img 
-                    src="/logo.jpg" 
-                    alt="AI Territory Logo" 
-                    className="h-8 w-8 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900 transition-all duration-200 group-hover:ring-blue-300 dark:group-hover:ring-blue-600" 
-                  />
-                  <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent transition-all duration-200 group-hover:from-blue-700 group-hover:to-purple-700">
-                    AI Territory
-                  </span>
-                  </Link>
-                {/* Nav Links */}
-                {navLinks.map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className={`mobile-nav-link block py-3 px-4 text-base font-medium rounded-lg hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20 ${
-                      location.pathname === item.to 
-                        ? "text-blue-500 bg-blue-50 dark:bg-blue-950/20" 
-                        : "text-foreground"
-                    }`}
-                    onClick={() => setDrawerOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-                {/* Resources Dropdown as links */}
-                <div className="mt-4">
-                  <div className="text-xs font-semibold text-muted-foreground mb-3 px-4">Resources</div>
-                  <Link 
-                    to="/resources/ai-agents" 
-                    className="mobile-nav-link block py-3 px-4 rounded-lg hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20" 
-                    onClick={() => setDrawerOpen(false)}
-                  >
-                    AI Agents
-                  </Link>
-                  <Link 
-                    to="/resources/ai-innovation" 
-                    className="mobile-nav-link block py-3 px-4 rounded-lg hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20" 
-                    onClick={() => setDrawerOpen(false)}
-                  >
-                    AI Innovation
-                  </Link>
-                  <Link 
-                    to="/resources/ai-tutorials" 
-                    className="mobile-nav-link block py-3 px-4 rounded-lg hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20" 
-                    onClick={() => setDrawerOpen(false)}
-                  >
-                    AI Tutorials
-                  </Link>
-                  <Link 
-                    to="/resources/ai-automation" 
-                    className="mobile-nav-link block py-3 px-4 rounded-lg hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20" 
-                    onClick={() => setDrawerOpen(false)}
-                  >
-                    AI Automation
-                  </Link>
-                </div>
-                {/* Divider */}
-                <hr className="my-4 border-muted" />
-                {/* Right side actions */}
-                <div className="flex flex-col gap-3">
-                  <ThemeToggle small />
-                  <SignedOut>
-                    <SignUpButton mode="modal">
-                      <button className="mobile-nav-link w-full text-sm font-medium px-4 py-3 rounded-md border border-primary bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md">
-                        Sign Up
-                      </button>
-                    </SignUpButton>
-                      <SignInButton mode="modal">
-                      <button className="mobile-nav-link w-full text-sm font-medium px-4 py-3 rounded-md border border-border bg-background text-foreground hover:bg-accent hover:border-border/50 shadow-sm hover:shadow-md">
-                        Login
-                      </button>
-                      </SignInButton>
-                  </SignedOut>
-                  <SignedIn>
-                        <UserButton afterSignOutUrl="/" />
-                  </SignedIn>
-                </div>
-                <DrawerClose asChild>
-                  <button className="mobile-nav-link mt-6 w-full py-3 rounded-lg bg-muted text-muted-foreground font-semibold hover:bg-muted/80">
-                    Close
-                  </button>
-                </DrawerClose>
-              </div>
-            </DrawerContent>
-          </Drawer>
+          <Hamburger 
+            isOpen={drawerOpen}
+            onToggle={() => setDrawerOpen(!drawerOpen)}
+          />
+          <MobileMenu 
+            isOpen={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+          />
         </div>
       </div>
     </nav>

@@ -293,12 +293,28 @@ textarea:focus-visible {
     transition: color 0.2s;
   }
   
-  /* Drawer animation from top */
-  .drawer-from-top {
-    transform: translateY(-100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Drawer animation from top - Override Vaul completely */
+  .drawer-from-top,
+  [data-vaul-drawer] {
+    transform: translateY(-100%) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    bottom: auto !important;
+    top: 0 !important;
   }
-  .drawer-from-top[data-state="open"] {
-    transform: translateY(0);
+  
+  .drawer-from-top[data-state="open"],
+  [data-vaul-drawer][data-state="open"] {
+    transform: translateY(0) !important;
+  }
+  
+  /* Disable Vaul's default bottom animation */
+  [data-vaul-drawer][data-vaul-drawer-direction="bottom"] {
+    transform: translateY(-100%) !important;
+    bottom: auto !important;
+    top: 0 !important;
+  }
+  
+  [data-vaul-drawer][data-vaul-drawer-direction="bottom"][data-state="open"] {
+    transform: translateY(0) !important;
   }
 }
