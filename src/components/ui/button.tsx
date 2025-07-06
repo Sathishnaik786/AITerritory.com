@@ -75,7 +75,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, rounded, className }))}
+        className={cn(buttonVariants({ variant, size, rounded, className }), "slide-hover")}
         ref={ref}
         disabled={!asChild && (disabled || loading)}
         {...props}

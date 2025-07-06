@@ -228,3 +228,77 @@ textarea:focus-visible {
 }
 
 /* Add standard line-clamp property for compatibility */
+
+/* Slide hover animation for buttons */
+.slide-hover {
+  position: relative;
+  overflow: hidden;
+}
+.slide-hover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0%;
+  background: rgba(0,0,0,0.08);
+  transition: height 0.3s cubic-bezier(0.4,0,0.2,1), top 0.3s cubic-bezier(0.4,0,0.2,1);
+  z-index: 0;
+}
+.slide-hover:hover::after,
+.slide-hover:focus-visible::after {
+  height: 100%;
+}
+
+/* On mobile, slide from top instead of bottom */
+@media (max-width: 768px) {
+  .slide-hover::after {
+    top: 0;
+    bottom: auto;
+    height: 0%;
+  }
+  .slide-hover:hover::after,
+  .slide-hover:focus-visible::after {
+    height: 100%;
+  }
+}
+
+/* Mobile navbar link improvements */
+@media (max-width: 768px) {
+  .mobile-nav-link {
+    position: relative;
+    overflow: hidden;
+  }
+  .mobile-nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 0%;
+    background: rgba(59,130,246,0.1);
+    transition: height 0.2s cubic-bezier(0.4,0,0.2,1);
+    z-index: 0;
+  }
+  .mobile-nav-link:hover,
+  .mobile-nav-link:focus {
+    background: none !important;
+    color: inherit !important;
+  }
+  .mobile-nav-link:active::after {
+    height: 100%;
+  }
+  .mobile-nav-link:active {
+    color: #2563eb !important;
+    transition: color 0.2s;
+  }
+  
+  /* Drawer animation from top */
+  .drawer-from-top {
+    transform: translateY(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .drawer-from-top[data-state="open"] {
+    transform: translateY(0);
+  }
+}
