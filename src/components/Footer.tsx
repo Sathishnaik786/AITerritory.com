@@ -128,8 +128,8 @@ export function Footer() {
               <Link to="/legal/terms-of-service" className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">Terms of Service</Link>
               <ThemeToggle small />
             </div>
-            {/* Feedback Modal Trigger Button */}
-            <div className="flex items-center gap-4">
+            {/* Feedback and Testimonial Buttons */}
+            <div className="flex flex-col sm:flex-row items-center gap-3">
               <FeedbackModal />
               {/* Submit Testimonial Button: opens sign-in modal if not logged in, else opens testimonial form */}
               {!user ? (

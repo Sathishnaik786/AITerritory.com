@@ -152,7 +152,7 @@ export function Navbar() {
                   <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent transition-all duration-200 group-hover:from-blue-700 group-hover:to-purple-700">
                     AI Territory
                   </span>
-                </Link>
+                  </Link>
                 {/* Nav Links */}
                 {navLinks.map((item) => (
                   <Link

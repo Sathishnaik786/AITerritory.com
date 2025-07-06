@@ -33,7 +33,7 @@ const ToolCarousel: React.FC<ToolCarouselProps> = ({ tools = [], loading = false
     <Carousel
       opts={{ align: "start" }}
       orientation="horizontal"
-      className="w-full max-w-2xl"
+      className="w-full"
       plugins={[plugin.current]}
       onMouseEnter={plugin.current.stop}
       onMouseLeave={plugin.current.reset}
@@ -49,10 +49,10 @@ const ToolCarousel: React.FC<ToolCarouselProps> = ({ tools = [], loading = false
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.5, delay: index * 0.08, ease: 'easeOut' }}
-              className="w-full flex flex-col justify-center"
+              className="w-full h-full flex flex-col justify-center"
             >
-              <Card className="w-full flex flex-col justify-center">
-                <CardContent className="flex items-center justify-center p-0 w-full">
+              <Card className="w-full h-full flex flex-col justify-center">
+                <CardContent className="flex items-center justify-center p-0 w-full h-full">
               <FeaturedToolCard tool={tool} />
                 </CardContent>
               </Card>

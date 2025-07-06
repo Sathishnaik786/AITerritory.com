@@ -76,35 +76,36 @@ const FAQItem: React.FC<{ item: FAQItem; isOpen: boolean; onToggle: () => void; 
         <CardHeader className="pb-2">
           <Button
             variant="ghost"
-            className="w-full justify-between p-0 h-auto text-left font-semibold text-lg hover:bg-transparent"
+            className="w-full justify-between p-0 h-auto text-left font-semibold text-base sm:text-lg hover:bg-transparent"
             onClick={onToggle}
           >
-            <span className="flex items-start gap-3">
+            <span className="flex items-start gap-2 sm:gap-3 min-w-0 flex-1">
               <motion.div
                 animate={{ rotate: isOpen ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <HelpCircle className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0 group-hover:text-blue-600 transition-colors" />
+                <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 mt-1 flex-shrink-0 group-hover:text-blue-600 transition-colors" />
               </motion.div>
-              <span className="group-hover:text-blue-600 transition-colors">
+              <span className="group-hover:text-blue-600 transition-colors text-sm sm:text-base break-words text-wrap flex-1 min-w-0 pr-2">
                 {item.question}
               </span>
             </span>
             <motion.div
               animate={{ rotate: isOpen ? 180 : 0 }}
               transition={{ duration: 0.3 }}
+              className="flex-shrink-0"
             >
-              {isOpen ? (
-                <ChevronUp className="w-5 h-5 text-blue-500 flex-shrink-0 group-hover:text-blue-600 transition-colors" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-blue-500 flex-shrink-0 group-hover:text-blue-600 transition-colors" />
-              )}
+            {isOpen ? (
+                <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0 group-hover:text-blue-600 transition-colors" />
+            ) : (
+                <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0 group-hover:text-blue-600 transition-colors" />
+            )}
             </motion.div>
           </Button>
         </CardHeader>
         <AnimatePresence>
           {isOpen && (
-            <motion.div
+        <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -115,19 +116,19 @@ const FAQItem: React.FC<{ item: FAQItem; isOpen: boolean; onToggle: () => void; 
                 stiffness: 100,
                 damping: 20
               }}
-              className="overflow-hidden"
-            >
-              <CardContent className="pt-0 pb-6">
+          className="overflow-hidden"
+        >
+              <CardContent className="pt-0 pb-4 sm:pb-6">
                 <motion.p 
-                  className="text-muted-foreground leading-relaxed pl-8"
+                  className="text-muted-foreground leading-relaxed pl-6 sm:pl-8 text-sm sm:text-base"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: 0.1 }}
                 >
-                  {item.answer}
+              {item.answer}
                 </motion.p>
-              </CardContent>
-            </motion.div>
+          </CardContent>
+        </motion.div>
           )}
         </AnimatePresence>
       </Card>
@@ -155,19 +156,19 @@ export const FAQ: React.FC = () => {
   };
 
   return (
-    <section className="py-16">
+    <section className="py-8 sm:py-16">
       <div className="container mx-auto px-4">
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.7 }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Frequently Asked Questions
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
             Everything you need to know about AI Territory and how to make the most of our platform
           </p>
         </motion.div>
@@ -193,25 +194,27 @@ export const FAQ: React.FC = () => {
         </motion.div>
 
         <motion.div
-          className="text-center mt-12 flex flex-col items-center gap-4"
+          className="text-center mt-8 sm:mt-12 flex flex-col items-center gap-4"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <p className="text-muted-foreground mb-4">
+          <p className="text-muted-foreground mb-4 text-sm sm:text-base">
             Still have questions? We're here to help!
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
             <Button
               variant="default"
               onClick={() => handleNavigate('/company/contact-us')}
+              className="w-full sm:w-auto"
             >
               Contact Support
             </Button>
             <Button
               variant="outline"
               onClick={() => handleNavigate('/resources/all-resources')}
+              className="w-full sm:w-auto"
             >
               Browse ALL Tools
             </Button>

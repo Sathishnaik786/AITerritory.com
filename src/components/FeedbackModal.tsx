@@ -64,7 +64,13 @@ export default function FeedbackModal() {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} variant="outline">Give Feedback</Button>
+      <Button 
+        onClick={() => setOpen(true)} 
+        variant="outline"
+        className="px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors w-full sm:w-auto"
+      >
+        Give Feedback
+      </Button>
       <Dialog onOpenChange={setOpen} open={open}>
         <DialogContent className="backdrop-blur-md bg-white/70 dark:bg-gray-900/80 bg-opacity-80 rounded-2xl shadow-xl border-0 p-6">
           <DialogHeader>

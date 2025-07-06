@@ -50,7 +50,7 @@ export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
 
   if (loading) {
     return (
-      <div className={`grid ${getGridCols()} gap-3 sm:gap-4 lg:gap-5`}>
+      <div className={`grid ${getGridCols()} gap-6`}>
         {Array.from({ length: initialCount }).map((_, index) => (
           <div key={index} className="space-y-3 h-full">
             <div className="h-48 w-full rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
@@ -82,7 +82,7 @@ export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className={`grid ${getGridCols()} gap-3 sm:gap-4 lg:gap-5 auto-rows-fr`}
+          className={`grid ${getGridCols()} gap-6`}
         >
           {displayedTools.map((tool, index) => (
             <motion.div

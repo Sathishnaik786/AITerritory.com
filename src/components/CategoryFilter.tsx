@@ -56,28 +56,28 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
-        <Button
-          variant={!selectedCategory ? "default" : "ghost"}
+      <Button
+        variant={!selectedCategory ? "default" : "ghost"}
           className="w-full justify-start text-sm h-10 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-          onClick={() => onCategoryChange(undefined)}
-        >
+        onClick={() => onCategoryChange(undefined)}
+      >
           <span className="truncate">All Categories</span>
           {showCounts && (
             <Badge variant="secondary" className="ml-auto flex-shrink-0">
               {categories?.length || 0}
             </Badge>
           )}
-        </Button>
+      </Button>
       </motion.div>
 
       <AnimatePresence>
-        {categories?.map((category, i) => (
-          <motion.div
-            key={category.id}
+      {categories?.map((category, i) => (
+        <motion.div
+          key={category.id}
             initial={{ opacity: 0, x: -20, scale: 0.95 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: -20, scale: 0.95 }}
-            viewport={{ once: true, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.2 }}
             transition={{ 
               duration: 0.4, 
               delay: i * 0.05, 
@@ -94,26 +94,26 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
               scale: 0.98,
               transition: { duration: 0.1 }
             }}
-          >
-            <Button
-              variant={selectedCategory === category.id ? "default" : "ghost"}
+        >
+          <Button
+          variant={selectedCategory === category.id ? "default" : "ghost"}
               className="w-full justify-start text-sm h-10 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] group"
-              onClick={() => onCategoryChange(category.id)}
-            >
+          onClick={() => onCategoryChange(category.id)}
+        >
               <span className="flex-1 text-left truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                 {category.name}
               </span>
-              {showCounts && (
+          {showCounts && (
                 <Badge 
                   variant="secondary" 
                   className="ml-2 flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
                 >
                   {category.tool_count || 0}
-                </Badge>
-              )}
-            </Button>
-          </motion.div>
-        ))}
+            </Badge>
+          )}
+        </Button>
+        </motion.div>
+      ))}
       </AnimatePresence>
 
       {/* Empty state */}

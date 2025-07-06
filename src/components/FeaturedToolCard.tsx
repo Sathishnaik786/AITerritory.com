@@ -26,7 +26,7 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.98 }}
       whileFocus={{ border: '2px solid #007bff' }}
-      className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 flex flex-col h-full p-2 xs:p-3 sm:p-5 w-full max-w-full"
+      className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 flex flex-col h-full min-h-[280px] p-2 xs:p-3 sm:p-5 w-full max-w-full"
     >
       {/* Top Row: Logo, Verified, Name, Rating */}
       <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -61,7 +61,7 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
         </div>
       </div>
       {/* Description */}
-      <div className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm mb-2 line-clamp-2 break-words">
+      <div className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm mb-2 line-clamp-2 break-words flex-1">
         {tool.description}
       </div>
       {/* Tags */}
