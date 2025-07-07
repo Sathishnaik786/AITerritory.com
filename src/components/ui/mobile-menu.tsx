@@ -33,7 +33,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const menuVariants = {
     closed: {
       opacity: 0,
-      y: -50,
+      x: 100,
       scale: 0.95,
       transition: {
         duration: 0.4,
@@ -42,7 +42,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     },
     open: {
       opacity: 1,
-      y: 0,
+      x: 0,
       scale: 1,
       transition: {
         duration: 0.6,
@@ -118,7 +118,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md"
             variants={backdropVariants}
             initial="closed"
             animate="open"
@@ -128,7 +128,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           
           {/* Menu Panel */}
           <motion.div
-            className="fixed inset-x-0 top-0 z-50 mt-16 h-[calc(100vh-4rem)] bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-2xl"
+            className="fixed right-0 top-0 z-50 h-full w-80 bg-gradient-to-b from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-2xl border-l border-slate-700/50 shadow-2xl"
             variants={menuVariants}
             initial="closed"
             animate="open"
@@ -137,7 +137,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             <div className="flex flex-col h-full">
               {/* Header */}
               <motion.div 
-                className="flex items-center justify-between p-6 border-b border-white/10"
+                className="flex items-center justify-between p-8 border-b border-slate-700/50"
                 variants={menuVariants}
                 initial="closed"
                 animate="open"
@@ -151,21 +151,21 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     <img 
                       src="/logo.jpg" 
                       alt="AI Territory Logo" 
-                      className="h-10 w-10 rounded-full object-cover ring-2 ring-white/20 transition-all duration-200 group-hover:ring-white/40" 
+                      className="h-12 w-12 rounded-full object-cover ring-2 ring-slate-600 transition-all duration-200 group-hover:ring-slate-400" 
                     />
                     <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full p-0.5 transition-all duration-200 group-hover:from-blue-300 group-hover:to-purple-300 group-hover:scale-110">
                       <Sparkles className="w-3 h-3 text-white" />
                     </div>
                   </div>
-                  <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                  <span className="font-extrabold text-2xl tracking-tight bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
                     AI Territory
                   </span>
                 </Link>
                 
                 <motion.button
                   onClick={onClose}
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-                  whileHover={{ scale: 1.05 }}
+                  className="p-3 rounded-xl hover:bg-slate-700/50 transition-colors border border-slate-600/50"
+                  whileHover={{ scale: 1.05, rotate: 90 }}
                   whileTap={{ scale: 0.95 }}
                   aria-label="Close menu"
                 >
@@ -175,27 +175,27 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
               {/* Navigation Content */}
               <motion.div 
-                className="flex-1 overflow-y-auto p-6"
+                className="flex-1 overflow-y-auto p-8"
                 variants={menuVariants}
                 initial="closed"
                 animate="open"
               >
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {/* Main Navigation */}
                   <motion.div variants={itemVariants}>
-                    <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">
                       Navigation
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {navLinks.map((item) => (
                         <motion.div key={item.to} variants={itemVariants}>
                           <Link
                             to={item.to}
                             className={cn(
-                              "block py-3 px-4 text-lg font-medium rounded-xl transition-all duration-200",
+                              "block py-4 px-6 text-lg font-semibold rounded-2xl transition-all duration-300 border border-transparent",
                               location.pathname === item.to
-                                ? "text-white bg-white/20 border border-white/20"
-                                : "text-gray-200 hover:text-white hover:bg-white/10"
+                                ? "text-white bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-blue-500/30 shadow-lg"
+                                : "text-slate-300 hover:text-white hover:bg-slate-700/50 hover:border-slate-600/50"
                             )}
                             onClick={onClose}
                           >
@@ -208,15 +208,15 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
                   {/* Resources */}
                   <motion.div variants={itemVariants}>
-                    <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">
                       Resources
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {resourceLinks.map((item) => (
                         <motion.div key={item.to} variants={itemVariants}>
                           <Link
                             to={item.to}
-                            className="block py-3 px-4 text-lg font-medium text-gray-200 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200"
+                            className="block py-4 px-6 text-lg font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 hover:border-slate-600/50 rounded-2xl transition-all duration-300 border border-transparent"
                             onClick={onClose}
                           >
                             {item.label}
@@ -230,31 +230,31 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
               {/* Footer Actions */}
               <motion.div 
-                className="p-6 border-t border-white/10 space-y-4"
+                className="p-8 border-t border-slate-700/50 space-y-6"
                 variants={menuVariants}
                 initial="closed"
                 animate="open"
               >
-                <motion.div variants={itemVariants} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-300">Theme</span>
+                <motion.div variants={itemVariants} className="flex items-center justify-between p-4 bg-slate-800/50 rounded-2xl border border-slate-700/50">
+                  <span className="text-sm font-semibold text-slate-300">Theme</span>
                   <ThemeToggle small />
                 </motion.div>
                 
-                <motion.div variants={itemVariants} className="space-y-3">
+                <motion.div variants={itemVariants} className="space-y-4">
                   <SignedOut>
                     <SignUpButton mode="modal">
-                      <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl">
+                      <button className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-2xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-xl hover:shadow-2xl border border-blue-400/30">
                         Sign Up
                       </button>
                     </SignUpButton>
                     <SignInButton mode="modal">
-                      <button className="w-full py-3 px-4 border border-white/20 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-all duration-200">
+                      <button className="w-full py-4 px-6 border border-slate-600/50 bg-slate-800/50 text-white font-bold rounded-2xl hover:bg-slate-700/50 transition-all duration-300">
                         Login
                       </button>
                     </SignInButton>
                   </SignedOut>
                   <SignedIn>
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center p-4 bg-slate-800/50 rounded-2xl border border-slate-700/50">
                       <UserButton afterSignOutUrl="/" />
                     </div>
                   </SignedIn>
