@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { navLinks } from "../data/navLinks";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import ThemeToggle from "./ThemeToggle";
 
 export default function MobileMenu() {
   const [open, setOpen] = useState(false);
@@ -111,18 +112,23 @@ export default function MobileMenu() {
           )}
         </motion.nav>
         {/* Bottom CTA or contact */}
-        <div className="mt-8 px-6">
-          <div className="text-xs text-muted-foreground mb-2">Contact: <a href="mailto:info@aiterritory.org" className="underline">info@aiterritory.org</a></div>
-          <Button
-            className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 text-white font-semibold shadow-lg hover:from-blue-700 hover:to-pink-600 hover:via-purple-700 transition-colors border-0"
-            size="lg"
-            onClick={() => {
-              setOpen(false);
-              navigate("/home");
-            }}
-          >
-            Explore AI Territory
-          </Button>
+        <div className="mt-8 px-6 flex items-center gap-2">
+          <div className="flex-1">
+            <div className="text-xs text-muted-foreground mb-2">Contact: <a href="mailto:info@aiterritory.org" className="underline">info@aiterritory.org</a></div>
+            <Button
+              className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 text-white font-semibold shadow-lg hover:from-blue-700 hover:to-pink-600 hover:via-purple-700 transition-colors border-0"
+              size="lg"
+              onClick={() => {
+                setOpen(false);
+                navigate("/home");
+              }}
+            >
+              Explore AI Territory
+            </Button>
+          </div>
+          <div className="pl-2 flex items-center h-full">
+            <ThemeToggle small />
+          </div>
         </div>
       </SheetContent>
     </Sheet>
