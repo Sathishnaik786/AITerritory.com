@@ -40,9 +40,9 @@ export function Navbar() {
             <span className="font-bold text-xl sm:text-2xl tracking-tight bg-gradient-to-r from-blue-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
               AI Territory
             </span>
-            <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full p-1 shadow-sm">
+            {/* <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full p-1 shadow-sm">
               <Sparkles className="w-3 h-3 text-white" />
-            </div>
+            </div> */}
           </div>
         </Link>
 
