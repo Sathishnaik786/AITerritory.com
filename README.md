@@ -1,231 +1,310 @@
-# 🚀 AITerritory.org - AI-Powered Content Creation, SEO & Publishing Platform
+# 🧠 AI Territory.org
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/your-username/AITerritory.com/actions)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Deployment](https://img.shields.io/badge/deployed-Render%20%2F%20Netlify-blue)](https://aiterritory.org)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/your-netlify-badge/deploy-status)](https://app.netlify.com/sites/aiterritory/deploys)
+[![Render Backend](https://img.shields.io/badge/Backend-Render-blue)](https://dashboard.render.com/)
+[![Build Status](https://github.com/your-org/aiterritory.org/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/aiterritory.org/actions)
 
-## 📋 Project Overview
+---
 
-**AITerritory.org** is a full-stack AI-powered content creation, SEO, and publishing platform designed for creators, marketers, and startups. It enables users to generate high-quality blog posts, schedule social media content, optimize for SEO, and analyze performance—all in one place.
+## 🧭 Project Overview
 
-- **Target Audience:** Creators, marketers, startups
-- **Core Use Cases:** Blog generation, social media scheduling, SEO optimization, analytics
+**AI Territory** is your all-in-one AI-powered platform for discovering, repurposing, and managing the best AI tools, prompts, and resources. Built for creators, marketers, developers, and AI enthusiasts, it offers a seamless experience to boost productivity, SEO, and content generation.
 
-## 🎯 Key Features
+> **Vision:** "Empowering everyone to leverage AI for smarter, faster, and more creative digital work."
 
-- **AI-powered content generation** (OpenAI, Claude, Hugging Face)
-- **SEO optimization** with real-time keyword suggestions
-- **Social media publishing** (Twitter, Facebook, LinkedIn, Instagram)
-- **Email marketing integration** (Mailchimp, ConvertKit)
-- **Plagiarism detection and rewriting tools**
-- **Analytics for content performance**
-- **Collaborative workflows for teams**
-- **Scheduled content calendar**
-- **Multi-language support**
-- **Image generation** using DALL·E and Midjourney API
+Live: [https://aiterritory.org](https://aiterritory.org)
 
-## 🏗️ Project Structure
+---
+
+## 🚀 Features
+
+- **Smart Repurposing:** Instantly transform content for different platforms and formats.
+- **SEO Copilot:** AI-driven SEO suggestions, meta tag generation, and performance insights.
+- **Prompt Library:** Curated, searchable prompt collections for OpenAI, Claude, and more.
+- **Blog Generation:** AI-powered blog creation and management.
+- **Tool Discovery:** Explore, filter, and bookmark 500+ AI tools.
+- **Trending & Featured Tools:** Real-time updates on what's hot in AI.
+- **User Dashboard:** Manage bookmarks, submissions, and feedback.
+- **Testimonials & Reviews:** Community-driven insights and ratings.
+- **YouTube AI Content:** Embedded videos and channel integration.
+- **API Access:** RESTful endpoints for tools, prompts, and more.
+- **Responsive UI:** Mobile-first, fast, and accessible.
+
+---
+
+## 🧱 Project Structure
 
 ```
 AITerritory.com/
-├── README.md
-├── package.json
-├── package-lock.json
-├── bun.lockb
-├── .gitignore
-├── .dockerignore
-├── docker-compose.yml
-├── Dockerfile.frontend
-├── ecosystem.config.js
-├── netlify.toml
-├── render.yaml
-├── nginx.conf
-├── tailwind.config.ts
-├── postcss.config.js
-├── tsconfig.json
-├── tsconfig.app.json
-├── tsconfig.node.json
-├── favicon_io/                  # Favicon and icon assets
-├── public/                      # Static assets (logo, favicon, robots.txt, etc.)
-├── docs/                        # Project documentation (e.g., databse.md)
-├── server/                      # Backend (Node.js/Express)
-│   ├── server.js                # Main server entry
-│   ├── package.json
-│   ├── Dockerfile
-│   ├── .dockerignore
-│   ├── config/                  # Configuration files (e.g., database.js)
-│   ├── controllers/             # Route controllers (AI, tools, prompts, etc.)
-│   ├── lib/                     # Supabase and other libraries
-│   ├── middleware/              # Express middleware (error handler, rate limiter)
-│   ├── models/                  # Database models (Tool, Tag, Review, etc.)
-│   ├── routes/                  # API routes (tools, prompts, likes, etc.)
-│   ├── scripts/                 # Database and utility scripts (migrations, seeds)
-│   └── test-*.js                # Test scripts
-├── src/                         # Frontend (React + TypeScript)
-│   ├── App.tsx
-│   ├── App.css
-│   ├── index.css
-│   ├── main.tsx
-│   ├── admin/                   # Admin dashboard and management pages
-│   ├── assets/                  # Images and static assets
-│   ├── components/              # Reusable UI components
-│   │   └── ui/                  # Shadcn/UI and custom UI primitives
-│   ├── context/                 # React context providers
-│   ├── data/                    # Static data (e.g., tools.ts)
-│   ├── hooks/                   # Custom React hooks
-│   ├── lib/                     # Utility libraries
-│   ├── pages/                   # Main app pages (Home, Tools, Prompts, etc.)
-│   ├── services/                # API and business logic services
-│   └── types/                   # TypeScript type definitions
-├── supabase/                    # Supabase database config
-│   └── migrations/              # SQL migration scripts
+├── src/                # Frontend (React, Vite, Shadcn/UI, Zustand)
+│   ├── admin/          # Admin dashboard & pages
+│   ├── app/            # App data & dashboard
+│   ├── components/     # UI & feature components
+│   ├── context/        # React contexts
+│   ├── data/           # Static data (tools, blogs, nav)
+│   ├── hooks/          # Custom React hooks
+│   ├── lib/            # Utilities
+│   ├── pages/          # Main pages (Home, Blog, Tools, etc.)
+│   ├── services/       # API & business logic
+│   ├── types/          # TypeScript types
+│   └── assets/         # Images & static assets
+├── server/             # Backend (Node.js, Express, Supabase, Prisma)
+│   ├── controllers/    # API controllers
+│   ├── lib/            # Supabase & helpers
+│   ├── middleware/     # Auth, error handling, rate limiting
+│   ├── models/         # ORM models
+│   ├── routes/         # Express routes
+│   ├── scripts/        # DB & migration scripts
+│   └── server.js       # Entry point
+├── supabase/           # DB migrations & SQL
+│   └── migrations/     # SQL migration files
+├── public/             # Static files (favicon, robots.txt, images)
+├── docs/               # Documentation
+├── Dockerfile.frontend # Frontend Docker config
+├── docker-compose.yml  # Multi-service Docker setup
+├── nginx.conf          # Nginx config (if used)
+├── package.json        # Project metadata & scripts
+└── README.md           # This file
 ```
-
-## 🛠️ Tech Stack
-
-- **Frontend:** React + Next.js 14, Tailwind CSS, Shadcn/ui, Zustand, React Query, Vite, Framer Motion
-- **Backend:** Node.js + Express, PostgreSQL, Redis, Prisma, JWT Auth, S3 file upload
-- **AI Services:** OpenAI, Cohere, Claude, Hugging Face, spaCy, Pinecone
-- **DevOps:** Render (backend), Netlify (frontend), GitHub Actions CI/CD, Sentry, Docker, Cloudflare
-
-## ⚡ Quick Start
-
-### Prerequisites
-- Node.js 18+
-- PostgreSQL 15+
-- Redis 7+
-- Docker & Docker Compose
-- pnpm (recommended) or npm
-
-### Local Development
-
-```bash
-# 1. Clone the repository
-$ git clone https://github.com/your-username/AITerritory.com.git
-$ cd AITerritory.com
-
-# 2. Install dependencies
-$ pnpm install
-
-# 3. Set up environment variables
-$ cp .env.example .env
-$ cp server/.env.example server/.env
-$ cp src/.env.example src/.env
-
-# 4. Start the development environment
-$ docker-compose up -d
-# Or run frontend and backend separately
-$ pnpm run dev:full
-
-# 5. Access the app
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-```
-
-## 🖼️ Example Screenshots
-
-> _Add your own screenshots here!_
-
-![Homepage Screenshot](docs/screenshots/homepage.png)
-![Admin Dashboard Screenshot](docs/screenshots/admin-dashboard.png)
-
-## 📡 Example API Usage
-
-**Get all tools:**
-```http
-GET https://aiterritory.org/api/tools
-```
-**Sample response:**
-```json
-[
-  {
-    "id": "tool_123",
-    "name": "AI Blog Writer",
-    "category": "Content Generation",
-    "description": "Generate SEO-optimized blog posts with AI.",
-    ...
-  },
-  ...
-]
-```
-
-**Create a new prompt:**
-```http
-POST https://aiterritory.org/api/prompts
-Content-Type: application/json
-{
-  "title": "Write a product review for...",
-  "category": "Reviews"
-}
-```
-
-## 🧪 Running Tests
-
-```bash
-# Run all tests
-$ pnpm test
-
-# Run frontend tests
-$ cd src && pnpm test
-
-# Run backend tests
-$ cd server && pnpm test
-```
-
-## 🙋 Requesting Support or Features
-
-- For **support**, open a [GitHub Issue](https://github.com/your-username/AITerritory.com/issues) or email [support@aiterritory.com](mailto:support@aiterritory.com)
-- For **feature requests**, use [GitHub Discussions](https://github.com/your-username/AITerritory.com/discussions) or the in-app feedback form
-
-## 🚀 Deployment
-
-- **Frontend:** Hosted on Netlify and connected to domain `aiterritory.org`
-- **Backend:** Deployed on Render with environment variables configured
-- **Custom Domain:** DNS records point to Netlify and Render IPs
-
-## 🔍 SEO & Meta
-
-- `robots.txt` and `sitemap.xml` implemented
-- Open Graph, Twitter Card, and canonical tags via `react-helmet-async`
-- OG image hosted on CDN and verified with Facebook, Twitter, LinkedIn inspectors
-
-## 🌐 Live URLs
-
-- **Website:** https://aiterritory.org
-- **Sitemap:** https://aiterritory.org/sitemap.xml
-- **Robots.txt:** https://aiterritory.org/robots.txt
-
-## 🛣️ Next Steps (Roadmap)
-
-- Launch on ProductHunt and Dev.to
-- Improve mobile UX and finalize React Native app
-- Add billing plans with Stripe
-- Expand AI tools (auto-meta, real-time SEO audit)
 
 ---
 
-## 🤝 Contributing
+## ⚙️ Tech Stack
 
-We welcome contributions from the community! To get started:
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+**Frontend:**
+- React, Vite, TypeScript
+- Next.js (planned)
+- Tailwind CSS, Shadcn/UI
+- Zustand (state), React Query (data)
+- Framer Motion (animations)
 
-For major changes, please open an issue first to discuss what you would like to change.
+**Backend:**
+- Node.js, Express
+- PostgreSQL, Prisma ORM
+- Redis (caching)
+- Supabase (auth, storage, DB)
+- JWT (auth), S3 (uploads)
+
+**AI/ML:**
+- OpenAI, Claude, HuggingFace
+- Pinecone (vector search)
+- spaCy (NLP)
+
+**Deployment:**
+- Netlify (Frontend)
+- Render (Backend)
+- GitHub Actions (CI/CD)
+
+---
+
+## 🔐 Environment Setup Instructions
+
+### Prerequisites
+- Node.js >= 18.x
+- pnpm or npm
+- PostgreSQL (local or cloud)
+- Supabase account (for auth/storage)
+- Redis (optional, for caching)
+- Docker (optional)
+
+### 1. Clone & Install
+```bash
+git clone https://github.com/your-org/aiterritory.org.git
+cd AITerritory.com
+pnpm install # or npm install
+```
+
+### 2. Environment Variables
+
+#### Frontend (`.env` in root or `src/`):
+```
+VITE_API_URL=http://localhost:5000
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+#### Backend (`server/.env`):
+```
+DATABASE_URL=postgresql://user:pass@localhost:5432/aiterritory
+SUPABASE_URL=your-supabase-url
+SUPABASE_SERVICE_KEY=your-supabase-service-key
+JWT_SECRET=your-jwt-secret
+REDIS_URL=redis://localhost:6379
+S3_BUCKET=your-s3-bucket
+S3_ACCESS_KEY=your-access-key
+S3_SECRET_KEY=your-secret-key
+```
+
+### 3. Development
+- **Frontend:**
+  ```bash
+  pnpm run dev
+  # or
+  cd src && pnpm run dev
+  ```
+- **Backend:**
+  ```bash
+  cd server
+  pnpm run dev
+  ```
+
+### 4. Production
+- **Frontend:**
+  ```bash
+  pnpm run build && pnpm run preview
+  ```
+- **Backend:**
+  ```bash
+  cd server
+  pnpm run start
+  ```
+
+### 5. Docker (Optional)
+```bash
+docker-compose up --build
+```
+
+---
+
+## 🧪 Testing Instructions
+
+- **Frontend:**
+  ```bash
+  pnpm run test
+  ```
+- **Backend:**
+  ```bash
+  cd server
+  pnpm run test
+  ```
+- **Database:**
+  ```bash
+  cd server/scripts
+  node testDatabase.js
+  ```
+
+---
+
+## 🧠 Smart Repurposing + SEO Copilot Instructions
+
+- **Smart Repurposing:**
+  1. Go to the [Dashboard](https://aiterritory.org/dashboard)
+  2. Select content (blog, prompt, etc.)
+  3. Click "Repurpose" and choose target format (e.g., LinkedIn, Twitter, Blog)
+  4. Edit and approve AI-generated output
+
+- **SEO Copilot:**
+  1. Open any blog or tool detail page
+  2. Use the "SEO Copilot" panel for meta tag suggestions, keyword ideas, and performance tips
+  3. Apply suggestions and re-check SEO score
+
+---
+
+## 🧰 API Example Usage
+
+- **GET /tools**
+  ```http
+  GET https://aiterritory.org/api/tools
+  ```
+- **POST /prompts**
+  ```http
+  POST https://aiterritory.org/api/prompts
+  Content-Type: application/json
+  {
+    "title": "Best LinkedIn Post",
+    "content": "Write a viral LinkedIn post about AI."
+  }
+  ```
+- **GET /categories**
+  ```http
+  GET https://aiterritory.org/api/categories
+  ```
+- **GET /blog**
+  ```http
+  GET https://aiterritory.org/api/blog
+  ```
+
+See [API Docs](docs/) for full details.
+
+---
+
+## 🎨 Screenshots
+
+> _Add screenshots to the `public/` folder and update links below as needed._
+
+| Homepage | Dashboard | Smart Repurposing | Blog Section |
+|---|---|---|---|
+| ![Homepage](public/screenshots/homepage.png) | ![Dashboard](public/screenshots/dashboard.png) | ![Repurposing](public/screenshots/repurposing.png) | ![Blog](public/screenshots/blog.png) |
+
+---
+
+## 🌍 SEO Integration
+
+- [Sitemap.xml](https://aiterritory.org/sitemap.xml)
+- [robots.txt](https://aiterritory.org/robots.txt)
+- Meta tags & OG images for all pages
+- Automated SEO audits (Lighthouse > 90)
+- Schema.org structured data
+
+---
+
+## 🔐 Security Notes
+
+- **CSP:** Strict Content Security Policy headers
+- **JWT:** Secure, short-lived tokens for API
+- **Rate Limiting:** Express middleware to prevent abuse
+- **Supabase:** Row-level security, access policies
+- **HTTPS:** Enforced in production
+
+---
+
+## 🌐 Deployment Setup
+
+- **Frontend:**
+  - Deployed via [Netlify](https://app.netlify.com/sites/aiterritory/deploys)
+  - Connect repo, set build command: `pnpm run build`, publish: `dist/`
+  - Configure custom domain, HTTPS, and environment variables
+- **Backend:**
+  - Deployed via [Render](https://dashboard.render.com/)
+  - Connect repo, set start command: `pnpm run start`
+  - Set environment variables, PostgreSQL, and Supabase configs
+- **CI/CD:**
+  - [GitHub Actions](https://github.com/your-org/aiterritory.org/actions) for tests, lint, and deploy
+
+---
+
+## 📥 Contribution Guide
+
+1. Fork the repo & create a feature branch
+2. Follow [Conventional Commits](https://www.conventionalcommits.org/)
+3. Add/Update tests for new features
+4. Run `pnpm run lint` and `pnpm run test`
+5. Submit a pull request with a clear description
+6. Join [GitHub Discussions](https://github.com/your-org/aiterritory.org/discussions) for ideas & feedback
+
+---
+
+## 🛣️ Roadmap
+
+- Stripe billing & subscriptions
+- React Native mobile app
+- AI-powered analytics dashboard
+- Multi-language support
+- More prompt templates & integrations
+- Community Q&A and forum
+
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- **Documentation**: [docs.aiterritory.com](https://docs.aiterritory.com)
-- **Issues**: [GitHub Issues](https://github.com/your-username/AITerritory.com/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/AITerritory.com/discussions)
-- **Email**: support@aiterritory.com
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-**Built with ❤️ by the AITerritory.org Team**
+## 📫 Support & Contact
+
+- Email: [support@aiterritory.com](mailto:support@aiterritory.com)
+- [GitHub Issues](https://github.com/your-org/aiterritory.org/issues)
+- [GitHub Discussions](https://github.com/your-org/aiterritory.org/discussions)
+- [Docs](docs/)

@@ -42,6 +42,7 @@ import {
   SignInButton,
   SignUpButton,
   UserButton,
+  SignIn,
 } from "@clerk/clerk-react";
 import AdminDashboard from './admin/AdminDashboard';
 import BusinessFunctionsAdmin from './admin/BusinessFunctionsAdmin';
