@@ -229,92 +229,42 @@ textarea:focus-visible {
 
 /* Add standard line-clamp property for compatibility */
 
-/* Slide hover animation for buttons */
-.slide-hover {
-  position: relative;
-  overflow: hidden;
-}
-.slide-hover::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 0%;
-  background: rgba(0,0,0,0.08);
-  transition: height 0.3s cubic-bezier(0.4,0,0.2,1), top 0.3s cubic-bezier(0.4,0,0.2,1);
-  z-index: 0;
-}
-.slide-hover:hover::after,
-.slide-hover:focus-visible::after {
-  height: 100%;
+/* Enhanced hover effects for interactive elements */
+.hover-lift {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
 
-/* On mobile, slide from top instead of bottom */
-@media (max-width: 768px) {
-  .slide-hover::after {
-    top: 0;
-    bottom: auto;
-    height: 0%;
-  }
-  .slide-hover:hover::after,
-  .slide-hover:focus-visible::after {
-    height: 100%;
-  }
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* Mobile navbar link improvements */
+/* Smooth focus transitions */
+.focus-ring {
+  transition: box-shadow 0.2s ease-out;
+}
+
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Mobile-specific improvements */
 @media (max-width: 768px) {
-  .mobile-nav-link {
-    position: relative;
-    overflow: hidden;
-  }
-  .mobile-nav-link::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 0%;
-    background: rgba(59,130,246,0.1);
-    transition: height 0.2s cubic-bezier(0.4,0,0.2,1);
-    z-index: 0;
-  }
-  .mobile-nav-link:hover,
-  .mobile-nav-link:focus {
-    background: none !important;
-    color: inherit !important;
-  }
-  .mobile-nav-link:active::after {
-    height: 100%;
-  }
-  .mobile-nav-link:active {
-    color: #2563eb !important;
-    transition: color 0.2s;
+  /* Prevent horizontal scroll on mobile */
+  body {
+    overflow-x: hidden;
   }
   
-  /* Drawer animation from top - Override Vaul completely */
-  .drawer-from-top,
-  [data-vaul-drawer] {
-    transform: translateY(-100%) !important;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    bottom: auto !important;
-    top: 0 !important;
+  /* Improve touch targets */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
   }
   
-  .drawer-from-top[data-state="open"],
-  [data-vaul-drawer][data-state="open"] {
-    transform: translateY(0) !important;
-  }
-  
-  /* Disable Vaul's default bottom animation */
-  [data-vaul-drawer][data-vaul-drawer-direction="bottom"] {
-    transform: translateY(-100%) !important;
-    bottom: auto !important;
-    top: 0 !important;
-  }
-  
-  [data-vaul-drawer][data-vaul-drawer-direction="bottom"][data-state="open"] {
-    transform: translateY(0) !important;
+  /* Better text rendering on mobile */
+  * {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
   }
 }

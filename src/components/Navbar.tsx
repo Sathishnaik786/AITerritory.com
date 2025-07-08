@@ -13,92 +13,77 @@ import {
   NavigationMenuIndicator,
   NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
-import { CircleCheckIcon, CircleHelpIcon, CircleIcon, Sparkles } from "lucide-react";
-import { Hamburger } from './ui/hamburger';
-import { MobileMenu } from './ui/mobile-menu';
-import { navigationMenuTriggerStyle } from './ui/navigation-menu.constants';
-
-const navLinks = [
-  { label: "AI Tools", to: "/resources/all-resources" },
-  { label: "AI for Business", to: "/ai-for-business" },
-  { label: "Blog", to: "/blog" },
-  { label: "Newsletter", to: "/newsletter" },
-  { label: "Prompts", to: "/prompts" },
-];
+import { Sparkles } from "lucide-react";
+import MobileMenu from "./MobileMenu";
+import { navLinks } from "../data/navLinks";
 
 export function Navbar() {
   const { resolvedTheme } = useTheme();
   const { user } = useUser();
   const location = useLocation();
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   return (
-    <nav className="w-full z-50 px-0 py-2 bg-background/80 backdrop-blur-md border-b border-border sticky top-0 overflow-visible">
-      <div className="container mx-auto flex items-center justify-between gap-4 px-3 sm:px-4 lg:px-6 xl:px-8">
-          {/* Logo */}
-            <Link 
-              to="/" 
-              className="flex items-center gap-2 flex-shrink-0 navbar-link group"
-            >
-              <div className="relative flex items-center gap-2">
-                <img 
-                  src="/logo.jpg" 
-                  alt="AI Territory Logo"
-                  className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900 transition-all duration-200 group-hover:ring-blue-300 dark:group-hover:ring-blue-600"
-                  loading="lazy"
-                />
-                <span className="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent transition-all duration-200 group-hover:from-blue-700 group-hover:to-purple-700">
-                  AI Territory
-                </span>
-                <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-0.5 transition-all duration-200 group-hover:from-blue-600 group-hover:to-purple-600 group-hover:scale-110">
-                  <Sparkles className="w-3 h-3 text-white" />
-                </div>
-              </div>
-            </Link>
+    <nav className="w-full z-50 px-0 py-3 bg-background/95 backdrop-blur-xl border-b border-border/50 sticky top-0 shadow-sm">
+      <div className="container mx-auto flex items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+        {/* Logo */}
+        <Link 
+          to="/" 
+          className="flex items-center gap-3 flex-shrink-0"
+        >
+          <div className="relative flex items-center gap-3">
+            <img 
+              src="/logo.jpg" 
+              alt="AI Territory Logo"
+              className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl object-cover ring-2 ring-blue-200 dark:ring-blue-800 shadow-sm"
+              loading="lazy"
+            />
+            <span className="font-bold text-xl sm:text-2xl tracking-tight bg-gradient-to-r from-blue-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
+              AI Territory
+            </span>
+            <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full p-1 shadow-sm">
+              <Sparkles className="w-3 h-3 text-white" />
+            </div>
+          </div>
+        </Link>
 
         {/* Desktop Navigation Menu */}
         <div className="flex-1 justify-center hidden lg:flex">
           <NavigationMenu>
-            <NavigationMenuList className="gap-1">
+            <NavigationMenuList className="gap-2">
               {/* Main nav links */}
               {navLinks.map((item) => (
-                <NavigationMenuItem key={item.to}>
-                  <NavigationMenuLink asChild>
-                    <Link 
-                      to={item.to}
-                      className={`navbar-link px-3 py-2 text-xs font-medium rounded-md hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20 whitespace-nowrap ${
-                        location.pathname === item.to 
-                          ? "text-blue-500 bg-blue-50 dark:bg-blue-950/20" 
-                          : "text-foreground"
-                      }`}
-                    >
+                item.dropdown ? (
+                  <NavigationMenuItem key={item.label}>
+                    <NavigationMenuTrigger className="px-5 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap text-foreground/80 hover:text-foreground hover:bg-muted/50 data-[state=open]:text-blue-700 dark:data-[state=open]:text-blue-300 data-[state=open]:bg-blue-50 dark:data-[state=open]:bg-blue-950/40 transition-all duration-200">
                       {item.label}
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid gap-3 w-[320px] p-6 rounded-2xl shadow-xl bg-background/95 backdrop-blur-xl border border-border/50">
+                        {item.children?.map((child) => (
+                          <ListItem key={child.to} to={child.to} title={child.label}>
+                            {/* Optionally add description here */}
+                          </ListItem>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                ) : (
+                  <NavigationMenuItem key={item.to}>
+                    <NavigationMenuLink asChild>
+                      <Link 
+                        to={item.to}
+                        className={`px-5 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all duration-200 ${
+                          location.pathname === item.to 
+                            ? "text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 shadow-sm" 
+                            : "text-foreground/80 hover:text-foreground hover:bg-muted/50"
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                )
               ))}
-              {/* Dropdown: Resources */}
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="navbar-link px-3 py-2 text-xs font-medium rounded-md hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/20 data-[state=open]:text-blue-500 data-[state=open]:bg-blue-50 dark:data-[state=open]:bg-blue-950/20 whitespace-nowrap">
-                  Resources
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid gap-2 w-[280px] p-4 rounded-lg shadow-lg bg-background border">
-                    <ListItem to="/resources/ai-agents" title="AI Agents">
-                      Expert AI agents to supercharge your productivity.
-                    </ListItem>
-                    <ListItem to="/resources/ai-tutorials" title="AI Tutorials">
-                      Master AI with our comprehensive tutorials and guides.
-                    </ListItem>
-                    <ListItem to="/resources/ai-automation" title="AI Automation">
-                      Revolutionize workflows with intelligent automation.
-                    </ListItem>
-                    <ListItem to="/resources/ai-innovation" title="AI Innovation">
-                      Discover cutting-edge AI breakthroughs and innovations.
-                    </ListItem>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
             </NavigationMenuList>
             <NavigationMenuIndicator />
             <NavigationMenuViewport />
@@ -106,35 +91,28 @@ export function Navbar() {
         </div>
 
         {/* Desktop Right side: Theme, Auth/User */}
-        <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
+        <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
           <ThemeToggle small />
-            <SignedOut>
+          <SignedOut>
             <SignUpButton mode="modal">
-              <button className="navbar-link text-xs font-medium px-3 py-2 rounded-md border border-border bg-background text-foreground hover:bg-accent hover:border-border/50 shadow-sm hover:shadow-md whitespace-nowrap">
+              <button className="px-5 py-2.5 text-sm font-medium rounded-xl border border-border bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap">
                 Sign Up
               </button>
             </SignUpButton>
             <SignInButton mode="modal">
-              <button className="navbar-link text-xs font-medium px-3 py-2 rounded-md border border-border bg-background text-foreground hover:bg-accent hover:border-border/50 shadow-sm hover:shadow-md whitespace-nowrap">
+              <button className="px-5 py-2.5 text-sm font-medium rounded-xl border border-border bg-background text-foreground shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap">
                 Login
               </button>
             </SignInButton>
-            </SignedOut>
-            <SignedIn>
+          </SignedOut>
+          <SignedIn>
             <UserButton afterSignOutUrl="/" />
-            </SignedIn>
+          </SignedIn>
         </div>
 
-        {/* Mobile Hamburger Menu */}
+        {/* Mobile Menu: Only show on mobile */}
         <div className="flex lg:hidden items-center">
-          <Hamburger 
-            isOpen={drawerOpen}
-            onToggle={() => setDrawerOpen(!drawerOpen)}
-          />
-          <MobileMenu 
-            isOpen={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-          />
+          <MobileMenu />
         </div>
       </div>
     </nav>
@@ -147,10 +125,10 @@ function ListItem({ title, children, to, ...props }: React.ComponentPropsWithout
       <NavigationMenuLink asChild>
         <Link 
           to={to} 
-          className="navbar-link block rounded-md px-3 py-2 hover:bg-accent focus:bg-accent"
+          className="block rounded-xl px-4 py-3 hover:bg-muted/50 transition-all duration-200"
         >
-          <div className="text-sm leading-none font-medium">{title}</div>
-          <p className="text-muted-foreground line-clamp-2 text-xs leading-snug">{children}</p>
+          <div className="text-sm leading-none font-semibold mb-2">{title}</div>
+          <p className="text-muted-foreground line-clamp-2 text-xs leading-relaxed">{children}</p>
         </Link>
       </NavigationMenuLink>
     </li>

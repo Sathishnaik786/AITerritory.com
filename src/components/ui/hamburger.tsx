@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface HamburgerProps {
@@ -10,114 +9,49 @@ interface HamburgerProps {
 
 export function Hamburger({ isOpen, onToggle, className }: HamburgerProps) {
   return (
-    <motion.button
+    <button
       onClick={onToggle}
       className={cn(
-        'relative w-14 h-14 flex items-center justify-center rounded-2xl bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-slate-700/50 shadow-2xl hover:shadow-slate-500/20 transition-all duration-700 focus:outline-none focus:ring-2 focus:ring-slate-400/50 overflow-hidden group',
-        isOpen && 'shadow-slate-400/30 bg-gradient-to-br from-slate-800/95 to-slate-700/95',
+        'w-10 h-10 flex items-center justify-center rounded-lg bg-background border border-border focus:outline-none focus:ring-2 focus:ring-blue-500/50',
         className
       )}
-      whileHover={{ 
-        scale: 1.05,
-        transition: { duration: 0.2, ease: "easeOut" }
-      }}
-      whileTap={{ 
-        scale: 0.95,
-        transition: { duration: 0.1 }
-      }}
       aria-label={isOpen ? 'Close menu' : 'Open menu'}
       aria-expanded={isOpen}
     >
-      {/* Animated background glow */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-2xl"
-        animate={{
-          opacity: isOpen ? 1 : 0,
-          scale: isOpen ? 1.2 : 0.8,
-          rotate: isOpen ? 180 : 0,
-        }}
-        transition={{ duration: 0.6, ease: "easeInOut" }}
-      />
-      
-      <div className="relative w-7 h-7">
-        {/* Top bar - morphs into arc */}
-        <motion.div
-          className="absolute top-0 left-0 w-7 h-0.5 bg-white rounded-full origin-center"
-          animate={{
-            rotate: isOpen ? 45 : 0,
-            y: isOpen ? 10 : 0,
-            width: isOpen ? 7 : 7,
-            borderRadius: isOpen ? "50%" : "9999px",
-            height: isOpen ? 0.5 : 0.5,
-          }}
-          transition={{ 
-            duration: 0.6, 
-            ease: [0.4, 0, 0.2, 1],
-            rotate: { delay: isOpen ? 0.1 : 0, duration: 0.5 },
-            y: { delay: isOpen ? 0.1 : 0, duration: 0.5 }
-          }}
-        />
-        
-        {/* Middle bar - morphs into circle */}
-        <motion.div
-          className="absolute top-3 left-0 w-7 h-0.5 bg-white rounded-full origin-center"
-          animate={{
-            opacity: isOpen ? 0 : 1,
-            scale: isOpen ? 0 : 1,
-            rotate: isOpen ? 90 : 0,
-            borderRadius: isOpen ? "50%" : "9999px",
-            width: isOpen ? 0 : 7,
-            height: isOpen ? 0 : 0.5,
-          }}
-          transition={{ 
-            duration: 0.4, 
-            ease: "easeInOut",
-            opacity: { delay: isOpen ? 0 : 0.3 }
-          }}
-        />
-        
-        {/* Bottom bar - morphs into arc */}
-        <motion.div
-          className="absolute top-6 left-0 w-7 h-0.5 bg-white rounded-full origin-center"
-          animate={{
-            rotate: isOpen ? -45 : 0,
-            y: isOpen ? -10 : 0,
-            width: isOpen ? 7 : 7,
-            borderRadius: isOpen ? "50%" : "9999px",
-            height: isOpen ? 0.5 : 0.5,
-          }}
-          transition={{ 
-            duration: 0.6, 
-            ease: [0.4, 0, 0.2, 1],
-            rotate: { delay: isOpen ? 0.1 : 0, duration: 0.5 },
-            y: { delay: isOpen ? 0.1 : 0, duration: 0.5 }
-          }}
-        />
+      <div className="relative w-5 h-5">
+        {/* Circle with dots design */}
+        <div className="relative w-5 h-5">
+          {/* Main circle */}
+          <div className={cn(
+            "absolute inset-0 rounded-full border-2 border-foreground transition-all duration-300",
+            isOpen && "rotate-90 scale-75 opacity-50"
+          )} />
+          
+          {/* Dots */}
+          <div className={cn(
+            "absolute top-1 left-1 w-1 h-1 bg-foreground rounded-full transition-all duration-300",
+            isOpen && "top-2 left-2 w-0.5 h-0.5"
+          )} />
+          <div className={cn(
+            "absolute top-1 right-1 w-1 h-1 bg-foreground rounded-full transition-all duration-300",
+            isOpen && "top-2 right-2 w-0.5 h-0.5"
+          )} />
+          <div className={cn(
+            "absolute bottom-1 left-1 w-1 h-1 bg-foreground rounded-full transition-all duration-300",
+            isOpen && "bottom-2 left-2 w-0.5 h-0.5"
+          )} />
+          <div className={cn(
+            "absolute bottom-1 right-1 w-1 h-1 bg-foreground rounded-full transition-all duration-300",
+            isOpen && "bottom-2 right-2 w-0.5 h-0.5"
+          )} />
+          
+          {/* Center dot */}
+          <div className={cn(
+            "absolute top-1/2 left-1/2 w-1 h-1 bg-foreground rounded-full transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300",
+            isOpen && "w-0.5 h-0.5"
+          )} />
+        </div>
       </div>
-      
-      {/* Ripple effect when open */}
-      <motion.div
-        className="absolute inset-0 rounded-2xl border-2 border-white/20"
-        animate={{
-          scale: isOpen ? [1, 1.3, 1] : 1,
-          opacity: isOpen ? [0.3, 0, 0.3] : 0,
-        }}
-        transition={{
-          duration: 1.5,
-          repeat: isOpen ? Infinity : 0,
-          ease: "easeInOut"
-        }}
-      />
-      
-      {/* Inner glow when open */}
-      <motion.div
-        className="absolute inset-2 rounded-xl bg-gradient-to-br from-white/10 to-transparent"
-        animate={{
-          opacity: isOpen ? 1 : 0,
-          scale: isOpen ? 1 : 0.8,
-        }}
-        transition={{ duration: 0.5, ease: "easeInOut" }}
-      />
-    </motion.button>
+    </button>
   );
 } 
