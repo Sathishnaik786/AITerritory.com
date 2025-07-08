@@ -1,5 +1,12 @@
+const express = require('express');
+const router = express.Router();
+
 const feedbackRouter = require('./feedback');
+const blogRouter = require('./blog');
 const reviewsController = require('../controllers/reviewsController');
 
 router.use('/api/feedback', feedbackRouter);
-router.get('/reviews', reviewsController.getReviewsByUser); 
+router.use('/api/blogs', blogRouter);
+router.get('/reviews', reviewsController.getReviewsByUser);
+
+module.exports = router; 

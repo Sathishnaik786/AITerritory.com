@@ -1,17 +1,15 @@
 export interface BlogPost {
   id: string;
   title: string;
-  summary: string;
-  content: string;
-  bannerImage: string;
-  author: string;
-  date: string;
-  readTime: number; // in minutes
-  category: string;
-  tags: string[];
   slug: string;
+  description: string;
+  cover_image_url: string;
+  content: string;
+  author_name: string;
+  tags: string[];
+  created_at: string;
+  category?: string;
   featured?: boolean;
-  published: boolean;
 }
 
 export interface BlogCategory {

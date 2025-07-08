@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { useTheme } from 'next-themes';
+import { Suspense, lazy } from 'react';
+import { FAQ } from '../components/FAQ';
 
 // --- CATEGORY DATA ---
 const categories = [
@@ -111,6 +113,8 @@ const CategoryBar: React.FC = () => {
 const canonicalUrl = 'https://aiterritory.org';
 
 const seoDescription = "AITerritory.org is your gateway to real-time AI tools for content creation, SEO, text-to-video, and productivity. Get curated AI tools based on your work, role, and needs. Discover, compare, and master the latest AI tools to boost your efficiency, creativity, and results. Whether you're a marketer, creator, developer, or entrepreneur, AI Territory helps you find the perfect tool for every task.";
+
+const Testimonials = lazy(() => import('../components/Testimonials'));
 
 // --- MAIN LANDINGPRO PAGE ---
 const LandingPro: React.FC = () => {
@@ -303,6 +307,12 @@ const LandingPro: React.FC = () => {
             </section>
           </main>
         )}
+        <Suspense fallback={null}>
+          <Testimonials />
+        </Suspense>
+        <div className="w-full overflow-hidden">
+          <FAQ />
+        </div>
       </div>
     </>
   );

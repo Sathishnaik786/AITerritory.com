@@ -144,6 +144,11 @@ app.use('/api/reviews', reviewsRoutes);
 app.use('/api/ai-learning-path-courses', aiLearningPathCoursesRoutes);
 app.use('/api/ai-agent-learning-resources', aiAgentLearningResourcesRoutes);
 
+// Import the main router for all grouped API routes
+const mainRouter = require('./routes/index');
+// Register the main router (this will add /api/blogs and others from routes/index.js)
+app.use(mainRouter);
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ 

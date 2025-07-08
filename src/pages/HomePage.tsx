@@ -1,17 +1,59 @@
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState, Suspense, lazy, Dispatch, SetStateAction, useEffect } from 'react';
 import { useTools, useFeaturedTools, useTrendingTools } from '../hooks/useTools';
+import { useCategories } from '../hooks/useCategories';
 import { CategoryFilter } from '../components/CategoryFilter';
 import { PaginatedToolGrid } from '../components/PaginatedToolGrid';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card';
-import { TrendingUp, Star, Filter, X } from 'lucide-react';
+import { TrendingUp, Star, Filter, X, Home, Newspaper, LogIn, ChevronDown, Layers, CreditCard, Users, Search, Wrench } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SearchBar from '../components/SearchBar';
 import { FAQ } from '../components/FAQ';
 import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { ScrollArea } from '../components/ui/scroll-area';
+import { Separator } from '../components/ui/separator';
+import ThemeToggle from '../components/ThemeToggle';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { Category } from '../types/category';
+import { useNavigate } from 'react-router-dom';
 
 const Testimonials = lazy(() => import('../components/Testimonials'));
 
 const ToolCarousel = React.lazy(() => import('../components/ToolCarousel'));
+
+// Sidebar navigation items
+const sidebarNav = [
+  { label: 'Home', icon: Home, to: '/' },
+  { label: 'Today Launched', icon: Wrench, to: '/tools?launched=today', badge: 3 },
+  { label: 'News Today', icon: Newspaper, to: '/blog', badge: 14 },
+];
+
+// Sidebar sort/filter buttons
+const sortOptions = [
+  { label: 'Sort By', icon: ChevronDown },
+  { label: 'Pricing', icon: CreditCard },
+  { label: 'Tech Used', icon: Layers },
+];
+
+// Example category icon mapping (expand as needed)
+const categoryIcons: Record<string, React.ReactNode> = {
+  '3d': <Users className="w-4 h-4 text-pink-400" />, // Replace with relevant icons
+  'academics': <Users className="w-4 h-4 text-purple-400" />,
+  'advertising': <Users className="w-4 h-4 text-red-400" />,
+  'affiliate marketing': <Users className="w-4 h-4 text-orange-400" />,
+  'agent': <Users className="w-4 h-4 text-blue-400" />,
+  'aggregator': <Users className="w-4 h-4 text-green-400" />,
+  'analytics': <Users className="w-4 h-4 text-cyan-400" />,
+  'animation': <Users className="w-4 h-4 text-yellow-400" />,
+  'anime': <Users className="w-4 h-4 text-pink-500" />,
+  'answers': <Users className="w-4 h-4 text-yellow-500" />,
+  'api': <Users className="w-4 h-4 text-gray-400" />,
+};
+
+// Extend Category type locally to include tool_count
+interface CategoryWithCount extends Category {
+  tool_count?: number;
+}
 
 export const HomePage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
@@ -23,6 +65,17 @@ export const HomePage: React.FC = () => {
   });
   const { data: featuredTools, isLoading: featuredLoading } = useFeaturedTools();
   const { data: trendingTools, isLoading: trendingLoading } = useTrendingTools();
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isSidebarOpen) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+    return () => document.body.classList.remove('overflow-hidden');
+  }, [isSidebarOpen]);
 
   const handleCategoryChange = (categoryId: string | undefined) => {
     setSelectedCategory(categoryId);
@@ -47,6 +100,7 @@ export const HomePage: React.FC = () => {
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
             Explore our curated collection of cutting-edge AI tools that transform how you work, create, and innovate.
           </p>
+          <TodayButtons />
           <div className="max-w-2xl mx-auto mb-8">
             <SearchBar
               value={searchQuery}
@@ -160,49 +214,53 @@ export const HomePage: React.FC = () => {
             <AnimatePresence>
               {isSidebarOpen && (
                 <motion.aside
-                  className="fixed left-0 top-0 h-full w-80 max-w-[85vw] bg-background border-r border-border z-50 lg:hidden shadow-2xl"
+                  className="fixed left-0 top-0 h-full w-full max-w-[95vw] z-50 lg:hidden p-4 flex flex-col"
                   initial={{ x: '-100%' }}
                   animate={{ x: 0 }}
                   exit={{ x: '-100%' }}
                   transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                 >
-                  <div className="flex items-center justify-between p-4 border-b border-border">
-                    <h2 className="font-bold text-lg">Filters</h2>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsSidebarOpen(false)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="p-4 overflow-y-auto h-full">
-                    <CategoryFilter
-                      selectedCategory={selectedCategory}
-                      onCategoryChange={handleCategoryChange}
-                      showCounts={true}
-                    />
-                  </div>
+                  <SidebarContent
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    selectedCategory={selectedCategory}
+                    handleCategoryChange={handleCategoryChange}
+                    categories={categories}
+                    categoriesLoading={categoriesLoading}
+                    mobile
+                  />
                 </motion.aside>
               )}
             </AnimatePresence>
 
             {/* Sidebar - Desktop */}
-            <aside className="hidden lg:block w-[300px] flex-shrink-0">
-              <div className="bg-muted/50 rounded-xl p-6 sticky top-4">
-                <h2 className="font-bold text-lg mb-6">Filters</h2>
-                <CategoryFilter
-                  selectedCategory={selectedCategory}
-                  onCategoryChange={handleCategoryChange}
-                  showCounts={true}
-                />
-              </div>
-            </aside>
+            <motion.aside
+              className="hidden lg:block w-[320px] flex-shrink-0"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            >
+              <SidebarContent
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                selectedCategory={selectedCategory}
+                handleCategoryChange={handleCategoryChange}
+                categories={categories}
+                categoriesLoading={categoriesLoading}
+              />
+            </motion.aside>
 
             {/* Main Content */}
             <main className="flex-1 min-w-0">
               <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-bold">All Tools</h1>
+                <h1 className="text-2xl font-bold flex items-center gap-2">
+                  {selectedCategory
+                    ? (() => {
+                        const cat = (categories || []).find((c: CategoryWithCount) => c.id === selectedCategory);
+                        return cat ? <><span>{categoryIcons[cat.name.toLowerCase()] || <Users className="w-5 h-5 text-muted-foreground" />}</span>{cat.name}</> : 'Category';
+                      })()
+                    : 'All Tools'}
+                </h1>
                 <span className="text-muted-foreground text-base">{tools?.length || 0} tools found</span>
               </div>
               <PaginatedToolGrid
@@ -217,19 +275,121 @@ export const HomePage: React.FC = () => {
             </main>
           </div>
         </div>
-
-        {/* Testimonials Section */}
-        <div className="w-full overflow-hidden">
-          <Suspense fallback={null}>
-            <Testimonials />
-          </Suspense>
-        </div>
-
-        {/* FAQ Section */}
-        <div className="w-full overflow-hidden">
-          <FAQ />
-        </div>
       </div>
     </div>
   );
 };
+
+function SidebarContent({ searchQuery, setSearchQuery, selectedCategory, handleCategoryChange, categories, categoriesLoading, mobile = false }: {
+  searchQuery: string;
+  setSearchQuery: Dispatch<SetStateAction<string>>;
+  selectedCategory: string | undefined;
+  handleCategoryChange: (categoryId: string | undefined) => void;
+  categories: CategoryWithCount[] | undefined;
+  categoriesLoading: boolean;
+  mobile?: boolean;
+}) {
+  return (
+    <Card className={`bg-muted/60 rounded-xl p-4 sm:p-6 h-full flex flex-col shadow-xl border border-border/60 w-full ${mobile ? 'overflow-y-auto h-full' : 'max-w-xs sm:max-w-none mx-auto sm:mx-0 overflow-hidden'}`}>
+      {/* Top nav */}
+      <nav className="mb-4">
+        {sidebarNav.map((item, idx) => (
+          <a
+            key={item.label}
+            href={item.to}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-base font-medium hover:bg-accent transition-colors mb-1 group w-full min-h-[44px]"
+          >
+            <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+            <span>{item.label}</span>
+            {item.badge && (
+              <Badge className="ml-2 bg-green-500 text-white font-bold px-2 py-0.5 text-xs">{item.badge}</Badge>
+            )}
+          </a>
+        ))}
+        <div className="flex items-center gap-3 px-3 py-2 mt-2">
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="flex items-center gap-2 text-base font-medium text-foreground hover:bg-accent px-2 py-1 rounded-lg transition-colors">
+                <LogIn className="w-5 h-5 text-yellow-500" /> Sign In
+              </button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+        </div>
+      </nav>
+      {/* Search */}
+      <div className="mb-4">
+        <SearchBar
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder="Search Tool with AI"
+          className="w-full"
+        />
+      </div>
+      {/* Sort/Filter Buttons */}
+      <div className="flex flex-col gap-2 mb-4">
+        {sortOptions.map(opt => (
+          <Button key={opt.label} variant="outline" className="w-full justify-start gap-2">
+            <opt.icon className="w-4 h-4" /> {opt.label}
+          </Button>
+        ))}
+      </div>
+      {/* Category List */}
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-sm font-semibold text-muted-foreground">Category</span>
+        <span className="text-xs text-muted-foreground flex items-center gap-1"><Users className="w-4 h-4" /> </span>
+      </div>
+      <Separator className="mb-2" />
+      <ScrollArea className={`flex-1 min-h-0 ${mobile ? 'h-full max-h-full' : 'max-h-[40vh] sm:max-h-[calc(100vh-2rem)]'} pr-2 overflow-y-auto`}>
+        {categoriesLoading ? (
+          <div className="space-y-2">
+            {[...Array(10)].map((_, i) => (
+              <div key={i} className="h-8 bg-muted rounded animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <ul className="space-y-1">
+            {categories?.map((cat: CategoryWithCount) => (
+              <li key={cat.id}>
+                <button
+                  className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-accent ${selectedCategory === cat.id ? 'bg-accent text-primary' : 'text-foreground'}`}
+                  onClick={() => handleCategoryChange(cat.id)}
+                >
+                  <span>{categoryIcons[cat.name.toLowerCase()] || <Users className="w-4 h-4 text-muted-foreground" />}</span>
+                  <span className="flex-1 text-left truncate">{cat.name}</span>
+                  <Badge variant="secondary" className="ml-auto flex-shrink-0">{cat.tool_count || 0}</Badge>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </ScrollArea>
+    </Card>
+  );
+}
+
+function TodayButtons() {
+  const navigate = useNavigate();
+  return (
+    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 w-full max-w-2xl mx-auto">
+      <button
+        className="relative flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto px-4 sm:px-8 py-3 rounded-2xl font-semibold text-white text-base sm:text-lg bg-gradient-to-r from-purple-600 to-blue-500 shadow-lg hover:scale-105 transition-all"
+        onClick={() => navigate('/tools?launched=today')}
+      >
+        <Wrench className="w-5 h-5 sm:w-6 sm:h-6" />
+        Launched Today
+        <span className="absolute -top-2 -right-2 sm:-top-2 sm:-right-2 bg-orange-500 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow-md">3</span>
+      </button>
+      <button
+        className="relative flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto px-4 sm:px-8 py-3 rounded-2xl font-semibold text-white text-base sm:text-lg bg-gradient-to-r from-pink-500 to-purple-500 shadow-lg hover:scale-105 transition-all"
+        onClick={() => navigate('/blog')}
+      >
+        <Newspaper className="w-5 h-5 sm:w-6 sm:h-6" />
+        News Today
+        <span className="absolute -top-2 -right-2 sm:-top-2 sm:-right-2 bg-green-600 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow-md">14</span>
+      </button>
+    </div>
+  );
+}
