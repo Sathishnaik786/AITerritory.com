@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { BlogCard } from '../components/BlogCard';
 import { BlogService } from '../services/blogService';
 import { BlogPost } from '../types/blog';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const CATEGORIES = [
   'All',
@@ -42,9 +44,30 @@ const Blog: React.FC = () => {
   const rest = blogs.filter(post => !post.featured);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
+      {/* Hero Section */}
+      <section className="w-full py-12 md:py-16 bg-gradient-to-b from-blue-100/60 to-transparent dark:from-gray-900/60 dark:to-gray-900">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <motion.h1
+            className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 dark:text-white tracking-tight"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            AI Territory Blog
+          </motion.h1>
+          <motion.p
+            className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+          >
+            Discover the latest in AI, productivity, and innovation. Curated insights, guides, and tools for the modern creator.
+          </motion.p>
+        </div>
+      </section>
       {/* Category Filter */}
-      <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">
+      <div className="max-w-6xl mx-auto px-4 pt-2 pb-6">
         <div className="flex flex-nowrap gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
           {CATEGORIES.map((cat) => (
             <button
@@ -57,28 +80,56 @@ const Blog: React.FC = () => {
           ))}
         </div>
       </div>
-      {/* Hero Section */}
+      {/* Featured Blog Card */}
       {featured && (
-        <section className="w-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-gray-800 dark:to-gray-900 py-10 mb-8">
-          <div className="max-w-4xl mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
-            <img src={featured.cover_image_url} alt={featured.title} className="w-full md:w-1/2 rounded-lg shadow-lg object-cover max-h-72" />
-            <div className="flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">{featured.title}</h1>
+        <motion.section
+          className="w-full max-w-5xl mx-auto px-4 mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="flex flex-col md:flex-row items-center gap-8 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl p-6 md:p-10 backdrop-blur-md border border-gray-200 dark:border-gray-800">
+            <img src={featured.cover_image_url} alt={featured.title} className="w-full md:w-1/2 rounded-xl shadow-lg object-cover max-h-80 mb-4 md:mb-0" />
+            <div className="flex-1 flex flex-col items-start">
+              <div className="mb-2 flex flex-wrap gap-2">
+                {Array.isArray(featured.tags) && featured.tags.map(tag => (
+                  <span key={tag} className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">{tag}</span>
+                ))}
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-3 text-gray-900 dark:text-white line-clamp-2">{featured.title}</h2>
               <p className="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3">{featured.description}</p>
-              <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">By {featured.author_name} | {new Date(featured.created_at).toLocaleDateString()}</div>
-              <a href={`/blog/${featured.slug}`} className="inline-block px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Read More</a>
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
+                <span className="font-semibold">{featured.author_name}</span>
+                <span>•</span>
+                <span>{new Date(featured.created_at).toLocaleDateString()}</span>
+              </div>
+              <Link to={`/blog/${featured.slug}`} className="inline-block px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition shadow-md mt-2">Read More</Link>
             </div>
           </div>
-        </section>
+        </motion.section>
       )}
       {/* Blog Grid */}
       <section className="py-4">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.08 } }
+            }}
+          >
             {rest.map((post) => (
-              <BlogCard key={post.id} post={post} />
+              <motion.div
+                key={post.id}
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                transition={{ duration: 0.5 }}
+              >
+                <BlogCard post={post} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>
