@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,6 +38,14 @@ const AdminDashboard: React.FC = () => {
     queryKey: ['blogs'],
     queryFn: BlogService.getAll,
   });
+
+  const [newsletterCount, setNewsletterCount] = useState<number | null>(null);
+  useEffect(() => {
+    fetch('/api/newsletter/subscribers')
+      .then(res => res.json())
+      .then(data => setNewsletterCount(data.subscribers?.length || 0))
+      .catch(() => setNewsletterCount(0));
+  }, []);
 
   const StatCard = ({ title, value, isLoading, icon: Icon, link, subtext }) => (
     <Link to={link}>
@@ -153,6 +161,20 @@ const AdminDashboard: React.FC = () => {
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
                <CardContent><p className="text-sm text-muted-foreground">Manage tutorials</p></CardContent>
+            </Card>
+          </Link>
+        </div>
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">Newsletter Subscribers</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <Link to="/admin/newsletter-subscribers">
+            <Card className="hover:shadow-lg transition cursor-pointer">
+              <CardContent className="flex flex-col items-center py-6">
+                <CardTitle className="text-lg font-semibold mb-2">Newsletter Subscribers</CardTitle>
+                <div className="text-3xl font-bold text-blue-600">{newsletterCount !== null ? newsletterCount : '—'}</div>
+              </CardContent>
             </Card>
           </Link>
         </div>

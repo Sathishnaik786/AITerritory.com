@@ -17,7 +17,12 @@ import { Sparkles } from "lucide-react";
 import MobileMenu from "./MobileMenu";
 import { navLinks } from "../data/navLinks";
 
-export function Navbar() {
+interface NavbarProps {
+  newsletterOpen: boolean;
+  setNewsletterOpen: (open: boolean) => void;
+}
+
+export function Navbar({ newsletterOpen, setNewsletterOpen }: NavbarProps) {
   const { resolvedTheme } = useTheme();
   const { user } = useUser();
   const location = useLocation();
@@ -52,7 +57,18 @@ export function Navbar() {
             <NavigationMenuList className="gap-2">
               {/* Main nav links */}
               {navLinks.map((item) => (
-                item.dropdown ? (
+                item.label === "Newsletter" ? (
+                  <NavigationMenuItem key={item.label}>
+                    <NavigationMenuLink asChild>
+                      <button
+                        onClick={() => setNewsletterOpen(true)}
+                        className="px-5 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap transition-all duration-200 text-foreground/80 hover:text-foreground hover:bg-muted/50"
+                      >
+                        {item.label}
+                      </button>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                ) : item.dropdown ? (
                   <NavigationMenuItem key={item.label}>
                     <NavigationMenuTrigger className="px-5 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap text-foreground/80 hover:text-foreground hover:bg-muted/50 data-[state=open]:text-blue-700 dark:data-[state=open]:text-blue-300 data-[state=open]:bg-blue-50 dark:data-[state=open]:bg-blue-950/40 transition-all duration-200">
                       {item.label}
@@ -112,7 +128,7 @@ export function Navbar() {
 
         {/* Mobile Menu: Only show on mobile */}
         <div className="flex lg:hidden items-center">
-          <MobileMenu />
+          <MobileMenu newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
         </div>
       </div>
     </nav>

@@ -74,6 +74,9 @@ import LandingPro from "./pages/LandingPro";
 import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
 import BlogsAdmin from './admin/BlogsAdmin';
+import NewsletterSubscribersAdmin from './admin/NewsletterSubscribersAdmin';
+import { NavbarNewsletterModal } from './components/NavbarNewsletterModal';
+import { useState } from 'react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -130,12 +133,13 @@ function SEO() {
 function ThemedAppContent() {
   const location = useLocation();
   const isLandingPro = location.pathname === '/';
+  const [newsletterOpen, setNewsletterOpen] = useState(false);
   return (
     <div className={`min-h-screen antialiased`}>
       <HelmetProvider>
         <SEO />
         <div className="relative min-h-screen flex flex-col items-center">
-          <Navbar />
+          <Navbar newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
           <ScrollToTopButton />
           <main className={`flex-1 w-full max-w-[1970px] min-h-screen mx-auto ${isLandingPro ? 'px-0' : 'px-4 sm:px-6 lg:px-8'}`}>
             <Routes>
@@ -244,6 +248,7 @@ function ThemedAppContent() {
                       <Route path="submissions/features" element={<FeatureRequestsAdmin />} />
                       <Route path="feedback" element={<FeedbackAdmin />} />
                       <Route path="blogs" element={<BlogsAdmin />} />
+                      <Route path="newsletter-subscribers" element={<NewsletterSubscribersAdmin />} />
                     </Routes>
                   </AdminLayout>
                 </ProtectedRoute>
@@ -265,6 +270,7 @@ function ThemedAppContent() {
             </Routes>
           </main>
         </div>
+        <NavbarNewsletterModal isOpen={newsletterOpen} onClose={() => setNewsletterOpen(false)} />
         {/* Only show Footer if not on LandingPro */}
         {!isLandingPro && <Footer />}
       </HelmetProvider>

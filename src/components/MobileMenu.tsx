@@ -7,8 +7,14 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { navLinks } from "../data/navLinks";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import ThemeToggle from "./ThemeToggle";
+import { NavbarNewsletterModal } from "./NavbarNewsletterModal";
 
-export default function MobileMenu() {
+interface MobileMenuProps {
+  newsletterOpen: boolean;
+  setNewsletterOpen: (open: boolean) => void;
+}
+
+export default function MobileMenu({ newsletterOpen, setNewsletterOpen }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
@@ -39,7 +45,25 @@ export default function MobileMenu() {
           className="flex flex-col gap-1 px-2 pt-4"
         >
           {navLinks.map((item, idx) =>
-            item.dropdown ? (
+            item.label === "Newsletter" ? (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ delay: 0.05 * idx }}
+              >
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    setNewsletterOpen(true);
+                  }}
+                  className="block text-lg py-2 px-4 border-b border-border/20 transition-colors text-zinc-700 dark:text-zinc-100 hover:text-blue-500 w-full text-left"
+                >
+                  {item.label}
+                </button>
+              </motion.div>
+            ) : item.dropdown ? (
               <Collapsible
                 key={item.label}
                 open={openDropdown === item.label}

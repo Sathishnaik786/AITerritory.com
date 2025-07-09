@@ -10,9 +10,9 @@ import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import { Badge } from '@/components/ui/badge';
-import { Dialog } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ArrowUp } from 'lucide-react';
+import Newsletter from '@/components/Newsletter';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -45,6 +45,9 @@ const BlogDetail: React.FC = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Newsletter modal state
+  const [newsletterOpen, setNewsletterOpen] = useState(false);
 
   useEffect(() => {
     if (slug) {
@@ -332,8 +335,20 @@ const BlogDetail: React.FC = () => {
         >
           <h3 className="text-xl font-bold mb-2">Enjoying the content?</h3>
           <p className="mb-4 text-gray-700 dark:text-gray-300">Subscribe to our newsletter for the latest AI insights, guides, and tools delivered to your inbox.</p>
-          <a href="/newsletter" className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-md">Subscribe Now</a>
+          <button
+            className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-md"
+            onClick={() => setNewsletterOpen(true)}
+          >
+            Subscribe Now
+          </button>
         </motion.div>
+        {/* Newsletter Modal */}
+        <Newsletter 
+          isOpen={newsletterOpen} 
+          onClose={() => setNewsletterOpen(false)}
+          title="Stay Ahead in AI! 🚀"
+          subtitle="Subscribe for the latest AI insights, guides, and exclusive tools."
+        />
       </div>
 
       {/* Next Reads Section */}
