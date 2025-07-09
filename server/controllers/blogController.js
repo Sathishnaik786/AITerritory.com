@@ -59,7 +59,8 @@ async function getBlogsByCategory(req, res) {
     .order('created_at', { ascending: false });
 
   if (error) {
-    return res.status(500).json({ error: 'Failed to fetch blogs by category' });
+    console.error('Supabase error:', error); // Log the real error
+    return res.status(500).json({ error: 'Failed to fetch blogs by category', details: error.message || error });
   }
   res.json(data);
 }

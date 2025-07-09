@@ -33,6 +33,9 @@ const Blog: React.FC = () => {
   }, [selectedCategory]);
 
   if (loading) return <div className="py-12 text-center">Loading...</div>;
+  if (!Array.isArray(blogs)) {
+    return <div className="py-12 text-center text-red-600">Failed to load blogs. Please try again later.</div>;
+  }
 
   // Find featured post for hero section
   const featured = blogs.find(post => post.featured);

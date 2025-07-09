@@ -168,6 +168,7 @@ app.get('/', (req, res) => {
       categories: '/api/categories',
       prompts: '/api/prompts',
       tags: '/api/tags',
+      blogs: '/api/blogs', // <-- Add this line
       health: '/health'
     }
   });
