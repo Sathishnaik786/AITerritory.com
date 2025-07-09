@@ -11,6 +11,7 @@ const BLOG_FIELDS = [
   'author_name',
   'tags',
   'created_at',
+  'reading_time', // Added field
 ];
 
 // GET /api/blogs
@@ -48,7 +49,23 @@ async function getBlogBySlug(req, res) {
   res.json(data);
 }
 
+// GET /api/blogs/category/:category
+async function getBlogsByCategory(req, res) {
+  const { category } = req.params;
+  const { data, error } = await supabase
+    .from('blogs')
+    .select(BLOG_FIELDS.join(','))
+    .ilike('category', `%${category}%`)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    return res.status(500).json({ error: 'Failed to fetch blogs by category' });
+  }
+  res.json(data);
+}
+
 module.exports = {
   getAllBlogs,
   getBlogBySlug,
+  getBlogsByCategory,
 }; 

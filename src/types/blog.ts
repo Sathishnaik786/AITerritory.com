@@ -10,6 +10,7 @@ export interface BlogPost {
   created_at: string;
   category?: string;
   featured?: boolean;
+  reading_time?: string;
 }
 
 export interface BlogCategory {

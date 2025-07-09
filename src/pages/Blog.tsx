@@ -3,16 +3,34 @@ import { BlogCard } from '../components/BlogCard';
 import { BlogService } from '../services/blogService';
 import { BlogPost } from '../types/blog';
 
+const CATEGORIES = [
+  'All',
+  'AI Tool Reviews',
+  'Content Creation with AI',
+  'SEO & AI-Powered Marketing',
+  'Prompt Engineering',
+  'Productivity & Automation Tools'
+];
+
 const Blog: React.FC = () => {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   useEffect(() => {
-    BlogService.getAll().then(data => {
-      setBlogs(data);
-      setLoading(false);
-    });
-  }, []);
+    setLoading(true);
+    if (selectedCategory === 'All') {
+      BlogService.getAll().then(data => {
+        setBlogs(data);
+        setLoading(false);
+      });
+    } else {
+      BlogService.getByCategory(selectedCategory).then(data => {
+        setBlogs(data);
+        setLoading(false);
+      });
+    }
+  }, [selectedCategory]);
 
   if (loading) return <div className="py-12 text-center">Loading...</div>;
 
@@ -22,6 +40,18 @@ const Blog: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
+      {/* Category Filter */}
+      <div className="max-w-6xl mx-auto px-4 pt-6 pb-2 flex flex-wrap gap-2">
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            className={`px-4 py-1 rounded-full border text-sm font-medium transition-colors ${selectedCategory === cat ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700'}`}
+            onClick={() => setSelectedCategory(cat)}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
       {/* Hero Section */}
       {featured && (
         <section className="w-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-gray-800 dark:to-gray-900 py-10 mb-8">

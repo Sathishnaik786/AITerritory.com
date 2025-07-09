@@ -214,7 +214,7 @@ export const HomePage: React.FC = () => {
             <AnimatePresence>
               {isSidebarOpen && (
                 <motion.aside
-                  className="fixed left-0 top-0 h-full w-full max-w-[95vw] z-50 lg:hidden p-4 flex flex-col"
+                  className="fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-full max-w-[95vw] z-50 lg:hidden p-4 flex flex-col bg-background dark:bg-gray-900"
                   initial={{ x: '-100%' }}
                   animate={{ x: 0 }}
                   exit={{ x: '-100%' }}
@@ -223,7 +223,7 @@ export const HomePage: React.FC = () => {
                   <SidebarContent
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
-                    selectedCategory={selectedCategory}
+                      selectedCategory={selectedCategory}
                     handleCategoryChange={handleCategoryChange}
                     categories={categories}
                     categoriesLoading={categoriesLoading}
@@ -235,7 +235,7 @@ export const HomePage: React.FC = () => {
 
             {/* Sidebar - Desktop */}
             <motion.aside
-              className="hidden lg:block w-[320px] flex-shrink-0"
+              className="hidden lg:block w-[320px] flex-shrink-0 sticky top-4"
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -243,11 +243,11 @@ export const HomePage: React.FC = () => {
               <SidebarContent
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
-                selectedCategory={selectedCategory}
+                  selectedCategory={selectedCategory}
                 handleCategoryChange={handleCategoryChange}
                 categories={categories}
                 categoriesLoading={categoriesLoading}
-              />
+                />
             </motion.aside>
 
             {/* Main Content */}

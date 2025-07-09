@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { BlogService } from '../services/blogService';
 import { BlogPost } from '../types/blog';
+import { Clock } from 'lucide-react';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -48,7 +49,14 @@ const BlogDetail: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8">
         <h1 className="text-2xl font-bold mb-4">{blog.title}</h1>
         <img src={blog.cover_image_url} alt={blog.title} className="w-full rounded mb-4" />
-        <div className="mb-4 text-muted-foreground">By {blog.author_name} | {new Date(blog.created_at).toLocaleDateString()}</div>
+        <div className="mb-4 text-muted-foreground flex flex-wrap items-center gap-3">
+          <span>By {blog.author_name}</span>
+          <span>|</span>
+          <span>{new Date(blog.created_at).toLocaleDateString()}</span>
+          {blog.reading_time && (
+            <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{blog.reading_time}</span>
+          )}
+        </div>
         <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: blog.content }} />
       </div>
     </div>

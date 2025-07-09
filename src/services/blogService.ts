@@ -11,5 +11,9 @@ export const BlogService = {
   async getBySlug(slug: string): Promise<BlogPost> {
     const res = await axios.get<BlogPost>(`${API_BASE}/${slug}`);
     return res.data;
+  },
+  async getByCategory(category: string): Promise<BlogPost[]> {
+    const res = await axios.get<BlogPost[]>(`${API_BASE}/category/${encodeURIComponent(category)}`);
+    return res.data;
   }
 }; 
