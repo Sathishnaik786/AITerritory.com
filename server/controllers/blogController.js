@@ -65,8 +65,58 @@ async function getBlogsByCategory(req, res) {
   res.json(data);
 }
 
+// POST /api/blogs
+async function createBlog(req, res) {
+  const blog = req.body;
+  // Generate slug if not provided
+  if (!blog.slug && blog.title) {
+    blog.slug = blog.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  }
+  const { data, error } = await supabase
+    .from('blogs')
+    .insert([blog])
+    .select()
+    .single();
+  if (error) {
+    return res.status(500).json({ error: 'Failed to create blog', details: error.message || error });
+  }
+  res.status(201).json(data);
+}
+
+// PUT /api/blogs/:id
+async function updateBlog(req, res) {
+  const { id } = req.params;
+  const blog = req.body;
+  const { data, error } = await supabase
+    .from('blogs')
+    .update(blog)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) {
+    return res.status(500).json({ error: 'Failed to update blog', details: error.message || error });
+  }
+  res.json(data);
+}
+
+// DELETE /api/blogs/:id
+async function deleteBlog(req, res) {
+  const { id } = req.params;
+  const { error } = await supabase
+    .from('blogs')
+    .delete()
+    .eq('id', id);
+  if (error) {
+    return res.status(500).json({ error: 'Failed to delete blog', details: error.message || error });
+  }
+  res.status(204).end();
+}
+
 module.exports = {
   getAllBlogs,
   getBlogBySlug,
   getBlogsByCategory,
+  createBlog,
+  updateBlog,
+  deleteBlog,
 }; 

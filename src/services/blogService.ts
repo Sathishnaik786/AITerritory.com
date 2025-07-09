@@ -15,5 +15,16 @@ export const BlogService = {
   async getByCategory(category: string): Promise<BlogPost[]> {
     const res = await api.get<BlogPost[]>(`${API_BASE}/category/${encodeURIComponent(category)}`);
     return res.data;
-  }
+  },
+  async create(blog: Partial<BlogPost>): Promise<BlogPost> {
+    const res = await api.post(API_BASE, blog);
+    return res.data;
+  },
+  async update(blog: Partial<BlogPost>): Promise<BlogPost> {
+    const res = await api.put(`${API_BASE}/${blog.id}`, blog);
+    return res.data;
+  },
+  async delete(id: string): Promise<void> {
+    await api.delete(`${API_BASE}/${id}`);
+  },
 }; 

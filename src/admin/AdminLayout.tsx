@@ -34,6 +34,7 @@ const contentNav = [
   { label: 'AI Innovations', icon: Rocket, to: '/admin/ai-innovations' },
   { label: 'AI Tutorials', icon: BookOpen, to: '/admin/ai-tutorials' },
   { label: 'Feedback', icon: Lightbulb, to: '/admin/feedback' },
+  { label: 'Blogs', icon: BookOpen, to: '/admin/blogs' },
 ];
 
 const AdminSidebarNav = () => {

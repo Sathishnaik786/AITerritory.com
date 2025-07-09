@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getContactSubmissions, getAdvertiseSubmissions, getToolSubmissions, getFeatureRequests } from '@/services/submissionService';
 import { getFeedback } from '@/services/feedbackService';
+import { BlogService } from '../services/blogService';
 import { Mail, Megaphone, PlusSquare, Lightbulb, Users, Bot, Rocket, BookOpen } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
@@ -31,6 +32,11 @@ const AdminDashboard: React.FC = () => {
   const { data: feedback, isLoading: isLoadingFeedback } = useQuery({
     queryKey: ['feedback'],
     queryFn: getFeedback,
+  });
+
+  const { data: blogs, isLoading: isLoadingBlogs } = useQuery({
+    queryKey: ['blogs'],
+    queryFn: BlogService.getAll,
   });
 
   const StatCard = ({ title, value, isLoading, icon: Icon, link, subtext }) => (
@@ -105,6 +111,14 @@ const AdminDashboard: React.FC = () => {
       <section>
         <h2 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">Content Management</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard
+            title="Blogs"
+            value={blogs?.length ?? 0}
+            isLoading={isLoadingBlogs}
+            icon={BookOpen}
+            link="/admin/blogs"
+            subtext="Total blog posts"
+          />
           <Link to="/admin/business-functions">
             <Card className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

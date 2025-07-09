@@ -73,6 +73,7 @@ import BackgroundAnimation from './components/ui/BackgroundAnimation';
 import LandingPro from "./pages/LandingPro";
 import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
+import BlogsAdmin from './admin/BlogsAdmin';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -242,6 +243,7 @@ function ThemedAppContent() {
                       <Route path="submissions/tools" element={<ToolSubmissionsAdmin />} />
                       <Route path="submissions/features" element={<FeatureRequestsAdmin />} />
                       <Route path="feedback" element={<FeedbackAdmin />} />
+                      <Route path="blogs" element={<BlogsAdmin />} />
                     </Routes>
                   </AdminLayout>
                 </ProtectedRoute>
