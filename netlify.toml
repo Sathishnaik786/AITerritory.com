@@ -8,6 +8,18 @@
   SWC_BINARY_PATH = ""
   VITE_API_BASE_URL = "https://aiterritory-com.onrender.com/api"
 
+# Security headers for all pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.aiterritory.org https://*.clerk.accounts.dev https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://aiterritory-com.onrender.com https://clerk.aiterritory.org https://*.clerk.accounts.dev https://api.stripe.com wss://*.clerk.accounts.dev; frame-src https://js.stripe.com;"
+
+# Cache headers for static assets
 [[headers]]
   for = "/assets/*"
   [headers.values]

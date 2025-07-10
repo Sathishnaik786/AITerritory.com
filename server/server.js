@@ -160,21 +160,9 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Admin endpoint - serves admin information or redirects to frontend
+// Admin endpoint - redirect to frontend admin dashboard
 app.get('/admin', (req, res) => {
-  res.json({
-    message: 'AI Territory Admin API',
-    version: '1.0.0',
-    note: 'Admin interface is available at the frontend /admin route',
-    adminFeatures: {
-      dashboard: 'View admin dashboard',
-      submissions: 'Manage user submissions',
-      content: 'Manage tools, blogs, and other content',
-      feedback: 'View user feedback',
-      analytics: 'View site analytics'
-    },
-    authentication: 'Requires admin token for API operations'
-  });
+  res.redirect('https://aiterritory.org/admin');
 });
 
 // Root endpoint

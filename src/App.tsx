@@ -288,7 +288,12 @@ function App() {
     >
       <BackgroundAnimation />
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true
+          }}
+        >
           <TooltipProvider>
             <HelmetProvider>
               <ScrollToTop />
