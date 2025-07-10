@@ -156,6 +156,24 @@ const mainRouter = require('./routes/index');
 // Register the main router (this will add /api/blogs and others from routes/index.js)
 app.use(mainRouter);
 
+// /api index endpoint
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'AI Tools Directory API',
+    version: '1.0.0',
+    endpoints: {
+      tools: '/api/tools',
+      categories: '/api/categories',
+      prompts: '/api/prompts',
+      tags: '/api/tags',
+      blogs: '/api/blogs',
+      Admin: '/admin',
+      health: '/health',
+      newsletterSubscribers: '/api/newsletter-subscribers'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ 
