@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 const API_BASE_URL = 'http://localhost:3003/api';
 
 async function testLikesAPI() {

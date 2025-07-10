@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 async function sendWelcomeEmail(email) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM;
