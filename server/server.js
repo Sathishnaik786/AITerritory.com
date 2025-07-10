@@ -26,6 +26,7 @@ const feedbackRouter = require('./routes/feedback');
 const reviewsRoutes = require('./routes/reviews');
 const aiLearningPathCoursesRoutes = require('./routes/ai-learning-path-courses');
 const aiAgentLearningResourcesRoutes = require('./routes/ai-agent-learning-resources');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -143,6 +144,7 @@ app.use('/api/feedback', feedbackRouter);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/ai-learning-path-courses', aiLearningPathCoursesRoutes);
 app.use('/api/ai-agent-learning-resources', aiAgentLearningResourcesRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Import the main router for all grouped API routes
 const mainRouter = require('./routes/index');
@@ -158,6 +160,23 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Admin endpoint - serves admin information or redirects to frontend
+app.get('/admin', (req, res) => {
+  res.json({
+    message: 'AI Territory Admin API',
+    version: '1.0.0',
+    note: 'Admin interface is available at the frontend /admin route',
+    adminFeatures: {
+      dashboard: 'View admin dashboard',
+      submissions: 'Manage user submissions',
+      content: 'Manage tools, blogs, and other content',
+      feedback: 'View user feedback',
+      analytics: 'View site analytics'
+    },
+    authentication: 'Requires admin token for API operations'
+  });
+});
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
@@ -168,7 +187,8 @@ app.get('/', (req, res) => {
       categories: '/api/categories',
       prompts: '/api/prompts',
       tags: '/api/tags',
-      blogs: '/api/blogs', // <-- Add this line
+      blogs: '/api/blogs',
+      Admin: '/admin',
       health: '/health'
     }
   });
