@@ -1,4 +1,5 @@
 const supabase = require('../config/database');
+const { sendEmail } = require('../lib/resend');
 
 // Generic function to get submissions
 const getSubmissions = (tableName) => async (req, res) => {
@@ -116,46 +117,40 @@ const submitAdvertiseRequest = async (req, res) => {
 // POST: Tool Submission Form
 const submitTool = async (req, res) => {
   try {
-    const { name, email, tool_name, tool_url, description } = req.body;
-    
+    const { email, tool_name, tool_url, youtube_url } = req.body;
     // Validation
-    if (!name || !email || !tool_name || !tool_url) {
+    if (!email || !tool_name || !tool_url) {
       return res.status(400).json({ 
         error: 'Missing required fields',
-        required: ['name', 'email', 'tool_name', 'tool_url'],
-        received: { name, email, tool_name, tool_url, description }
+        required: ['email', 'tool_name', 'tool_url'],
+        received: { email, tool_name, tool_url, youtube_url }
       });
     }
-
     // Validate URL format
     try {
       new URL(tool_url);
+      if (youtube_url) new URL(youtube_url);
     } catch (urlError) {
       return res.status(400).json({ 
-        error: 'Invalid tool URL format' 
+        error: 'Invalid URL format' 
       });
     }
-
     // Sanitize inputs
     const sanitizedData = {
-      name: String(name).trim().slice(0, 255),
       email: String(email).trim().slice(0, 255),
       tool_name: String(tool_name).trim().slice(0, 255),
       tool_url: String(tool_url).trim().slice(0, 500),
-      description: description ? String(description).trim().slice(0, 2000) : null
+      youtube_url: youtube_url ? String(youtube_url).trim().slice(0, 500) : null,
     };
-
     const { data, error } = await supabase
-      .from('submitted_tools')
+      .from('tool_submissions')
       .insert([sanitizedData])
       .select()
       .single();
-
     if (error) {
       console.error('Tool submission error:', error);
       throw error;
     }
-
     res.status(201).json({ 
       success: true, 
       message: 'Tool submitted successfully',
@@ -217,6 +212,52 @@ const submitFeatureRequest = async (req, res) => {
   }
 };
 
+// DELETE: Tool Submission by ID
+const deleteToolSubmission = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { error } = await supabase
+      .from('tool_submissions')
+      .delete()
+      .eq('id', id);
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // Not found
+        return res.status(404).json({ error: 'Submission not found' });
+      }
+      throw error;
+    }
+    return res.status(204).send();
+  } catch (error) {
+    console.error('Delete tool submission error:', error);
+    res.status(500).json({ error: 'Failed to delete tool submission', details: error.message });
+  }
+};
+
+// PATCH: Update status (approve/reject) for tool submission
+const updateToolSubmissionStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    if (!['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+    const { data, error } = await supabase
+      .from('tool_submissions')
+      .update({ status })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) {
+      return res.status(500).json({ error: 'Failed to update status', details: error.message });
+    }
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    console.error('Update tool submission status error:', error);
+    res.status(500).json({ error: 'Failed to update status', details: error.message });
+  }
+};
+
 module.exports = {
   // GET methods for admin viewing
   getContactSubmissions: getSubmissions('contact_us'),
@@ -229,4 +270,6 @@ module.exports = {
   submitAdvertiseRequest,
   submitTool,
   submitFeatureRequest,
+  deleteToolSubmission,
+  updateToolSubmissionStatus,
 }; 

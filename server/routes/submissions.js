@@ -14,4 +14,10 @@ router.post('/advertise', submissionsController.submitAdvertiseRequest);
 router.post('/tools', submissionsController.submitTool);
 router.post('/features', submissionsController.submitFeatureRequest);
 
+// DELETE route for tool submissions
+router.delete('/tools/:id', submissionsController.deleteToolSubmission);
+
+// PATCH route for updating tool submission status
+router.patch('/tools/:id/status', submissionsController.updateToolSubmissionStatus);
+
 module.exports = router; 

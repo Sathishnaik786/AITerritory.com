@@ -148,6 +148,9 @@ app.use('/api/ai-learning-path-courses', aiLearningPathCoursesRoutes);
 app.use('/api/ai-agent-learning-resources', aiAgentLearningResourcesRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Add /api/paypal webhook route
+app.use('/api/paypal', require('./routes/paypal'));
+
 // Add /api/newsletter-subscribers route, protected by adminAuth
 app.get('/api/newsletter-subscribers', adminAuth, newsletterController.getAllSubscribers);
 

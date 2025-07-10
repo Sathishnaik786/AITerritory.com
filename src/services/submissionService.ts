@@ -18,9 +18,12 @@ export interface AdvertiseSubmission extends Submission {
 }
 
 export interface ToolSubmission extends Submission {
+  email: string;
   tool_name: string;
   tool_url: string;
-  description: string | null;
+  youtube_url?: string | null;
+  created_at: string;
+  status: 'pending' | 'approved' | 'rejected';
 }
 
 export interface FeatureRequest extends Submission {
@@ -43,11 +46,12 @@ export interface AdvertiseFormData {
 }
 
 export interface ToolFormData {
-  name: string;
   email: string;
   tool_name: string;
   tool_url: string;
-  description?: string;
+  youtube_url?: string;
+  plan: string;
+  transaction_id?: string | null;
 }
 
 export interface FeatureRequestFormData {
@@ -97,4 +101,12 @@ export const submitToolForm = async (data: ToolFormData): Promise<{ success: boo
 export const submitFeatureRequestForm = async (data: FeatureRequestFormData): Promise<{ success: boolean; message: string; data: FeatureRequest }> => {
   const response = await api.post('/submissions/features', data);
   return response.data;
+};
+
+export const deleteToolSubmission = async (id: string): Promise<void> => {
+  await api.delete(`/submissions/tools/${id}`);
+};
+
+export const updateToolSubmissionStatus = async (id: string, status: 'approved' | 'rejected'): Promise<void> => {
+  await api.patch(`/submissions/tools/${id}/status`, { status });
 }; 
