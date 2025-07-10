@@ -233,7 +233,7 @@ const AITutorials = () => {
           </p>
           <Button variant="secondary" size="lg" className="group" onClick={() => setNewsletterOpen(true)}>
             Subscribe
-            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
         <Newsletter

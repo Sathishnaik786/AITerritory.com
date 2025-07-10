@@ -9,6 +9,6 @@ const newsletterRoutes = require('./newsletter');
 router.use('/api/feedback', feedbackRouter);
 router.use('/api/blogs', blogRouter);
 router.use('/api/newsletter', newsletterRoutes);
-router.get('/reviews', reviewsController.getReviewsByUser);
+router.get('/reviews', reviewsController.getReviewsByUser); 
 
 module.exports = router; 

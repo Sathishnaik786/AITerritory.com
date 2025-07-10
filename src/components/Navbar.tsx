@@ -66,23 +66,23 @@ export function Navbar({ newsletterOpen, setNewsletterOpen }: NavbarProps) {
                       >
                         {item.label}
                       </button>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
                 ) : item.dropdown ? (
                   <NavigationMenuItem key={item.label}>
                     <NavigationMenuTrigger className="px-5 py-2.5 text-sm font-medium rounded-xl whitespace-nowrap text-foreground/80 hover:text-foreground hover:bg-muted/50 data-[state=open]:text-blue-700 dark:data-[state=open]:text-blue-300 data-[state=open]:bg-blue-50 dark:data-[state=open]:bg-blue-950/40 transition-all duration-200">
                       {item.label}
                     </NavigationMenuTrigger>
-                    <NavigationMenuContent>
+                <NavigationMenuContent>
                       <ul className="grid gap-3 w-[320px] p-6 rounded-2xl shadow-xl bg-background/95 backdrop-blur-xl border border-border/50">
                         {item.children?.map((child) => (
                           <ListItem key={child.to} to={child.to} title={child.label}>
                             {/* Optionally add description here */}
-                          </ListItem>
+                    </ListItem>
                         ))}
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
                 ) : (
                   <NavigationMenuItem key={item.to}>
                     <NavigationMenuLink asChild>

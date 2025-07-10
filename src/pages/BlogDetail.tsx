@@ -12,7 +12,7 @@ import rehypeHighlight from 'rehype-highlight';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ArrowUp } from 'lucide-react';
-import Newsletter from '@/components/Newsletter';
+import { Newsletter } from '@/components/Newsletter';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
