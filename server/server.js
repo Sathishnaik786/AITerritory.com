@@ -27,6 +27,8 @@ const reviewsRoutes = require('./routes/reviews');
 const aiLearningPathCoursesRoutes = require('./routes/ai-learning-path-courses');
 const aiAgentLearningResourcesRoutes = require('./routes/ai-agent-learning-resources');
 const adminRoutes = require('./routes/admin');
+const adminAuth = require('./middleware/adminAuth');
+const newsletterController = require('./controllers/newsletterController');
 
 const app = express();
 
@@ -146,6 +148,9 @@ app.use('/api/ai-learning-path-courses', aiLearningPathCoursesRoutes);
 app.use('/api/ai-agent-learning-resources', aiAgentLearningResourcesRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Add /api/newsletter-subscribers route, protected by adminAuth
+app.get('/api/newsletter-subscribers', adminAuth, newsletterController.getAllSubscribers);
+
 // Import the main router for all grouped API routes
 const mainRouter = require('./routes/index');
 // Register the main router (this will add /api/blogs and others from routes/index.js)
@@ -177,7 +182,8 @@ app.get('/', (req, res) => {
       tags: '/api/tags',
       blogs: '/api/blogs',
       Admin: '/admin',
-      health: '/health'
+      health: '/health',
+      newsletterSubscribers: '/api/newsletter-subscribers'
     }
   });
 });
