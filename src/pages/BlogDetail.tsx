@@ -13,6 +13,10 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ArrowUp } from 'lucide-react';
 import { Newsletter } from '@/components/Newsletter';
+import { FaXTwitter, FaLinkedin, FaWhatsapp, FaReddit, FaDiscord } from 'react-icons/fa6';
+import { BlogCard } from '@/components/BlogCard';
+import { useToast } from '@/components/ui/use-toast';
+import { Helmet } from 'react-helmet-async';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -21,6 +25,7 @@ const BlogDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [nextReads, setNextReads] = useState<BlogPost[]>([]);
+  const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
 
   // --- Table of Contents Scrollspy ---
@@ -48,6 +53,32 @@ const BlogDetail: React.FC = () => {
 
   // Newsletter modal state
   const [newsletterOpen, setNewsletterOpen] = useState(false);
+  const [newsletterError, setNewsletterError] = useState('');
+
+  // Reading progress bar state
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!contentRef.current) return;
+      const content = contentRef.current;
+      const rect = content.getBoundingClientRect();
+      const scrollTop = window.scrollY;
+      const offsetTop = content.offsetTop;
+      const height = content.offsetHeight;
+      const winHeight = window.innerHeight;
+      let percent = 0;
+      if (scrollTop + winHeight > offsetTop) {
+        percent = Math.min(
+          100,
+          ((scrollTop + winHeight - offsetTop) / height) * 100
+        );
+      }
+      setProgress(Math.max(0, Math.min(100, percent)));
+    };
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [blog]);
 
   useEffect(() => {
     if (slug) {
@@ -57,6 +88,14 @@ const BlogDetail: React.FC = () => {
         .then(data => {
           setBlog(data);
           setNotFound(false);
+          // Fetch related blogs by category (excluding current)
+          if (data && data.category) {
+            BlogService.getAll().then(all => {
+              setRelatedBlogs(
+                all.filter(b => b.category === data.category && b.slug !== slug).slice(0, 6)
+              );
+            });
+          }
         })
         .catch((err) => {
           if (err.response && err.response.status === 404) {
@@ -89,6 +128,8 @@ const BlogDetail: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [headings]);
 
+  const { toast } = useToast();
+
   if (loading) return <div className="py-12 text-center">Loading...</div>;
   if (notFound) return (
     <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -102,6 +143,10 @@ const BlogDetail: React.FC = () => {
     </div>
   );
   if (!blog) return <div className="py-12 text-center">Not found</div>;
+
+  // Define shareUrl and shareTitle for share links
+  const shareUrl = `https://aiterritory.org/blog/${blog.slug}`;
+  const shareTitle = blog.title;
 
   // Add ids to headings in the HTML (for anchor links)
   if (contentRef.current) {
@@ -119,6 +164,25 @@ const BlogDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 scroll-smooth overflow-y-auto">
+      {/* Dynamic Open Graph & Twitter Meta Tags */}
+      <Helmet>
+        <title>{blog.title}</title>
+        <meta property="og:title" content={blog.title} />
+        <meta property="og:description" content={blog.description || 'Discover the latest in AI, tools, and productivity at AI Territory.'} />
+        <meta property="og:image" content={blog.cover_image_url || 'https://aiterritory.org/logo.jpg'} />
+        <meta property="og:url" content={`https://aiterritory.org/blog/${blog.slug}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={blog.title} />
+        <meta name="twitter:description" content={blog.description || 'Discover the latest in AI, tools, and productivity at AI Territory.'} />
+        <meta name="twitter:image" content={blog.cover_image_url || 'https://aiterritory.org/logo.jpg'} />
+      </Helmet>
+      {/* Reading Progress Bar */}
+      <div className="fixed top-0 left-0 w-full h-1 z-50">
+        <div
+          className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-200"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
       {/* Sticky Back Button */}
       <motion.div
         className="fixed top-6 left-4 z-30"
@@ -136,70 +200,8 @@ const BlogDetail: React.FC = () => {
       </motion.div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 relative">
-        {/* Floating Table of Contents (large screens) */}
-        {headings.length >= 3 && (
-          <motion.aside
-            className="hidden lg:block fixed top-32 left-0 z-20 w-64 pl-6"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="bg-white/80 dark:bg-gray-900/80 rounded-xl shadow-lg p-4 border border-gray-200 dark:border-gray-800">
-              <div className="font-bold text-gray-700 dark:text-gray-200 mb-2 text-base">Table of contents</div>
-              <ul className="space-y-1 text-sm">
-                {headings.map(h => (
-                  <li key={h.id} className={`pl-2 border-l-2 ${activeHeading === h.id ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30 font-semibold' : 'border-blue-200 dark:border-blue-700'}`}>
-                    <button
-                      className={`text-left w-full py-1 px-1 rounded hover:bg-blue-50 dark:hover:bg-gray-800 transition ${h.level === 3 ? 'ml-4 text-xs' : ''}`}
-                      onClick={() => scrollToHeading(h.id)}
-                    >
-                      {h.text}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </motion.aside>
-        )}
-        {/* Mobile ToC Drawer */}
-        {headings.length >= 3 && (
-          <Sheet>
-            <SheetTrigger asChild>
-              <button className="lg:hidden fixed top-20 right-4 z-30 bg-white/90 dark:bg-gray-900/90 border border-gray-200 dark:border-gray-800 rounded-full px-4 py-2 shadow-md text-sm font-semibold flex items-center gap-2">
-                <span>Table of Contents</span>
-              </button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-72 p-4">
-              <div className="font-bold text-gray-700 dark:text-gray-200 mb-2 text-base">Table of contents</div>
-              <ul className="space-y-1 text-sm">
-                {headings.map(h => (
-                  <li key={h.id} className={`pl-2 border-l-2 ${activeHeading === h.id ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30 font-semibold' : 'border-blue-200 dark:border-blue-700'}`}>
-                    <button
-                      className={`text-left w-full py-1 px-1 rounded hover:bg-blue-50 dark:hover:bg-gray-800 transition ${h.level === 3 ? 'ml-4 text-xs' : ''}`}
-                      onClick={() => scrollToHeading(h.id)}
-                    >
-                      {h.text}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </SheetContent>
-          </Sheet>
-        )}
         {/* Hero Section */}
         <div className="relative w-full min-h-[220px] flex flex-col items-center justify-center mb-10">
-          {/* Floating Share Bar (desktop) */}
-          <div className="hidden lg:flex flex-col gap-3 fixed left-8 top-40 z-30">
-            <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 transition shadow"><Facebook className="w-5 h-5" /></a>
-            <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(blog.title)}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 transition shadow"><Twitter className="w-5 h-5" /></a>
-            <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(blog.title)}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 transition shadow"><Linkedin className="w-5 h-5" /></a>
-          </div>
-          {/* Mobile Share Bar */}
-          <div className="lg:hidden flex gap-3 fixed bottom-4 left-1/2 -translate-x-1/2 z-30 bg-white/90 dark:bg-gray-900/90 rounded-full px-4 py-2 shadow-lg border border-gray-200 dark:border-gray-800">
-            <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 transition"><Facebook className="w-5 h-5" /></a>
-            <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(blog.title)}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 transition"><Twitter className="w-5 h-5" /></a>
-            <a href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(blog.title)}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 transition"><Linkedin className="w-5 h-5" /></a>
-          </div>
           {/* Animated Gradient Background */}
           <motion.div
             className="absolute inset-0 z-0 bg-gradient-to-br from-blue-200/60 via-purple-100/60 to-white dark:from-gray-900/80 dark:via-gray-800/80 dark:to-gray-900/80 rounded-b-3xl"
@@ -270,7 +272,7 @@ const BlogDetail: React.FC = () => {
               strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-white" {...props} />,
               a: ({node, ...props}) => <a className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer" {...props} />,
               img: ({node, ...props}) => <img className="rounded-xl my-4 shadow-md max-w-full" {...props} alt={props.alt || ''} />,
-              code({node, inline, className, children, ...props}) {
+              code({node, inline, className, children, ...props}: {node: any, inline?: boolean, className?: string, children: React.ReactNode}) {
                 return !inline ? (
                   <pre className="bg-gray-900 text-white rounded-lg p-4 overflow-x-auto my-4 text-sm"><code {...props}>{children}</code></pre>
                 ) : (
@@ -315,6 +317,32 @@ const BlogDetail: React.FC = () => {
             {blog.content}
           </ReactMarkdown>
         </motion.div>
+        {/* Social Share Buttons */}
+        <div className="flex flex-wrap justify-center gap-4 my-8">
+          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-11 h-11 rounded-full bg-[#1DA1F2] shadow hover:scale-110 transition" title="Share on X" aria-label="Share on X">
+            <FaXTwitter className="w-5 h-5 text-white" />
+          </a>
+          <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-11 h-11 rounded-full bg-[#0077B5] shadow hover:scale-110 transition" title="Share on LinkedIn" aria-label="Share on LinkedIn">
+            <FaLinkedin className="w-5 h-5 text-white" />
+          </a>
+          <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + ' ' + shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-11 h-11 rounded-full bg-[#25D366] shadow hover:scale-110 transition" title="Share on WhatsApp" aria-label="Share on WhatsApp">
+            <FaWhatsapp className="w-5 h-5 text-white" />
+          </a>
+          <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-11 h-11 rounded-full bg-[#1877F3] shadow hover:scale-110 transition" title="Share on Facebook" aria-label="Share on Facebook">
+            <Facebook className="w-5 h-5 text-white" />
+          </a>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(shareUrl);
+              if (toast) toast({ title: 'Link copied!', description: 'Share link copied to clipboard.' });
+            }}
+            className="flex items-center justify-center w-11 h-11 rounded-full bg-gray-200 dark:bg-gray-700 shadow hover:scale-110 transition"
+            title="Copy Link"
+            aria-label="Copy Link"
+          >
+            <svg className="w-5 h-5 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 7h2a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2v-2m8-10H9a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V9a2 2 0 00-2-2z" /></svg>
+          </button>
+        </div>
         {/* Scroll-to-top Button */}
         {showScrollTop && (
           <button
@@ -325,23 +353,49 @@ const BlogDetail: React.FC = () => {
             <ArrowUp className="w-5 h-5" />
           </button>
         )}
-        {/* Newsletter Signup CTA */}
-        <motion.div
-          className="mt-10 mb-8 p-6 rounded-2xl bg-gradient-to-r from-blue-100/80 to-purple-100/80 dark:from-gray-800/80 dark:to-gray-900/80 shadow-xl flex flex-col items-center"
+        {/* Newsletter Signup CTA - Premium Enhanced */}
+        <motion.section
+          className="mt-10 mb-8 w-full max-w-2xl mx-auto rounded-2xl bg-gradient-to-r from-blue-100/80 to-purple-100/80 dark:from-gray-800/80 dark:to-gray-900/80 shadow-xl border border-gray-200 dark:border-gray-800 p-6 flex flex-col items-center"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.2 }}
+          transition={{ duration: 0.7, delay: 0.1 }}
         >
-          <h3 className="text-xl font-bold mb-2">Enjoying the content?</h3>
-          <p className="mb-4 text-gray-700 dark:text-gray-300">Subscribe to our newsletter for the latest AI insights, guides, and tools delivered to your inbox.</p>
-          <button
-            className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-md"
-            onClick={() => setNewsletterOpen(true)}
-          >
-            Subscribe Now
-          </button>
-        </motion.div>
+          <div className="flex flex-col items-center w-full gap-2">
+            <h3 className="text-2xl font-bold mb-1 text-center">📬 Get the Best of AI Weekly</h3>
+            <p className="mb-4 text-gray-700 dark:text-gray-300 text-center text-base max-w-xl">Join 5,000+ creators staying ahead with AI insights, tools, and trends. <span className="font-semibold">No spam. Only value.</span></p>
+            <form
+              className="w-full flex flex-col sm:flex-row items-center gap-3"
+              onSubmit={e => {
+                e.preventDefault();
+                const email = (e.target as any).email.value.trim();
+                if (!/^\S+@\S+\.\S+$/.test(email)) {
+                  setNewsletterError('Please enter a valid email address.');
+                  return;
+                }
+                setNewsletterError('');
+                // TODO: Replace with real subscribe logic (Supabase, API, etc.)
+                window.alert('Thank you for subscribing!');
+                (e.target as any).reset();
+              }}
+            >
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="Enter your email…"
+                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              />
+              <button
+                type="submit"
+                className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                Subscribe
+              </button>
+            </form>
+            {newsletterError && <div className="text-red-500 text-sm mt-1">{newsletterError}</div>}
+          </div>
+        </motion.section>
         {/* Newsletter Modal */}
         <Newsletter 
           isOpen={newsletterOpen} 
@@ -349,6 +403,124 @@ const BlogDetail: React.FC = () => {
           title="Stay Ahead in AI! 🚀"
           subtitle="Subscribe for the latest AI insights, guides, and exclusive tools."
         />
+        {/* Author Bio Section */}
+        <section className="w-full max-w-2xl mx-auto mt-10 mb-8">
+          <div className="flex flex-col sm:flex-row items-center gap-6 bg-white/90 dark:bg-gray-900/90 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg p-6">
+            <img
+              src={blog.author_image_url ?? (blog as any)?.author_avatar_url ?? '/logo.jpg'}
+              alt={blog.author_name}
+              className="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700 shadow-md"
+            />
+            <div className="flex-1 flex flex-col items-center sm:items-start text-center sm:text-left">
+              <div className="font-bold text-xl text-gray-900 dark:text-white mb-1">{blog.author_name}</div>
+              <div className="text-gray-500 text-sm mb-2">{blog.author_bio ?? (blog as any)?.author_bio ?? 'AI enthusiast and contributor at AI Territory.'}</div>
+              {/* Social Links */}
+              {blog.author_social_links && typeof blog.author_social_links === 'object' && (
+                <div className="flex gap-3 mt-1">
+                  {blog.author_social_links?.twitter && (
+                    <a href={blog.author_social_links.twitter} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition" title="Twitter" aria-label="Twitter">
+                      <FaXTwitter className="w-5 h-5 text-[#1DA1F2]" />
+                    </a>
+                  )}
+                  {blog.author_social_links?.linkedin && (
+                    <a href={blog.author_social_links.linkedin} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition" title="LinkedIn" aria-label="LinkedIn">
+                      <FaLinkedin className="w-5 h-5 text-[#0077B5]" />
+                    </a>
+                  )}
+                  {blog.author_social_links?.github && (
+                    <a href={blog.author_social_links.github} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition" title="GitHub" aria-label="GitHub">
+                      <svg className="w-5 h-5 text-gray-800 dark:text-gray-200" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.184 6.839 9.504.5.092.682-.217.682-.483 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.07 1.532 1.032 1.532 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.339-2.221-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.987 1.029-2.687-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.295 2.748-1.025 2.748-1.025.546 1.378.202 2.397.1 2.65.64.7 1.028 1.594 1.028 2.687 0 3.847-2.337 4.695-4.566 4.944.36.31.68.921.68 1.857 0 1.34-.012 2.422-.012 2.753 0 .268.18.579.688.481C19.138 20.2 22 16.448 22 12.021 22 6.484 17.523 2 12 2z"/></svg>
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+        {/* Author Bio + Share This Post Section */}
+        <motion.section
+          className="mt-12 mb-12 flex flex-col md:flex-row items-center md:items-start gap-8 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-lg p-6"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          {/* Share This Post */}
+          <div className="flex flex-col items-center w-full">
+            <div className="font-semibold text-gray-700 dark:text-gray-200 mb-2">Share This Post</div>
+            <div className="flex flex-wrap justify-center gap-3 mb-2">
+              <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#1DA1F2] hover:scale-110 transition shadow" title="Share on X" aria-label="Share on X">
+                <FaXTwitter className="w-5 h-5 text-white" />
+              </a>
+              <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#0077B5] hover:scale-110 transition shadow" title="Share on LinkedIn" aria-label="Share on LinkedIn">
+                <FaLinkedin className="w-5 h-5 text-white" />
+              </a>
+              <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + ' ' + shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#25D366] hover:scale-110 transition shadow" title="Share on WhatsApp" aria-label="Share on WhatsApp">
+                <FaWhatsapp className="w-5 h-5 text-white" />
+              </a>
+              <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#1877F3] hover:scale-110 transition shadow" title="Share on Facebook" aria-label="Share on Facebook">
+                <Facebook className="w-5 h-5 text-white" />
+              </a>
+              <button
+                onClick={() => {navigator.clipboard.writeText(shareUrl)}}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 hover:scale-110 transition shadow"
+                title="Copy Link"
+                aria-label="Copy Link"
+              >
+                <svg className="w-5 h-5 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 7h2a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2v-2m8-10H9a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V9a2 2 0 00-2-2z" /></svg>
+              </button>
+            </div>
+            <div className="text-xs text-gray-400">Share this article with your network!</div>
+          </div>
+        </motion.section>
+      {/* Related Blogs Section */}
+      {relatedBlogs.length > 0 && (
+        <motion.section
+          className="mt-12 mb-8"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="flex items-center mb-4">
+            <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2">📚 Related Reads</h2>
+            {blog.category && (
+              <Link
+                to={`/blog?category=${encodeURIComponent(blog.category)}`}
+                className="text-blue-600 text-sm ml-auto hover:underline"
+              >
+                See all
+              </Link>
+            )}
+          </div>
+          <div className="flex overflow-x-auto gap-4 py-4 scroll-smooth snap-x px-1"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            {relatedBlogs.map((item) => (
+              <motion.div
+                key={item.id}
+                className="min-w-[220px] max-w-xs bg-white/90 dark:bg-gray-900/90 rounded-xl p-2 shadow-md flex-shrink-0 snap-start transition-transform duration-200 hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-800"
+                whileHover={{ scale: 1.04, y: -2 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
+              >
+                <Link to={`/blog/${item.slug}`} className="block">
+                  <img
+                    src={item.cover_image_url}
+                    alt={item.title}
+                    loading="lazy"
+                    className="w-full h-32 object-cover rounded-lg mb-2 border border-gray-100 dark:border-gray-800"
+                  />
+                  <div className="font-semibold text-base mb-1 line-clamp-2">{item.title}</div>
+                  <div className="text-xs text-muted-foreground line-clamp-2 mb-1">{item.description}</div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+      )}
       </div>
 
       {/* Next Reads Section */}

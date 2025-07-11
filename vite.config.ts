@@ -26,4 +26,8 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    ssr: 'src/entry-server.jsx', // or .tsx if using TypeScript
+    outDir: 'dist',
+  },
 }));

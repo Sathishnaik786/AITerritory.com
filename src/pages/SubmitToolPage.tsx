@@ -82,42 +82,42 @@ const SubmitToolPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="bg-[#232946] rounded-2xl shadow-xl p-8 flex flex-col gap-6 border border-[#232946]/80">
             <div>
               <label className="block text-[#bfc9ff] font-semibold mb-1 text-sm">Email Address</label>
-              <input
-                type="email"
-                name="email"
+        <input
+          type="email"
+          name="email"
                 placeholder="your@email.com"
-                value={form.email}
-                onChange={handleChange}
+          value={form.email}
+          onChange={handleChange}
                 className={`w-full bg-[#181c2a] border ${fieldErrors.email ? 'border-red-500' : 'border-[#353b5c]'} rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#6c63ff] text-base`}
-                required
+          required
                 disabled={loading}
-              />
+        />
               {fieldErrors.email && <span className="text-xs text-red-400">{fieldErrors.email}</span>}
             </div>
             <div>
               <label className="block text-[#bfc9ff] font-semibold mb-1 text-sm">Tool Name</label>
-              <input
-                type="text"
-                name="tool_name"
+        <input
+          type="text"
+          name="tool_name"
                 placeholder="Enter your AI tool name"
-                value={form.tool_name}
-                onChange={handleChange}
+          value={form.tool_name}
+          onChange={handleChange}
                 className={`w-full bg-[#181c2a] border ${fieldErrors.tool_name ? 'border-red-500' : 'border-[#353b5c]'} rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#6c63ff] text-base`}
-                required
+          required
                 disabled={loading}
-              />
+        />
               {fieldErrors.tool_name && <span className="text-xs text-red-400">{fieldErrors.tool_name}</span>}
             </div>
             <div>
               <label className="block text-[#bfc9ff] font-semibold mb-1 text-sm">Tool Website URL</label>
-              <input
-                type="url"
-                name="tool_url"
+        <input
+          type="url"
+          name="tool_url"
                 placeholder="https://your-tool-website.com"
-                value={form.tool_url}
-                onChange={handleChange}
+          value={form.tool_url}
+          onChange={handleChange}
                 className={`w-full bg-[#181c2a] border ${fieldErrors.tool_url ? 'border-red-500' : 'border-[#353b5c]'} rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#6c63ff] text-base`}
-                required
+          required
                 disabled={loading}
               />
               {fieldErrors.tool_url && <span className="text-xs text-red-400">{fieldErrors.tool_url}</span>}
@@ -129,23 +129,23 @@ const SubmitToolPage: React.FC = () => {
                 name="youtube_url"
                 placeholder="https://youtube.com/watch?v=..."
                 value={form.youtube_url}
-                onChange={handleChange}
+          onChange={handleChange}
                 className={`w-full bg-[#181c2a] border ${fieldErrors.youtube_url ? 'border-red-500' : 'border-[#353b5c]'} rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#6c63ff] text-base`}
                 disabled={loading}
-              />
+        />
               <span className="text-xs text-[#bfc9ff]">Add a demo video to increase your tool's visibility</span>
               {fieldErrors.youtube_url && <span className="text-xs text-red-400 block">{fieldErrors.youtube_url}</span>}
             </div>
-            <button
-              type="submit"
+        <button
+          type="submit"
               className="bg-gradient-to-r from-[#6c63ff] to-[#7f53ff] text-white font-semibold py-2 px-6 rounded-lg shadow hover:from-[#7f53ff] hover:to-[#6c63ff] transition disabled:opacity-60 mt-2 text-lg tracking-wide"
               disabled={loading || Object.keys(validateForm()).length > 0}
-            >
-              {loading ? 'Submitting...' : 'Submit Tool'}
-            </button>
+        >
+          {loading ? 'Submitting...' : 'Submit Tool'}
+        </button>
             {success && <div className="text-green-400 text-center mt-2">{success}</div>}
             {error && <div className="text-red-400 text-center mt-2">{error}</div>}
-          </form>
+      </form>
         </div>
         {/* Sidebar */}
         <div className="w-full md:w-80 flex-shrink-0 bg-[#232946] rounded-2xl shadow-xl p-6 flex flex-col gap-6 h-fit border border-[#232946]/80">

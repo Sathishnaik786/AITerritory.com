@@ -65,13 +65,38 @@ async function getBlogsByCategory(req, res) {
   res.json(data);
 }
 
+// Helper to slugify a string
+function slugify(str) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+// Helper to estimate reading time (words/200)
+function estimateReadingTime(content) {
+  if (!content) return 1;
+  const wordCount = content.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(wordCount / 200));
+}
+
 // POST /api/blogs
 async function createBlog(req, res) {
   const blog = req.body;
   // Generate slug if not provided
   if (!blog.slug && blog.title) {
-    blog.slug = blog.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    let baseSlug = slugify(blog.title);
+    let slug = baseSlug;
+    let i = 1;
+    // Ensure slug is unique
+    while (true) {
+      const { data: existing } = await supabase.from('blogs').select('id').eq('slug', slug).single();
+      if (!existing) break;
+      slug = `${baseSlug}-${i++}`;
+    }
+    blog.slug = slug;
   }
+  // Estimate reading time
+  blog.reading_time = estimateReadingTime(blog.content);
   const { data, error } = await supabase
     .from('blogs')
     .insert([blog])
@@ -87,6 +112,20 @@ async function createBlog(req, res) {
 async function updateBlog(req, res) {
   const { id } = req.params;
   const blog = req.body;
+  // Regenerate slug if title changed or slug missing
+  if ((!blog.slug || blog.slug === '') && blog.title) {
+    let baseSlug = slugify(blog.title);
+    let slug = baseSlug;
+    let i = 1;
+    while (true) {
+      const { data: existing } = await supabase.from('blogs').select('id').eq('slug', slug).neq('id', id).single();
+      if (!existing) break;
+      slug = `${baseSlug}-${i++}`;
+    }
+    blog.slug = slug;
+  }
+  // Estimate reading time
+  blog.reading_time = estimateReadingTime(blog.content);
   const { data, error } = await supabase
     .from('blogs')
     .update(blog)

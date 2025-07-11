@@ -5,8 +5,9 @@ import { ArrowRight } from 'lucide-react';
 import { FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 import { SiDiscord } from 'react-icons/si';
 import { Instagram } from 'lucide-react';
+import Prompts from '../components/Prompts';
 
-const Prompts = () => {
+const PromptsPage = () => {
   const [newsletterOpen, setNewsletterOpen] = useState(false);
 
   const socialLinks = [
@@ -18,7 +19,7 @@ const Prompts = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-12">
       {/* Newsletter CTA Section */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white mb-12">
         <div className="max-w-2xl mx-auto text-center">
@@ -39,9 +40,10 @@ const Prompts = () => {
           socialLinks={socialLinks}
         />
       </div>
-      {/* ...rest of Prompts page content... */}
+      {/* Prompts List Section */}
+      <Prompts />
     </div>
   );
 };
 
-export default Prompts; 
+export default PromptsPage; 

@@ -185,7 +185,7 @@ function ThemedAppContent() {
                 </ProtectedRoute>
               } />
               <Route path="/company/submit-tool" element={
-                <SubmitToolPage />
+                  <SubmitToolPage />
               } />
               <Route path="/company/youtube-channel" element={<YouTubeChannelPage />} />
               <Route path="/company/request-feature" element={

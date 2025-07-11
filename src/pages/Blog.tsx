@@ -44,9 +44,9 @@ const Blog: React.FC = () => {
   const rest = blogs.filter(post => !post.featured);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="container mx-auto px-4 py-12">
       {/* Hero Section */}
-      <section className="w-full py-12 md:py-16 bg-gradient-to-b from-blue-100/60 to-transparent dark:from-gray-900/60 dark:to-gray-900">
+      <section className="w-full py-12 md:py-16">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <motion.h1
             className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 dark:text-white tracking-tight"
@@ -67,7 +67,7 @@ const Blog: React.FC = () => {
         </div>
       </section>
       {/* Category Filter */}
-      <div className="max-w-6xl mx-auto px-4 pt-2 pb-6">
+      <div className="max-w-6xl mx-auto pt-2 pb-6">
         <div className="flex flex-nowrap gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
           {CATEGORIES.map((cat) => (
             <button
@@ -83,7 +83,7 @@ const Blog: React.FC = () => {
       {/* Featured Blog Card */}
       {featured && (
         <motion.section
-          className="w-full max-w-5xl mx-auto px-4 mb-12"
+          className="w-full max-w-5xl mx-auto mb-12"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -110,7 +110,7 @@ const Blog: React.FC = () => {
       )}
       {/* Blog Grid */}
       <section className="py-4">
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8"
             initial="hidden"

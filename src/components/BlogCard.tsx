@@ -159,19 +159,19 @@ export const BlogCard: React.FC<BlogCardProps> = ({
       initial="hidden"
       animate="visible"
       whileHover="hover"
-      className={`group cursor-pointer ${className}`}
+      className={`group cursor-pointer flex flex-col h-full ${className} transition-all duration-300 shadow-sm hover:shadow-lg hover:scale-105 hover:bg-muted/50 rounded-xl bg-white dark:bg-gray-900`}
     >
-      <Link to={`/blog/${post.slug}`}>
-        <Card className="h-full overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
-          <div className="aspect-[16/10] overflow-hidden rounded-md border border-gray-200 dark:border-gray-800 shadow-sm">
+      <Link to={`/blog/${post.slug}`} aria-label={`Read blog: ${post.title}`}>
+        <Card className="h-full overflow-hidden border-0 bg-transparent shadow-none rounded-xl">
+          <div className="aspect-[16/10] overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
             <img
               src={displayImage}
               alt={post.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-cover rounded-xl group-hover:scale-105 group-hover:brightness-110 transition-transform transition-filter duration-300"
             />
           </div>
           <CardContent className="p-4 sm:p-5">
-            <div className="flex items-center gap-1.5 sm:gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-2">
               <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
                 {displayCategory}
               </Badge>
@@ -181,7 +181,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
                 </Badge>
               )}
             </div>
-            <h3 className="font-serif font-bold text-sm sm:text-base md:text-lg mb-3 line-clamp-2 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors leading-tight group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
+            <h3 className="text-xl font-semibold text-primary mb-2 line-clamp-2 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors leading-tight group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
               {post.title}
             </h3>
             <p className="text-xs sm:text-sm md:text-base text-gray-700 dark:text-gray-300 line-clamp-3 mb-4 leading-relaxed font-normal">

@@ -189,59 +189,61 @@ const LandingPro: React.FC = () => {
         <meta name="description" content={seoDescription} />
         <link rel="canonical" href={canonicalUrl} />
       </Helmet>
-      <div className={`min-h-screen w-full flex flex-col items-center justify-center px-2 sm:px-4 lg:px-8 ${bgMain} ${textMain}`}>
-        {/* Title */}
-        <motion.h1
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className={`text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-center mt-6 mb-3 sm:mt-8 sm:mb-4 ${h1Text}`}
-        >
-          Discover Your Perfect AI Tool <br className="hidden sm:block" />
-          <span className="text-blue-400">AI Territory's Intelligent Tool Finder</span>
-        </motion.h1>
-        {/* Subtitle */}
-        <div className={`text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl text-center mb-4 sm:mb-8 lg:mb-10 max-w-xs xs:max-w-sm sm:max-w-2xl mx-auto ${subtitleText}`}>
-          Describe your needs and get personalized AI tool recommendations instantly
-        </div>
-        {/* Prompt Input */}
-        <form onSubmit={handlePromptSubmit} className="w-full max-w-xs xs:max-w-sm sm:max-w-xl mx-auto flex flex-col items-center mb-4 sm:mb-8 lg:mb-10">
-          <div className="relative w-full">
-            <Textarea
-              className={`w-full min-h-[48px] xs:min-h-[60px] sm:min-h-[70px] rounded-lg sm:rounded-xl border border-border ${inputBg} ${inputText} ${inputPlaceholder} text-xs xs:text-sm sm:text-base lg:text-lg px-3 xs:px-4 sm:px-6 py-2 xs:py-3 sm:py-5 pr-10 xs:pr-12 sm:pr-14 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 resize-none shadow-none`}
-              placeholder="Describe what you want to accomplish with AI..."
-              value={prompt}
-              onChange={e => setPrompt(e.target.value)}
-              required
-            />
-            <button
-              type="submit"
-              className="absolute bottom-2 xs:bottom-3 sm:bottom-4 right-2 xs:right-3 sm:right-4 rounded-full p-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
-              style={{ minHeight: 36, minWidth: 36, maxHeight: 40, maxWidth: 40 }}
-            >
-              <ArrowRight size={16} className="w-4 h-4 xs:w-5 xs:h-5" />
-            </button>
+      <div className="min-h-screen w-full p-2 sm:p-4 lg:p-8 ${bgMain} ${textMain}">
+        <div className="flex flex-col items-center justify-center w-full min-h-[60vh] max-w-3xl mx-auto">
+          {/* Title */}
+          <motion.h1
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            className={`text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-center mt-6 mb-3 sm:mt-8 sm:mb-4 ${h1Text}`}
+          >
+            Discover Your Perfect AI Tool <br className="hidden sm:block" />
+            <span className="text-blue-400">AI Territory's Intelligent Tool Finder</span>
+          </motion.h1>
+          {/* Subtitle */}
+          <div className={`text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl text-center mb-4 sm:mb-8 lg:mb-10 max-w-xs xs:max-w-sm sm:max-w-2xl mx-auto ${subtitleText}`}>
+            Describe your needs and get personalized AI tool recommendations instantly
           </div>
-        </form>
-        {/* Suggestions: mobile zig-zag, desktop grid */}
-        {renderMobileSuggestions()}
-        {renderDesktopSuggestions()}
-        {/* Explore AI Tools Button */}
-        <button
-          onClick={() => navigate('/home')}
-          className="mt-3 sm:mt-4 px-4 xs:px-6 sm:px-8 py-2 xs:py-3 sm:py-4 bg-primary hover:bg-primary/90 text-primary-foreground text-sm xs:text-base sm:text-lg font-bold rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full xs:w-auto"
-        >
-          Explore AI Territory
-        </button>
-        {/* Show More Button */}
-        <button
-          onClick={() => setShowMore(v => !v)}
-          className="mt-6 mb-2 px-4 xs:px-6 py-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-full shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm xs:text-base"
-          aria-expanded={showMore}
-          aria-controls="seo-content-section"
-        >
-          {showMore ? 'Show Less' : 'Show More About AI Territory'}
-        </button>
+          {/* Prompt Input */}
+          <form onSubmit={handlePromptSubmit} className="w-full max-w-xs xs:max-w-sm sm:max-w-xl mx-auto flex flex-col items-center mb-4 sm:mb-8 lg:mb-10">
+            <div className="relative w-full">
+              <Textarea
+                className={`w-full min-h-[48px] xs:min-h-[60px] sm:min-h-[70px] rounded-lg sm:rounded-xl border border-border ${inputBg} ${inputText} ${inputPlaceholder} text-xs xs:text-sm sm:text-base lg:text-lg px-3 xs:px-4 sm:px-6 py-2 xs:py-3 sm:py-5 pr-10 xs:pr-12 sm:pr-14 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 resize-none shadow-none`}
+                placeholder="Describe what you want to accomplish with AI..."
+                value={prompt}
+                onChange={e => setPrompt(e.target.value)}
+                required
+              />
+              <button
+                type="submit"
+                className="absolute bottom-2 xs:bottom-3 sm:bottom-4 right-2 xs:right-3 sm:right-4 rounded-full p-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+                style={{ minHeight: 36, minWidth: 36, maxHeight: 40, maxWidth: 40 }}
+              >
+                <ArrowRight size={16} className="w-4 h-4 xs:w-5 xs:h-5" />
+              </button>
+            </div>
+          </form>
+          {/* Suggestions: mobile zig-zag, desktop grid */}
+          {renderMobileSuggestions()}
+          {renderDesktopSuggestions()}
+          {/* Explore AI Tools Button */}
+          <button
+            onClick={() => navigate('/home')}
+            className="mt-3 sm:mt-4 px-4 xs:px-6 sm:px-8 py-2 xs:py-3 sm:py-4 bg-primary hover:bg-primary/90 text-primary-foreground text-sm xs:text-base sm:text-lg font-bold rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full xs:w-auto"
+          >
+            Explore AI Territory
+          </button>
+          {/* Show More Button */}
+          <button
+            onClick={() => setShowMore(v => !v)}
+            className="mt-6 mb-2 px-4 xs:px-6 py-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-full shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm xs:text-base"
+            aria-expanded={showMore}
+            aria-controls="seo-content-section"
+          >
+            {showMore ? 'Show Less' : 'Show More About AI Territory'}
+          </button>
+        </div>
         {/* SEO Content Section */}
         {showMore && (
           <main id="seo-content-section" className={`px-2 xs:px-4 sm:px-6 py-6 xs:py-8 sm:py-10 w-full max-w-xs xs:max-w-sm sm:max-w-2xl md:max-w-4xl lg:max-w-6xl mx-auto ${sectionBg} rounded-xl mt-3 sm:mt-4 ${sectionText} overflow-x-auto`} style={{ WebkitOverflowScrolling: 'touch' }}>

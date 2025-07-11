@@ -11,6 +11,13 @@ export interface BlogPost {
   category?: string;
   featured?: boolean;
   reading_time?: string;
+  author_image_url?: string;
+  author_bio?: string;
+  author_social_links?: {
+    twitter?: string;
+    linkedin?: string;
+    github?: string;
+  };
 }
 
 export interface BlogCategory {

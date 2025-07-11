@@ -115,7 +115,8 @@ export default function Prompts() {
         (p.description && p.description.toLowerCase().includes(search.toLowerCase())))
   );
 
-  const bgMain = theme === 'dark' ? 'bg-[#171717]' : 'bg-white';
+  // Remove solid background for main wrapper to allow gradient to show through
+  const bgMain = '';
   const textMain = theme === 'dark' ? 'text-white' : 'text-gray-900';
   const bgSidebar = theme === 'dark' ? 'bg-[#23272a]' : 'bg-gray-100';
   const textSidebar = theme === 'dark' ? 'text-white' : 'text-gray-900';
@@ -217,7 +218,7 @@ export default function Prompts() {
   };
 
   return (
-    <div className={`flex flex-col min-h-[90vh] ${bgMain} ${textMain} rounded-lg shadow-lg overflow-hidden pt-8`}> 
+    <>
       {/* Main Title and Description */}
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-4 pb-2 text-center">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2">AI Territory Prompts</h1>
@@ -324,7 +325,7 @@ export default function Prompts() {
                         >
                           <Card className={`w-full ${cardBg} ${cardText} ${cardBorder} relative rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200`}>
                             <CardContent className="p-4 sm:p-5">
-                              <div className="flex flex-col h-full justify-between min-h-[160px] sm:min-h-[180px]">
+                              <div className="flex flex-col h-full justify-between">
                                 <div className="flex items-start justify-between mb-2 sm:mb-3">
                                   <div className="text-base sm:text-lg font-bold leading-tight">{prompt.title}</div>
                                   <div className="flex gap-1.5 sm:gap-2">
@@ -422,6 +423,6 @@ export default function Prompts() {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+    </>
   );
 } 
