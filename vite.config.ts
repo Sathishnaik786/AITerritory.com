@@ -27,7 +27,11 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    ssr: 'src/entry-server.jsx', // or .tsx if using TypeScript
     outDir: 'dist',
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+      },
+    },
   },
 }));
