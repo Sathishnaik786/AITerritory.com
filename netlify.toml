@@ -24,7 +24,7 @@
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: https: blob:;
       connect-src 'self' https://aiterritory-com.onrender.com https://clerk.aiterritory.org https://*.clerk.accounts.dev https://api.stripe.com wss://*.clerk.accounts.dev https://www.google-analytics.com https://www.googletagmanager.com;
-      frame-src https://js.stripe.com;
+      frame-src https://js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com;
       worker-src 'self' blob:;
     """
 
