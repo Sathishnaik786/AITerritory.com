@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Textarea } from '../components/ui/textarea';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Mic, Search, Image, BookOpen, Sparkles } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { useTheme } from 'next-themes';
 import { Suspense, lazy } from 'react';
 import { FAQ } from '../components/FAQ';
+import { TagCloud } from 'react-tagcloud';
 
 // --- CATEGORY DATA ---
 const categories = [
@@ -182,68 +183,77 @@ const LandingPro: React.FC = () => {
     </div>
   );
 
-  return (
+  return (  
     <>
       <Helmet>
-        <title>AITerritory: Real-Time AI Tools for Every Task</title>
+        <title>AITerritory | Real Time AI Tools for Every Task</title>
         <meta name="description" content={seoDescription} />
         <link rel="canonical" href={canonicalUrl} />
       </Helmet>
       <div className="min-h-screen w-full p-2 sm:p-4 lg:p-8 ${bgMain} ${textMain}">
-        <div className="flex flex-col items-center justify-center w-full min-h-[60vh] max-w-3xl mx-auto">
+        <div className="flex flex-col items-center justify-center w-full min-h-[60vh]">
           {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
-            className={`text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-center mt-6 mb-3 sm:mt-8 sm:mb-4 ${h1Text}`}
+            className={`text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-center mt-6 mb-3 sm:mt-8 sm:mb-4 leading-tight ${h1Text}`}
           >
-            Discover Your Perfect AI Tool <br className="hidden sm:block" />
-            <span className="text-blue-400">AI Territory's Intelligent Tool Finder</span>
+            Discover, Compare, and<br className="hidden sm:block" />
+            Leverage the Power of <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-blue-500 bg-clip-text text-transparent">AI Tools</span>
           </motion.h1>
           {/* Subtitle */}
-          <div className={`text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl text-center mb-4 sm:mb-8 lg:mb-10 max-w-xs xs:max-w-sm sm:max-w-2xl mx-auto ${subtitleText}`}>
-            Describe your needs and get personalized AI tool recommendations instantly
+          <div className={`text-base xs:text-lg sm:text-xl md:text-2xl lg:text-2xl text-center mb-8 sm:mb-10 w-full font-normal ${subtitleText}`}>
+            Explore the best free AI tools with our comprehensive AI tools list. Discover top-notch artificial intelligence tools, AI software, and AI websites to enhance your digital experience. Access powerful AI online for free and elevate your tech journey with the latest in AI innovations.
           </div>
-          {/* Prompt Input */}
-          <form onSubmit={handlePromptSubmit} className="w-full max-w-xs xs:max-w-sm sm:max-w-xl mx-auto flex flex-col items-center mb-4 sm:mb-8 lg:mb-10">
-            <div className="relative w-full">
-              <Textarea
-                className={`w-full min-h-[48px] xs:min-h-[60px] sm:min-h-[70px] rounded-lg sm:rounded-xl border border-border ${inputBg} ${inputText} ${inputPlaceholder} text-xs xs:text-sm sm:text-base lg:text-lg px-3 xs:px-4 sm:px-6 py-2 xs:py-3 sm:py-5 pr-10 xs:pr-12 sm:pr-14 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-all duration-200 resize-none shadow-none`}
-                placeholder="Describe what you want to accomplish with AI..."
-                value={prompt}
-                onChange={e => setPrompt(e.target.value)}
-                required
+          {/* Tag Cloud Demo */}
+          <div className="w-full flex justify-center mb-8">
+            <TagCloud
+              minSize={12}
+              maxSize={35}
+              colorOptions={{
+                luminosity: 'dark',
+                hue: 'blue',
+              }}
+              tags={[]}
+              className="text-lg"
+            />
+          </div>
+          {/* Feature Buttons */}
+          <div className="flex flex-row gap-6 mb-10">
+            <button
+              className="relative flex items-center gap-2 px-8 py-5 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold text-lg shadow-lg hover:scale-105 transition-transform"
+              onClick={() => navigate('/home')}
+            >
+              <span>Launched Today</span>
+              <span className="absolute -top-3 -right-3 bg-orange-500 text-white text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center border-2 border-white">5</span>
+            </button>
+            <button
+              className="relative flex items-center gap-2 px-8 py-5 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-500 text-white font-semibold text-lg shadow-lg hover:scale-105 transition-transform"
+              onClick={() => navigate('/home')}
+            >
+              <span>News Today</span>
+              <span className="absolute -top-3 -right-3 bg-green-500 text-white text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center border-2 border-white">21</span>
+            </button>
+          </div>
+          {/* Search Bar */}
+          <div className="w-full max-w-xl mt-2">
+            <div className="flex items-center bg-[#181d2a] bg-opacity-80 border border-[#2a3144] rounded-2xl px-6 py-5 shadow-lg">
+              <Search className="text-gray-400 mr-3 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search AI with AI"
+                className="flex-1 bg-transparent outline-none text-lg text-white placeholder:text-gray-400"
+                style={{ minWidth: 0 }}
               />
-              <button
-                type="submit"
-                className="absolute bottom-2 xs:bottom-3 sm:bottom-4 right-2 xs:right-3 sm:right-4 rounded-full p-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
-                style={{ minHeight: 36, minWidth: 36, maxHeight: 40, maxWidth: 40 }}
-              >
-                <ArrowRight size={16} className="w-4 h-4 xs:w-5 xs:h-5" />
-              </button>
             </div>
-          </form>
-          {/* Suggestions: mobile zig-zag, desktop grid */}
-          {renderMobileSuggestions()}
-          {renderDesktopSuggestions()}
-          {/* Explore AI Tools Button */}
-          <button
-            onClick={() => navigate('/home')}
-            className="mt-3 sm:mt-4 px-4 xs:px-6 sm:px-8 py-2 xs:py-3 sm:py-4 bg-primary hover:bg-primary/90 text-primary-foreground text-sm xs:text-base sm:text-lg font-bold rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full xs:w-auto"
-          >
-            Explore AI Territory
-          </button>
-          {/* Show More Button */}
-          <button
-            onClick={() => setShowMore(v => !v)}
-            className="mt-6 mb-2 px-4 xs:px-6 py-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-full shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm xs:text-base"
-            aria-expanded={showMore}
-            aria-controls="seo-content-section"
-          >
-            {showMore ? 'Show Less' : 'Show More About AI Territory'}
-          </button>
+          </div>
         </div>
+        {/* Insert BentoGridDemo below hero section */}
+        <div className="my-12">
+          {/* Remove BentoGridDemo section */}
+        </div>
+        {/* --- END FEATURES BENTO GRID --- */}
         {/* SEO Content Section */}
         {showMore && (
           <main id="seo-content-section" className={`px-2 xs:px-4 sm:px-6 py-6 xs:py-8 sm:py-10 w-full max-w-xs xs:max-w-sm sm:max-w-2xl md:max-w-4xl lg:max-w-6xl mx-auto ${sectionBg} rounded-xl mt-3 sm:mt-4 ${sectionText} overflow-x-auto`} style={{ WebkitOverflowScrolling: 'touch' }}>

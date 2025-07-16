@@ -317,32 +317,6 @@ const BlogDetail: React.FC = () => {
             {blog.content}
           </ReactMarkdown>
         </motion.div>
-        {/* Social Share Buttons */}
-        <div className="flex flex-wrap justify-center gap-4 my-8">
-          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-11 h-11 rounded-full bg-[#1DA1F2] shadow hover:scale-110 transition" title="Share on X" aria-label="Share on X">
-            <FaXTwitter className="w-5 h-5 text-white" />
-          </a>
-          <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-11 h-11 rounded-full bg-[#0077B5] shadow hover:scale-110 transition" title="Share on LinkedIn" aria-label="Share on LinkedIn">
-            <FaLinkedin className="w-5 h-5 text-white" />
-          </a>
-          <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + ' ' + shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-11 h-11 rounded-full bg-[#25D366] shadow hover:scale-110 transition" title="Share on WhatsApp" aria-label="Share on WhatsApp">
-            <FaWhatsapp className="w-5 h-5 text-white" />
-          </a>
-          <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-11 h-11 rounded-full bg-[#1877F3] shadow hover:scale-110 transition" title="Share on Facebook" aria-label="Share on Facebook">
-            <Facebook className="w-5 h-5 text-white" />
-          </a>
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(shareUrl);
-              if (toast) toast({ title: 'Link copied!', description: 'Share link copied to clipboard.' });
-            }}
-            className="flex items-center justify-center w-11 h-11 rounded-full bg-gray-200 dark:bg-gray-700 shadow hover:scale-110 transition"
-            title="Copy Link"
-            aria-label="Copy Link"
-          >
-            <svg className="w-5 h-5 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 7h2a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2v-2m8-10H9a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V9a2 2 0 00-2-2z" /></svg>
-          </button>
-        </div>
         {/* Scroll-to-top Button */}
         {showScrollTop && (
           <button

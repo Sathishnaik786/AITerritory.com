@@ -135,13 +135,13 @@ function ThemedAppContent() {
   const isLandingPro = location.pathname === '/';
   const [newsletterOpen, setNewsletterOpen] = useState(false);
   return (
-    <div className={`min-h-screen antialiased`}>
+    <div className={`min-h-screen antialiased w-full flex flex-col`}>
       <HelmetProvider>
         <SEO />
-        <div className="relative min-h-screen flex flex-col items-center">
+        <div className="relative min-h-screen flex flex-col items-center w-full">
           <Navbar newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
           <ScrollToTopButton />
-          <main className={`flex-1 w-full max-w-[1970px] min-h-screen mx-auto ${isLandingPro ? 'px-0' : 'px-4 sm:px-6 lg:px-8'}`}>
+          <main className={`flex-1 w-full min-h-screen`}>
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<LandingPro />} />

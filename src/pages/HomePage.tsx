@@ -100,7 +100,6 @@ export const HomePage: React.FC = () => {
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
             Explore our curated collection of cutting-edge AI tools that transform how you work, create, and innovate.
           </p>
-          <TodayButtons />
           <div className="max-w-2xl mx-auto mb-8">
             <SearchBar
               value={searchQuery}
@@ -367,29 +366,5 @@ function SidebarContent({ searchQuery, setSearchQuery, selectedCategory, handleC
         )}
       </ScrollArea>
     </Card>
-  );
-}
-
-function TodayButtons() {
-  const navigate = useNavigate();
-  return (
-    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 w-full max-w-2xl mx-auto">
-      <button
-        className="relative flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto px-4 sm:px-8 py-3 rounded-2xl font-semibold text-white text-base sm:text-lg bg-gradient-to-r from-purple-600 to-blue-500 shadow-lg hover:scale-105 transition-all"
-        onClick={() => navigate('/tools?launched=today')}
-      >
-        <Wrench className="w-5 h-5 sm:w-6 sm:h-6" />
-        Launched Today
-        <span className="absolute -top-2 -right-2 sm:-top-2 sm:-right-2 bg-orange-500 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow-md">3</span>
-      </button>
-      <button
-        className="relative flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto px-4 sm:px-8 py-3 rounded-2xl font-semibold text-white text-base sm:text-lg bg-gradient-to-r from-pink-500 to-purple-500 shadow-lg hover:scale-105 transition-all"
-        onClick={() => navigate('/blog')}
-      >
-        <Newspaper className="w-5 h-5 sm:w-6 sm:h-6" />
-        News Today
-        <span className="absolute -top-2 -right-2 sm:-top-2 sm:-right-2 bg-green-600 text-white text-xs font-bold rounded-full px-2 py-0.5 shadow-md">14</span>
-      </button>
-    </div>
   );
 }

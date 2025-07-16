@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import BackgroundAnimation from './ui/BackgroundAnimation';
 
 const faqData = [
   {
-    question: "What makes this template unique?",
-    answer: "This template is crafted with modern design principles, clean code, and a focus on usability. It offers a unique blend of aesthetics and functionality, making it stand out from generic templates."
+    question: "What is AI Territory?",
+    answer: "AI Territory is a curated directory of AI tools, resources, and insights to help creators, businesses, and enthusiasts stay ahead in the world of artificial intelligence."
   },
   {
-    question: "Can I customize the template to match my brand?",
-    answer: "Absolutely! The template is built with customization in mind. You can easily change colors, fonts, and layout to align with your brand identity."
+    question: "How can I submit a new AI tool or resource?",
+    answer: "You can submit your AI tool or resource using the 'Submit Tool' page on our website. Our team will review your submission before it appears in the directory."
   },
   {
-    question: "Is this template optimized for SEO and speed?",
-    answer: "Yes, the template is optimized for fast loading times and SEO best practices, ensuring your site performs well in search engines and provides a great user experience."
+    question: "Is there a cost to use the tools listed on AI Territory?",
+    answer: "Most tools listed are free to explore. Some may have premium features or pricing, which will be indicated on their detail pages."
   },
   {
-    question: "Is the template mobile-friendly?",
-    answer: "Definitely. The template is fully responsive and looks great on all devices, from desktops to smartphones."
+    question: "How do I subscribe to the AI Territory newsletter?",
+    answer: "Simply enter your email address in the newsletter section and click 'Subscribe' to receive weekly updates on the latest AI tools and trends."
   },
   {
-    question: "Can I use this template for commercial projects?",
-    answer: "Yes, you can use this template for both personal and commercial projects without any restrictions."
+    question: "How can I contact support or provide feedback?",
+    answer: "You can reach out to us via the 'Contact Us' page or use the feedback form available on the website. We value your input!"
   }
 ];
 
@@ -32,18 +33,19 @@ export const FAQ: React.FC = () => {
   };
 
   return (
-    <section className="w-full bg-[#0a0a0f] py-16 flex flex-col items-center justify-center min-h-[80vh]">
-      <div className="flex flex-col items-center w-full max-w-2xl px-4">
+    <section className="relative w-full py-16 flex flex-col items-center justify-center min-h-[80vh] bg-transparent overflow-hidden">
+      <BackgroundAnimation />
+      <div className="relative z-10 flex flex-col items-center w-full max-w-2xl px-4">
         {/* FAQ Section Label */}
-        <span className="mb-4 px-5 py-1 rounded-full bg-[#18182a] text-[#8b5cf6] text-xs font-semibold tracking-wider border border-[#2a2a40]">
+        <span className="mb-4 px-5 py-1 rounded-full bg-white/40 dark:bg-[#18182a]/40 text-[#8b5cf6] text-xs font-semibold tracking-wider border border-[#e5e7eb]/40 dark:border-[#2a2a40]/40 backdrop-blur-sm">
           FAQ'S SECTION
         </span>
         {/* Heading */}
-        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-2 text-center">
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2 text-center">
           Some Common FAQ's
         </h2>
         {/* Subheading */}
-        <p className="text-base sm:text-lg text-[#7c7c9a] mb-10 text-center">
+        <p className="text-base sm:text-lg text-gray-600 dark:text-[#7c7c9a] mb-10 text-center">
           Get answers to your questions and learn about our platform
         </p>
         {/* FAQ List */}
@@ -51,21 +53,20 @@ export const FAQ: React.FC = () => {
           {faqData.map((item, idx) => (
             <div
               key={idx}
-              className={`rounded-2xl bg-[#18182a] shadow-lg transition-all duration-200 ${openIndex === idx ? 'ring-2 ring-[#8b5cf6]' : ''}`}
+              className={`rounded-2xl bg-white/30 dark:bg-[#18182a]/30 shadow-lg transition-all duration-200 backdrop-blur-md ${openIndex === idx ? 'ring-2 ring-[#8b5cf6]' : ''}`}
             >
               <button
-                className="w-full flex items-center justify-between px-6 py-4 text-left text-white font-medium text-base sm:text-lg focus:outline-none"
+                className="w-full flex items-center justify-between px-6 py-4 text-left text-gray-900 dark:text-white font-medium text-base sm:text-lg focus:outline-none"
                 onClick={() => handleToggle(idx)}
                 aria-expanded={openIndex === idx}
               >
                 <span>{item.question}</span>
-                <ChevronDown className={`w-6 h-6 ml-2 transition-transform duration-200 ${openIndex === idx ? 'rotate-180' : ''} text-[#bdbdf7]`} />
+                <ChevronDown className={`w-6 h-6 ml-2 transition-transform duration-200 ${openIndex === idx ? 'rotate-180' : ''} text-[#8b5cf6]`} />
               </button>
               <div
                 className={`overflow-hidden transition-all duration-300 px-6 ${openIndex === idx ? 'max-h-40 py-2' : 'max-h-0 py-0'}`}
-                style={{ color: '#bdbdf7' }}
               >
-                <p className="text-sm sm:text-base leading-relaxed">
+                <p className="text-sm sm:text-base leading-relaxed text-gray-700 dark:text-[#bdbdf7]">
                   {item.answer}
                 </p>
               </div>
