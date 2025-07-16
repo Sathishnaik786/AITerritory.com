@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Textarea } from '../components/ui/textarea';
 import { motion } from 'framer-motion';
-import { ArrowRight, Mic, Search, Image, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowRight, Mic, Search, Image, BookOpen, Sparkles, Rocket, Newspaper } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { useTheme } from 'next-themes';
 import { Suspense, lazy } from 'react';
@@ -197,54 +197,58 @@ const LandingPro: React.FC = () => {
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
-            className={`text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-center mt-6 mb-3 sm:mt-8 sm:mb-4 leading-tight ${h1Text}`}
+            className={`text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center mt-6 mb-2 sm:mt-8 sm:mb-3 leading-tight ${h1Text}`}
+            style={{ display: 'block', WebkitLineClamp: 'unset', WebkitBoxOrient: 'unset', overflow: 'visible' }}
           >
-            Discover, Compare, and<br className="hidden sm:block" />
-            Leverage the Power of <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-blue-500 bg-clip-text text-transparent">AI Tools</span>
+            Discover, Compare, and Leverage the Power of <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-blue-500 bg-clip-text text-transparent">AI Tools</span>
           </motion.h1>
           {/* Subtitle */}
-          <div className={`text-base xs:text-lg sm:text-xl md:text-2xl lg:text-2xl text-center mb-8 sm:mb-10 w-full font-normal ${subtitleText}`}>
-            Explore the best free AI tools with our comprehensive AI tools list. Discover top-notch artificial intelligence tools, AI software, and AI websites to enhance your digital experience. Access powerful AI online for free and elevate your tech journey with the latest in AI innovations.
+          <div className={`text-base xs:text-lg sm:text-xl md:text-2xl lg:text-2xl text-center mb-7 sm:mb-10 w-full font-normal ${subtitleText}`}
+            style={{ display: 'block', maxWidth: '700px', margin: '0 auto' }}>
+            Discover and compare the best AI tools for content creation, productivity, and more all in one place
           </div>
           {/* Tag Cloud Demo */}
-          <div className="w-full flex justify-center mb-8">
-            <TagCloud
-              minSize={12}
-              maxSize={35}
-              colorOptions={{
-                luminosity: 'dark',
-                hue: 'blue',
-              }}
-              tags={[]}
-              className="text-lg"
-            />
+          <div className="w-full flex justify-center mb-6 overflow-x-auto max-w-full">
+            <div className="min-w-[220px] max-w-xs sm:max-w-lg w-full">
+              <TagCloud
+                minSize={12}
+                maxSize={35}
+                colorOptions={{
+                  luminosity: 'dark',
+                  hue: 'blue',
+                }}
+                tags={[]}
+                className="text-base sm:text-lg"
+              />
+            </div>
           </div>
           {/* Feature Buttons */}
-          <div className="flex flex-row gap-6 mb-10">
+          <div className="flex flex-row gap-4 sm:gap-6 mb-8 w-full max-w-xs sm:max-w-2xl">
             <button
-              className="relative flex items-center gap-2 px-8 py-5 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold text-lg shadow-lg hover:scale-105 transition-transform"
+              className="relative flex-1 flex items-center justify-center gap-2 px-4 sm:px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold text-base sm:text-lg shadow-lg hover:scale-105 transition-transform min-w-0"
               onClick={() => navigate('/home')}
             >
+              <Rocket className="w-5 h-5 sm:w-6 sm:h-6" />
               <span>Launched Today</span>
               <span className="absolute -top-3 -right-3 bg-orange-500 text-white text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center border-2 border-white">5</span>
             </button>
             <button
-              className="relative flex items-center gap-2 px-8 py-5 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-500 text-white font-semibold text-lg shadow-lg hover:scale-105 transition-transform"
+              className="relative flex-1 flex items-center justify-center gap-2 px-4 sm:px-8 py-4 rounded-2xl bg-gradient-to-r from-pink-600 to-purple-500 text-white font-semibold text-base sm:text-lg shadow-lg hover:scale-105 transition-transform min-w-0"
               onClick={() => navigate('/home')}
             >
+              <Newspaper className="w-5 h-5 sm:w-6 sm:h-6" />
               <span>News Today</span>
               <span className="absolute -top-3 -right-3 bg-green-500 text-white text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center border-2 border-white">21</span>
             </button>
           </div>
           {/* Search Bar */}
-          <div className="w-full max-w-xl mt-2">
-            <div className="flex items-center bg-[#181d2a] bg-opacity-80 border border-[#2a3144] rounded-2xl px-6 py-5 shadow-lg">
+          <div className="w-full max-w-xs sm:max-w-xl mt-2">
+            <div className="flex items-center bg-[#181d2a] bg-opacity-80 border border-[#2a3144] rounded-2xl px-4 sm:px-6 py-4 sm:py-5 shadow-lg">
               <Search className="text-gray-400 mr-3 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search AI with AI"
-                className="flex-1 bg-transparent outline-none text-lg text-white placeholder:text-gray-400"
-                style={{ minWidth: 0 }}
+                className="flex-1 bg-transparent outline-none text-base sm:text-lg text-white placeholder:text-gray-400 min-w-0"
               />
             </div>
           </div>
