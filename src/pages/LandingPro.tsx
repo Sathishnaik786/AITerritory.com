@@ -197,7 +197,7 @@ const LandingPro: React.FC = () => {
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
-            className={`text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center mt-6 mb-2 sm:mt-8 sm:mb-3 leading-tight ${h1Text}`}
+            className={`text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-center mt-6 mb-2 sm:mt-8 sm:mb-3 leading-tight ${h1Text}`}
             style={{ display: 'block', WebkitLineClamp: 'unset', WebkitBoxOrient: 'unset', overflow: 'visible' }}
           >
             Discover, Compare, and Leverage the Power of <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-blue-500 bg-clip-text text-transparent">AI Tools</span>
@@ -205,7 +205,7 @@ const LandingPro: React.FC = () => {
           {/* Subtitle */}
           <div className={`text-base xs:text-lg sm:text-xl md:text-2xl lg:text-2xl text-center mb-7 sm:mb-10 w-full font-normal ${subtitleText}`}
             style={{ display: 'block', maxWidth: '700px', margin: '0 auto' }}>
-            Discover and compare the best AI tools for content creation, productivity, and more all in one place
+            Discover and compare the best AI tools for content cre ation, productivity, and more all in one place
           </div>
           {/* Tag Cloud Demo */}
           <div className="w-full flex justify-center mb-6 overflow-x-auto max-w-full">
