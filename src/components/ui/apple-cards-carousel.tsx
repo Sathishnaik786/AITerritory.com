@@ -24,7 +24,8 @@ type Card = {
   src: string;
   title: string;
   category: string;
-  content: React.ReactNode;
+  content: string; // raw string for copying
+  contentNode?: React.ReactNode; // JSX for display
 };
 
 export const CarouselContext = createContext<{
@@ -230,7 +231,30 @@ export const Card = ({
               >
                 {card.title}
               </motion.p>
-              <div className="py-10">{card.content}</div>
+              <div className="py-10">
+                <div className="mb-4 text-base md:text-lg text-neutral-700 dark:text-neutral-200 whitespace-pre-line">
+                  {card.contentNode ? card.contentNode : card.content}
+                </div>
+                <div className="flex gap-4">
+                  <button
+                    className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+                    onClick={() => {
+                      navigator.clipboard.writeText(card.content);
+                      alert('Prompt copied!');
+                    }}
+                  >
+                    Copy Prompt
+                  </button>
+                  <button
+                    className="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition"
+                    onClick={() => {
+                      window.location.href = '/prompts';
+                    }}
+                  >
+                    Go to Prompts
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </div>
         )}

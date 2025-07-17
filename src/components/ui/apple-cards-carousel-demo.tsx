@@ -24,7 +24,8 @@ export default function AppleCardsCarouselDemo() {
               src: card.image_url,
               title: card.title,
               category: card.category,
-              content: (
+              content: card.content, // pass the raw string
+              contentNode: (
                 <div className="p-6 text-base md:text-lg text-neutral-700 dark:text-neutral-200 whitespace-pre-line">
                   {card.content}
                 </div>
