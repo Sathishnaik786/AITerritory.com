@@ -32,6 +32,7 @@ const Blog: React.FC = () => {
         setLoading(false);
       });
     }
+
   }, [selectedCategory]);
 
   if (loading) return <div className="py-12 text-center">Loading...</div>;
@@ -45,8 +46,8 @@ const Blog: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-12">
-      {/* Hero Section */}
-      <section className="w-full py-12 md:py-16">
+      {/* Hero Section - Hide on mobile */}
+      <section className="w-full py-12 md:py-16 hidden sm:block">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <motion.h1
             className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 dark:text-white tracking-tight"
@@ -108,28 +109,29 @@ const Blog: React.FC = () => {
           </div>
         </motion.section>
       )}
-      {/* Blog Grid */}
+      {/* Blog Cards - Mobile Vertical Scroll Snap */}
       <section className="py-4">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.08 } }
-            }}
-          >
-            {rest.map((post) => (
-              <motion.div
-                key={post.id}
-                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-                transition={{ duration: 0.5 }}
-              >
-                <BlogCard post={post} />
-              </motion.div>
-            ))}
-          </motion.div>
+        {/* Mobile: Vertical scroll snap carousel */}
+        <div
+          className="overflow-y-auto scroll-smooth snap-y snap-mandatory flex flex-col gap-4 py-8 hide-scrollbar sm:hidden"
+          style={{ height: '80vh', scrollPaddingTop: '2rem', scrollPaddingBottom: '2rem' }}
+        >
+          {rest.map((post) => (
+            <div
+              key={post.id}
+              className="snap-center mx-auto w-[90vw] max-w-md rounded-xl bg-white dark:bg-gray-900 shadow-md p-4 mt-8 mb-8"
+            >
+              <BlogCard post={post} />
+            </div>
+          ))}
+        </div>
+        {/* Desktop/Tablet: Grid */}
+        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 hidden sm:grid">
+          {rest.map((post) => (
+            <div key={post.id}>
+              <BlogCard post={post} />
+            </div>
+          ))}
         </div>
       </section>
     </div>
