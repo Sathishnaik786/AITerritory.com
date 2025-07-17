@@ -8,6 +8,8 @@ import { useTheme } from 'next-themes';
 import { Suspense, lazy } from 'react';
 import { FAQ } from '../components/FAQ';
 import { TagCloud } from 'react-tagcloud';
+import FeatureBentoGrid from '../components/FeatureBentoGrid';
+import AppleCardsCarouselDemo from '../components/ui/apple-cards-carousel-demo';
 
 // --- CATEGORY DATA ---
 const categories = [
@@ -254,10 +256,8 @@ const LandingPro: React.FC = () => {
           </div>
         </div>
         {/* Insert BentoGridDemo below hero section */}
-        <div className="my-12">
-          {/* Remove BentoGridDemo section */}
-        </div>
-        {/* --- END FEATURES BENTO GRID --- */}
+        <FeatureBentoGrid />
+        <AppleCardsCarouselDemo />
         {/* SEO Content Section */}
         {showMore && (
           <main id="seo-content-section" className={`px-2 xs:px-4 sm:px-6 py-6 xs:py-8 sm:py-10 w-full max-w-xs xs:max-w-sm sm:max-w-2xl md:max-w-4xl lg:max-w-6xl mx-auto ${sectionBg} rounded-xl mt-3 sm:mt-4 ${sectionText} overflow-x-auto`} style={{ WebkitOverflowScrolling: 'touch' }}>
