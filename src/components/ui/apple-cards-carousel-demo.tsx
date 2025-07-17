@@ -11,7 +11,7 @@ export default function AppleCardsCarouselDemo() {
   return (
     <div className="w-full h-full py-20">
       <h2 className="max-w-7xl pl-4 mx-auto text-xl md:text-5xl font-bold text-neutral-800 dark:text-neutral-200 font-sans">
-        Get to know your iSad.
+        Create Stunning Images With Prompts
       </h2>
       <Carousel items={cards} />
     </div>
@@ -84,8 +84,50 @@ const data = [
   },
   {
     category: "Hiring",
-    title: "Hiring for a Staff Software Engineer",
+    title: "",
     src: "https://images.unsplash.com/photo-1511984804822-e16ba72f5848?q=80&w=2048&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    content: <DummyContent />,
+  },
+  {
+    category: "Hiring",
+    title: "",
+    src: "https://videos.openai.com/vg-assets/assets%2Ftask_01k08vc277e14atj1r0804e71x%2F1752643834_img_1.webp?st=2025-07-17T04%3A36%3A34Z&se=2025-07-23T05%3A36%3A34Z&sks=b&skt=2025-07-17T04%3A36%3A34Z&ske=2025-07-23T05%3A36%3A34Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=3d249c53-07fa-4ba4-9b65-0bf8eb4ea46a&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=XZMF1pY2zV5M7JdjMP5stxj2%2B62UdAwtrCQSMrJv4go%3D&az=oaivgprodscus",
+    content: <DummyContent />,
+  },
+  {
+    category: "Hiring",
+    title: "",
+    src: "https://videos.openai.com/vg-assets/assets%2Ftask_01k06ygg4zffqb8ytv8mw0p3w9%2F1752580013_img_0.webp?st=2025-07-17T04%3A37%3A19Z&se=2025-07-23T05%3A37%3A19Z&sks=b&skt=2025-07-17T04%3A37%3A19Z&ske=2025-07-23T05%3A37%3A19Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=3d249c53-07fa-4ba4-9b65-0bf8eb4ea46a&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=fksQoiL4oO9LUkAjkt%2FeyhpgJo%2FfAG9DW7tb2PXMgSs%3D&az=oaivgprodscus",
+    content: <DummyContent />,
+  },
+  {
+    category: "Hiring",
+    title: "",
+    src: "https://videos.openai.com/vg-assets/assets%2Ftask_01k079rkgqfw58tng7vq669pa3%2F1752591888_img_0.webp?st=2025-07-17T03%3A41%3A30Z&se=2025-07-23T04%3A41%3A30Z&sks=b&skt=2025-07-17T03%3A41%3A30Z&ske=2025-07-23T04%3A41%3A30Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=3d249c53-07fa-4ba4-9b65-0bf8eb4ea46a&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=gFm5h6b8BzhaOc0fut8e06yvIoku%2FhZzQnnQGuHF8Qw%3D&az=oaivgprodscus",
+    content: <DummyContent />,
+  },
+  {
+    category: "Hiring",
+    title: "",
+    src: "https://videos.openai.com/vg-assets/assets%2Ftask_01k0bbyv9he23b7hgqwrwfk23b%2F1752728413_img_1.webp?st=2025-07-17T03%3A41%3A30Z&se=2025-07-23T04%3A41%3A30Z&sks=b&skt=2025-07-17T03%3A41%3A30Z&ske=2025-07-23T04%3A41%3A30Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=3d249c53-07fa-4ba4-9b65-0bf8eb4ea46a&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=LC6l1WRlIymFZgY4tQjODOn9GEKBSmD1ZMf1uCjYNs8%3D&az=oaivgprodscus",
+    content: <DummyContent />,
+  },
+  {
+    category: "Hiring",
+    title: "",
+    src: "https://videos.openai.com/vg-assets/assets%2Ftask_01k0936yyfe3earjmszhr08twa%2F1752652109_img_0.webp?st=2025-07-17T05%3A32%3A45Z&se=2025-07-23T06%3A32%3A45Z&sks=b&skt=2025-07-17T05%3A32%3A45Z&ske=2025-07-23T06%3A32%3A45Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=3d249c53-07fa-4ba4-9b65-0bf8eb4ea46a&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=O5nkF0F94x%2BTsoFehpS1rVvm%2FV%2FPDLsDmqUqDX0Sb4g%3D&az=oaivgprodscus",
+    content: <DummyContent />,
+  },
+  {
+    category: "Hiring",
+    title: "",
+    src: "https://videos.openai.com/vg-assets/assets%2Ftask_01k037ac55fzkv6n5vcg4gwkj5%2F1752455064_img_0.webp?st=2025-07-17T05%3A32%3A45Z&se=2025-07-23T06%3A32%3A45Z&sks=b&skt=2025-07-17T05%3A32%3A45Z&ske=2025-07-23T06%3A32%3A45Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=3d249c53-07fa-4ba4-9b65-0bf8eb4ea46a&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=aCcV28QCAFKyHr1DZGh7GXxul0YJRDNohRGT8FT5sWM%3D&az=oaivgprodscus",
+    content: <DummyContent />,
+  },
+  {
+    category: "Hiring",
+    title: "",
+    src: "https://videos.openai.com/vg-assets/assets%2Ftask_01k092474eegk8na3mpmkgsm9e%2F1752650921_img_0.webp?st=2025-07-17T03%3A41%3A52Z&se=2025-07-23T04%3A41%3A52Z&sks=b&skt=2025-07-17T03%3A41%3A52Z&ske=2025-07-23T04%3A41%3A52Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=3d249c53-07fa-4ba4-9b65-0bf8eb4ea46a&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=0xHLSfCENfSf7TY9BHvCe5oBEhh%2B6qhaFhH3PcsrbC4%3D&az=oaivgprodscus",
     content: <DummyContent />,
   },
 ]; 

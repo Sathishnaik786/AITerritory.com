@@ -9,6 +9,7 @@ import { Suspense, lazy } from 'react';
 import { FAQ } from '../components/FAQ';
 import { TagCloud } from 'react-tagcloud';
 import FeatureBentoGrid from '../components/FeatureBentoGrid';
+import UseCasesTimeline from '../components/UseCasesTimeline';
 import AppleCardsCarouselDemo from '../components/ui/apple-cards-carousel-demo';
 
 // --- CATEGORY DATA ---
@@ -257,6 +258,7 @@ const LandingPro: React.FC = () => {
         </div>
         {/* Insert BentoGridDemo below hero section */}
         <FeatureBentoGrid />
+        <UseCasesTimeline />
         <AppleCardsCarouselDemo />
         {/* SEO Content Section */}
         {showMore && (
