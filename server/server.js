@@ -29,6 +29,7 @@ const aiAgentLearningResourcesRoutes = require('./routes/ai-agent-learning-resou
 const adminRoutes = require('./routes/admin');
 const adminAuth = require('./middleware/adminAuth');
 const newsletterController = require('./controllers/newsletterController');
+const appleCarouselRoutes = require('./routes/appleCarousel');
 
 const app = express();
 
@@ -147,6 +148,7 @@ app.use('/api/reviews', reviewsRoutes);
 app.use('/api/ai-learning-path-courses', aiLearningPathCoursesRoutes);
 app.use('/api/ai-agent-learning-resources', aiAgentLearningResourcesRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/apple-carousel', appleCarouselRoutes);
 
 // Add /api/paypal webhook route
 app.use('/api/paypal', require('./routes/paypal'));
@@ -172,6 +174,7 @@ app.get('/api', (req, res) => {
       blogs: '/api/blogs',
       Admin: '/admin',
       health: '/health',
+      Carsoul: '/apple-carousel';
       newsletterSubscribers: '/api/newsletter-subscribers'
     }
   });
