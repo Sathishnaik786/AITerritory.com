@@ -174,7 +174,7 @@ app.get('/api', (req, res) => {
       blogs: '/api/blogs',
       Admin: '/admin',
       health: '/health',
-      Carsoul: '/apple-carousel';
+      Carsoul: '/apple-carousel',
       newsletterSubscribers: '/api/newsletter-subscribers'
     }
   });
