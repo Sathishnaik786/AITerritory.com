@@ -316,9 +316,9 @@ const AllAIToolsPage = () => {
         loading={loading}
         stats={stats} // Pass the stats map
         variant="default"
-        initialCount={6}
-        incrementCount={6}
-        columns={4}
+        initialCount={9}
+        incrementCount={9}
+        columns={3}
         showResultsCount={true}
       />
       </motion.div>
@@ -327,4 +327,4 @@ const AllAIToolsPage = () => {
   );
 };
 
-export default AllAIToolsPage; 
+export default AllAIToolsPage;

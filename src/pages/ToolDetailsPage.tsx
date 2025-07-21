@@ -95,13 +95,6 @@ const useCases = [
   },
 ];
 
-// Add placeholder screenshots array at the top of the component file
-const screenshots = [
-  '/public/screenshot1.png',
-  '/public/screenshot2.png',
-  '/public/screenshot3.png',
-];
-
 // Add this type above your component:
 type Comment = {
   id: string;
@@ -620,12 +613,26 @@ const ToolDetailsPage: React.FC = () => {
 
           {/* Carousel/Feature Media */}
           <div className="max-w-4xl mx-auto px-4 md:px-8 mt-6 mb-10">
-            {/* TODO: Replace with Swiper/Framer Motion carousel for screenshots/highlights */}
-            <div className="w-full flex gap-4 overflow-x-auto pb-2">
-              {(screenshots || []).slice(0, 4).map((src, idx) => (
-                <img key={src} src={src} alt={`Screenshot ${idx + 1}`} className="w-72 h-44 object-cover rounded-xl shadow border border-gray-100 dark:border-gray-800 bg-white flex-shrink-0" />
-              ))}
-        </div>
+            {tool.screenshots && tool.screenshots.length > 0 ? (
+              <div className="w-full flex gap-6 overflow-x-auto pb-4">
+                {tool.screenshots.map((src, idx) => (
+                  <motion.div
+                    key={idx}
+                    className="flex-shrink-0"
+                    whileHover={{ scale: 1.1, zIndex: 10 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                  >
+                    <img 
+                      src={src} 
+                      alt={`Screenshot ${idx + 1}`} 
+                      className="w-80 h-52 object-cover rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 bg-white cursor-pointer" 
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground py-8">No screenshots available.</div>
+            )}
           </div>
 
           {/* Details Section */}

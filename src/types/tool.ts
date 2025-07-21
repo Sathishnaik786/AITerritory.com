@@ -16,6 +16,7 @@ export interface Tool {
   pricing_type: string;
   created_at: string;
   updated_at: string;
+  screenshots?: string[]; // Use array for multiple screenshots
   
   // Related data
   categories?: Category;

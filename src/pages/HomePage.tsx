@@ -210,7 +210,8 @@ export const HomePage: React.FC = () => {
                     tools={featuredTools || []}
                     loading={featuredLoading}
                     variant="compact"
-                    stats={stats} // Pass the stats map
+                    stats={stats}
+                    itemsToShow={2}
                   />
                 </Suspense>
               </CardContent>
@@ -239,7 +240,8 @@ export const HomePage: React.FC = () => {
                     tools={trendingTools || []}
                     loading={trendingLoading}
                     variant="compact"
-                    stats={stats} // Pass the stats map
+                    stats={stats}
+                    itemsToShow={2}
                   />
                 </Suspense>
               </CardContent>
@@ -337,8 +339,8 @@ export const HomePage: React.FC = () => {
                 tools={tools || []}
                 loading={toolsLoading}
                 variant="default"
-                initialCount={6}
-                incrementCount={6}
+                initialCount={9}
+                incrementCount={9}
                 columns={3}
                 showResultsCount={false}
                 stats={stats} // Pass the stats map

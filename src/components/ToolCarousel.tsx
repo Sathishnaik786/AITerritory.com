@@ -16,9 +16,10 @@ interface ToolCarouselProps {
   loading?: boolean;
   stats: Record<string, ToolCardStats>; // Add stats prop
   variant?: string;
+  itemsToShow?: number;
 }
 
-const ToolCarousel: React.FC<ToolCarouselProps> = ({ tools = [], loading = false, stats, variant }) => {
+const ToolCarousel: React.FC<ToolCarouselProps> = ({ tools = [], loading = false, stats, variant, itemsToShow = 3 }) => {
   const plugin = React.useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true })
   );
@@ -44,7 +45,7 @@ const ToolCarousel: React.FC<ToolCarouselProps> = ({ tools = [], loading = false
         {tools.map((tool, index) => (
           // Ensure stats for the tool exist before rendering
           stats[tool.id] && (
-            <CarouselItem key={tool.id || index} className="sm:basis-1/2 md:basis-1/3">
+            <CarouselItem key={tool.id || index} className={`sm:basis-1/2 ${itemsToShow === 2 ? 'md:basis-1/2' : 'md:basis-1/3'}`}>
               <div className="p-1">
                 <ToolCard
                   tool={tool}
