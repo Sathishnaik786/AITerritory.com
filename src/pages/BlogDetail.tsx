@@ -147,6 +147,9 @@ const BlogDetail: React.FC = () => {
   // Define shareUrl and shareTitle for share links
   const shareUrl = `https://aiterritory.org/blog/${blog.slug}`;
   const shareTitle = blog.title;
+  const metaDescription = blog.description || 'Discover the latest in AI, tools, and productivity at AI Territory.';
+  const metaImage = blog.cover_image_url || 'https://aiterritory.org/logo.jpg';
+  const canonicalUrl = `https://aiterritory.org/blog/${blog.slug}`;
 
   // Add ids to headings in the HTML (for anchor links)
   if (contentRef.current) {
@@ -163,18 +166,49 @@ const BlogDetail: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 scroll-smooth overflow-y-auto">
-      {/* Dynamic Open Graph & Twitter Meta Tags */}
+    <>
       <Helmet>
         <title>{blog.title}</title>
+        <meta name="description" content={metaDescription} />
+        <link rel="canonical" href={canonicalUrl} />
+        {/* Open Graph Meta Tags */}
+        <meta property="og:type" content="article" />
         <meta property="og:title" content={blog.title} />
-        <meta property="og:description" content={blog.description || 'Discover the latest in AI, tools, and productivity at AI Territory.'} />
-        <meta property="og:image" content={blog.cover_image_url || 'https://aiterritory.org/logo.jpg'} />
-        <meta property="og:url" content={`https://aiterritory.org/blog/${blog.slug}`} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:image" content={metaImage} />
+        <meta property="og:url" content={canonicalUrl} />
+        {/* Twitter Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={blog.title} />
-        <meta name="twitter:description" content={blog.description || 'Discover the latest in AI, tools, and productivity at AI Territory.'} />
-        <meta name="twitter:image" content={blog.cover_image_url || 'https://aiterritory.org/logo.jpg'} />
+        <meta name="twitter:description" content={metaDescription} />
+        <meta name="twitter:image" content={metaImage} />
+      </Helmet>
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": blog.title,
+            "description": metaDescription,
+            "image": metaImage,
+            "author": {
+              "@type": "Person",
+              "name": blog.author_name
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "AITerritory",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://aiterritory.org/logo.jpg"
+              }
+            },
+            "datePublished": blog.created_at,
+            "dateModified": blog.updated_at || blog.created_at,
+            "mainEntityOfPage": canonicalUrl,
+            "url": canonicalUrl
+          })}
+        </script>
       </Helmet>
       {/* Reading Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 z-50">
@@ -534,7 +568,7 @@ const BlogDetail: React.FC = () => {
           </div>
         </div>
       </motion.div>
-    </div>
+    </>
   );
 };
 

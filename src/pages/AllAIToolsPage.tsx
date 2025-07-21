@@ -8,9 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Search, Filter } from 'lucide-react';
 import { Tool } from '../types/tool';
+import { Helmet } from "react-helmet-async";
+import { useUser } from '@clerk/clerk-react';
+import { supabase } from '../services/supabaseClient'; // Adjust path
+import { ToolCard, ToolCardStats } from '../components/ToolCard'; // Import ToolCardStats
 
 const AllAIToolsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
+  const [stats, setStats] = useState<Record<string, ToolCardStats>>({});
+  const { user } = useUser();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -21,42 +27,69 @@ const AllAIToolsPage = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
 
-  const fetchTools = () => {
+  const fetchToolsAndStats = async () => {
     setLoading(true);
     setError(null);
+    
+    // 1. Build query params for fetching tools
     const params = new URLSearchParams();
     if (search) params.append('search', search);
     if (pricingType) params.append('pricing_type', pricingType);
     if (minRating) params.append('min_rating', minRating);
     if (selectedTag) params.append('tag', selectedTag);
     if (sortBy) params.append('sort', sortBy);
-    // Remove pagination parameters to get all tools for "Show More" functionality
-    params.append('limit', '1000'); // Get a large number of tools
+    params.append('limit', '1000');
     
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3004/api';
-    fetch(`${apiBaseUrl}/tools?${params.toString()}`)
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch tools');
-        return res.json();
-      })
-      .then(data => {
-        setTools(data.tools || data);
-        setError(null);
-      })
-      .catch(err => {
-        setError(err.message || 'An error occurred');
-      })
-      .finally(() => setLoading(false));
+    try {
+      // 2. Fetch the tools
+      const toolsRes = await fetch(`${apiBaseUrl}/tools?${params.toString()}`);
+      if (!toolsRes.ok) throw new Error('Failed to fetch tools');
+      const fetchedTools = await toolsRes.json();
+      const toolsData = fetchedTools.tools || fetchedTools;
+      setTools(toolsData);
+      
+      // 3. If tools are found, fetch their stats
+      if (toolsData.length > 0) {
+        const toolIds = toolsData.map(t => t.id);
+        
+        const [likesRes, bookmarksRes] = await Promise.all([
+          supabase.from('likes').select('tool_id, user_id').in('tool_id', toolIds),
+          supabase.from('user_bookmarks').select('tool_id, user_id').in('tool_id', toolIds)
+        ]);
+        
+        const likes = likesRes.data || [];
+        const bookmarks = bookmarksRes.data || [];
+        
+        const statsMap: Record<string, ToolCardStats> = {};
+        toolsData.forEach(tool => {
+          const toolLikes = likes.filter(l => l.tool_id === tool.id);
+          const toolBookmarks = bookmarks.filter(b => b.tool_id === tool.id);
+          
+          statsMap[tool.id] = {
+            likes: toolLikes.length,
+            bookmarks: toolBookmarks.length,
+            userHasLiked: user ? toolLikes.some(l => l.user_id === user.id) : false,
+            userHasBookmarked: user ? toolBookmarks.some(b => b.user_id === user.id) : false,
+          };
+        });
+        setStats(statsMap);
+      }
+    } catch (err) {
+      setError(err.message || 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchTools();
+    fetchToolsAndStats();
     // eslint-disable-next-line
-  }, []);
+  }, [user]); // Refetch stats when user logs in/out
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchTools();
+    fetchToolsAndStats();
   };
 
   const clearFilters = () => {
@@ -77,6 +110,23 @@ const AllAIToolsPage = () => {
   );
 
   return (
+    <>
+      <Helmet>
+        <title>All AI Tools | AITerritory</title>
+        <meta name="description" content="Browse all AI tools on AITerritory. Discover, compare, and review the latest artificial intelligence solutions for every category and use case." />
+        <link rel="canonical" href="https://aiterritory.org/all-ai-tools" />
+        {/* Open Graph Meta Tags */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="All AI Tools | AITerritory" />
+        <meta property="og:description" content="Browse all AI tools on AITerritory. Discover, compare, and review the latest artificial intelligence solutions for every category and use case." />
+        <meta property="og:url" content="https://aiterritory.org/all-ai-tools" />
+        <meta property="og:image" content="/default-thumbnail.jpg" />
+        {/* Twitter Meta Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="All AI Tools | AITerritory" />
+        <meta name="twitter:description" content="Browse all AI tools on AITerritory. Discover, compare, and review the latest artificial intelligence solutions for every category and use case." />
+        <meta name="twitter:image" content="/default-thumbnail.jpg" />
+      </Helmet>
     <div className="container mx-auto px-4 py-8 relative">
       {/* Subtle animated background for depth */}
       <motion.div
@@ -264,6 +314,7 @@ const AllAIToolsPage = () => {
       <PaginatedToolGrid
         tools={tools}
         loading={loading}
+        stats={stats} // Pass the stats map
         variant="default"
         initialCount={6}
         incrementCount={6}
@@ -272,6 +323,7 @@ const AllAIToolsPage = () => {
       />
       </motion.div>
     </div>
+    </>
   );
 };
 

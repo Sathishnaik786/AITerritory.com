@@ -1,4 +1,4 @@
-import React, { useState, Suspense, lazy, Dispatch, SetStateAction, useEffect } from 'react';
+import React, { useState, Suspense, lazy, Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import { useTools, useFeaturedTools, useTrendingTools } from '../hooks/useTools';
 import { useCategories } from '../hooks/useCategories';
 import { CategoryFilter } from '../components/CategoryFilter';
@@ -16,6 +16,11 @@ import ThemeToggle from '../components/ThemeToggle';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import { Category } from '../types/category';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from "react-helmet-async";
+import { supabase } from '../services/supabaseClient'; // Adjust path if needed
+import { Tool } from '../types/tool';
+import { ToolCard, ToolCardStats } from '../components/ToolCard';
+import { useUser } from '@clerk/clerk-react';
 
 const Testimonials = lazy(() => import('../components/Testimonials'));
 
@@ -67,6 +72,53 @@ export const HomePage: React.FC = () => {
   const { data: trendingTools, isLoading: trendingLoading } = useTrendingTools();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const navigate = useNavigate();
+  const { user } = useUser();
+
+  const [stats, setStats] = useState<Record<string, ToolCardStats>>({});
+
+  // Combine all tools into one list to fetch stats for all of them at once
+  const allTools = useMemo(() => {
+    const combined = [...(tools || []), ...(featuredTools || []), ...(trendingTools || [])];
+    // Remove duplicates
+    return combined.filter((tool, index, self) => 
+      index === self.findIndex((t) => t.id === tool.id)
+    );
+  }, [tools, featuredTools, trendingTools]);
+
+  useEffect(() => {
+    const fetchAllStats = async () => {
+      if (allTools.length === 0) return;
+      
+      const toolIds = allTools.map(t => t.id);
+      
+      // Fetch likes and bookmarks in parallel
+      const [likesRes, bookmarksRes] = await Promise.all([
+        supabase.from('likes').select('tool_id, user_id').in('tool_id', toolIds),
+        supabase.from('user_bookmarks').select('tool_id, user_id').in('tool_id', toolIds)
+      ]);
+
+      const likes = likesRes.data || [];
+      const bookmarks = bookmarksRes.data || [];
+      
+      // Process the data into a stats map
+      const statsMap: Record<string, ToolCardStats> = {};
+      allTools.forEach(tool => {
+        const toolLikes = likes.filter(l => l.tool_id === tool.id);
+        const toolBookmarks = bookmarks.filter(b => b.tool_id === tool.id);
+        
+        statsMap[tool.id] = {
+          likes: toolLikes.length,
+          bookmarks: toolBookmarks.length,
+          userHasLiked: user ? toolLikes.some(l => l.user_id === user.id) : false,
+          userHasBookmarked: user ? toolBookmarks.some(b => b.user_id === user.id) : false,
+        };
+      });
+      
+      setStats(statsMap);
+    };
+    
+    fetchAllStats();
+  }, [allTools, user]);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -84,6 +136,23 @@ export const HomePage: React.FC = () => {
   };
 
   return (
+    <>
+      <Helmet>
+        <title>AITerritory | Discover the Best AI Tools & Resources</title>
+        <meta name="description" content="Explore the best AI tools, resources, and innovations on AITerritory. Find, compare, and review top artificial intelligence solutions for every need." />
+        <link rel="canonical" href="https://aiterritory.org/" />
+        {/* Open Graph Meta Tags */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="AITerritory | Discover the Best AI Tools & Resources" />
+        <meta property="og:description" content="Explore the best AI tools, resources, and innovations on AITerritory. Find, compare, and review top artificial intelligence solutions for every need." />
+        <meta property="og:url" content="https://aiterritory.org/" />
+        <meta property="og:image" content="/default-thumbnail.jpg" />
+        {/* Twitter Meta Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="AITerritory | Discover the Best AI Tools & Resources" />
+        <meta name="twitter:description" content="Explore the best AI tools, resources, and innovations on AITerritory. Find, compare, and review top artificial intelligence solutions for every need." />
+        <meta name="twitter:image" content="/default-thumbnail.jpg" />
+      </Helmet>
     <div className="w-full overflow-x-hidden">
       <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-10">
         {/* Hero Section */}
@@ -141,6 +210,7 @@ export const HomePage: React.FC = () => {
                     tools={featuredTools || []}
                     loading={featuredLoading}
                     variant="compact"
+                    stats={stats} // Pass the stats map
                   />
                 </Suspense>
               </CardContent>
@@ -169,6 +239,7 @@ export const HomePage: React.FC = () => {
                     tools={trendingTools || []}
                     loading={trendingLoading}
                     variant="compact"
+                    stats={stats} // Pass the stats map
                   />
                 </Suspense>
               </CardContent>
@@ -270,12 +341,14 @@ export const HomePage: React.FC = () => {
                 incrementCount={6}
                 columns={3}
                 showResultsCount={false}
+                stats={stats} // Pass the stats map
               />
             </main>
           </div>
         </div>
       </div>
     </div>
+    </>
   );
 };
 
