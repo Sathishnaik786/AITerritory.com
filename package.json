@@ -95,6 +95,7 @@
     "rehype-highlight": "^7.0.2",
     "rehype-sanitize": "^6.0.0",
     "remark-gfm": "^4.0.1",
+    "schema": "^0.2.1",
     "schema-dts": "^1.1.5",
     "simplemde": "^1.11.2",
     "sonner": "^2.0.6",

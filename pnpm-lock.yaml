@@ -209,6 +209,9 @@ importers:
       react-router-dom:
         specifier: ^6.26.2
         version: 6.30.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-schemaorg:
+        specifier: ^2.0.0
+        version: 2.0.0(react@18.3.1)(schema-dts@1.1.5)(typescript@5.8.3)
       react-simplemde-editor:
         specifier: ^5.2.0
         version: 5.2.0(easymde@2.20.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -230,6 +233,12 @@ importers:
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
+      schema:
+        specifier: ^0.2.1
+        version: 0.2.1
+      schema-dts:
+        specifier: ^1.1.5
+        version: 1.1.5
       simplemde:
         specifier: ^1.11.2
         version: 1.11.2
@@ -7412,6 +7421,14 @@ packages:
     peerDependencies:
       react: '>=16.8'
 
+  react-schemaorg@2.0.0:
+    resolution: {integrity: sha512-UqciFKA203ewNjn0zC09uYKuJSvMD8L75L1s/cW4rc7cS64w8l7vaI3SYkuoI/nwCBkJRmOkSJedWDUZBlYZwg==}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      react: '>=16.3.0'
+      schema-dts: '>=0.7.4'
+      typescript: '>=3.1.6'
+
   react-scripts@3.4.4:
     resolution: {integrity: sha512-7J7GZyF/QvZkKAZLneiOIhHozvOMHey7hO9cdO9u68jjhGZlI8hDdOm6UyuHofn6Ajc9Uji5I6Psm/nKNuWdyw==}
     engines: {node: '>=8.10'}
@@ -7790,6 +7807,9 @@ packages:
   scheduler@0.23.2:
     resolution: {integrity: sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==}
 
+  schema-dts@1.1.5:
+    resolution: {integrity: sha512-RJr9EaCmsLzBX2NDiO5Z3ux2BVosNZN5jo0gWgsyKvxKIUL5R3swNvoorulAeL9kLB0iTSX7V6aokhla2m7xbg==}
+
   schema-utils@1.0.0:
     resolution: {integrity: sha512-i27Mic4KovM/lnGsy8whRCHhc7VicJajAjTrYg11K9zfZXnYIt4k5F+kZkwjnrhKzLic/HLU4j11mjsz2G/75g==}
     engines: {node: '>= 4'}
@@ -7797,6 +7817,9 @@ packages:
   schema-utils@2.7.1:
     resolution: {integrity: sha512-SHiNtMOUGWBQJwzISiVYKu82GiV4QYGePp3odlY1tuKO7gPtphAT5R/py0fA6xtbgLL/RvtJZnU9b8s0F1q0Xg==}
     engines: {node: '>= 8.9.0'}
+
+  schema@0.2.1:
+    resolution: {integrity: sha512-qe1rWLwVGv4p11+9ZO6UwfcagNlHAexd7VdWhCQKajPRkoQOahq4mnE9YT88+osL1N3ZtQuh8broh+I3aeaPvA==}
 
   seedrandom@3.0.5:
     resolution: {integrity: sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==}
@@ -17810,6 +17833,12 @@ snapshots:
       '@remix-run/router': 1.23.0
       react: 18.3.1
 
+  react-schemaorg@2.0.0(react@18.3.1)(schema-dts@1.1.5)(typescript@5.8.3):
+    dependencies:
+      react: 18.3.1
+      schema-dts: 1.1.5
+      typescript: 5.8.3
+
   react-scripts@3.4.4(eslint@9.30.1(jiti@1.21.7))(react@18.3.1)(typescript@5.8.3):
     dependencies:
       '@babel/core': 7.9.0
@@ -18362,6 +18391,8 @@ snapshots:
     dependencies:
       loose-envify: 1.4.0
 
+  schema-dts@1.1.5: {}
+
   schema-utils@1.0.0:
     dependencies:
       ajv: 6.12.6
@@ -18373,6 +18404,8 @@ snapshots:
       '@types/json-schema': 7.0.15
       ajv: 6.12.6
       ajv-keywords: 3.5.2(ajv@6.12.6)
+
+  schema@0.2.1: {}
 
   seedrandom@3.0.5: {}
 
