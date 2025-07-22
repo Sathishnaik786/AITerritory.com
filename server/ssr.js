@@ -1,55 +1,61 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
-const { HelmetProvider } = require('react-helmet-async');
-const { supabase } = require('./lib/supabaseClient');
-
-// Import your App (compiled for SSR)
-const ServerApp = require('../dist/server/entry-server.js').default;
-
-const isProd = process.env.NODE_ENV === 'production';
-const PORT = process.env.PORT || 3000;
+import express from 'express';
+import fs from 'fs';
+import path from 'path';
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
+import App from '../src/App';
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 // Serve static assets
-app.use(express.static(path.resolve(__dirname, '../dist/client'), { index: false }));
+app.use(express.static(path.resolve(__dirname, '../dist')));
 
-app.get('*', async (req, res) => {
-  // Read the HTML template
-  const template = fs.readFileSync(
-    path.resolve(__dirname, '../dist/client/index.html'),
-    'utf-8'
-  );
+// OG data mapping
+const OG_DATA = {
+  '/': {
+    title: 'AI Territory - Discover AI Tools & Resources',
+    description: 'Explore the best AI tools, tutorials and resources for developers and businesses',
+    image: '/og-default.png'
+  },
+  '/tools': {
+    title: 'AI Tools Directory',
+    description: 'Browse our collection of curated AI tools',
+    image: '/og-tools.png'
+  },
+  '/blog': {
+    title: 'AI Blog - Latest Insights',
+    description: 'Read our latest articles on AI technology',
+    image: '/og-blog.png'
+  }
+};
 
-  // --- Dynamic Blog Meta Tag Injection ---
-  const helmetContext = {};
+app.get('*', (req, res) => {
+  const filePath = path.resolve(__dirname, '../dist/index.html');
+  fs.readFile(filePath, 'utf8', (err, htmlData) => {
+    if (err) {
+      return res.status(500).send('Error loading the app');
+    }
 
-  const appHtml = ReactDOMServer.renderToString(
-    React.createElement(
-      HelmetProvider,
-      { context: helmetContext },
-      React.createElement(ServerApp, { location: req.url })
-    )
-  );
+    // Get OG data for current route
+    const ogData = OG_DATA[req.path] || OG_DATA['/'];
+    
+    // Inject OG tags
+    const injectedHTML = htmlData
+      .replace('</title>', `</title>
+        <meta property="og:title" content="${ogData.title}" />
+        <meta property="og:description" content="${ogData.description}" />
+        <meta property="og:image" content="${ogData.image}" />
+        <meta property="og:url" content="https://yourdomain.com${req.path}" />
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="${ogData.title}">
+        <meta name="twitter:description" content="${ogData.description}">
+        <meta name="twitter:image" content="${ogData.image}">`);
 
-  // Get the meta tags from Helmet
-  const { helmet } = helmetContext;
-
-  // Inject the rendered app and meta tags into the template
-  const html = template
-    .replace('<!--app-head-->', `
-      ${helmet.title.toString()}
-      ${helmet.meta.toString()}
-      ${helmet.link.toString()}
-    `)
-    .replace('<!--app-html-->', appHtml);
-
-  res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
+    res.send(injectedHTML);
+  });
 });
 
 app.listen(PORT, () => {
-  console.log(`SSR server running at http://localhost:${PORT}`);
+  console.log(`Server is listening on port ${PORT}`);
 });
