@@ -111,6 +111,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@netlify/edge-functions": "^2.16.1",
     "@swc/core": "^1.12.7",
     "@tailwindcss/typography": "^0.5.15",
     "@types/node": "^22.5.5",
@@ -131,5 +132,8 @@
     "vite": "^7.0.2",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-sitemap": "^0.8.2"
+  },
+  "resolutions": {
+    "react-image-lightbox": "5.1.4"
   }
 }
