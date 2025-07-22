@@ -545,9 +545,9 @@ const ToolDetailsPage: React.FC = () => {
   if (!tool) return <div className="py-16 text-center text-gray-500">Tool not found.</div>;
 
   // SEO Configuration
-  const canonicalUrl = `https://aiterritory.org/tools/${tool.categories?.slug || tool.id}`;
+  const canonicalUrl = `https://aiterritory.org/tools/${tool.id}`;
   const metaDescription = tool.description ? tool.description.slice(0, 160) : 'Discover this AI tool on AITerritory.';
-  const metaImage = tool.image_url || '/default-thumbnail.jpg';
+  const metaImage = tool.image_url ? tool.image_url : 'https://aiterritory.org/og-default.png';
   const toolKeywords = Array.isArray(tool.tool_tags) ? tool.tool_tags.map(tag => tag.tags?.name).filter(Boolean).join(', ') : '';
 
   return (

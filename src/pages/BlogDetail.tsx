@@ -135,7 +135,7 @@ const BlogDetail: React.FC = () => {
   const shareUrl = `https://aiterritory.org/blog/${blog.slug}`;
   const shareTitle = blog.title;
   const metaDescription = blog.description || 'Discover the latest in AI, tools, and productivity at AI Territory.';
-  const metaImage = blog.cover_image_url || 'https://aiterritory.org/logo.jpg';
+  const metaImage = blog.cover_image_url ? blog.cover_image_url : 'https://aiterritory.org/og-default.png';
   const canonicalUrl = `https://aiterritory.org/blog/${blog.slug}`;
 
   if (contentRef.current) {

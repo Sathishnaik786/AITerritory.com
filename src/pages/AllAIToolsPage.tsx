@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Search, Filter } from 'lucide-react';
 import { Tool } from '../types/tool';
-import SEO from '../components/SEO';
+import MetaTags from '../components/MetaTags';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../services/supabaseClient'; // Adjust path
 import { ToolCard, ToolCardStats } from '../components/ToolCard'; // Import ToolCardStats
@@ -111,11 +111,11 @@ const AllAIToolsPage = () => {
 
   return (
     <>
-      <SEO
+      <MetaTags
         title="All AI Tools | AITerritory"
         description="Browse all AI tools on AITerritory. Discover, compare, and review the latest artificial intelligence solutions for every category and use case."
-        image="/default-thumbnail.jpg"
-        keywords="AI tools, artificial intelligence, AI directory, AI solutions, AI comparison"
+        image="https://aiterritory.org/og-default.png"
+        url="https://aiterritory.org/all-ai-tools"
       />
     <div className="container mx-auto px-4 py-8 relative">
       {/* Subtle animated background for depth */}

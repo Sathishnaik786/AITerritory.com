@@ -16,7 +16,7 @@ import ThemeToggle from '../components/ThemeToggle';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import { Category } from '../types/category';
 import { useNavigate } from 'react-router-dom';
-import SEO from '../components/SEO';
+import MetaTags from '../components/MetaTags';
 import { JsonLd } from 'react-schemaorg';
 import { Organization, FAQPage } from 'schema-dts';
 import { supabase } from '../services/supabaseClient'; // Adjust path if needed
@@ -154,12 +154,11 @@ export const HomePage: React.FC = () => {
 
   return (
     <>
-      <SEO 
+      <MetaTags
         title="AITerritory | Discover the Best AI Tools & Resources"
         description="Explore the best AI tools, resources, and innovations on AITerritory. Find, compare, and review top artificial intelligence solutions for every need."
-        image="/default-thumbnail.jpg"
-        keywords="AI tools, artificial intelligence, AI resources, AI directory, AI solutions"
-        structuredData={organizationSchema}
+        image="https://aiterritory.org/og-default.png"
+        url="https://aiterritory.org"
       />
     <div className="w-full overflow-x-hidden">
       <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-10">
