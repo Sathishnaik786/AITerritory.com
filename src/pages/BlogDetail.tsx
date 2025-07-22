@@ -2,21 +2,19 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { BlogService } from '../services/blogService';
 import { BlogPost } from '../types/blog';
-import { Clock, ArrowLeft, UserCircle, Facebook, Twitter, Linkedin } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Clock, ArrowLeft, UserCircle, Facebook } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ArrowUp } from 'lucide-react';
 import { Newsletter } from '@/components/Newsletter';
-import { FaXTwitter, FaLinkedin, FaWhatsapp, FaReddit, FaDiscord } from 'react-icons/fa6';
-import { BlogCard } from '@/components/BlogCard';
+import { FaXTwitter, FaLinkedin, FaWhatsapp } from 'react-icons/fa6';
 import { useToast } from '@/components/ui/use-toast';
-import SEO from '../components/SEO';
+import MetaTags from '../components/MetaTags';
+import { Components } from 'react-markdown';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -28,9 +26,7 @@ const BlogDetail: React.FC = () => {
   const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // --- Table of Contents Scrollspy ---
   const [activeHeading, setActiveHeading] = useState<string | null>(null);
-  // Only parse headings after blog is loaded
   const headings = useMemo(() => {
     if (!blog || !blog.content) return [];
     const parser = new DOMParser();
@@ -42,7 +38,6 @@ const BlogDetail: React.FC = () => {
     }));
   }, [blog]);
 
-  // --- Scroll-to-top button ---
   const [showScrollTop, setShowScrollTop] = useState(false);
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 300);
@@ -51,17 +46,14 @@ const BlogDetail: React.FC = () => {
   }, []);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // Newsletter modal state
   const [newsletterOpen, setNewsletterOpen] = useState(false);
   const [newsletterError, setNewsletterError] = useState('');
 
-  // Reading progress bar state
   const [progress, setProgress] = useState(0);
   useEffect(() => {
     const handleScroll = () => {
       if (!contentRef.current) return;
       const content = contentRef.current;
-      const rect = content.getBoundingClientRect();
       const scrollTop = window.scrollY;
       const offsetTop = content.offsetTop;
       const height = content.offsetHeight;
@@ -88,7 +80,6 @@ const BlogDetail: React.FC = () => {
         .then(data => {
           setBlog(data);
           setNotFound(false);
-          // Fetch related blogs by category (excluding current)
           if (data && data.category) {
             BlogService.getAll().then(all => {
               setRelatedBlogs(
@@ -97,14 +88,13 @@ const BlogDetail: React.FC = () => {
             });
           }
         })
-        .catch((err) => {
-          if (err.response && err.response.status === 404) {
+        .catch((err: unknown) => {
+          if (err instanceof Error && 'response' in err && (err as { response?: { status: number } }).response?.status === 404) {
             setNotFound(true);
           }
           setBlog(null);
         })
         .finally(() => setLoading(false));
-      // Fetch next reads (other blogs)
       BlogService.getAll().then(all => {
         setNextReads(all.filter(b => b.slug !== slug).slice(0, 8));
       });
@@ -128,8 +118,6 @@ const BlogDetail: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [headings]);
 
-  const { toast } = useToast();
-
   if (loading) return <div className="py-12 text-center">Loading...</div>;
   if (notFound) return (
     <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -144,69 +132,76 @@ const BlogDetail: React.FC = () => {
   );
   if (!blog) return <div className="py-12 text-center">Not found</div>;
 
-  // Define shareUrl and shareTitle for share links
   const shareUrl = `https://aiterritory.org/blog/${blog.slug}`;
   const shareTitle = blog.title;
   const metaDescription = blog.description || 'Discover the latest in AI, tools, and productivity at AI Territory.';
   const metaImage = blog.cover_image_url || 'https://aiterritory.org/logo.jpg';
   const canonicalUrl = `https://aiterritory.org/blog/${blog.slug}`;
 
-  // Add ids to headings in the HTML (for anchor links)
   if (contentRef.current) {
     Array.from(contentRef.current.querySelectorAll('h2, h3')).forEach((el, i) => {
       el.id = headings[i]?.id || `heading-${i}`;
     });
   }
-  // Scroll to anchor
-  const scrollToHeading = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+
+  const markdownComponents: Components = {
+    h1: ({node, ...props}) => <h1 className="text-3xl md:text-4xl font-bold mt-8 mb-4" {...props} />,
+    h2: ({node, ...props}) => <h2 className="text-2xl md:text-3xl font-bold mt-8 mb-3" {...props} />,
+    h3: ({node, ...props}) => <h3 className="text-xl md:text-2xl font-semibold mt-6 mb-2" {...props} />,
+    strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-white" {...props} />,
+    a: ({node, ...props}) => <a className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer" {...props} />,
+    img: ({node, ...props}) => <img className="rounded-xl my-4 shadow-md max-w-full" {...props} alt={props.alt || ''} />,
+    code: (props) => {
+      const { inline, className, children, ...rest } = props as { inline?: boolean; className?: string; children?: React.ReactNode };
+      return !inline ? (
+        <pre className="bg-gray-900 text-white rounded-lg p-4 overflow-x-auto my-4 text-sm"><code className={className} {...rest}>{children}</code></pre>
+      ) : (
+        <code className={`bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-sm font-mono ${className}`} {...rest}>{children}</code>
+      );
+    },
+    blockquote: ({node, children, ...props}) => {
+      const text = React.Children.map(children, child => {
+        if (typeof child === 'string') return child;
+        if (React.isValidElement(child) && 'props' in child && 'children' in child.props) {
+            return String(child.props.children);
+        }
+        return '';
+      }).join('').trim();
+
+      if (text.startsWith('[!info]')) {
+        return <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 rounded-lg p-3 my-4"><span className="mt-0.5">ℹ️</span><div>{text.replace('[!info]', '').trim()}</div></div>;
+      }
+      if (text.startsWith('[!tip]')) {
+        return <div className="flex items-start gap-2 bg-green-50 dark:bg-green-900/30 border-l-4 border-green-400 rounded-lg p-3 my-4"><span className="mt-0.5">💡</span><div>{text.replace('[!tip]', '').trim()}</div></div>;
+      }
+      if (text.startsWith('[!warning]')) {
+        return <div className="flex items-start gap-2 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 rounded-lg p-3 my-4"><span className="mt-0.5">⚠️</span><div>{text.replace('[!warning]', '').trim()}</div></div>;
+      }
+      return <blockquote className="border-l-4 border-gray-300 dark:border-gray-700 pl-4 italic text-gray-600 dark:text-gray-300 my-4" {...props}>{children}</blockquote>;
+    },
+    p: ({node, ...props}) => {
+      if (node?.position?.start.offset === 0) {
+        return <p className="first-letter:text-5xl first-letter:font-serif first-letter:float-left first-letter:mr-2 first-letter:font-bold first-letter:text-blue-500 dark:first-letter:text-blue-300" {...props} />;
+      }
+      return <p {...props} />;
+    },
   };
 
   return (
     <>
-      <SEO
+      <MetaTags
         title={blog.title}
         description={metaDescription}
         image={metaImage}
-        article={true}
-        keywords={blog.tags?.join(', ') || 'AI, artificial intelligence, blog'}
-        structuredData={{
-          "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          "headline": blog.title,
-          "description": metaDescription,
-          "image": metaImage,
-          "author": {
-            "@type": "Person",
-            "name": blog.author_name
-          },
-          "publisher": {
-            "@type": "Organization",
-            "name": "AITerritory",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://aiterritory.org/logo.jpg"
-              }
-            },
-            "datePublished": blog.created_at,
-            "dateModified": blog.created_at,
-            "mainEntityOfPage": {
-              "@type": "WebPage",
-              "@id": canonicalUrl
-            }
-          }}
-        />
-      {/* Reading Progress Bar */}
+        url={canonicalUrl}
+        type="article"
+      />
       <div className="fixed top-0 left-0 w-full h-1 z-50">
         <div
           className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-200"
           style={{ width: `${progress}%` }}
         />
       </div>
-      {/* Sticky Back Button */}
       <motion.div
         className="fixed top-6 left-4 z-30"
         initial={{ opacity: 0, x: -20 }}
@@ -223,16 +218,13 @@ const BlogDetail: React.FC = () => {
       </motion.div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 relative">
-        {/* Hero Section */}
         <div className="relative w-full min-h-[220px] flex flex-col items-center justify-center mb-10">
-          {/* Animated Gradient Background */}
           <motion.div
             className="absolute inset-0 z-0 bg-gradient-to-br from-blue-200/60 via-purple-100/60 to-white dark:from-gray-900/80 dark:via-gray-800/80 dark:to-gray-900/80 rounded-b-3xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
           />
-          {/* Title */}
           <motion.h1
             className="relative z-10 text-4xl md:text-5xl font-serif font-extrabold text-center text-gray-900 dark:text-white tracking-tight mb-4 mt-8"
             initial={{ opacity: 0, y: 20 }}
@@ -241,7 +233,6 @@ const BlogDetail: React.FC = () => {
           >
             {blog.title}
           </motion.h1>
-          {/* Tags */}
           {Array.isArray(blog.tags) && blog.tags.length > 0 && (
             <div className="relative z-10 flex flex-wrap justify-center gap-2 mb-2">
               {blog.tags.map(tag => (
@@ -249,7 +240,6 @@ const BlogDetail: React.FC = () => {
               ))}
             </div>
           )}
-          {/* Meta Info with Avatar */}
           <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground mb-2">
             <span className="flex items-center gap-2">
               <UserCircle className="w-6 h-6 text-blue-400" />
@@ -262,7 +252,6 @@ const BlogDetail: React.FC = () => {
             )}
           </div>
         </div>
-        {/* Featured Image with Glassmorphism */}
         <motion.div
           className="w-full flex justify-center mb-8"
           initial={{ opacity: 0, scale: 0.98 }}
@@ -278,7 +267,6 @@ const BlogDetail: React.FC = () => {
             />
           </div>
         </motion.div>
-        {/* Blog Content (Markdown) */}
         <motion.div
           ref={contentRef}
           className="prose lg:prose-xl max-w-none prose-neutral dark:prose-invert prose-img:rounded-xl prose-img:shadow-md prose-a:text-blue-600 dark:prose-a:text-blue-400"
@@ -289,59 +277,11 @@ const BlogDetail: React.FC = () => {
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeSanitize, rehypeHighlight]}
-            components={{
-              h1: ({node, ...props}) => <h1 className="text-3xl md:text-4xl font-bold mt-8 mb-4" {...props} />,
-              h2: ({node, ...props}) => <h2 className="text-2xl md:text-3xl font-bold mt-8 mb-3" {...props} />,
-              h3: ({node, ...props}) => <h3 className="text-xl md:text-2xl font-semibold mt-6 mb-2" {...props} />,
-              strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-white" {...props} />,
-              a: ({node, ...props}) => <a className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer" {...props} />,
-              img: ({node, ...props}) => <img className="rounded-xl my-4 shadow-md max-w-full" {...props} alt={props.alt || ''} />,
-              code({node, inline, className, children, ...props}: {node: any, inline?: boolean, className?: string, children: React.ReactNode}) {
-                return !inline ? (
-                  <pre className="bg-gray-900 text-white rounded-lg p-4 overflow-x-auto my-4 text-sm"><code {...props}>{children}</code></pre>
-                ) : (
-                  <code className="bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-sm font-mono" {...props}>{children}</code>
-                );
-              },
-              blockquote({node, children, ...props}) {
-                // Notion-style callouts: > [!info], [!tip], [!warning]
-                const text = String(children[0] || '').trim();
-                if (text.startsWith('[!info]')) {
-                  return <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 rounded-lg p-3 my-4"><span className="mt-0.5">ℹ️</span><div>{text.replace('[!info]', '').trim()}</div></div>;
-                }
-                if (text.startsWith('[!tip]')) {
-                  return <div className="flex items-start gap-2 bg-green-50 dark:bg-green-900/30 border-l-4 border-green-400 rounded-lg p-3 my-4"><span className="mt-0.5">💡</span><div>{text.replace('[!tip]', '').trim()}</div></div>;
-                }
-                if (text.startsWith('[!warning]')) {
-                  return <div className="flex items-start gap-2 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 rounded-lg p-3 my-4"><span className="mt-0.5">⚠️</span><div>{text.replace('[!warning]', '').trim()}</div></div>;
-                }
-                return <blockquote className="border-l-4 border-gray-300 dark:border-gray-700 pl-4 italic text-gray-600 dark:text-gray-300 my-4" {...props}>{children}</blockquote>;
-              },
-              // Drop cap for first paragraph
-              p({node, ...props}) {
-                if (node.position?.start.offset === 0) {
-                  return <p className="first-letter:text-5xl first-letter:font-serif first-letter:float-left first-letter:mr-2 first-letter:font-bold first-letter:text-blue-500 dark:first-letter:text-blue-300" {...props} />;
-                }
-                return <p {...props} />;
-              },
-              // Custom highlight: ==highlight==
-              text: ({node, ...props}) => {
-                const text = String(props.children);
-                if (text.includes('==')) {
-                  const parts = text.split(/(==[^=]+==)/g);
-                  return <>{parts.map((part, i) => part.startsWith('==') && part.endsWith('==')
-                    ? <span key={i} className="bg-yellow-100 text-yellow-800 px-1 rounded">{part.slice(2, -2)}</span>
-                    : part
-                  )}</>;
-                }
-                return text;
-              },
-            }}
+            components={markdownComponents}
           >
             {blog.content}
           </ReactMarkdown>
         </motion.div>
-        {/* Scroll-to-top Button */}
         {showScrollTop && (
           <button
             className="fixed bottom-24 right-6 z-40 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition"
@@ -351,7 +291,6 @@ const BlogDetail: React.FC = () => {
             <ArrowUp className="w-5 h-5" />
           </button>
         )}
-        {/* Newsletter Signup CTA - Premium Enhanced */}
         <motion.section
           className="mt-10 mb-8 w-full max-w-2xl mx-auto rounded-2xl bg-gradient-to-r from-blue-100/80 to-purple-100/80 dark:from-gray-800/80 dark:to-gray-900/80 shadow-xl border border-gray-200 dark:border-gray-800 p-6 flex flex-col items-center"
           initial={{ opacity: 0, y: 30 }}
@@ -366,15 +305,16 @@ const BlogDetail: React.FC = () => {
               className="w-full flex flex-col sm:flex-row items-center gap-3"
               onSubmit={e => {
                 e.preventDefault();
-                const email = (e.target as any).email.value.trim();
+                const form = e.target as HTMLFormElement;
+                const emailInput = form.elements.namedItem('email') as HTMLInputElement | null;
+                const email = emailInput?.value.trim() ?? '';
                 if (!/^\S+@\S+\.\S+$/.test(email)) {
                   setNewsletterError('Please enter a valid email address.');
                   return;
                 }
                 setNewsletterError('');
-                // TODO: Replace with real subscribe logic (Supabase, API, etc.)
                 window.alert('Thank you for subscribing!');
-                (e.target as any).reset();
+                form.reset();
               }}
             >
               <input
@@ -394,25 +334,22 @@ const BlogDetail: React.FC = () => {
             {newsletterError && <div className="text-red-500 text-sm mt-1">{newsletterError}</div>}
           </div>
         </motion.section>
-        {/* Newsletter Modal */}
         <Newsletter 
           isOpen={newsletterOpen} 
           onClose={() => setNewsletterOpen(false)}
           title="Stay Ahead in AI! 🚀"
           subtitle="Subscribe for the latest AI insights, guides, and exclusive tools."
         />
-        {/* Author Bio Section */}
         <section className="w-full max-w-2xl mx-auto mt-10 mb-8">
           <div className="flex flex-col sm:flex-row items-center gap-6 bg-white/90 dark:bg-gray-900/90 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg p-6">
             <img
-              src={blog.author_image_url ?? (blog as any)?.author_avatar_url ?? '/logo.jpg'}
+              src={blog.author_image_url ?? '/logo.jpg'}
               alt={blog.author_name}
               className="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700 shadow-md"
             />
             <div className="flex-1 flex flex-col items-center sm:items-start text-center sm:text-left">
               <div className="font-bold text-xl text-gray-900 dark:text-white mb-1">{blog.author_name}</div>
-              <div className="text-gray-500 text-sm mb-2">{blog.author_bio ?? (blog as any)?.author_bio ?? 'AI enthusiast and contributor at AI Territory.'}</div>
-              {/* Social Links */}
+              <div className="text-gray-500 text-sm mb-2">{blog.author_bio ?? 'AI enthusiast and contributor at AI Territory.'}</div>
               {blog.author_social_links && typeof blog.author_social_links === 'object' && (
                 <div className="flex gap-3 mt-1">
                   {blog.author_social_links?.twitter && (
@@ -435,7 +372,6 @@ const BlogDetail: React.FC = () => {
             </div>
           </div>
         </section>
-        {/* Author Bio + Share This Post Section */}
         <motion.section
           className="mt-12 mb-12 flex flex-col md:flex-row items-center md:items-start gap-8 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-lg p-6"
           initial={{ opacity: 0, y: 30 }}
@@ -443,7 +379,6 @@ const BlogDetail: React.FC = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          {/* Share This Post */}
           <div className="flex flex-col items-center w-full">
             <div className="font-semibold text-gray-700 dark:text-gray-200 mb-2">Share This Post</div>
             <div className="flex flex-wrap justify-center gap-3 mb-2">
@@ -471,7 +406,6 @@ const BlogDetail: React.FC = () => {
             <div className="text-xs text-gray-400">Share this article with your network!</div>
           </div>
         </motion.section>
-      {/* Related Blogs Section */}
       {relatedBlogs.length > 0 && (
         <motion.section
           className="mt-12 mb-8"
@@ -521,7 +455,6 @@ const BlogDetail: React.FC = () => {
       )}
       </div>
 
-      {/* Next Reads Section */}
       <motion.div
         className="max-w-6xl mx-auto px-4 pb-16"
         initial={{ opacity: 0, y: 40 }}
@@ -531,9 +464,7 @@ const BlogDetail: React.FC = () => {
       >
         <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">📚 Next Reads: <span className="font-normal">More from AI Territory</span></h2>
         <div className="relative">
-          {/* Gradient fade left */}
           <div className="pointer-events-none absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white/90 dark:from-gray-900/90 to-transparent z-10" />
-          {/* Gradient fade right */}
           <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white/90 dark:from-gray-900/90 to-transparent z-10" />
           <div className="flex gap-4 overflow-x-auto scroll-smooth snap-x pb-2 px-1"
             style={{ WebkitOverflowScrolling: 'touch' }}

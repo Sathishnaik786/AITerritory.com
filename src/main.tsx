@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import { ClerkProvider } from "@clerk/clerk-react";
 import App from "./App.tsx";
 import "./index.css"; // Ensure this is imported for global styles
@@ -23,11 +24,13 @@ if (PUBLISHABLE_KEY && PUBLISHABLE_KEY.includes('pk_test_') && import.meta.env.P
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ClerkProvider 
-      publishableKey={PUBLISHABLE_KEY || ''} 
-      afterSignOutUrl="/"
-    >
-      <App />
-    </ClerkProvider>
+    <HelmetProvider>
+      <ClerkProvider
+        publishableKey={PUBLISHABLE_KEY || ''}
+        afterSignOutUrl="/"
+      >
+        <App />
+      </ClerkProvider>
+    </HelmetProvider>
   </React.StrictMode>
 );

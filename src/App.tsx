@@ -66,7 +66,7 @@ import MyBookmarksPage from './pages/MyBookmarksPage';
 import UserDashboardPage from './pages/UserDashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Prompts from './components/Prompts';
-import { HelmetProvider } from 'react-helmet-async';
+import MetaTags from './components/MetaTags';
 import SEO from './components/SEO';
 import React, { Suspense } from 'react';
 import FeedbackAdmin from './admin/FeedbackAdmin';
@@ -104,7 +104,7 @@ function ThemedAppContent() {
   const [newsletterOpen, setNewsletterOpen] = useState(false);
   return (
     <div className={`min-h-screen antialiased w-full flex flex-col`}>
-      <HelmetProvider>
+        <MetaTags />
         <div className="relative min-h-screen flex flex-col items-center w-full">
           <Navbar newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
           <ScrollToTopButton />
@@ -238,7 +238,6 @@ function ThemedAppContent() {
         <NavbarNewsletterModal isOpen={newsletterOpen} onClose={() => setNewsletterOpen(false)} />
         {/* Only show Footer if not on LandingPro */}
         {!isLandingPro && <Footer />}
-      </HelmetProvider>
     </div>
   );
 }
@@ -260,14 +259,12 @@ function App() {
           }}
         >
           <TooltipProvider>
-            <HelmetProvider>
               <ScrollToTop />
               <Toaster position="top-right" richColors />
               <Suspense fallback={<div>Loading...</div>}>
                 <ThemedAppContent />
               </Suspense>
               <ReactQueryDevtools initialIsOpen={false} />
-            </HelmetProvider>
           </TooltipProvider>
         </BrowserRouter>
       </QueryClientProvider>

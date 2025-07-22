@@ -7,7 +7,7 @@ import { SiWhatsapp } from 'react-icons/si';
 import { Review } from '../types/review';
 import { useUser, SignInButton, useAuth } from '@clerk/clerk-react';
 import { toast } from '../components/ui/sonner';
-import SEO from '../components/SEO';
+import MetaTags from '../components/MetaTags';
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -377,8 +377,9 @@ const ToolDetailsPage: React.FC = () => {
       const { review: updated } = await res.json();
       setReviews(reviews => reviews.map(r => r.id === updated.id ? updated : r));
       setEditingReviewId(null);
-    } catch (err: any) {
-      alert(err.message || 'Failed to update review');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update review';
+      alert(message);
     } finally {
       setSubmitting(false);
     }
@@ -398,16 +399,17 @@ const ToolDetailsPage: React.FC = () => {
       });
       if (!res.ok) throw new Error('Failed to delete review');
       setReviews(reviews => reviews.filter(r => r.id !== reviewId));
-    } catch (err: any) {
-      alert(err.message || 'Failed to delete review');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to delete review';
+      alert(message);
     } finally {
       setSubmitting(false);
     }
   };
 
   // Helper to get Clerk avatar URL
-  const getClerkAvatarUrl = (user_id) =>
-    user_id ? `https://images.clerk.dev/${user_id}/profile_image?width=48` : undefined;
+  const getClerkAvatarUrl = (user_id: string | undefined | null) =>
+    user_id ? `https://images.clerk.dev/v1/user/${user_id}/profile_image?width=48` : undefined;
 
   // Only show approved reviews to regular users
   const visibleReviews = isAdmin ? reviews : reviews.filter(r => r.moderation_status === 'approved');
@@ -426,8 +428,9 @@ const ToolDetailsPage: React.FC = () => {
       const { review: updated } = await res.json();
       setReviews(reviews => reviews.map(r => r.id === updated.id ? updated : r));
       toast.success(`Review ${status === 'approved' ? 'approved' : 'hidden'}`);
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to update moderation status');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update moderation status';
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -549,11 +552,12 @@ const ToolDetailsPage: React.FC = () => {
 
   return (
     <div className="relative bg-white dark:bg-[#171717] min-h-screen">
-      <SEO
+      <MetaTags
         title={`${tool.name} | AITerritory`}
         description={metaDescription}
         image={metaImage}
-        keywords={`${tool.name}, ${tool.categories?.name || ''}, ${toolKeywords}, AI tool, artificial intelligence`}
+        url={canonicalUrl}
+        type="website"
       />
       {/* Main Content + Sidebar Layout */}
       <div className="max-w-6xl mx-auto px-4 md:px-8 flex flex-col lg:flex-row gap-8">
