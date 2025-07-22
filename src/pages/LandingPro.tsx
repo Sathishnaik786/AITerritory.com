@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Textarea } from '../components/ui/textarea';
 import { motion } from 'framer-motion';
 import { ArrowRight, Mic, Search, Image, BookOpen, Sparkles, Rocket, Newspaper } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { useTheme } from 'next-themes';
 import { Suspense, lazy } from 'react';
 import { FAQ } from '../components/FAQ';
@@ -188,11 +188,11 @@ const LandingPro: React.FC = () => {
 
   return (  
     <>
-      <Helmet>
-        <title>AITerritory | Real Time AI Tools for Every Task</title>
-        <meta name="description" content={seoDescription} />
-        <link rel="canonical" href={canonicalUrl} />
-      </Helmet>
+      <SEO
+        title="AITerritory | Real Time AI Tools for Every Task"
+        description={seoDescription}
+        keywords="AI tools, artificial intelligence, content creation, SEO, text-to-video, productivity"
+      />
       <div className="min-h-screen w-full p-2 sm:p-4 lg:p-8 ${bgMain} ${textMain}">
         <div className="flex flex-col items-center justify-center w-full min-h-[60vh]">
           {/* Title */}
@@ -336,4 +336,4 @@ const LandingPro: React.FC = () => {
   );
 };
 
-export default LandingPro; 
+export default LandingPro;

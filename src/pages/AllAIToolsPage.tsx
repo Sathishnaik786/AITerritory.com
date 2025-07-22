@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Search, Filter } from 'lucide-react';
 import { Tool } from '../types/tool';
-import { Helmet } from "react-helmet-async";
+import SEO from '../components/SEO';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../services/supabaseClient'; // Adjust path
 import { ToolCard, ToolCardStats } from '../components/ToolCard'; // Import ToolCardStats
@@ -111,22 +111,12 @@ const AllAIToolsPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>All AI Tools | AITerritory</title>
-        <meta name="description" content="Browse all AI tools on AITerritory. Discover, compare, and review the latest artificial intelligence solutions for every category and use case." />
-        <link rel="canonical" href="https://aiterritory.org/all-ai-tools" />
-        {/* Open Graph Meta Tags */}
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="All AI Tools | AITerritory" />
-        <meta property="og:description" content="Browse all AI tools on AITerritory. Discover, compare, and review the latest artificial intelligence solutions for every category and use case." />
-        <meta property="og:url" content="https://aiterritory.org/all-ai-tools" />
-        <meta property="og:image" content="/default-thumbnail.jpg" />
-        {/* Twitter Meta Tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="All AI Tools | AITerritory" />
-        <meta name="twitter:description" content="Browse all AI tools on AITerritory. Discover, compare, and review the latest artificial intelligence solutions for every category and use case." />
-        <meta name="twitter:image" content="/default-thumbnail.jpg" />
-      </Helmet>
+      <SEO
+        title="All AI Tools | AITerritory"
+        description="Browse all AI tools on AITerritory. Discover, compare, and review the latest artificial intelligence solutions for every category and use case."
+        image="/default-thumbnail.jpg"
+        keywords="AI tools, artificial intelligence, AI directory, AI solutions, AI comparison"
+      />
     <div className="container mx-auto px-4 py-8 relative">
       {/* Subtle animated background for depth */}
       <motion.div

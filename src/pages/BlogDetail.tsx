@@ -16,7 +16,7 @@ import { Newsletter } from '@/components/Newsletter';
 import { FaXTwitter, FaLinkedin, FaWhatsapp, FaReddit, FaDiscord } from 'react-icons/fa6';
 import { BlogCard } from '@/components/BlogCard';
 import { useToast } from '@/components/ui/use-toast';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -167,37 +167,25 @@ const BlogDetail: React.FC = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{blog.title}</title>
-        <meta name="description" content={metaDescription} />
-        <link rel="canonical" href={canonicalUrl} />
-        {/* Open Graph Meta Tags */}
-        <meta property="og:type" content="article" />
-        <meta property="og:title" content={blog.title} />
-        <meta property="og:description" content={metaDescription} />
-        <meta property="og:image" content={metaImage} />
-        <meta property="og:url" content={canonicalUrl} />
-        {/* Twitter Meta Tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={blog.title} />
-        <meta name="twitter:description" content={metaDescription} />
-        <meta name="twitter:image" content={metaImage} />
-      </Helmet>
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BlogPosting",
-            "headline": blog.title,
-            "description": metaDescription,
-            "image": metaImage,
-            "author": {
-              "@type": "Person",
-              "name": blog.author_name
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "AITerritory",
+      <SEO
+        title={blog.title}
+        description={metaDescription}
+        image={metaImage}
+        article={true}
+        keywords={blog.tags?.join(', ') || 'AI, artificial intelligence, blog'}
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "headline": blog.title,
+          "description": metaDescription,
+          "image": metaImage,
+          "author": {
+            "@type": "Person",
+            "name": blog.author_name
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "AITerritory",
               "logo": {
                 "@type": "ImageObject",
                 "url": "https://aiterritory.org/logo.jpg"
@@ -205,11 +193,12 @@ const BlogDetail: React.FC = () => {
             },
             "datePublished": blog.created_at,
             "dateModified": blog.updated_at || blog.created_at,
-            "mainEntityOfPage": canonicalUrl,
-            "url": canonicalUrl
-          })}
-        </script>
-      </Helmet>
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": canonicalUrl
+            }
+          }}
+        />
       {/* Reading Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 z-50">
         <div
@@ -572,4 +561,4 @@ const BlogDetail: React.FC = () => {
   );
 };
 
-export default BlogDetail; 
+export default BlogDetail;

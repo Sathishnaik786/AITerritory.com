@@ -384,17 +384,29 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
           <div className="flex items-center gap-4">
             {/* Like */}
             <div className="flex items-center gap-1">
-              <Heart className={`w-4 h-4 ${hasLiked ? 'fill-red-500 text-red-500' : ''}`} />
+              <Heart 
+                className={`w-4 h-4 ${hasLiked ? 'fill-red-500 text-red-500' : ''}`} 
+                onClick={e => { e.stopPropagation(); handleLike(e); }}
+                style={{ cursor: 'pointer' }}
+              />
               <span className="text-xs text-muted-foreground font-medium">{likeCount}</span>
             </div>
             {/* Bookmark */}
             <div className="flex items-center gap-1">
-              <Bookmark className={`w-4 h-4 ${bookmarked ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+              <Bookmark 
+                className={`w-4 h-4 ${bookmarked ? 'fill-yellow-500 text-yellow-500' : ''}`} 
+                onClick={e => { e.stopPropagation(); handleBookmark(e); }}
+                style={{ cursor: 'pointer' }}
+              />
               <span className="text-xs text-muted-foreground font-medium">{stats.bookmarks ?? 0}</span>
             </div>
             {/* Share */}
             <div className="flex items-center gap-1">
-              <Share2 className="w-4 h-4" />
+              <Share2 
+                className="w-4 h-4" 
+                onClick={e => { e.stopPropagation(); setIsShareModalOpen(true); }}
+                style={{ cursor: 'pointer' }}
+              />
               <span className="text-xs text-muted-foreground font-medium">{reviewCount}</span>
             </div>
           </div>

@@ -66,7 +66,8 @@ import MyBookmarksPage from './pages/MyBookmarksPage';
 import UserDashboardPage from './pages/UserDashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Prompts from './components/Prompts';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { HelmetProvider } from 'react-helmet-async';
+import SEO from './components/SEO';
 import React, { Suspense } from 'react';
 import FeedbackAdmin from './admin/FeedbackAdmin';
 import BackgroundAnimation from './components/ui/BackgroundAnimation';
@@ -95,40 +96,7 @@ function ScrollToTop() {
   return null;
 }
 
-function SEO() {
-  const location = useLocation();
-  const canonicalUrl = `https://aiterritory.org${location.pathname}`;
-  return (
-    <Helmet>
-    <title>AI Territory</title>
-    <meta name="description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
-    <meta name="robots" content="index, follow" />
-    
-    {/* Open Graph */}
-    <meta property="og:title" content="AI Territory" />
-    <meta property="og:description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:image" content="https://aiterritory.org/og-image.png" />
-    <meta property="og:site_name" content="AITerritory" />
-    
-    {/* Twitter Card */}
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta property="twitter:domain" content="aiterritory.org" />
-    <meta property="twitter:url" content={canonicalUrl} />
-    <meta name="twitter:title" content="AI Territory" />
-    <meta name="twitter:description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
-    <meta name="twitter:image" content="https://aiterritory.org/og-image.png" />
-    
-    {/* Canonical */}
-    <link rel="canonical" href={canonicalUrl} />
-    <link rel="preconnect" href="https://aiterritory-com.onrender.com" />
-    <link rel="dns-prefetch" href="https://aiterritory-com.onrender.com" />
-    <link rel="preconnect" href="https://api.openai.com" />
-    <link rel="dns-prefetch" href="https://api.openai.com" />
-  </Helmet>  
-  );
-}
+// SEO component has been moved to src/components/SEO.tsx
 
 function ThemedAppContent() {
   const location = useLocation();
@@ -137,7 +105,7 @@ function ThemedAppContent() {
   return (
     <div className={`min-h-screen antialiased w-full flex flex-col`}>
       <HelmetProvider>
-        <SEO />
+        <SEO title="AI Tools Directory | Find the Best AI Tools" description="Discover the best AI tools for productivity, image generation, text generation, and more. Find AI tools to enhance your workflow and boost productivity." />
         <div className="relative min-h-screen flex flex-col items-center w-full">
           <Navbar newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
           <ScrollToTopButton />

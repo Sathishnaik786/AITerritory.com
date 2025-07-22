@@ -16,7 +16,7 @@ import ThemeToggle from '../components/ThemeToggle';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import { Category } from '../types/category';
 import { useNavigate } from 'react-router-dom';
-import { Helmet } from "react-helmet-async";
+import SEO from '../components/SEO';
 import { supabase } from '../services/supabaseClient'; // Adjust path if needed
 import { Tool } from '../types/tool';
 import { ToolCard, ToolCardStats } from '../components/ToolCard';
@@ -137,22 +137,12 @@ export const HomePage: React.FC = () => {
 
   return (
     <>
-      <Helmet>
-        <title>AITerritory | Discover the Best AI Tools & Resources</title>
-        <meta name="description" content="Explore the best AI tools, resources, and innovations on AITerritory. Find, compare, and review top artificial intelligence solutions for every need." />
-        <link rel="canonical" href="https://aiterritory.org/" />
-        {/* Open Graph Meta Tags */}
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="AITerritory | Discover the Best AI Tools & Resources" />
-        <meta property="og:description" content="Explore the best AI tools, resources, and innovations on AITerritory. Find, compare, and review top artificial intelligence solutions for every need." />
-        <meta property="og:url" content="https://aiterritory.org/" />
-        <meta property="og:image" content="/default-thumbnail.jpg" />
-        {/* Twitter Meta Tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="AITerritory | Discover the Best AI Tools & Resources" />
-        <meta name="twitter:description" content="Explore the best AI tools, resources, and innovations on AITerritory. Find, compare, and review top artificial intelligence solutions for every need." />
-        <meta name="twitter:image" content="/default-thumbnail.jpg" />
-      </Helmet>
+      <SEO 
+        title="AITerritory | Discover the Best AI Tools & Resources"
+        description="Explore the best AI tools, resources, and innovations on AITerritory. Find, compare, and review top artificial intelligence solutions for every need."
+        image="/default-thumbnail.jpg"
+        keywords="AI tools, artificial intelligence, AI resources, AI directory, AI solutions"
+      />
     <div className="w-full overflow-x-hidden">
       <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-10">
         {/* Hero Section */}

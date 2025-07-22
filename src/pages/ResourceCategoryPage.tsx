@@ -1,7 +1,7 @@
 import React from 'react';
 import SimpleToolCard from '../components/SimpleToolCard';
 import { useTools } from '../hooks/useTools';
-import { Helmet } from "react-helmet-async";
+import SEO from '../components/SEO';
 
 interface ResourceCategoryPageProps {
   title: string;
@@ -31,22 +31,12 @@ const ResourceCategoryPage: React.FC<ResourceCategoryPageProps> = ({ title, filt
 
   return (
     <>
-      <Helmet>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <link rel="canonical" href={canonicalUrl} />
-        {/* Open Graph Meta Tags */}
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:image" content="/default-thumbnail.jpg" />
-        {/* Twitter Meta Tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={pageTitle} />
-        <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content="/default-thumbnail.jpg" />
-      </Helmet>
+      <SEO
+        title={pageTitle}
+        description={pageDescription}
+        image="/default-thumbnail.jpg"
+        keywords={`${filterCategory || filterTag || title}, AI tools, artificial intelligence, resources`}
+      />
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -77,4 +67,4 @@ const ResourceCategoryPage: React.FC<ResourceCategoryPageProps> = ({ title, filt
   );
 };
 
-export default ResourceCategoryPage; 
+export default ResourceCategoryPage;

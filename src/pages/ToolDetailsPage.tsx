@@ -7,7 +7,7 @@ import { SiWhatsapp } from 'react-icons/si';
 import { Review } from '../types/review';
 import { useUser, SignInButton, useAuth } from '@clerk/clerk-react';
 import { toast } from '../components/ui/sonner';
-import { Helmet } from "react-helmet-async";
+import SEO from '../components/SEO';
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -129,6 +129,7 @@ const ToolDetailsPage: React.FC = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const testimonialsPerView = window.innerWidth < 640 ? 1 : window.innerWidth < 1024 ? 2 : 3;
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   // Likes state
   const [likesCount, setLikesCount] = useState(0);
@@ -540,13 +541,20 @@ const ToolDetailsPage: React.FC = () => {
   if (error) return <div className="py-16 text-center text-red-500">Error: {error}</div>;
   if (!tool) return <div className="py-16 text-center text-gray-500">Tool not found.</div>;
 
-  // SEO Helmet
+  // SEO Configuration
   const canonicalUrl = `https://aiterritory.org/tools/${tool.categories?.slug || tool.id}`;
   const metaDescription = tool.description ? tool.description.slice(0, 160) : 'Discover this AI tool on AITerritory.';
   const metaImage = tool.image_url || '/default-thumbnail.jpg';
+  const toolKeywords = Array.isArray(tool.tool_tags) ? tool.tool_tags.map(tag => tag.tags?.name).filter(Boolean).join(', ') : '';
 
   return (
     <div className="relative bg-white dark:bg-[#171717] min-h-screen">
+      <SEO
+        title={`${tool.name} | AITerritory`}
+        description={metaDescription}
+        image={metaImage}
+        keywords={`${tool.name}, ${tool.categories?.name || ''}, ${toolKeywords}, AI tool, artificial intelligence`}
+      />
       {/* Main Content + Sidebar Layout */}
       <div className="max-w-6xl mx-auto px-4 md:px-8 flex flex-col lg:flex-row gap-8">
         {/* Main Content */}
@@ -702,7 +710,7 @@ const ToolDetailsPage: React.FC = () => {
             
             {/* Existing Reviews List */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {reviews.map(review => (
+              {(showAllReviews ? reviews : reviews.slice(0, 2)).map(review => (
                 <div key={review.id} className="p-4 border rounded-lg">
                   <div className="flex items-center gap-1 mb-2">
                     {[1, 2, 3, 4, 5].map(star => (
@@ -714,6 +722,13 @@ const ToolDetailsPage: React.FC = () => {
                       </div>
               ))}
             </div>
+            {reviews.length > 2 && (
+              <div className="flex justify-center mt-4">
+                <Button variant="outline" size="sm" onClick={() => setShowAllReviews(v => !v)}>
+                  {showAllReviews ? 'Show Less' : `Show More (${reviews.length - 2} more)`}
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Related Tools Section (horizontal scroll) */}
@@ -795,4 +810,4 @@ const ToolDetailsPage: React.FC = () => {
   );
 };
 
-export default ToolDetailsPage; 
+export default ToolDetailsPage;
