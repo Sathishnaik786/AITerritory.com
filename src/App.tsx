@@ -105,7 +105,6 @@ function ThemedAppContent() {
   return (
     <div className={`min-h-screen antialiased w-full flex flex-col`}>
       <HelmetProvider>
-        <SEO title="AI Tools Directory | Find the Best AI Tools" description="Discover the best AI tools for productivity, image generation, text generation, and more. Find AI tools to enhance your workflow and boost productivity." />
         <div className="relative min-h-screen flex flex-col items-center w-full">
           <Navbar newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
           <ScrollToTopButton />

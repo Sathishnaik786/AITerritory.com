@@ -5,6 +5,7 @@ import { BlogPost } from '../types/blog';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
+import SEO from '../components/SEO';
 const CATEGORIES = [
   'All',
   'AI Tool Reviews',
@@ -45,9 +46,14 @@ const Blog: React.FC = () => {
   const rest = blogs.filter(post => !post.featured);
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      {/* Hero Section - Hide on mobile */}
-      <section className="w-full py-12 md:py-16 hidden sm:block">
+    <>
+      <SEO
+        title="AI Territory Blog | Insights, Guides, and Tool Reviews"
+        description="Explore the latest in AI, productivity, and innovation. Discover curated insights, in-depth guides, and reviews of the best AI tools."
+      />
+      <div className="container mx-auto px-4 py-12">
+        {/* Hero Section - Hide on mobile */}
+        <section className="w-full py-12 md:py-16 hidden sm:block">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <motion.h1
             className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 dark:text-white tracking-tight"
@@ -90,7 +96,7 @@ const Blog: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           <div className="flex flex-col md:flex-row items-center gap-8 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-2xl p-6 md:p-10 backdrop-blur-md border border-gray-200 dark:border-gray-800">
-            <img src={featured.cover_image_url} alt={featured.title} className="w-full md:w-1/2 rounded-xl shadow-lg object-cover max-h-80 mb-4 md:mb-0" />
+            <img src={featured.cover_image_url} alt={featured.title} className="w-full md:w-1/2 rounded-xl shadow-lg object-cover max-h-80 mb-4 md:mb-0" loading="lazy" />
             <div className="flex-1 flex flex-col items-start">
               <div className="mb-2 flex flex-wrap gap-2">
                 {Array.isArray(featured.tags) && featured.tags.map(tag => (
@@ -135,7 +141,8 @@ const Blog: React.FC = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 
-export default Blog; 
+export default Blog;

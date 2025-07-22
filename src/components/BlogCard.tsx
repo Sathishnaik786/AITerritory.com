@@ -68,6 +68,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
                 src={displayImage}
                 alt={post.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
               />
             </div>
             <CardContent className="p-3 sm:p-4 md:p-5">
@@ -199,4 +200,4 @@ export const BlogCard: React.FC<BlogCardProps> = ({
       </Link>
     </motion.div>
   );
-}; 
+};

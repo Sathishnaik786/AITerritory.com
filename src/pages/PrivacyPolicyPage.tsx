@@ -1,10 +1,16 @@
 import React from 'react';
+import SEO from '../components/SEO';
 
 const PrivacyPolicyPage: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-6 text-center">Privacy Policy</h1>
-      <p className="text-md text-muted-foreground mb-4">
+    <>
+      <SEO
+        title="Privacy Policy | AI Territory"
+        description="Read the AI Territory privacy policy to understand how we collect, use, and protect your personal information."
+      />
+      <div className="container mx-auto px-4 py-12">
+        <h1 className="text-4xl font-bold mb-6 text-center">Privacy Policy</h1>
+        <p className="text-md text-muted-foreground mb-4">
         At Viralai, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
       </p>
       <h2 className="text-2xl font-semibold mb-3">Information We Collect</h2>
@@ -31,6 +37,7 @@ const PrivacyPolicyPage: React.FC = () => {
         Last updated: {new Date().toLocaleDateString()}
       </p>
     </div>
+    </>
   );
 };
 

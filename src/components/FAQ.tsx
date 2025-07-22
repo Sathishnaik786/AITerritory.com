@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import BackgroundAnimation from './ui/BackgroundAnimation';
+import { Helmet } from 'react-helmet-async';
 
 const faqData = [
   {
@@ -32,8 +33,28 @@ export const FAQ: React.FC = () => {
     setOpenIndex(openIndex === idx ? null : idx);
   };
 
+  // Create FAQPage schema
+  const faqPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqData.map(item => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer
+      }
+    }))
+  };
+
   return (
-    <section className="relative w-full py-16 flex flex-col items-center justify-center min-h-[80vh] bg-transparent overflow-hidden">
+    <>
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(faqPageSchema)}
+        </script>
+      </Helmet>
+      <section className="relative w-full py-16 flex flex-col items-center justify-center min-h-[80vh] bg-transparent overflow-hidden">
       <BackgroundAnimation />
       <div className="relative z-10 flex flex-col items-center w-full max-w-2xl px-4">
         {/* FAQ Section Label */}
@@ -75,5 +96,6 @@ export const FAQ: React.FC = () => {
         </div>
       </div>
     </section>
+    </>
   );
-}; 
+};

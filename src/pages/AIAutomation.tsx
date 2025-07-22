@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 import { SiDiscord } from 'react-icons/si';
 import { Instagram } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const AIAutomation = () => {
   const automationTools = [
@@ -72,9 +73,14 @@ const AIAutomation = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Hero Section */}
-      <div className="text-center mb-16">
+    <>
+      <SEO
+        title="AI Automation | Streamline Workflows & Boost Productivity"
+        description="Discover how AI can automate your workflows, streamline processes, and boost productivity. Explore popular tools like Zapier AI, Make.com, and n8n."
+      />
+      <div className="container mx-auto px-4 py-8">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
         <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           AI Automation
         </h1>
@@ -216,6 +222,7 @@ const AIAutomation = () => {
         />
       </div>
     </div>
+    </>
   );
 };
 

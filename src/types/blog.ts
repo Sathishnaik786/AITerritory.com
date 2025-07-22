@@ -8,9 +8,11 @@ export interface BlogPost {
   author_name: string;
   tags: string[];
   created_at: string;
+  date?: string; // For compatibility with mock data
   category?: string;
   featured?: boolean;
   reading_time?: string;
+  readTime?: number; // For compatibility with mock data
   author_image_url?: string;
   author_bio?: string;
   author_social_links?: {
@@ -18,6 +20,10 @@ export interface BlogPost {
     linkedin?: string;
     github?: string;
   };
+  published?: boolean;
+  summary?: string; // For compatibility with mock data
+  bannerImage?: string; // For compatibility with mock data
+  author?: string; // For compatibility with mock data
 }
 
 export interface BlogCategory {
@@ -26,4 +32,4 @@ export interface BlogCategory {
   slug: string;
   description: string;
   postCount: number;
-} 
+}

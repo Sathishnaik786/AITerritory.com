@@ -2,6 +2,24 @@ User-agent: *
 Disallow: /auth/
 Disallow: /dashboard/
 Disallow: /settings/
+Disallow: /admin/
+Allow: /
+
+
+# Allow Google bot to crawl everything allowed above without delay
+User-agent: Googlebot
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /admin/
+Allow: /
+
+# Allow Bing bot with specific rules
+User-agent: Bingbot
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /admin/
 Allow: /
 
 Sitemap: https://aiterritory.org/sitemap.xml

@@ -16,7 +16,7 @@ export const NextBlogs: React.FC<NextBlogsProps> = ({
 }) => {
   // Filter out the current post and get up to 4 recommended posts
   const recommendedPosts = posts
-    .filter(post => post.id !== currentPostId && post.published)
+    .filter(post => post.id !== currentPostId)
     .slice(0, 4);
 
   if (recommendedPosts.length === 0) {
@@ -69,4 +69,4 @@ export const NextBlogs: React.FC<NextBlogsProps> = ({
       </div>
     </section>
   );
-}; 
+};

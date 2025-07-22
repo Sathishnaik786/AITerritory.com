@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 import { SiDiscord } from 'react-icons/si';
 import { Instagram } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const AITutorials = () => {
   const featuredTutorials = [
@@ -140,9 +141,14 @@ const AITutorials = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Hero Section */}
-      <div className="text-center mb-16">
+    <>
+      <SEO
+        title="AI Tutorials | Learn AI with Comprehensive Guides"
+        description="Master artificial intelligence with our comprehensive tutorials, from beginner-friendly guides to advanced techniques in ChatGPT, and more."
+      />
+      <div className="container mx-auto px-4 py-8">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
         <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           AI Tutorials
         </h1>
@@ -245,6 +251,7 @@ const AITutorials = () => {
         />
       </div>
     </div>
+    </>
   );
 };
 

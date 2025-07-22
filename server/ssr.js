@@ -68,7 +68,12 @@ app.get('*', async (req, res) => {
 
   // Inject the rendered app and meta tags into the template
   const html = template
-    .replace('<!--app-head-->', `\n      ${blogMeta || helmet.title.toString() + '\n' + helmet.meta.toString() + '\n' + helmet.link.toString()}\n    `)
+    .replace('<!--app-head-->', `
+      ${helmet.title.toString()}
+      ${helmet.meta.toString()}
+      ${helmet.link.toString()}
+      ${blogMeta}
+    `)
     .replace('<!--app-html-->', appHtml);
 
   res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
@@ -76,4 +81,4 @@ app.get('*', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`SSR server running at http://localhost:${PORT}`);
-}); 
+});

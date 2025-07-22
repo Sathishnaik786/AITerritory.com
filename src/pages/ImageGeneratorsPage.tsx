@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Search, Filter, ChevronLeft, ChevronRight, Image } from 'lucide-react';
 import { Tool } from '../types/tool';
 
+import SEO from '../components/SEO';
 const ImageGeneratorsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,9 +89,14 @@ const ImageGeneratorsPage = () => {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
+    <>
+      <SEO
+        title="AI Image Generators | Create Stunning Visuals"
+        description="Discover the best AI image generators to create stunning visuals, art, and graphics from text prompts."
+      />
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4 flex items-center justify-center gap-3">
           <Image className="w-8 h-8 text-purple-500" />
           Image Generators
@@ -289,6 +295,7 @@ const ImageGeneratorsPage = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

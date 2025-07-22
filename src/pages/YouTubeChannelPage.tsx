@@ -4,6 +4,7 @@ import { PlayCircle, X } from 'lucide-react';
 import { useYouTubeContent } from '@/hooks/useYouTubeContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import SEO from '../components/SEO';
 
 const YouTubeChannelPage: React.FC = () => {
   const { data: youtubeContent, isLoading, error } = useYouTubeContent();
@@ -28,6 +29,10 @@ const YouTubeChannelPage: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title="AI Territory YouTube Channel"
+        description="Discover video tutorials, AI news, and in-depth reviews on our YouTube channel. Learn how to get the most out of the latest AI tools and stay ahead of the curve."
+      />
       <div className="container mx-auto px-4 py-12">
         <div className="mb-12 text-center">
           <h1 className="text-4xl font-bold mb-4">Our YouTube Channel</h1>

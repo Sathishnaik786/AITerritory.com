@@ -192,7 +192,7 @@ const BlogDetail: React.FC = () => {
               }
             },
             "datePublished": blog.created_at,
-            "dateModified": blog.updated_at || blog.created_at,
+            "dateModified": blog.created_at,
             "mainEntityOfPage": {
               "@type": "WebPage",
               "@id": canonicalUrl
@@ -274,6 +274,7 @@ const BlogDetail: React.FC = () => {
               src={blog.cover_image_url}
               alt={blog.title}
               className="w-full rounded-2xl shadow-2xl object-cover max-h-[420px] border border-white/60 dark:border-gray-800/60"
+              loading="lazy"
             />
           </div>
         </motion.div>
@@ -548,7 +549,7 @@ const BlogDetail: React.FC = () => {
                 transition={{ duration: 0.4 }}
               >
                 <Link to={`/blog/${item.slug}`} className="block">
-                  <img src={item.cover_image_url} alt={item.title} className="w-full h-36 object-cover rounded-lg mb-3" />
+                  <img src={item.cover_image_url} alt={item.title} className="w-full h-36 object-cover rounded-lg mb-3" loading="lazy" />
                   <div className="font-semibold text-lg mb-1 line-clamp-2">{item.title}</div>
                   <div className="text-xs text-muted-foreground line-clamp-2 mb-1">{item.description}</div>
                 </Link>

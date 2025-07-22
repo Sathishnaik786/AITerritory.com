@@ -8,6 +8,7 @@ interface SEOProps {
   image?: string;
   article?: boolean;
   keywords?: string;
+  structuredData?: Record<string, any>;
 }
 
 const SEO: React.FC<SEOProps> = ({
@@ -16,6 +17,7 @@ const SEO: React.FC<SEOProps> = ({
   image = 'https://aiterritory.org/og-image.png',
   article = false,
   keywords = 'AI tools, artificial intelligence, content generation, AI platform',
+  structuredData,
 }) => {
   const location = useLocation();
   const canonicalUrl = `https://aiterritory.org${location.pathname}`;
@@ -50,6 +52,13 @@ const SEO: React.FC<SEOProps> = ({
       <link rel="dns-prefetch" href="https://aiterritory-com.onrender.com" />
       <link rel="preconnect" href="https://api.openai.com" />
       <link rel="dns-prefetch" href="https://api.openai.com" />
+      
+      {/* JSON-LD Structured Data */}
+      {structuredData && (
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      )}
     </Helmet>
   );
 };

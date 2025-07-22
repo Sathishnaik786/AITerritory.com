@@ -1,10 +1,16 @@
 import React from 'react';
+import SEO from '../components/SEO';
 
 const TermsOfServicePage: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-6 text-center">Terms of Service</h1>
-      <p className="text-md text-muted-foreground mb-4">
+    <>
+      <SEO
+        title="Terms of Service | AI Territory"
+        description="Read the AI Territory terms of service to understand the rules and guidelines for using our website and services."
+      />
+      <div className="container mx-auto px-4 py-12">
+        <h1 className="text-4xl font-bold mb-6 text-center">Terms of Service</h1>
+        <p className="text-md text-muted-foreground mb-4">
         Welcome to Viralai. By accessing or using our website, you agree to be bound by these Terms of Service and all applicable laws and regulations.
       </p>
       <h2 className="text-2xl font-semibold mb-3">Use of Our Website</h2>
@@ -31,6 +37,7 @@ const TermsOfServicePage: React.FC = () => {
         Last updated: {new Date().toLocaleDateString()}
       </p>
     </div>
+    </>
   );
 };
 

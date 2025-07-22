@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Search, Filter, ChevronLeft, ChevronRight, Type } from 'lucide-react';
 import { Tool } from '../types/tool';
 
+import SEO from '../components/SEO';
 const TextGeneratorsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,9 +89,14 @@ const TextGeneratorsPage = () => {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
+    <>
+      <SEO
+        title="AI Text Generators | Create Compelling Content"
+        description="Discover the best AI text generators to create compelling content, from articles and blog posts to marketing copy and social media updates."
+      />
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4 flex items-center justify-center gap-3">
           <Type className="w-8 h-8 text-green-500" />
           Text Generators
@@ -289,6 +295,7 @@ const TextGeneratorsPage = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

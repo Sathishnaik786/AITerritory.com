@@ -17,6 +17,8 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-reac
 import { Category } from '../types/category';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
+import { JsonLd } from 'react-schemaorg';
+import { Organization, FAQPage } from 'schema-dts';
 import { supabase } from '../services/supabaseClient'; // Adjust path if needed
 import { Tool } from '../types/tool';
 import { ToolCard, ToolCardStats } from '../components/ToolCard';
@@ -135,6 +137,21 @@ export const HomePage: React.FC = () => {
     setIsSidebarOpen(false);
   };
 
+  // Organization schema for homepage
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "AI Territory",
+    "url": "https://aiterritory.org",
+    "logo": "https://aiterritory.org/logo.jpg",
+    "sameAs": [
+      "https://twitter.com/aiterritory",
+      "https://www.facebook.com/aiterritory",
+      "https://www.linkedin.com/company/aiterritory"
+    ],
+    "description": "AI Territory is a curated directory of AI tools, resources, and insights to help creators, businesses, and enthusiasts stay ahead in the world of artificial intelligence."
+  };
+
   return (
     <>
       <SEO 
@@ -142,6 +159,7 @@ export const HomePage: React.FC = () => {
         description="Explore the best AI tools, resources, and innovations on AITerritory. Find, compare, and review top artificial intelligence solutions for every need."
         image="/default-thumbnail.jpg"
         keywords="AI tools, artificial intelligence, AI resources, AI directory, AI solutions"
+        structuredData={organizationSchema}
       />
     <div className="w-full overflow-x-hidden">
       <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-10">

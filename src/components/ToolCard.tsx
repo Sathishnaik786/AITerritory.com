@@ -222,6 +222,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
                   src={tool.image_url || '/placeholder.svg'}
                   alt={tool.name}
                   className="w-12 h-12 rounded-full object-cover flex-shrink-0 ring-2 ring-purple-200 dark:ring-purple-700 shadow-lg"
+                  loading="lazy"
                 />
                 {tool.is_featured && (
                   <div className="absolute -top-1 -right-1 bg-blue-500 rounded-full p-0.5">
