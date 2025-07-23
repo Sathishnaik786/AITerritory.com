@@ -27,15 +27,23 @@ export default async (request: Request, context: Context) => {
     const htmlResponse = await fetch(url.origin);
     let html = await htmlResponse.text();
     
+    // Determine meta fields based on type
+    let metaTitle = data.title || data.name || "AI Territory";
+    let metaImage = data.image_url || data.cover_image_url || url.origin + "/og-default.png";
+    let metaDescription = data.description || "Discover the best AI tools and blog posts on AITerritory.";
+    
     // Inject meta tags
     html = html.replace(
       "</head>",
       `
-      <meta property="og:title" content="${data.title} | AI Territory">
-      <meta property="og:image" content="${data.image_url || url.origin + '/og-default.png'}">
-      <meta property="og:description" content="${data.description}">
+      <meta property="og:title" content="${metaTitle} | AI Territory">
+      <meta property="og:image" content="${metaImage}">
+      <meta property="og:description" content="${metaDescription}">
       <meta property="og:url" content="${url.href}">
       <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:title" content="${metaTitle} | AI Territory">
+      <meta name="twitter:description" content="${metaDescription}">
+      <meta name="twitter:image" content="${metaImage}">
       </head>`
     );
     

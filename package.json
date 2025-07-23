@@ -12,11 +12,6 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server:dev": "cd server && npm run dev",
-    "server:install": "cd server && npm install",
-    "setup": "npm install && npm run server:install",
-    "dev:full": "concurrently \"npm run dev\" \"npm run server:dev\"",
-    "dev:both": "concurrently \"npm run dev\" \"cd server && npm run dev\"",
     "kill-ports": "npx kill-port 3001 3002 3003 8080"
   },
   "dependencies": {
@@ -90,7 +85,6 @@
     "react-schemaorg": "^2.0.0",
     "react-simplemde-editor": "^5.2.0",
     "react-tagcloud": "^2.3.3",
-    "react-wordcloud": "^1.2.7",
     "recharts": "^3.0.2",
     "rehype-highlight": "^7.0.2",
     "rehype-sanitize": "^6.0.0",
@@ -128,13 +122,12 @@
     "kill-port": "^2.0.1",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.11",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^7.0.2",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-sitemap": "^0.8.2"
   },
-  "resolutions": {
-    "react-image-lightbox": "5.1.4"
-  }
+  "resolutions": {}
 }
