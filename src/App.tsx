@@ -254,21 +254,21 @@ function App() {
       <BackgroundAnimation />
       <QueryClientProvider client={queryClient}>
         <HelmetProvider>
-          <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true
-            }}
-          >
-            <TooltipProvider>
-                <ScrollToTop />
-                <Toaster position="top-right" richColors />
-                <Suspense fallback={<div>Loading...</div>}>
-                  <ThemedAppContent />
-                </Suspense>
-                <ReactQueryDevtools initialIsOpen={false} />
-            </TooltipProvider>
-          </BrowserRouter>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true
+          }}
+        >
+          <TooltipProvider>
+              <ScrollToTop />
+              <Toaster position="top-right" richColors />
+              <Suspense fallback={<div>Loading...</div>}>
+                <ThemedAppContent />
+              </Suspense>
+              <ReactQueryDevtools initialIsOpen={false} />
+          </TooltipProvider>
+        </BrowserRouter>
         </HelmetProvider>
       </QueryClientProvider>
     </ThemeProvider>
