@@ -1,10 +1,6 @@
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/tools/*"
-
-[[edge_functions]]
-function = "dynamic-meta"
-path = "/blog/*"
+path = "/*"
 
 [[redirects]]
 from = "/api/*"
