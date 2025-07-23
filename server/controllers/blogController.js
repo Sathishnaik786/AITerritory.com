@@ -30,9 +30,9 @@ async function getAllBlogs(req, res) {
 // GET /api/blogs/:slug
 async function getBlogBySlug(req, res) {
   const { slug } = req.params;
-  const { data, error } = await supabase
+  const { data: blog, error } = await supabase
     .from('blogs')
-    .select(BLOG_FIELDS.join(','))
+    .select('title, description, cover_image_url')
     .eq('slug', slug)
     .single();
 
@@ -43,10 +43,10 @@ async function getBlogBySlug(req, res) {
   if (error) {
     return res.status(500).json({ error: 'Failed to fetch blog' });
   }
-  if (!data) {
+  if (!blog) {
     return res.status(404).json({ error: 'Blog not found' });
   }
-  res.json(data);
+  res.json(blog);
 }
 
 // GET /api/blogs/category/:category
