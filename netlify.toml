@@ -1,6 +1,38 @@
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/*"
+path = "/tools/*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/blog/*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/ai-automation/*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/ai-tutorials/*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/categories/*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/tags/*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/resources/*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/youtube/*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/dashboard/*"
 
 [[redirects]]
 from = "/api/*"
