@@ -30,6 +30,7 @@ const adminRoutes = require('./routes/admin');
 const adminAuth = require('./middleware/adminAuth');
 const newsletterController = require('./controllers/newsletterController');
 const appleCarouselRoutes = require('./routes/appleCarousel');
+const blogRoutes = require('./routes/blog');
 
 const app = express();
 
@@ -128,6 +129,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Routes
 app.use('/api/tools', toolRoutes);
+app.use('/api/blogs', blogRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/business-functions', businessRoutes);
