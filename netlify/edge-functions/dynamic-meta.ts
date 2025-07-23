@@ -23,7 +23,8 @@ export default async (request: Request, context: Context) => {
   if (apiPath) {
     try {
       const id = url.pathname.replace(apiPath, "");
-      const apiUrl = `${url.origin}${API_MAP[apiPath]}${id}`;
+      // Use direct Render backend URL
+      const apiUrl = `https://aiterritory-com.onrender.com${API_MAP[apiPath]}${id}`;
       const response = await fetch(apiUrl);
       const data = await response.json();
       metaTitle = data.title || data.name || metaTitle;
