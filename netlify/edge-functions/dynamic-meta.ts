@@ -7,9 +7,9 @@ const API_MAP: Record<string, string> = {
   "/ai-tutorials/": "/api/ai-tutorials/",
   "/categories/": "/api/categories/", // For category pages
   "/tags/": "/api/tags/",             // For tag pages
-  "/resources/": "/api/resources/",   // For resource pages
+  "/resources/": "/api/resources/",   // For resource pages (future)
   "/youtube/": "/api/youtube/",       // For YouTube content
-  "/dashboard/": "/api/dashboard/",   // For user dashboard
+  "/dashboard/": "/api/dashboard/",   // For user dashboard (future)
   // Add more as needed
 };
 
@@ -27,11 +27,25 @@ export default async (request: Request, context: Context) => {
       const apiUrl = `https://aiterritory-com.onrender.com${API_MAP[apiPath]}${id}`;
       const response = await fetch(apiUrl);
       const data = await response.json();
-      metaTitle = data.title || data.name || metaTitle;
-      metaImage = data.image_url || data.cover_image_url || metaImage;
-      metaDescription = data.description || metaDescription;
+      if (apiPath === "/categories/") {
+        metaTitle = data.name || metaTitle;
+        metaDescription = data.description || metaDescription;
+        // No image field, use default
+      } else if (apiPath === "/tags/") {
+        metaTitle = data.name || metaTitle;
+        metaDescription = `Explore tools and content tagged with '${data.name || id}' on AITerritory.`;
+        // No image field, use default
+      } else if (apiPath === "/youtube/") {
+        metaTitle = data.title || metaTitle;
+        metaDescription = data.description || metaDescription;
+        metaImage = data.thumbnail_url || metaImage;
+      } else {
+        metaTitle = data.title || data.name || metaTitle;
+        metaImage = data.image_url || data.cover_image_url || metaImage;
+        metaDescription = data.description || metaDescription;
+      }
     } catch (error) {
-      console.error("Edge function API fetch error:", error); // Add logging
+      console.error("Edge function API fetch error:", error);
       // fallback to default meta
     }
   }
