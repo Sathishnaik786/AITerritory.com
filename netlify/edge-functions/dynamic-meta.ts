@@ -40,11 +40,11 @@ export default async (request: Request, context: Context) => {
 
   html = html.replace(
     "</head>",
-    `\n    <meta property="og:title" content="${metaTitle} | AI Territory">\n    <meta property="og:image" content="${metaImage}">\n    <meta property="og:description" content="${metaDescription}">\n    <meta property="og:url" content="${url.href}">\n    <meta name="twitter:card" content="summary_large_image">\n    <meta name="twitter:title" content="${metaTitle} | AI Territory">\n    <meta name="twitter:description" content="${metaDescription}">\n    <meta name="twitter:image" content="${metaImage}">\n    </head>`
+    `\n    <meta property=\"og:title\" content=\"${metaTitle} | AI Territory\">\n    <meta property=\"og:image\" content=\"${metaImage}\">\n    <meta property=\"og:description\" content=\"${metaDescription}\">\n    <meta property=\"og:url\" content=\"${url.href}\">\n    <meta name=\"twitter:card\" content=\"summary_large_image\">\n    <meta name=\"twitter:title\" content=\"${metaTitle} | AI Territory\">\n    <meta name=\"twitter:description\" content=\"${metaDescription}\">\n    <meta name=\"twitter:image\" content=\"${metaImage}\">\n    </head>`
   );
 
-  // Ensure <!DOCTYPE html> is present at the top
-  if (!/^\s*<!DOCTYPE html>/i.test(html)) {
+  // Ensure only one doctype at the very top
+  if (!html.trimStart().toLowerCase().startsWith('<!doctype html>')) {
     html = '<!DOCTYPE html>\n' + html;
   }
 
