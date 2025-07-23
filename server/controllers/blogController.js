@@ -37,7 +37,6 @@ async function getBlogBySlug(req, res) {
     .single();
 
   if (error && error.code === 'PGRST116') {
-    // Not found
     return res.status(404).json({ error: 'Blog not found' });
   }
   if (error) {

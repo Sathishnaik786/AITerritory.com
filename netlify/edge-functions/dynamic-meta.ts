@@ -30,6 +30,7 @@ export default async (request: Request, context: Context) => {
       metaImage = data.image_url || data.cover_image_url || metaImage;
       metaDescription = data.description || metaDescription;
     } catch (error) {
+      console.error("Edge function API fetch error:", error); // Add logging
       // fallback to default meta
     }
   }
