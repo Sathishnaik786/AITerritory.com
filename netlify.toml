@@ -1,5 +1,13 @@
 [[edge_functions]]
 function = "dynamic-meta"
+path = "/blog"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/prompts"
+
+[[edge_functions]]
+function = "dynamic-meta"
 path = "/tools/*"
 
 [[edge_functions]]

@@ -20,15 +20,35 @@ export default async (request: Request, context: Context) => {
   let metaImage = url.origin + "/og-default.png";
   let metaDescription = "Discover the best AI tools and blog posts on AITerritory.";
 
-  // Static meta tags for /blog and /prompts index pages
-  if (url.pathname === "/blog") {
-    metaTitle = "AI Blog | AITerritory";
-    metaDescription = "Read the latest articles, news, and insights about AI, tools, and productivity on AITerritory.";
-    metaImage = url.origin + "/og-default.png";
-  } else if (url.pathname === "/prompts") {
-    metaTitle = "AI Prompts | AITerritory";
-    metaDescription = "Discover, share, and use the best AI prompts for ChatGPT, Midjourney, and more on AITerritory.";
-    metaImage = url.origin + "/og-default.png";
+  // Static meta tags for main/landing pages
+  const staticMetaMap: Record<string, { title: string, description: string, image?: string }> = {
+    "/ai-for-business": {
+      title: "AI for Business | AITerritory",
+      description: "Explore how AI is transforming business operations, strategy, and growth. Discover tools, guides, and case studies.",
+      image: url.origin + "/og-default.png"
+    },
+    "/blog": {
+      title: "AI Blog | AITerritory",
+      description: "Read the latest articles, news, and insights about AI, tools, and productivity on AITerritory.",
+      image: url.origin + "/og-default.png"
+    },
+    "/prompts": {
+      title: "AI Prompts | AITerritory",
+      description: "Discover, share, and use the best AI prompts for ChatGPT, Midjourney, and more on AITerritory.",
+      image: url.origin + "/og-default.png"
+    },
+    "/resources/ai-agents": {
+      title: "AI Agents Resources | AITerritory",
+      description: "Find the best resources, guides, and tools for building and using AI agents.",
+      image: url.origin + "/og-default.png"
+    },
+    // Add more static routes as needed
+  };
+
+  if (staticMetaMap[url.pathname]) {
+    metaTitle = staticMetaMap[url.pathname].title;
+    metaDescription = staticMetaMap[url.pathname].description;
+    metaImage = staticMetaMap[url.pathname].image || metaImage;
   }
 
   if (apiPath) {
