@@ -20,6 +20,17 @@ export default async (request: Request, context: Context) => {
   let metaImage = url.origin + "/og-default.png";
   let metaDescription = "Discover the best AI tools and blog posts on AITerritory.";
 
+  // Static meta tags for /blog and /prompts index pages
+  if (url.pathname === "/blog") {
+    metaTitle = "AI Blog | AITerritory";
+    metaDescription = "Read the latest articles, news, and insights about AI, tools, and productivity on AITerritory.";
+    metaImage = url.origin + "/og-default.png";
+  } else if (url.pathname === "/prompts") {
+    metaTitle = "AI Prompts | AITerritory";
+    metaDescription = "Discover, share, and use the best AI prompts for ChatGPT, Midjourney, and more on AITerritory.";
+    metaImage = url.origin + "/og-default.png";
+  }
+
   if (apiPath) {
     try {
       const id = url.pathname.replace(apiPath, "");
