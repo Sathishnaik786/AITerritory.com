@@ -38,6 +38,10 @@ export default async (request: Request, context: Context) => {
   const htmlResponse = await fetch(url.origin);
   let html = await htmlResponse.text();
 
+  // Remove all existing OG and Twitter meta tags
+  html = html.replace(/<meta[^>]+(property|name)="og:[^"]+"[^>]*>/gi, '');
+  html = html.replace(/<meta[^>]+(property|name)="twitter:[^"]+"[^>]*>/gi, '');
+
   html = html.replace(
     "</head>",
     `\n    <meta property=\"og:title\" content=\"${metaTitle} | AI Territory\">\n    <meta property=\"og:image\" content=\"${metaImage}\">\n    <meta property=\"og:description\" content=\"${metaDescription}\">\n    <meta property=\"og:url\" content=\"${url.href}\">\n    <meta name=\"twitter:card\" content=\"summary_large_image\">\n    <meta name=\"twitter:title\" content=\"${metaTitle} | AI Territory\">\n    <meta name=\"twitter:description\" content=\"${metaDescription}\">\n    <meta name=\"twitter:image\" content=\"${metaImage}\">\n    </head>`
