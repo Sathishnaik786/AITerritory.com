@@ -18,12 +18,16 @@ const ToolDescriptionSection: React.FC<ToolDescriptionSectionProps> = ({ longDes
             p: ({node, ...props}) => <p className="mb-4" {...props} />,
             ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4" {...props} />,
             ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4" {...props} />,
-            code({node, inline, className, children, ...props}) {
-              return !inline ? (
-                <pre className="bg-gray-900 text-white rounded-lg p-4 overflow-x-auto my-4 text-sm"><code {...props}>{children}</code></pre>
-              ) : (
-                <code className="bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-sm font-mono" {...props}>{children}</code>
-              );
+            code({node, inline, className, children, ...props}: {node: any, inline?: boolean, className?: string, children: React.ReactNode}) {
+              if (!inline) {
+                return (
+                  <pre className="bg-gray-900 text-white rounded-lg p-4 overflow-x-auto my-4 text-sm"><code className={className} {...props}>{children}</code></pre>
+                );
+              } else {
+                return (
+                  <code className={"bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-sm font-mono " + (className || "")} {...props}>{children}</code>
+                );
+              }
             },
             a: ({node, ...props}) => <a className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer" {...props} />,
           }}

@@ -5,6 +5,9 @@ import { motion } from 'framer-motion';
 import { toast } from '@/components/ui/sonner';
 import { SiWhatsapp } from 'react-icons/si';
 import { FaTwitter } from 'react-icons/fa';
+import ShareDialog from './ShareDialog';
+import { FaLinkedin, FaFacebook, FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
+import { SignInButton } from '@clerk/clerk-react';
 
 interface Comment {
   id: string;
@@ -31,9 +34,15 @@ interface ToolInteractionSectionProps {
   onBookmarkToggle: () => void;
   onShare: (platform: string) => void;
   onCommentSubmit: (text: string) => Promise<void>;
+  toolTitle: string;
+  toolDescription: string;
+  toolImage?: string;
 }
 
 const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
+  toolTitle,
+  toolDescription,
+  toolImage,
   likesCount,
   userHasLiked,
   bookmarkCount,
@@ -47,6 +56,7 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
 }) => {
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   const handleLike = () => {
     if (!userSession) return toast('Please log in to like this tool.');
@@ -60,7 +70,10 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userSession) return toast('Please log in to comment.');
+    if (!userSession) {
+      toast('Please log in to comment.');
+      return;
+    }
     if (!newComment.trim()) return;
     
     setIsSubmitting(true);
@@ -102,47 +115,67 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
             <span>{bookmarkCount}</span>
           </motion.button>
 
-          {/* Share Buttons */}
-          <div className="flex items-center gap-2 ml-auto">
-            <Button variant="outline" size="icon" className="rounded-full" onClick={() => handleShare('copy')}><Share2 className="w-5 h-5" /></Button>
-            <Button variant="outline" size="icon" className="rounded-full" onClick={() => handleShare('whatsapp')}><SiWhatsapp className="w-5 h-5" /></Button>
-            <Button variant="outline" size="icon" className="rounded-full" onClick={() => handleShare('twitter')}><FaTwitter className="w-5 h-5" /></Button>
-          </div>
+          {/* Share Button */}
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-all bg-gray-100 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700"
+            onClick={() => setShareDialogOpen(true)}
+          >
+            <Share2 className="w-5 h-5" /> Share
+          </motion.button>
         </div>
+        <ShareDialog
+          open={shareDialogOpen}
+          onClose={() => setShareDialogOpen(false)}
+          title={toolTitle}
+          description={toolDescription}
+          image={toolImage}
+          url={window.location.href}
+        />
 
         {/* Comments Section */}
-        <div className="border-t border-muted pt-4">
-          <h3 className="font-semibold mb-2 flex items-center gap-2"><MessageCircle className="w-5 h-5" /> Comments ({comments.length})</h3>
-          
-          {/* Comments List */}
-          <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
-            {comments.length > 0 ? comments.map(c => (
-              <div key={c.id} className="flex items-start gap-3 bg-gray-50 dark:bg-gray-800 rounded-lg p-2 text-sm">
-                <img src={c.user.avatar || '/public/placeholder.svg'} alt={c.user.name} className="w-8 h-8 rounded-full border" />
-                <div>
-                  <span className="font-semibold">{c.user.name}</span>
-                  <p className="text-gray-700 dark:text-gray-200">{c.text}</p>
-                </div>
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-2">Comments</h3>
+          <form onSubmit={handleFormSubmit} className="flex flex-col gap-2">
+            <textarea
+              className="w-full p-2 border rounded"
+              placeholder={userSession ? 'Write a comment...' : 'Log in to comment'}
+              value={newComment}
+              onChange={e => {
+                if (!userSession) {
+                  toast('Please log in to comment.');
+                  return;
+                }
+                setNewComment(e.target.value);
+              }}
+              onFocus={() => {
+                if (!userSession) {
+                  toast('Please log in to comment.');
+                }
+              }}
+              disabled={isSubmitting}
+            />
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+              disabled={isSubmitting}
+              onClick={e => {
+                if (!userSession) {
+                  e.preventDefault();
+                  toast('Please log in to comment.');
+                }
+              }}
+            >
+              {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Post Comment'}
+            </button>
+            {!userSession && (
+              <div className="text-center mt-2">
+                <SignInButton mode="modal">
+                  <span className="text-blue-600 underline cursor-pointer">Log in or Sign up to comment</span>
+                </SignInButton>
               </div>
-            )) : <p className="text-sm text-gray-500">No comments yet.</p>}
-          </div>
-
-          {/* Comment Form */}
-          {userSession && (
-            <form onSubmit={handleFormSubmit} className="flex items-center gap-2 mt-4">
-              <input
-                type="text"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add a comment..."
-                className="flex-1 px-4 py-2 rounded-lg border bg-transparent focus:ring-2 focus:ring-blue-400"
-                disabled={isSubmitting}
-              />
-              <Button type="submit" disabled={isSubmitting || !newComment.trim()}>
-                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Post'}
-              </Button>
+            )}
             </form>
-          )}
         </div>
       </div>
     </section>

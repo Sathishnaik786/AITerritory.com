@@ -11,9 +11,11 @@ export interface ToolSidebarInfoProps {
     tags?: string[];
     pricingType?: string;
   };
+  onBookmark?: () => void;
+  onShare?: () => void;
 }
 
-const ToolSidebarInfo: React.FC<ToolSidebarInfoProps> = ({ tool }) => {
+const ToolSidebarInfo: React.FC<ToolSidebarInfoProps> = ({ tool, onBookmark, onShare }) => {
   return (
     <aside className="w-full md:w-72 lg:w-80 mt-8 md:mt-0 md:sticky md:top-24">
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-muted p-6 flex flex-col gap-6">
@@ -55,10 +57,10 @@ const ToolSidebarInfo: React.FC<ToolSidebarInfoProps> = ({ tool }) => {
         )}
         {/* Bookmark / Share Buttons */}
         <div className="flex gap-3 mt-2">
-          <Button variant="outline" className="rounded-xl flex items-center gap-2 w-full md:w-auto">
+          <Button variant="outline" className="rounded-xl flex items-center gap-2 w-full md:w-auto" onClick={onBookmark}>
             <Bookmark className="w-4 h-4" /> Bookmark
           </Button>
-          <Button variant="outline" className="rounded-xl flex items-center gap-2 w-full md:w-auto">
+          <Button variant="outline" className="rounded-xl flex items-center gap-2 w-full md:w-auto" onClick={onShare}>
             <Share2 className="w-4 h-4" /> Share
           </Button>
         </div>

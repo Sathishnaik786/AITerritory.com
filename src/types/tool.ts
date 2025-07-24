@@ -23,6 +23,7 @@ export interface Tool {
   tool_tags?: ToolTag[];
   sub_tools?: SubTool[];
   reviews?: Review[];
+  author?: string;
 }
 
 export interface Category {

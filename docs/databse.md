@@ -1,7 +1,7 @@
 ## Table: admin_users
 
 create table public.admin_users (
-  id uuid not null default extensions.uuid_generate_v4 (),
+  id uuid not null default uuid_generate_v4(),
   user_id text not null,
   email text null,
   phone text null,
@@ -13,19 +13,19 @@ create table public.admin_users (
 ## Table: advertise_requests
 
 create table public.advertise_requests (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   name text not null,
   email text not null,
   company text null,
   message text not null,
-  created_at timestamp with time zone null default timezone ('utc'::text, now()),
+  created_at timestamp with time zone null default timezone('utc'::text, now()),
   constraint advertise_requests_pkey primary key (id)
 ) TABLESPACE pg_default;
 
 ## Table: ai_agents
 
 create table public.ai_agents (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   type text not null,
   title text not null,
   description text null,
@@ -39,7 +39,7 @@ create table public.ai_agents (
 ## Table: ai_automation_guides
 
 create table public.ai_automation_guides (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   title text not null,
   description text null,
   video_link text null,
@@ -49,7 +49,7 @@ create table public.ai_automation_guides (
 ## Table: ai_automation_tools
 
 create table public.ai_automation_tools (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   title text not null,
   description text null,
   image text null,
@@ -61,7 +61,7 @@ create table public.ai_automation_tools (
 ## Table: ai_automation_use_cases
 
 create table public.ai_automation_use_cases (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   title text not null,
   description text null,
   image text null,
@@ -74,7 +74,7 @@ create table public.ai_automation_use_cases (
 ## Table: ai_innovations
 
 create table public.ai_innovations (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   type text not null,
   title text not null,
   description text null,
@@ -87,7 +87,7 @@ create table public.ai_innovations (
 ## Table: ai_learning_path_courses
 
 create table public.ai_learning_path_courses (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   learning_path_id uuid null,
   title text not null,
   description text null,
@@ -95,14 +95,13 @@ create table public.ai_learning_path_courses (
   duration text null,
   level text null,
   link text null,
-  constraint ai_learning_path_courses_pkey primary key (id),
-  constraint ai_learning_path_courses_learning_path_id_fkey foreign KEY (learning_path_id) references ai_learning_paths (id) on delete CASCADE
+  constraint ai_learning_path_courses_pkey primary key (id)
 ) TABLESPACE pg_default;
 
 ## Table: ai_learning_paths
 
 create table public.ai_learning_paths (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   title text not null,
   description text null,
   image text null,
@@ -112,7 +111,7 @@ create table public.ai_learning_paths (
 ## Table: ai_research_papers
 
 create table public.ai_research_papers (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   title text not null,
   authors text null,
   abstract text null,
@@ -124,7 +123,7 @@ create table public.ai_research_papers (
 ## Table: ai_tutorials
 
 create table public.ai_tutorials (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   type text not null,
   title text not null,
   description text null,
@@ -135,10 +134,40 @@ create table public.ai_tutorials (
   constraint ai_tutorials_pkey primary key (id)
 ) TABLESPACE pg_default;
 
+## Table: apple_carousel_cards
+
+create table public.apple_carousel_cards (
+  id uuid not null default gen_random_uuid(),
+  category text not null,
+  title text not null,
+  image_url text not null,
+  content text null,
+  created_at timestamp with time zone null default timezone('utc'::text, now()),
+  constraint apple_carousel_cards_pkey primary key (id)
+) TABLESPACE pg_default;
+
+## Table: blogs
+
+create table public.blogs (
+  id uuid not null default uuid_generate_v4(),
+  title text not null,
+  slug text not null,
+  description text null,
+  cover_image_url text null,
+  content text null,
+  author_name text null,
+  tags text[] null,
+  created_at timestamp with time zone null default now(),
+  featured boolean null default false,
+  category text not null,
+  reading_time integer null,
+  constraint blogs_pkey primary key (id)
+) TABLESPACE pg_default;
+
 ## Table: business_functions
 
 create table public.business_functions (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   icon text null,
   title text not null,
   description text null,
@@ -149,158 +178,249 @@ create table public.business_functions (
 ## Table: business_trending_courses
 
 create table public.business_trending_courses (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   business_function_id uuid null,
   title text not null,
   image text null,
   link text null,
-  constraint business_trending_courses_pkey primary key (id),
-  constraint business_trending_courses_business_function_id_fkey foreign KEY (business_function_id) references business_functions (id) on delete CASCADE
+  constraint business_trending_courses_pkey primary key (id)
 ) TABLESPACE pg_default;
 
 ## Table: business_trending_tools
 
 create table public.business_trending_tools (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   business_function_id uuid null,
   name text not null,
-  constraint business_trending_tools_pkey primary key (id),
-  constraint business_trending_tools_business_function_id_fkey foreign KEY (business_function_id) references business_functions (id) on delete CASCADE
+  constraint business_trending_tools_pkey primary key (id)
 ) TABLESPACE pg_default;
 
 ## Table: categories
 
 create table public.categories (
-  id uuid not null default extensions.uuid_generate_v4 (),
+  id uuid not null default uuid_generate_v4(),
   name character varying(255) not null,
   description text null,
   slug character varying(255) not null,
   created_at timestamp with time zone null default now(),
   updated_at timestamp with time zone null default now(),
-  constraint categories_pkey primary key (id),
-  constraint categories_name_key unique (name),
-  constraint categories_slug_key unique (slug)
+  constraint categories_pkey primary key (id)
 ) TABLESPACE pg_default;
-
-create trigger update_categories_updated_at BEFORE
-update on categories for EACH row
-execute FUNCTION update_updated_at_column ();
 
 ## Table: contact_us
 
 create table public.contact_us (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   name text not null,
   email text not null,
   message text not null,
-  created_at timestamp with time zone null default timezone ('utc'::text, now()),
+  created_at timestamp with time zone null default timezone('utc'::text, now()),
   constraint contact_us_pkey primary key (id)
 ) TABLESPACE pg_default;
 
 ## Table: feature_requests
 
 create table public.feature_requests (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   name text not null,
   email text not null,
   feature text not null,
   details text null,
-  created_at timestamp with time zone null default timezone ('utc'::text, now()),
+  created_at timestamp with time zone null default timezone('utc'::text, now()),
   constraint feature_requests_pkey primary key (id)
+) TABLESPACE pg_default;
+
+## Table: feedback
+
+create table public.feedback (
+  id uuid not null default gen_random_uuid(),
+  type text not null,
+  message text not null,
+  email text null,
+  created_at timestamp with time zone not null default now(),
+  constraint feedback_pkey primary key (id)
+) TABLESPACE pg_default;
+
+## Table: likes
+
+create table public.likes (
+  id uuid not null default gen_random_uuid(),
+  tool_id uuid null,
+  user_id text not null,
+  created_at timestamp with time zone null default timezone('utc'::text, now()),
+  constraint likes_pkey primary key (id)
+) TABLESPACE pg_default;
+
+## Table: newsletter_subscribers
+
+create table public.newsletter_subscribers (
+  id uuid not null default gen_random_uuid(),
+  email text not null,
+  created_at timestamp with time zone null default timezone('utc'::text, now()),
+  constraint newsletter_subscribers_pkey primary key (id)
+) TABLESPACE pg_default;
+
+## Table: prompt_bookmarks
+
+create table public.prompt_bookmarks (
+  id uuid not null default gen_random_uuid(),
+  prompt_id uuid null,
+  user_id text not null,
+  created_at timestamp with time zone null default now(),
+  constraint prompt_bookmarks_pkey primary key (id)
+) TABLESPACE pg_default;
+
+## Table: prompt_comments
+
+create table public.prompt_comments (
+  id uuid not null default gen_random_uuid(),
+  prompt_id uuid null,
+  user_id text not null,
+  comment text not null,
+  created_at timestamp with time zone null default now(),
+  constraint prompt_comments_pkey primary key (id)
+) TABLESPACE pg_default;
+
+## Table: prompt_likes
+
+create table public.prompt_likes (
+  id uuid not null default gen_random_uuid(),
+  prompt_id uuid null,
+  user_id text not null,
+  created_at timestamp with time zone null default now(),
+  constraint prompt_likes_pkey primary key (id)
+) TABLESPACE pg_default;
+
+## Table: prompts
+
+create table public.prompts (
+  id uuid not null default gen_random_uuid(),
+  title text not null,
+  description text not null,
+  category text not null,
+  author text null,
+  created_at timestamp with time zone null default now(),
+  constraint prompts_pkey primary key (id)
 ) TABLESPACE pg_default;
 
 ## Table: reviews
 
 create table public.reviews (
-  id uuid not null default extensions.uuid_generate_v4 (),
+  id uuid not null default uuid_generate_v4(),
   tool_id uuid null,
-  user_id uuid null,
+  user_id text null,
   rating integer null,
   comment text null,
   is_verified boolean null default false,
   created_at timestamp with time zone null default now(),
   updated_at timestamp with time zone null default now(),
   user_name character varying(255) null,
-  constraint reviews_pkey primary key (id),
-  constraint reviews_tool_id_fkey foreign KEY (tool_id) references tools (id) on delete CASCADE,
-  constraint reviews_rating_check check (
-    (
-      (rating >= 1)
-      and (rating <= 5)
-    )
-  )
+  constraint reviews_pkey primary key (id)
 ) TABLESPACE pg_default;
 
-create index IF not exists idx_reviews_tool_id on public.reviews using btree (tool_id) TABLESPACE pg_default;
+## Table: shares
 
-create index IF not exists idx_reviews_rating on public.reviews using btree (rating) TABLESPACE pg_default;
-
-create trigger update_reviews_updated_at BEFORE
-update on reviews for EACH row
-execute FUNCTION update_updated_at_column ();
+create table public.shares (
+  id uuid not null default gen_random_uuid(),
+  tool_id uuid null,
+  user_id text not null,
+  created_at timestamp with time zone null default timezone('utc'::text, now()),
+  platform text null,
+  tool_url text null,
+  tool_name text null,
+  constraint shares_pkey primary key (id)
+) TABLESPACE pg_default;
 
 ## Table: sub_tools
 
 create table public.sub_tools (
-  id uuid not null default extensions.uuid_generate_v4 (),
+  id uuid not null default uuid_generate_v4(),
   parent_tool_id uuid null,
   name character varying(255) not null,
   description text null,
   link character varying(500) null,
   created_at timestamp with time zone null default now(),
-  constraint sub_tools_pkey primary key (id),
-  constraint sub_tools_parent_tool_id_fkey foreign KEY (parent_tool_id) references tools (id) on delete CASCADE
+  constraint sub_tools_pkey primary key (id)
 ) TABLESPACE pg_default;
 
 ## Table: submitted_tools
 
 create table public.submitted_tools (
-  id uuid not null default gen_random_uuid (),
+  id uuid not null default gen_random_uuid(),
   name text not null,
   email text not null,
   tool_name text not null,
   tool_url text not null,
   description text null,
-  created_at timestamp with time zone null default timezone ('utc'::text, now()),
+  created_at timestamp with time zone null default timezone('utc'::text, now()),
   constraint submitted_tools_pkey primary key (id)
 ) TABLESPACE pg_default;
-
 
 ## Table: tags
 
 create table public.tags (
-  id uuid not null default extensions.uuid_generate_v4 (),
+  id uuid not null default uuid_generate_v4(),
   name character varying(100) not null,
   slug character varying(100) not null,
   created_at timestamp with time zone null default now(),
-  constraint tags_pkey primary key (id),
-  constraint tags_name_key unique (name),
-  constraint tags_slug_key unique (slug)
+  constraint tags_pkey primary key (id)
 ) TABLESPACE pg_default;
 
+## Table: testimonials
+
+create table public.testimonials (
+  id uuid not null default gen_random_uuid(),
+  user_id uuid null,
+  user_name text not null,
+  user_role text null,
+  user_avatar text null,
+  content text not null,
+  approved boolean not null default false,
+  created_at timestamp with time zone null default timezone('utc'::text, now()),
+  rating integer null default 5,
+  company_name text null,
+  constraint testimonials_pkey primary key (id)
+) TABLESPACE pg_default;
+
+## Table: tool_comments
+
+create table public.tool_comments (
+  id uuid not null default uuid_generate_v4(),
+  tool_id uuid null,
+  user_id text null,
+  comment text not null,
+  created_at timestamp without time zone null default now(),
+  constraint tool_comments_pkey primary key (id)
+) TABLESPACE pg_default;
+
+## Table: tool_submissions
+
+create table public.tool_submissions (
+  id uuid not null default gen_random_uuid(),
+  email text not null,
+  tool_name text not null,
+  tool_url text not null,
+  youtube_url text null,
+  created_at timestamp with time zone null default timezone('utc'::text, now()),
+  updated_at timestamp with time zone null default timezone('utc'::text, now()),
+  status text not null default 'pending',
+  constraint tool_submissions_pkey primary key (id)
+) TABLESPACE pg_default;
 
 ## Table: tool_tags
 
 create table public.tool_tags (
-  id uuid not null default extensions.uuid_generate_v4 (),
+  id uuid not null default uuid_generate_v4(),
   tool_id uuid null,
   tag_id uuid null,
   created_at timestamp with time zone null default now(),
-  constraint tool_tags_pkey primary key (id),
-  constraint tool_tags_tool_id_tag_id_key unique (tool_id, tag_id),
-  constraint tool_tags_tag_id_fkey foreign KEY (tag_id) references tags (id) on delete CASCADE,
-  constraint tool_tags_tool_id_fkey foreign KEY (tool_id) references tools (id) on delete CASCADE
+  constraint tool_tags_pkey primary key (id)
 ) TABLESPACE pg_default;
-
-create index IF not exists idx_tool_tags_tool_id on public.tool_tags using btree (tool_id) TABLESPACE pg_default;
-
-create index IF not exists idx_tool_tags_tag_id on public.tool_tags using btree (tag_id) TABLESPACE pg_default;
-
 
 ## Table: tools
 
 create table public.tools (
-  id uuid not null default extensions.uuid_generate_v4 (),
+  id uuid not null default uuid_generate_v4(),
   name character varying(255) not null,
   description text not null,
   category_id uuid null,
@@ -309,7 +429,7 @@ create table public.tools (
   image_url character varying(500) null,
   icon character varying(10) null,
   release_date date null,
-  rating numeric(3, 2) null default 0.0,
+  rating numeric null default 0.0,
   review_count integer null default 0,
   is_featured boolean null default false,
   is_trending boolean null default false,
@@ -320,63 +440,21 @@ create table public.tools (
   verified boolean null default false,
   bookmark_count integer not null default 0,
   status boolean null,
-  pricing_type public.pricing_type_enum null,
-  constraint tools_pkey primary key (id),
-  constraint tools_category_id_fkey foreign KEY (category_id) references categories (id) on delete set null
+  pricing_type text null,
+  tags text[] null,
+  screenshots text[] null,
+  constraint tools_pkey primary key (id)
 ) TABLESPACE pg_default;
-
-create index IF not exists idx_tools_category_id on public.tools using btree (category_id) TABLESPACE pg_default;
-
-create index IF not exists idx_tools_is_featured on public.tools using btree (is_featured) TABLESPACE pg_default;
-
-create index IF not exists idx_tools_is_trending on public.tools using btree (is_trending) TABLESPACE pg_default;
-
-create index IF not exists idx_tools_rating on public.tools using btree (rating) TABLESPACE pg_default;
-
-create index IF not exists idx_tools_created_at on public.tools using btree (created_at) TABLESPACE pg_default;
-
-create index IF not exists idx_tools_search on public.tools using gin (
-  to_tsvector(
-    'english'::regconfig,
-    (((name)::text || ' '::text) || description)
-  )
-) TABLESPACE pg_default;
-
-create index IF not exists idx_tools_is_new on public.tools using btree (is_new) TABLESPACE pg_default;
-
-create index IF not exists idx_tools_is_editors_choice on public.tools using btree (is_editors_choice) TABLESPACE pg_default;
-
-create index IF not exists idx_tools_verified on public.tools using btree (verified) TABLESPACE pg_default;
-
-create index IF not exists idx_tools_bookmark_count on public.tools using btree (bookmark_count desc) TABLESPACE pg_default;
-
-create trigger update_tools_updated_at BEFORE
-update on tools for EACH row
-execute FUNCTION update_updated_at_column ();
-
 
 ## Table: user_bookmarks
 
 create table public.user_bookmarks (
-  id uuid not null default extensions.uuid_generate_v4 (),
-  user_id uuid not null,
+  id uuid not null default uuid_generate_v4(),
+  user_id text not null,
   tool_id uuid not null,
   created_at timestamp with time zone null default now(),
-  constraint user_bookmarks_pkey primary key (id),
-  constraint user_bookmarks_user_id_tool_id_key unique (user_id, tool_id),
-  constraint user_bookmarks_tool_id_fkey foreign KEY (tool_id) references tools (id) on delete CASCADE,
-  constraint user_bookmarks_user_id_fkey foreign KEY (user_id) references auth.users (id) on delete CASCADE
+  constraint user_bookmarks_pkey primary key (id)
 ) TABLESPACE pg_default;
-
-create index IF not exists idx_user_bookmarks_user_id on public.user_bookmarks using btree (user_id) TABLESPACE pg_default;
-
-create index IF not exists idx_user_bookmarks_tool_id on public.user_bookmarks using btree (tool_id) TABLESPACE pg_default;
-
-create trigger on_bookmark_change
-after INSERT
-or DELETE on user_bookmarks for EACH row
-execute FUNCTION update_bookmark_count ();
-
 
 ## Table: users
 
@@ -385,27 +463,20 @@ create table public.users (
   full_name text null,
   email text null,
   phone text null,
-  created_at timestamp with time zone null default timezone ('utc'::text, now()),
-  constraint users_pkey primary key (id),
-  constraint users_id_fkey foreign KEY (id) references auth.users (id) on delete CASCADE
+  created_at timestamp with time zone null default timezone('utc'::text, now()),
+  constraint users_pkey primary key (id)
 ) TABLESPACE pg_default;
 
 ## Table: youtube_videos
 
 create table public.youtube_videos (
-  id bigint generated always as identity not null,
+  id bigint not null,
   video_id text not null,
   title text not null,
   description text null,
   thumbnail_url text null,
   video_type text not null,
   created_at timestamp with time zone null default now(),
-  constraint youtube_videos_pkey primary key (id),
-  constraint youtube_videos_video_id_key unique (video_id),
-  constraint youtube_videos_video_type_check check (
-    (
-      video_type = any (array['video'::text, 'short'::text])
-    )
-  )
+  constraint youtube_videos_pkey primary key (id)
 ) TABLESPACE pg_default;
 
