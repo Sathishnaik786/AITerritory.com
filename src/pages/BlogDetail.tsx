@@ -313,27 +313,40 @@ const BlogDetail: React.FC = () => {
           <div className="flex items-center gap-6 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800 pb-2 mb-2">
             {/* Share button: opens dropdown with social icons */}
             <div className="relative group">
-              <button className="flex items-center gap-1 hover:text-blue-600 transition rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white/10 hover:bg-blue-50 dark:hover:bg-gray-800 active:scale-95">
+              <button
+                className="flex items-center gap-1 hover:text-blue-600 transition rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white/10 hover:bg-blue-50 dark:hover:bg-gray-800 active:scale-95"
+                onClick={() => setShowShareBar((prev) => !prev)}
+                type="button"
+                aria-haspopup="true"
+                aria-expanded={showShareBar}
+              >
                 <FaXTwitter className="w-4 h-4" /> Share
               </button>
-              {/* Dropdown: social icons in circles, centered below */}
-              <div className="absolute left-1/2 -translate-x-1/2 mt-2 hidden group-hover:flex flex-row gap-2 bg-white dark:bg-[#18181b] rounded-full px-4 py-2 shadow-lg z-20 border border-gray-200 dark:border-gray-800">
-                <button onClick={() => handleShare('x')} aria-label="Share on X" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
-                  <FaXTwitter className="w-5 h-5 text-blue-600" />
-                </button>
-                <button onClick={() => handleShare('linkedin')} aria-label="Share on LinkedIn" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
-                  <FaLinkedin className="w-5 h-5 text-[#0077b5]" />
-                </button>
-                <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-green-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
-                  <FaWhatsapp className="w-5 h-5 text-[#25d366]" />
-                </button>
-                <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
-                  <FaFacebook className="w-5 h-5 text-[#1877f3]" />
-                </button>
-                <button onClick={() => handleShare('copy')} aria-label="Copy link" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
-                  <FaRegCopy className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-                </button>
-              </div>
+              {/* Popover for mobile, dropdown for desktop */}
+              {(showShareBar) && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center md:absolute md:left-1/2 md:-translate-x-1/2 md:mt-2 md:z-20 md:flex-row md:gap-2 md:bg-white md:dark:bg-[#18181b] md:rounded-full md:px-4 md:py-2 md:shadow-lg md:border md:border-gray-200 md:dark:border-gray-800 bg-black/40 md:bg-transparent"
+                  onClick={() => setShowShareBar(false)}
+                >
+                  <div className="flex flex-row gap-2 bg-white dark:bg-[#18181b] rounded-full px-4 py-2 shadow-lg border border-gray-200 dark:border-gray-800" onClick={e => e.stopPropagation()}>
+                    <button onClick={() => handleShare('x')} aria-label="Share on X" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                      <FaXTwitter className="w-5 h-5 text-blue-600" />
+                    </button>
+                    <button onClick={() => handleShare('linkedin')} aria-label="Share on LinkedIn" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                      <FaLinkedin className="w-5 h-5 text-[#0077b5]" />
+                    </button>
+                    <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-green-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                      <FaWhatsapp className="w-5 h-5 text-[#25d366]" />
+                    </button>
+                    <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                      <FaFacebook className="w-5 h-5 text-[#1877f3]" />
+                    </button>
+                    <button onClick={() => handleShare('copy')} aria-label="Copy link" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                      <FaRegCopy className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             {/* Save button: bookmark, requires login */}
             <button
@@ -461,19 +474,19 @@ const BlogDetail: React.FC = () => {
           <section>
             <h3 className="text-lg font-semibold mb-3 font-serif text-center">Share</h3>
             <div className="flex gap-3 flex-wrap justify-center">
-              <button aria-label="Share on X" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+              <button onClick={() => handleShare('x')} aria-label="Share on X" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
                 <FaXTwitter className="w-5 h-5 text-blue-600" />
               </button>
-              <button aria-label="Share on LinkedIn" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+              <button onClick={() => handleShare('linkedin')} aria-label="Share on LinkedIn" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
                 <FaLinkedin className="w-5 h-5 text-[#0077b5]" />
               </button>
-              <button aria-label="Share on WhatsApp" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-green-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+              <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-green-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
                 <FaWhatsapp className="w-5 h-5 text-[#25d366]" />
               </button>
-              <button aria-label="Share on Facebook" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+              <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
                 <FaFacebook className="w-5 h-5 text-[#1877f3]" />
               </button>
-              <button aria-label="Copy link" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+              <button onClick={() => handleShare('copy')} aria-label="Copy link" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
                 <FaRegCopy className="w-5 h-5 text-gray-700 dark:text-gray-200" />
               </button>
             </div>
