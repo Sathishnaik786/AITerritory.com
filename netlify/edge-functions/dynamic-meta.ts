@@ -81,6 +81,11 @@ export default async (request: Request, context: Context) => {
     }
   }
 
+  // Always ensure metaImage is set to /og-default.png if missing or empty
+  if (!metaImage) {
+    metaImage = url.origin + "/og-default.png";
+  }
+
   // Fetch original HTML
   const htmlResponse = await fetch(url.origin);
   let html = await htmlResponse.text();

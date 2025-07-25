@@ -19,6 +19,7 @@ import { logBlogEvent } from '../services/blogAnalyticsService';
 import { BookOpen, Book, ArrowUp, ArrowLeft } from 'lucide-react';
 import type { CodeProps } from 'react-markdown/lib/ast-to-react';
 import { supabase } from '../services/supabaseClient';
+import remarkEmoji from 'remark-emoji';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -276,7 +277,7 @@ const BlogDetail: React.FC = () => {
       <div className="w-full bg-white dark:bg-[#171717] pt-2 pb-2 border-b border-gray-100 dark:border-gray-800">
         {/* Back Button in hero section, above content */}
         <div className="max-w-4xl mx-auto px-4 flex items-center pt-2 pb-2">
-          <button
+        <button
             className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium text-base transition bg-white/80 dark:bg-[#171717]/80 rounded-full px-3 py-1 shadow"
             onClick={() => navigate(-1)}
           >
@@ -404,16 +405,39 @@ const BlogDetail: React.FC = () => {
       {blog.description && (
         <div className="max-w-3xl mx-auto px-2 sm:px-4 mb-8">
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
+            remarkPlugins={[remarkGfm, remarkEmoji as any]}
             rehypePlugins={[rehypeSanitize]}
             components={{
-              h1: ({node, ...props}) => <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mt-4 mb-2" {...props} />,
-              h2: ({node, ...props}) => <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mt-3 mb-2" {...props} />,
-              h3: ({node, ...props}) => <h3 className="text-base sm:text-lg md:text-xl font-semibold mt-2 mb-1" {...props} />,
-              ul: ({node, ...props}) => <ul className="list-disc pl-6 my-2" {...props} />,
-              ol: ({node, ...props}) => <ol className="list-decimal pl-6 my-2" {...props} />,
-              li: ({node, ...props}) => <li className="mb-1" {...props} />,
-              p: ({node, ...props}) => <p className="my-2 leading-relaxed" {...props} />,
+              h1: ({node, ...props}) => <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold font-serif mt-8 mb-6 leading-tight border-b border-gray-200 pb-2" {...props} />,
+              h2: ({node, ...props}) => <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif mt-10 mb-5 leading-tight border-b border-gray-100 pb-1" {...props} />,
+              h3: ({node, ...props}) => <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold font-serif mt-8 mb-3 leading-tight" {...props} />,
+              ul: ({node, ...props}) => <ul className="list-disc pl-7 my-5 space-y-2 marker:text-blue-500 text-base" {...props} />,
+              ol: ({node, ...props}) => <ol className="list-decimal pl-7 my-5 space-y-2 text-base" {...props} />,
+              li: ({node, ...props}) => <li className="mb-1 pl-1" {...props} />,
+              p: ({node, ...props}) => {
+                // First paragraph as lead
+                if (node?.position?.start.offset === 0) {
+                  return <p className="text-xl sm:text-2xl font-serif text-gray-600 dark:text-gray-300 my-6 leading-8 max-w-2xl font-light">{props.children}</p>;
+                }
+                return <p className="my-5 leading-8 text-base max-w-2xl text-gray-800 dark:text-gray-100 font-serif">{props.children}</p>;
+              },
+              hr: () => <div className="my-10 border-t border-gray-200" />,
+              a: ({href, children, ...props}) => {
+                const isInternal = href && (href.startsWith('/') || href.includes(window.location.hostname));
+                const baseClass = "font-semibold underline-offset-2 transition-colors duration-150";
+                const internalClass = "text-blue-700 underline hover:text-blue-900 border-b-2 border-blue-200 hover:border-blue-500";
+                const externalClass = "text-pink-600 hover:text-pink-800 underline";
+                return (
+                  <a
+                    href={href}
+                    className={baseClass + ' ' + (isInternal ? internalClass : externalClass)}
+                    target={isInternal ? undefined : "_blank"}
+                    rel={isInternal ? undefined : "noopener noreferrer"}
+                  >
+                    {children}
+                  </a>
+                );
+              },
             }}
           >
             {blog.description}
@@ -425,13 +449,13 @@ const BlogDetail: React.FC = () => {
         <div className="flex-1 min-w-0">
           {/* Markdown Content before CTA */}
           <div ref={contentRef} className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-gray-900 dark:prose-headings:text-white prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-300 prose-blockquote:my-6 prose-p:my-4 prose-p:leading-relaxed prose-p:text-[1.15rem] prose-img:rounded-xl prose-img:shadow-md prose-a:text-blue-600 dark:prose-a:text-blue-400 font-sans">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeSanitize, rehypeHighlight]}
-              components={markdownComponents}
-            >
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeSanitize, rehypeHighlight]}
+            components={markdownComponents}
+          >
               {contentBeforeCTA}
-            </ReactMarkdown>
+          </ReactMarkdown>
           </div>
           {/* Inline Newsletter CTA (Forbes-style, minimal, no card) */}
           <div className="w-full flex flex-col items-center justify-center my-4 sm:my-2">
@@ -473,12 +497,12 @@ const BlogDetail: React.FC = () => {
                     </a>
                     <div className="text-xs text-muted-foreground truncate font-serif">
                       {b.created_at ? new Date(b.created_at).toLocaleDateString() : ''}
-                    </div>
-                  </div>
+            </div>
+          </div>
                 </li>
               ))}
             </ul>
-          </section>
+        </section>
           {/* Share block */}
           <section>
             <h3 className="text-lg font-semibold mb-3 font-serif text-center">Share</h3>

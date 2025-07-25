@@ -1,49 +1,58 @@
-[[edge_functions]]
-function = "dynamic-meta"
-path = "/blog"
+# Remove Netlify's sitemap plugin
+# [[plugins]]
+# package = "@netlify/plugin-sitemap"
+#   [plugins.inputs]
+#   exclude = "/*"
 
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/prompts"
+path = "/blog*"
 
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/tools/*"
+path = "/tools*"
 
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/blog/*"
+path = "/resources*"
 
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/ai-automation/*"
+path = "/categories*"
 
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/ai-tutorials/*"
+path = "/tags*"
 
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/categories/*"
+path = "/prompts*"
 
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/tags/*"
+path = "/ai-automation*"
 
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/resources/*"
+path = "/ai-tutorials*"
 
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/youtube/*"
+path = "/youtube*"
 
 [[edge_functions]]
 function = "dynamic-meta"
-path = "/dashboard/*"
+path = "/dashboard*"
 
 [[redirects]]
 from = "/api/*"
 to = "https://aiterritory-com.onrender.com/api/:splat"
+status = 200
+force = true
+
+# Ensure sitemap.xml is always served from public/
+[[redirects]]
+from = "/sitemap.xml"
+to = "/sitemap.xml"
 status = 200
 force = true
