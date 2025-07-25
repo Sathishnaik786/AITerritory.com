@@ -270,19 +270,19 @@ const BlogDetail: React.FC = () => {
   const readingTime = Math.ceil(wordCount / 200);
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717]">
-      {/* Back Button */}
-      <div className="max-w-4xl mx-auto px-4 pt-6 pb-2">
-        <button
-          className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium text-base transition"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="w-5 h-5" /> Back
-        </button>
-      </div>
+    <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] overflow-x-hidden sm:px-2">
       {/* Title, Image, Description (minimal, no cards) */}
       {/* In the hero section, reduce top padding and make title full width on mobile */}
       <div className="w-full bg-white dark:bg-[#171717] pt-2 pb-4 border-b border-gray-100 dark:border-gray-800">
+        {/* Back Button in hero section, above content */}
+        <div className="max-w-4xl mx-auto px-4 flex items-center pt-2 pb-2">
+          <button
+            className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium text-base transition bg-white/80 dark:bg-[#171717]/80 rounded-full px-3 py-1 shadow"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="w-5 h-5" /> Back
+          </button>
+        </div>
         {/* Breadcrumbs */}
         <div className="max-w-4xl mx-auto px-4 text-xs text-gray-500 font-serif mb-2">
           {blog.category && <span className="uppercase tracking-wider">{blog.category}</span>}
@@ -387,7 +387,7 @@ const BlogDetail: React.FC = () => {
       <div className="relative w-full max-w-6xl mx-auto mb-8">
         <motion.img
           src={blog.cover_image_url || '/public/placeholder.svg'}
-          alt={blog.title}
+              alt={blog.title}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -396,7 +396,7 @@ const BlogDetail: React.FC = () => {
         />
         {/* Bottom gradient overlay for contrast */}
         <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/70 to-transparent pointer-events-none rounded-b-xl" />
-      </div>
+          </div>
       {blog.description && (
         <div className="max-w-3xl mx-auto px-2 sm:px-4 mb-8">
           <ReactMarkdown
@@ -417,7 +417,7 @@ const BlogDetail: React.FC = () => {
         </div>
       )}
       {/* Main Content + Sidebar */}
-      <div className="w-full max-w-4xl mx-auto flex flex-col lg:flex-row gap-8 mb-8">
+      <div className="w-full max-w-4xl mx-auto flex flex-col lg:flex-row gap-8 sm:gap-4 mb-8">
         <div className="flex-1 min-w-0">
           {/* Markdown Content before CTA */}
           <div ref={contentRef} className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-gray-900 dark:prose-headings:text-white prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-300 prose-blockquote:my-6 prose-p:my-5 prose-p:leading-relaxed prose-p:text-[1.15rem] prose-img:rounded-xl prose-img:shadow-md prose-a:text-blue-600 dark:prose-a:text-blue-400 font-sans">
@@ -445,7 +445,7 @@ const BlogDetail: React.FC = () => {
           </div>
         </div>
         {/* Sidebar: match ToolDetailsPage style */}
-        <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8 lg:sticky lg:top-0 z-20 order-first lg:order-none mb-6 lg:mb-0 bg-gray-50 dark:bg-[#19191b] rounded-xl p-4">
+        <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8 lg:sticky lg:top-0 z-20 order-first lg:order-none mb-6 lg:mb-0 bg-gray-50 dark:bg-[#19191b] rounded-xl p-4 min-w-0">
           {/* Table of Contents */}
           <BlogTOC headings={headings} activeHeading={activeHeading} />
           {/* Author Card */}
@@ -469,12 +469,12 @@ const BlogDetail: React.FC = () => {
                     </a>
                     <div className="text-xs text-muted-foreground truncate font-serif">
                       {b.created_at ? new Date(b.created_at).toLocaleDateString() : ''}
-                    </div>
-                  </div>
+            </div>
+          </div>
                 </li>
               ))}
             </ul>
-          </section>
+        </section>
           {/* Share block */}
           <section>
             <h3 className="text-lg font-semibold mb-3 font-serif text-center">Share</h3>
@@ -506,7 +506,7 @@ const BlogDetail: React.FC = () => {
           <div className="flex-1 h-px bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200" />
           <span className="uppercase tracking-widest text-xs font-semibold text-gray-500 font-serif">Comments</span>
           <div className="flex-1 h-px bg-gradient-to-l from-gray-200 via-gray-400 to-gray-200" />
-        </div>
+          </div>
         {/* Comment Box */}
         <form onSubmit={handleCommentSubmit} className="mb-6 flex flex-col gap-2">
           <textarea
@@ -565,12 +565,12 @@ const BlogDetail: React.FC = () => {
       <section className="w-full flex flex-col items-center justify-center my-12">
         <div className="max-w-4xl w-full">
           <h3 className="text-2xl font-bold font-serif mb-6 text-gray-900 dark:text-white">Read Next</h3>
-          <div className="flex gap-6 overflow-x-auto pb-2 scroll-smooth snap-x" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div className="flex gap-6 sm:gap-4 overflow-x-auto pb-2 scroll-smooth snap-x" style={{ WebkitOverflowScrolling: 'touch' }}>
             {(recentBlogs.slice(0, 6)).map((blog, i) => (
               <motion.a
                 key={blog.id}
                 href={`/blog/${blog.slug}`}
-                className="flex-1 min-w-[260px] max-w-xs bg-white dark:bg-[#18181b] rounded-xl shadow border border-gray-200 dark:border-gray-800 p-4 flex flex-col gap-3 hover:shadow-lg transition group snap-start"
+                className="flex-1 min-w-[260px] max-w-xs bg-white dark:bg-[#18181b] rounded-lg shadow border border-gray-200 dark:border-gray-800 p-4 flex flex-col gap-3 hover:shadow-lg transition group snap-start max-w-full min-w-0"
                 initial={{ opacity: 0, x: 40 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
@@ -579,14 +579,14 @@ const BlogDetail: React.FC = () => {
                 <img
                   src={blog.cover_image_url || '/public/placeholder.svg'}
                   alt={blog.title}
-                  className="w-full h-32 object-cover rounded-lg mb-2"
+                  className="w-full h-32 object-cover rounded-lg mb-2 max-w-full"
                   loading="lazy"
                   sizes="160px"
                 />
-                <div className="font-bold text-lg font-serif text-gray-900 dark:text-white group-hover:underline mb-1 line-clamp-2">{blog.title}</div>
+                <div className="font-bold text-lg font-serif text-gray-900 dark:text-white group-hover:underline mb-1 line-clamp-2 break-words">{blog.title}</div>
                 {/* Show short description */}
                 {blog.description && (
-                  <div className="text-sm text-gray-500 dark:text-gray-300 mb-1 line-clamp-2">{blog.description.slice(0, 80)}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-300 mb-1 line-clamp-2 break-words">{blog.description.slice(0, 80)}</div>
                 )}
                 <div className="text-xs text-muted-foreground font-serif">{blog.created_at ? new Date(blog.created_at).toLocaleDateString() : ''}</div>
               </motion.a>
