@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const blogController = require('../controllers/blogController');
+const blogCommentsRouter = require('./blogComments');
 
 // GET /api/blogs
 router.get('/', blogController.getAllBlogs);
@@ -17,5 +18,6 @@ router.post('/', blogController.createBlog);
 router.put('/:id', blogController.updateBlog);
 // DELETE /api/blogs/:id
 router.delete('/:id', blogController.deleteBlog);
+router.use('/:slug/comments', blogCommentsRouter);
 
 module.exports = router; 

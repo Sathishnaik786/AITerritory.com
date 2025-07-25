@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import BlogTOC from '../components/BlogTOC';
 import BlogComments from '../components/BlogComments';
@@ -16,7 +16,7 @@ import { FaXTwitter, FaLinkedin, FaWhatsapp, FaFacebook, FaRegCopy } from 'react
 import NewsletterCTA from '../components/NewsletterCTA';
 import { toast } from '@/components/ui/sonner';
 import { logBlogEvent } from '../services/blogAnalyticsService';
-import { BookOpen, Book, ArrowUp } from 'lucide-react';
+import { BookOpen, Book, ArrowUp, ArrowLeft } from 'lucide-react';
 import type { CodeProps } from 'react-markdown/lib/ast-to-react';
 import { supabase } from '../services/supabaseClient';
 
@@ -35,6 +35,7 @@ const BlogDetail: React.FC = () => {
   const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
   // Add state and effect for scroll progress
   const [progress, setProgress] = useState(0);
+  const navigate = useNavigate();
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -93,12 +94,7 @@ const BlogDetail: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [headings]);
 
-  // Show scroll-to-top FAB on mobile after scrolling 300px
-  useEffect(() => {
-    const onScroll = () => setShowShareBar(window.scrollY > 300);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  // (Removed scroll-based setShowShareBar effect)
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   // Helper: Split content for inline CTA
@@ -274,7 +270,16 @@ const BlogDetail: React.FC = () => {
   const readingTime = Math.ceil(wordCount / 200);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 dark:from-[#171717] dark:via-[#191919] dark:to-[#1a1a1a] transition-all duration-500 pt-6 pb-8 sm:pt-8 sm:pb-8 overflow-x-hidden">
+    <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717]">
+      {/* Back Button */}
+      <div className="max-w-4xl mx-auto px-4 pt-6 pb-2">
+        <button
+          className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium text-base transition"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft className="w-5 h-5" /> Back
+        </button>
+      </div>
       {/* Title, Image, Description (minimal, no cards) */}
       {/* In the hero section, reduce top padding and make title full width on mobile */}
       <div className="w-full bg-white dark:bg-[#171717] pt-2 pb-4 border-b border-gray-100 dark:border-gray-800">
@@ -440,7 +445,7 @@ const BlogDetail: React.FC = () => {
           </div>
         </div>
         {/* Sidebar: match ToolDetailsPage style */}
-        <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8 lg:sticky lg:top-24 z-20 order-first lg:order-none mb-6 lg:mb-0 bg-gray-50 dark:bg-[#19191b] rounded-xl p-4">
+        <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8 lg:sticky lg:top-0 z-20 order-first lg:order-none mb-6 lg:mb-0 bg-gray-50 dark:bg-[#19191b] rounded-xl p-4">
           {/* Table of Contents */}
           <BlogTOC headings={headings} activeHeading={activeHeading} />
           {/* Author Card */}
@@ -579,7 +584,10 @@ const BlogDetail: React.FC = () => {
                   sizes="160px"
                 />
                 <div className="font-bold text-lg font-serif text-gray-900 dark:text-white group-hover:underline mb-1 line-clamp-2">{blog.title}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-300 mb-1 line-clamp-2">{blog.description?.slice(0, 80)}</div>
+                {/* Show short description */}
+                {blog.description && (
+                  <div className="text-sm text-gray-500 dark:text-gray-300 mb-1 line-clamp-2">{blog.description.slice(0, 80)}</div>
+                )}
                 <div className="text-xs text-muted-foreground font-serif">{blog.created_at ? new Date(blog.created_at).toLocaleDateString() : ''}</div>
               </motion.a>
             ))}
