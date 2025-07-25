@@ -480,15 +480,6 @@ const BlogDetail: React.FC = () => {
           </section>
         </aside>
       </div>
-      {/* Mobile Sticky Share Bar (safe area) */}
-      <div className="fixed bottom-0 left-0 w-full z-40 md:hidden flex items-center justify-around bg-white/90 dark:bg-[#18181b]/90 border-t border-gray-200 dark:border-gray-800 shadow-lg py-2 backdrop-blur-md" role="region" aria-label="Share bar" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-        {blog && blog.slug && <BlogLikeBookmark blogId={blog.slug} />}
-        <button onClick={() => handleShare('x')} className="hover:text-blue-600 transition active:scale-95" aria-label="Share on X"><FaXTwitter className="w-6 h-6" /></button>
-        <button onClick={() => handleShare('linkedin')} className="hover:text-blue-600 transition active:scale-95" aria-label="Share on LinkedIn"><FaLinkedin className="w-6 h-6" /></button>
-        <button onClick={() => handleShare('whatsapp')} className="hover:text-green-600 transition active:scale-95" aria-label="Share on WhatsApp"><FaWhatsapp className="w-6 h-6" /></button>
-        <button onClick={() => handleShare('facebook')} className="hover:text-blue-700 transition active:scale-95" aria-label="Share on Facebook"><FaFacebook className="w-6 h-6" /></button>
-        <button onClick={() => handleShare('copy')} className="hover:text-gray-700 transition active:scale-95" aria-label="Copy link"><FaRegCopy className="w-6 h-6" />{copied && <span className="ml-1 text-xs text-green-600">Copied!</span>}</button>
-      </div>
       {/* Mobile TOC Drawer */}
       <MobileTOCDrawer open={showTOC} onClose={() => setShowTOC(false)} headings={headings} />
       {/* Comments Section */}
