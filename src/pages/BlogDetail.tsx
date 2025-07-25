@@ -216,6 +216,48 @@ const BlogDetail: React.FC = () => {
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 dark:from-[#171717] dark:via-[#191919] dark:to-[#1a1a1a] transition-all duration-500 pt-6 pb-8 sm:pt-8 sm:pb-8 overflow-x-hidden">
       {/* Title, Image, Description (minimal, no cards) */}
+      <div className="w-full bg-white dark:bg-[#171717] pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+        {/* Breadcrumbs */}
+        <div className="max-w-4xl mx-auto px-4 text-xs text-gray-500 font-serif mb-2">
+          {blog.category && <span className="uppercase tracking-wider">{blog.category}</span>}
+          {blog.subcategory && <span> &gt; {blog.subcategory}</span>}
+        </div>
+        {/* Headline */}
+        <div className="max-w-4xl mx-auto px-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-4 leading-tight">
+            {blog.title}
+          </h1>
+          {/* Subtitle (if present) */}
+          {blog.subtitle && (
+            <div className="text-lg italic text-gray-500 mb-3 font-serif">{blog.subtitle}</div>
+          )}
+          {/* Byline and Follow Author */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 font-serif">
+              <span className="font-bold text-blue-700 dark:text-blue-400 cursor-pointer hover:underline">{blog.author_name}</span>
+              <span className="text-gray-500">Senior Contributor.</span>
+              <span className="hidden sm:inline">&copy; {blog.author_bio || 'Contributor bio here.'}</span>
+            </div>
+            <button className="px-4 py-1.5 rounded-full border border-blue-600 text-blue-700 font-semibold text-xs hover:bg-blue-50 transition">Follow Author</button>
+          </div>
+          {/* Author bio (mobile) */}
+          <div className="text-xs text-gray-500 font-serif mb-2 sm:hidden">{blog.author_bio || 'Contributor bio here.'}</div>
+          {/* Publication date */}
+          <div className="text-xs text-gray-500 font-serif mb-4">
+            Published {blog.created_at ? new Date(blog.created_at).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
+            {blog.updated_at && (
+              <span>, Updated {new Date(blog.updated_at).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+            )}
+          </div>
+          {/* Action bar */}
+          <div className="flex items-center gap-6 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800 pb-2 mb-2">
+            <button className="flex items-center gap-1 hover:text-blue-600 transition"><FaXTwitter className="w-4 h-4" /> Share</button>
+            <button className="flex items-center gap-1 hover:text-blue-600 transition"><FaRegCopy className="w-4 h-4" /> Save</button>
+            <button className="flex items-center gap-1 hover:text-blue-600 transition"><ArrowUp className="w-4 h-4" /> Comment 11</button>
+          </div>
+        </div>
+      </div>
+      {/* Cover image below hero section */}
       <div className="relative w-full max-w-6xl mx-auto mb-8">
         <motion.img
           src={blog.cover_image_url || '/public/placeholder.svg'}
@@ -228,50 +270,18 @@ const BlogDetail: React.FC = () => {
         />
         {/* Bottom gradient overlay for contrast */}
         <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/70 to-transparent pointer-events-none rounded-b-xl" />
-        {/* Overlay: author, date, share buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="absolute bottom-6 left-6 flex flex-col sm:flex-row items-end sm:items-center gap-4 z-10"
-        >
-          {/* Author avatar + name + date */}
-          <div className="flex items-center gap-3 bg-black/60 px-4 py-2 rounded-xl shadow-lg">
-            <img
-              src={blog.author_image_url || '/logo.jpg'}
-              alt={blog.author_name}
-              className="w-10 h-10 rounded-full object-cover border-2 border-white"
-            />
-            <div className="flex flex-col">
-              <span className="text-white font-semibold text-base font-serif">{blog.author_name}</span>
-              <span className="text-xs text-gray-200 uppercase tracking-widest font-serif" style={{ letterSpacing: '0.08em' }}>{blog.created_at ? new Date(blog.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : ''}</span>
-            </div>
-          </div>
-          {/* Share buttons */}
-          <div className="flex flex-row gap-2 bg-black/60 px-3 py-2 rounded-xl shadow-lg">
-            <button onClick={() => handleShare('x')} aria-label="Share on X" className="rounded-full border border-white/60 p-2 hover:bg-white/10 transition active:scale-95"><FaXTwitter className="w-4 h-4 text-white" /></button>
-            <button onClick={() => handleShare('linkedin')} aria-label="Share on LinkedIn" className="rounded-full border border-white/60 p-2 hover:bg-white/10 transition active:scale-95"><FaLinkedin className="w-4 h-4 text-white" /></button>
-            <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="rounded-full border border-white/60 p-2 hover:bg-white/10 transition active:scale-95"><FaWhatsapp className="w-4 h-4 text-white" /></button>
-          </div>
-        </motion.div>
-      </div>
-      {/* Headline Section */}
-      <div className="max-w-3xl mx-auto px-2 sm:px-4 mb-6 mt-8">
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.7 }}
-          className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-3 leading-tight"
-        >
-          {blog.title}
-        </motion.h1>
-        {blog.subtitle && (
-          <div className="text-lg italic text-gray-500 mb-2 font-serif">{blog.subtitle}</div>
-        )}
-        <div className="flex flex-col sm:flex-row items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          <span>{wordCount} words</span>
-          <span>•</span>
-          <span>{readingTime} min read</span>
+        {/* Social share icons: pill-shaped, transparent, grouped, mobile-friendly */}
+        <div className="flex flex-row gap-2 items-center bg-black/40 backdrop-blur-md rounded-full px-3 py-2 shadow-lg absolute bottom-6 left-6 z-10"
+          style={{ minWidth: 120 }}>
+          <button onClick={() => handleShare('x')} aria-label="Share on X" className="rounded-full border border-white/60 p-2 bg-white/10 hover:bg-white/20 transition active:scale-95 flex items-center justify-center">
+            <FaXTwitter className="w-5 h-5 text-white" />
+          </button>
+          <button onClick={() => handleShare('linkedin')} aria-label="Share on LinkedIn" className="rounded-full border border-white/60 p-2 bg-white/10 hover:bg-white/20 transition active:scale-95 flex items-center justify-center">
+            <FaLinkedin className="w-5 h-5 text-white" />
+          </button>
+          <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="rounded-full border border-white/60 p-2 bg-white/10 hover:bg-white/20 transition active:scale-95 flex items-center justify-center">
+            <FaWhatsapp className="w-5 h-5 text-white" />
+          </button>
         </div>
       </div>
       {blog.description && (
@@ -411,15 +421,20 @@ const BlogDetail: React.FC = () => {
         <BlogComments blogId={blog.slug} />
       </section>
       {/* After the comments section, before the final newsletter CTA: */}
+      {/* In the Read Next section, fetch and display next 6 blogs, make horizontally scrollable, and animate each card */}
       <section className="w-full flex flex-col items-center justify-center my-12">
         <div className="max-w-4xl w-full">
           <h3 className="text-2xl font-bold font-serif mb-6 text-gray-900 dark:text-white">Read Next</h3>
-          <div className="flex flex-col sm:flex-row gap-6">
-            {(recentBlogs.slice(0, 3)).map(blog => (
-              <a
+          <div className="flex gap-6 overflow-x-auto pb-2 scroll-smooth snap-x" style={{ WebkitOverflowScrolling: 'touch' }}>
+            {(recentBlogs.slice(0, 6)).map((blog, i) => (
+              <motion.a
                 key={blog.id}
                 href={`/blog/${blog.slug}`}
-                className="flex-1 bg-white dark:bg-[#18181b] rounded-xl shadow border border-gray-200 dark:border-gray-800 p-4 flex flex-col gap-3 hover:shadow-lg transition group"
+                className="flex-1 min-w-[260px] max-w-xs bg-white dark:bg-[#18181b] rounded-xl shadow border border-gray-200 dark:border-gray-800 p-4 flex flex-col gap-3 hover:shadow-lg transition group snap-start"
+                initial={{ opacity: 0, x: 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
               >
                 <img
                   src={blog.cover_image_url || '/public/placeholder.svg'}
@@ -431,7 +446,7 @@ const BlogDetail: React.FC = () => {
                 <div className="font-bold text-lg font-serif text-gray-900 dark:text-white group-hover:underline mb-1 line-clamp-2">{blog.title}</div>
                 <div className="text-sm text-gray-500 dark:text-gray-300 mb-1 line-clamp-2">{blog.description?.slice(0, 80)}</div>
                 <div className="text-xs text-muted-foreground font-serif">{blog.created_at ? new Date(blog.created_at).toLocaleDateString() : ''}</div>
-              </a>
+              </motion.a>
             ))}
           </div>
         </div>
