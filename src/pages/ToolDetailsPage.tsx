@@ -1,3 +1,4 @@
+console.log('=== BlogDetail.tsx loaded ===');
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';

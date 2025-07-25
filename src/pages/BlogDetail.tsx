@@ -1,495 +1,449 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { BlogService } from '../services/blogService';
-import { BlogPost } from '../types/blog';
-import { Clock, ArrowLeft, UserCircle, Facebook } from 'lucide-react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import BlogTOC from '../components/BlogTOC';
+import BlogComments from '../components/BlogComments';
+import BlogLikeBookmark from '../components/BlogLikeBookmark';
+import AuthorCard from '../components/AuthorCard';
+import MobileTOCDrawer from '../components/MobileTOCDrawer';
+import { BlogService } from '../services/blogService';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
-import { Badge } from '@/components/ui/badge';
-import { ArrowUp } from 'lucide-react';
-import { Newsletter } from '@/components/Newsletter';
-import { FaXTwitter, FaLinkedin, FaWhatsapp } from 'react-icons/fa6';
-import { useToast } from '@/components/ui/use-toast';
-import MetaTags from '../components/MetaTags';
-import { Components } from 'react-markdown';
+import { useUser } from '@clerk/clerk-react';
+import { FaXTwitter, FaLinkedin, FaWhatsapp, FaFacebook, FaRegCopy } from 'react-icons/fa6';
+import NewsletterCTA from '../components/NewsletterCTA';
+import { toast } from '@/components/ui/sonner';
+import { logBlogEvent } from '../services/blogAnalyticsService';
+import { BookOpen, Book, ArrowUp } from 'lucide-react';
+import type { CodeProps } from 'react-markdown/lib/ast-to-react';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
-  const [blog, setBlog] = useState<BlogPost | null>(null);
+  const [blog, setBlog] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
-  const [nextReads, setNextReads] = useState<BlogPost[]>([]);
-  const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
+  const [showTOC, setShowTOC] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-
+  const { user, isSignedIn } = useUser();
+  const [showShareBar, setShowShareBar] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [activeHeading, setActiveHeading] = useState<string | null>(null);
-  const headings = useMemo(() => {
-    if (!blog || !blog.content) return [];
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(blog.content, 'text/html');
-    return Array.from(doc.querySelectorAll('h2, h3')).map((el, i) => ({
-      id: el.id || `heading-${i}`,
-      text: el.textContent || '',
-      level: el.tagName === 'H2' ? 2 : 3,
-    }));
-  }, [blog]);
-
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setShowScrollTop(window.scrollY > 300);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  const [newsletterOpen, setNewsletterOpen] = useState(false);
-  const [newsletterError, setNewsletterError] = useState('');
-
+  // In BlogDetail component, add state for recentBlogs and relatedBlogs
+  const [recentBlogs, setRecentBlogs] = useState<any[]>([]);
+  const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
+  // Add state and effect for scroll progress
   const [progress, setProgress] = useState(0);
   useEffect(() => {
     const handleScroll = () => {
-      if (!contentRef.current) return;
-      const content = contentRef.current;
       const scrollTop = window.scrollY;
-      const offsetTop = content.offsetTop;
-      const height = content.offsetHeight;
-      const winHeight = window.innerHeight;
-      let percent = 0;
-      if (scrollTop + winHeight > offsetTop) {
-        percent = Math.min(
-          100,
-          ((scrollTop + winHeight - offsetTop) / height) * 100
-        );
-      }
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const percent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       setProgress(Math.max(0, Math.min(100, percent)));
     };
     window.addEventListener('scroll', handleScroll);
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [blog]);
+  }, []);
 
   useEffect(() => {
     if (slug) {
       setLoading(true);
-      setNotFound(false);
       BlogService.getBySlug(slug)
-        .then(data => {
-          setBlog(data);
-          setNotFound(false);
-          if (data && data.category) {
-            BlogService.getAll().then(all => {
-              setRelatedBlogs(
-                all.filter(b => b.category === data.category && b.slug !== slug).slice(0, 6)
-              );
-            });
-          }
-        })
-        .catch((err: unknown) => {
-          if (err instanceof Error && 'response' in err && (err as { response?: { status: number } }).response?.status === 404) {
-            setNotFound(true);
-          }
-          setBlog(null);
-        })
+        .then(data => setBlog(data))
         .finally(() => setLoading(false));
-      BlogService.getAll().then(all => {
-        setNextReads(all.filter(b => b.slug !== slug).slice(0, 8));
-      });
     }
   }, [slug]);
 
   useEffect(() => {
-    if (!contentRef.current || headings.length < 3) return;
+    if (blog && blog.slug) {
+      logBlogEvent({ event_type: 'view', blog_id: blog.slug, user_id: isSignedIn ? user?.id : undefined });
+    }
+    // eslint-disable-next-line
+  }, [blog]);
+
+  // Extract headings for TOC
+  const headings = useMemo(() => {
+    if (!blog || !blog.content) return [];
+    // Use a markdown parser or regex to extract h2/h3 headings
+    const matches = [...blog.content.matchAll(/^(##+)\s+(.*)$/gm)];
+    return matches.map((m, i) => ({
+      id: `heading-${i}`,
+      text: m[2],
+      level: m[1].length === 2 ? 2 : 3,
+    }));
+  }, [blog]);
+
+  // ScrollSpy logic for activeHeading
+  useEffect(() => {
+    if (!contentRef.current || !headings.length) return;
     const handleScroll = () => {
-      const scrollY = window.scrollY;
       let current = headings[0]?.id;
       for (const h of headings) {
         const el = document.getElementById(h.id);
-        if (el && el.getBoundingClientRect().top + window.scrollY - 120 < scrollY) {
+        if (el && el.getBoundingClientRect().top + window.scrollY - 120 < window.scrollY) {
           current = h.id;
         }
       }
       setActiveHeading(current);
     };
     window.addEventListener('scroll', handleScroll);
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [headings]);
 
-  if (loading) return <div className="py-12 text-center">Loading...</div>;
-  if (notFound) return (
-    <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <div className="text-2xl font-bold mb-4">Blog not found</div>
-      <button
-        className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition"
-        onClick={() => navigate('/blog')}
-      >
-        Back to Blog List
-      </button>
-    </div>
-  );
-  if (!blog) return <div className="py-12 text-center">Not found</div>;
+  // Show scroll-to-top FAB on mobile after scrolling 300px
+  useEffect(() => {
+    const onScroll = () => setShowShareBar(window.scrollY > 300);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  const shareUrl = `https://aiterritory.org/blog/${blog.slug}`;
-  const shareTitle = blog.title;
-  const metaDescription = blog.description || 'Discover the latest in AI, tools, and productivity at AI Territory.';
-  const metaImage = blog.cover_image_url ? blog.cover_image_url : 'https://aiterritory.org/og-default.png';
-  const canonicalUrl = `https://aiterritory.org/blog/${blog.slug}`;
-
-  if (contentRef.current) {
-    Array.from(contentRef.current.querySelectorAll('h2, h3')).forEach((el, i) => {
-      el.id = headings[i]?.id || `heading-${i}`;
-    });
+  // Helper: Split content for inline CTA
+  function splitContentForCTA(content: string, percent: number = 0.3) {
+    const paragraphs = content.split(/\n{2,}/);
+    const splitIndex = Math.floor(paragraphs.length * percent);
+    return [
+      paragraphs.slice(0, splitIndex).join('\n\n'),
+      paragraphs.slice(splitIndex).join('\n\n'),
+    ];
   }
 
-  const markdownComponents: Components = {
-    h1: ({node, ...props}) => <h1 className="text-3xl md:text-4xl font-bold mt-8 mb-4" {...props} />,
-    h2: ({node, ...props}) => <h2 className="text-2xl md:text-3xl font-bold mt-8 mb-3" {...props} />,
-    h3: ({node, ...props}) => <h3 className="text-xl md:text-2xl font-semibold mt-6 mb-2" {...props} />,
-    strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-white" {...props} />,
-    a: ({node, ...props}) => <a className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer" {...props} />,
-    img: ({node, ...props}) => <img className="rounded-xl my-4 shadow-md max-w-full" {...props} alt={props.alt || ''} />,
-    code: (props) => {
-      const { inline, className, children, ...rest } = props as { inline?: boolean; className?: string; children?: React.ReactNode };
-      return !inline ? (
-        <pre className="bg-gray-900 text-white rounded-lg p-4 overflow-x-auto my-4 text-sm"><code className={className} {...rest}>{children}</code></pre>
-      ) : (
-        <code className={`bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-sm font-mono ${className}`} {...rest}>{children}</code>
-      );
-    },
-    blockquote: ({node, children, ...props}) => {
-      const text = React.Children.map(children, child => {
-        if (typeof child === 'string') return child;
-        if (React.isValidElement(child) && 'props' in child && 'children' in child.props) {
-            return String(child.props.children);
-        }
-        return '';
-      }).join('').trim();
+  const [contentBeforeCTA, contentAfterCTA] = useMemo(() => blog && blog.content ? splitContentForCTA(blog.content) : ['', ''], [blog]);
 
-      if (text.startsWith('[!info]')) {
-        return <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 rounded-lg p-3 my-4"><span className="mt-0.5">ℹ️</span><div>{text.replace('[!info]', '').trim()}</div></div>;
+  // Fetch recent and related blogs
+  useEffect(() => {
+    BlogService.getAll().then(all => {
+      setRecentBlogs(all.slice(0, 5));
+      if (blog && blog.category) {
+        setRelatedBlogs(all.filter(b => b.category === blog.category && b.slug !== blog.slug).slice(0, 5));
       }
-      if (text.startsWith('[!tip]')) {
-        return <div className="flex items-start gap-2 bg-green-50 dark:bg-green-900/30 border-l-4 border-green-400 rounded-lg p-3 my-4"><span className="mt-0.5">💡</span><div>{text.replace('[!tip]', '').trim()}</div></div>;
-      }
-      if (text.startsWith('[!warning]')) {
-        return <div className="flex items-start gap-2 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 rounded-lg p-3 my-4"><span className="mt-0.5">⚠️</span><div>{text.replace('[!warning]', '').trim()}</div></div>;
-      }
-      return <blockquote className="border-l-4 border-gray-300 dark:border-gray-700 pl-4 italic text-gray-600 dark:text-gray-300 my-4" {...props}>{children}</blockquote>;
+    });
+  }, [blog]);
+
+  if (loading) return <div className="max-w-4xl mx-auto px-4 py-12">Loading...</div>;
+  if (!blog) return <div className="max-w-2xl mx-auto px-4 py-16 text-center text-red-500">Blog not found.</div>;
+
+  // Editorial typography for main content
+  const markdownComponents = {
+    h1: ({node, ...props}) => <motion.h1 initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="font-bold font-serif text-3xl sm:text-4xl md:text-5xl mt-10 mb-5 leading-tight" {...props} />,
+    h2: ({node, ...props}) => {
+      const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      return <motion.h2 id={id} initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="font-semibold font-serif text-2xl sm:text-3xl md:text-4xl mt-8 mb-4 leading-tight group relative">
+        <a href={`#${id}`} className="absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition text-blue-500" aria-label="Copy section link">#</a>
+        {props.children}
+      </motion.h2>;
     },
+    h3: ({node, ...props}) => {
+      const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      return <motion.h3 id={id} initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="font-bold font-serif text-xl sm:text-2xl md:text-3xl mt-6 mb-3 leading-tight group relative uppercase tracking-wider" style={{ fontVariant: 'small-caps' }}>
+        <a href={`#${id}`} className="absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition text-blue-500" aria-label="Copy section link">#</a>
+        {props.children}
+      </motion.h3>;
+    },
+    h4: ({node, ...props}) => <h4 className="font-serif text-lg font-semibold mt-6 mb-2 leading-tight" {...props} />,
     p: ({node, ...props}) => {
+      // First paragraph as lead
       if (node?.position?.start.offset === 0) {
-        return <p className="first-letter:text-5xl first-letter:font-serif first-letter:float-left first-letter:mr-2 first-letter:font-bold first-letter:text-blue-500 dark:first-letter:text-blue-300" {...props} />;
+        return <motion.p initial={{opacity:0, y:10}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="text-xl font-serif text-gray-700 dark:text-gray-200 my-6 leading-relaxed max-w-[700px] font-light" {...props} />;
       }
-      return <p {...props} />;
+      return <motion.p initial={{opacity:0, y:10}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="my-5 font-serif leading-relaxed text-[1.15rem] max-w-[700px] text-gray-800 dark:text-gray-100" {...props} />;
     },
+    img: ({node, ...props}) => (
+      <motion.img
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.5 }}
+        className="rounded-xl my-6 shadow-md max-w-full"
+        {...props}
+        alt={props.alt || ''}
+      />
+    ),
+    code: function CodeComponent({ inline = false, className, children, ...rest }: CodeProps) {
+      return inline
+        ? <code className="bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-sm font-mono text-pink-600" {...rest}>{children}</code>
+        : <motion.div initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}}>
+            <pre className="bg-gray-900 text-white rounded-lg p-4 overflow-x-auto my-5 text-base leading-relaxed font-mono" {...rest}><code className={className}>{children}</code></pre>
+          </motion.div>;
+    },
+    blockquote: ({node, children, ...props}) => <motion.blockquote initial={{opacity:0, x:-20}} whileInView={{opacity:1, x:0}} viewport={{once:true}} transition={{duration:0.5}} className="border-l-8 border-blue-400 bg-blue-50 dark:bg-blue-900/20 pl-6 italic text-gray-700 dark:text-gray-200 my-8 rounded-r-lg shadow-sm font-serif text-lg" {...props}>{children}</motion.blockquote>,
   };
 
+  // Share handler
+  function handleShare(platform: string) {
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const shareTitle = blog?.title || 'Check out this blog!';
+    const encodedUrl = encodeURIComponent(shareUrl);
+    const encodedTitle = encodeURIComponent(shareTitle);
+    let url = '';
+    switch (platform) {
+      case 'x':
+        url = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+        break;
+      case 'linkedin':
+        url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+        break;
+      case 'whatsapp':
+        url = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
+        break;
+      case 'facebook':
+        url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+        break;
+      case 'copy':
+        navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        return;
+      default:
+        url = shareUrl;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+    logBlogEvent({ event_type: 'share', blog_id: blog.slug, user_id: isSignedIn ? user?.id : undefined, platform });
+  }
+
+  // Newsletter subscribe handler
+  async function handleNewsletterSubscribe(email: string) {
+    // TODO: Call your newsletter API or Supabase
+    logBlogEvent({ event_type: 'newsletter_signup', blog_id: blog.slug, user_id: isSignedIn ? user?.id : undefined });
+    toast('Subscribed! Check your inbox.');
+  }
+
+  const wordCount = blog?.content ? blog.content.split(/\s+/).length : 0;
+  const readingTime = Math.ceil(wordCount / 200);
+
   return (
-    <>
-      <MetaTags
-        title={blog.title}
-        description={metaDescription}
-        image={metaImage}
-        url={canonicalUrl}
-        type="article"
-      />
+    <div className="relative min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 dark:from-[#171717] dark:via-[#191919] dark:to-[#1a1a1a] transition-all duration-500 pt-6 pb-8 sm:pt-8 sm:pb-8 overflow-x-hidden">
+      {/* Title, Image, Description (minimal, no cards) */}
+      <div className="relative w-full max-w-6xl mx-auto mb-8">
+        <motion.img
+          src={blog.cover_image_url || '/public/placeholder.svg'}
+          alt={blog.title}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="w-full h-[220px] sm:h-[320px] md:h-[420px] lg:h-[520px] object-cover object-center rounded-none md:rounded-xl"
+          style={{ minHeight: 120 }}
+        />
+        {/* Bottom gradient overlay for contrast */}
+        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/70 to-transparent pointer-events-none rounded-b-xl" />
+        {/* Overlay: author, date, share buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="absolute bottom-6 left-6 flex flex-col sm:flex-row items-end sm:items-center gap-4 z-10"
+        >
+          {/* Author avatar + name + date */}
+          <div className="flex items-center gap-3 bg-black/60 px-4 py-2 rounded-xl shadow-lg">
+            <img
+              src={blog.author_image_url || '/logo.jpg'}
+              alt={blog.author_name}
+              className="w-10 h-10 rounded-full object-cover border-2 border-white"
+            />
+            <div className="flex flex-col">
+              <span className="text-white font-semibold text-base font-serif">{blog.author_name}</span>
+              <span className="text-xs text-gray-200 uppercase tracking-widest font-serif" style={{ letterSpacing: '0.08em' }}>{blog.created_at ? new Date(blog.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : ''}</span>
+            </div>
+          </div>
+          {/* Share buttons */}
+          <div className="flex flex-row gap-2 bg-black/60 px-3 py-2 rounded-xl shadow-lg">
+            <button onClick={() => handleShare('x')} aria-label="Share on X" className="rounded-full border border-white/60 p-2 hover:bg-white/10 transition active:scale-95"><FaXTwitter className="w-4 h-4 text-white" /></button>
+            <button onClick={() => handleShare('linkedin')} aria-label="Share on LinkedIn" className="rounded-full border border-white/60 p-2 hover:bg-white/10 transition active:scale-95"><FaLinkedin className="w-4 h-4 text-white" /></button>
+            <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="rounded-full border border-white/60 p-2 hover:bg-white/10 transition active:scale-95"><FaWhatsapp className="w-4 h-4 text-white" /></button>
+          </div>
+        </motion.div>
+      </div>
+      {/* Headline Section */}
+      <div className="max-w-3xl mx-auto px-2 sm:px-4 mb-6 mt-8">
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.7 }}
+          className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-3 leading-tight"
+        >
+          {blog.title}
+        </motion.h1>
+        {blog.subtitle && (
+          <div className="text-lg italic text-gray-500 mb-2 font-serif">{blog.subtitle}</div>
+        )}
+        <div className="flex flex-col sm:flex-row items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <span>{wordCount} words</span>
+          <span>•</span>
+          <span>{readingTime} min read</span>
+        </div>
+      </div>
+      {blog.description && (
+        <div className="max-w-3xl mx-auto px-2 sm:px-4 mb-8">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeSanitize]}
+            components={{
+              h1: ({node, ...props}) => <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mt-4 mb-2" {...props} />,
+              h2: ({node, ...props}) => <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mt-3 mb-2" {...props} />,
+              h3: ({node, ...props}) => <h3 className="text-base sm:text-lg md:text-xl font-semibold mt-2 mb-1" {...props} />,
+              ul: ({node, ...props}) => <ul className="list-disc pl-6 my-2" {...props} />,
+              ol: ({node, ...props}) => <ol className="list-decimal pl-6 my-2" {...props} />,
+              li: ({node, ...props}) => <li className="mb-1" {...props} />,
+              p: ({node, ...props}) => <p className="my-2 leading-relaxed" {...props} />,
+            }}
+          >
+            {blog.description}
+          </ReactMarkdown>
+        </div>
+      )}
+      {/* Main Content + Sidebar */}
+      <div className="w-full max-w-4xl mx-auto flex flex-col lg:flex-row gap-8 mb-8">
+        <div className="flex-1 min-w-0">
+          {/* Markdown Content before CTA */}
+          <div ref={contentRef} className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-gray-900 dark:prose-headings:text-white prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-300 prose-blockquote:my-6 prose-p:my-5 prose-p:leading-relaxed prose-p:text-[1.15rem] prose-img:rounded-xl prose-img:shadow-md prose-a:text-blue-600 dark:prose-a:text-blue-400 font-sans">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeSanitize, rehypeHighlight]}
+              components={markdownComponents}
+            >
+              {contentBeforeCTA}
+            </ReactMarkdown>
+          </div>
+          {/* Inline Newsletter CTA (Forbes-style, minimal, no card) */}
+          <div className="w-full flex flex-col items-center justify-center my-8">
+            <h3 className="text-2xl font-bold font-serif mb-1">Get the Best of AI Weekly</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-base mb-4">Join 5,000+ creators staying ahead with AI insights, tools, and trends. <span className="font-semibold">No spam. Only value.</span></p>
+            <NewsletterCTA onSubscribe={handleNewsletterSubscribe} onToast={toast} />
+          </div>
+          {/* Markdown Content after CTA */}
+          <div className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-gray-900 dark:prose-headings:text-white prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-300 prose-blockquote:my-6 prose-p:my-5 prose-p:leading-relaxed prose-p:text-[1.15rem] prose-img:rounded-xl prose-img:shadow-md prose-a:text-blue-600 dark:prose-a:text-blue-400 font-sans">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeSanitize, rehypeHighlight]}
+              components={markdownComponents}
+            >
+              {contentAfterCTA}
+            </ReactMarkdown>
+          </div>
+        </div>
+        {/* Sidebar: match ToolDetailsPage style */}
+        <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8 lg:sticky lg:top-24 z-20 order-first lg:order-none mb-6 lg:mb-0 bg-gray-50 dark:bg-[#19191b] rounded-xl p-4">
+          {/* Table of Contents */}
+          <BlogTOC headings={headings} activeHeading={activeHeading} />
+          {/* Author Card */}
+          <AuthorCard author={blog.author} />
+          {/* Recent Blogs */}
+          <section>
+            <h3 className="text-lg font-semibold mb-3 font-serif">Recent Blogs</h3>
+            <ul className="space-y-3">
+              {recentBlogs.map(b => (
+                <li key={b.id} className="flex items-center gap-3">
+                  <img
+                    src={b.cover_image_url || '/public/placeholder.svg'}
+                    alt={b.title}
+                    className="w-10 h-10 rounded-xl object-cover border border-gray-200 dark:border-gray-700 bg-white"
+                    loading="lazy"
+                    sizes="40px"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <a href={`/blog/${b.slug}`} className="block font-medium text-blue-700 dark:text-blue-400 truncate hover:underline font-serif">
+                      {b.title}
+                    </a>
+                    <div className="text-xs text-muted-foreground truncate font-serif">
+                      {b.created_at ? new Date(b.created_at).toLocaleDateString() : ''}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+          {/* Related Blogs */}
+          <section>
+            <h3 className="text-lg font-semibold mb-3 font-serif">Related Blogs</h3>
+            <ul className="space-y-3">
+              {relatedBlogs.map(b => (
+                <li key={b.id} className="flex items-center gap-3">
+                  <img
+                    src={b.cover_image_url || '/public/placeholder.svg'}
+                    alt={b.title}
+                    className="w-10 h-10 rounded-xl object-cover border border-gray-200 dark:border-gray-700 bg-white"
+                    loading="lazy"
+                    sizes="40px"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <a href={`/blog/${b.slug}`} className="block font-medium text-blue-700 dark:text-blue-400 truncate hover:underline font-serif">
+                      {b.title}
+                    </a>
+                    <div className="text-xs text-muted-foreground truncate font-serif">
+                      {b.created_at ? new Date(b.created_at).toLocaleDateString() : ''}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+          {/* Share block */}
+          <section>
+            <h3 className="text-lg font-semibold mb-3 font-serif">Share</h3>
+            <div className="flex gap-2 flex-wrap">
+              <button aria-label="Share on X" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95" onClick={() => handleShare('x')}><FaXTwitter className="w-4 h-4 text-black dark:text-white" /></button>
+              <button aria-label="Share on LinkedIn" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95" onClick={() => handleShare('linkedin')}><FaLinkedin className="w-4 h-4 text-[#0077b5]" /></button>
+              <button aria-label="Share on WhatsApp" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95" onClick={() => handleShare('whatsapp')}><FaWhatsapp className="w-4 h-4 text-[#25d366]" /></button>
+            </div>
+          </section>
+        </aside>
+      </div>
+      {/* Mobile Sticky Share Bar (safe area) */}
+      <div className="fixed bottom-0 left-0 w-full z-40 md:hidden flex items-center justify-around bg-white/90 dark:bg-[#18181b]/90 border-t border-gray-200 dark:border-gray-800 shadow-lg py-2 backdrop-blur-md" role="region" aria-label="Share bar" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <BlogLikeBookmark blogId={blog.slug} />
+        <button onClick={() => handleShare('x')} className="hover:text-blue-600 transition active:scale-95" aria-label="Share on X"><FaXTwitter className="w-6 h-6" /></button>
+        <button onClick={() => handleShare('linkedin')} className="hover:text-blue-600 transition active:scale-95" aria-label="Share on LinkedIn"><FaLinkedin className="w-6 h-6" /></button>
+        <button onClick={() => handleShare('whatsapp')} className="hover:text-green-600 transition active:scale-95" aria-label="Share on WhatsApp"><FaWhatsapp className="w-6 h-6" /></button>
+        <button onClick={() => handleShare('facebook')} className="hover:text-blue-700 transition active:scale-95" aria-label="Share on Facebook"><FaFacebook className="w-6 h-6" /></button>
+        <button onClick={() => handleShare('copy')} className="hover:text-gray-700 transition active:scale-95" aria-label="Copy link"><FaRegCopy className="w-6 h-6" />{copied && <span className="ml-1 text-xs text-green-600">Copied!</span>}</button>
+      </div>
+      {/* Mobile TOC Drawer */}
+      <MobileTOCDrawer open={showTOC} onClose={() => setShowTOC(false)} headings={headings} />
+      {/* Comments Section */}
+      <section className="max-w-2xl mx-auto my-16 px-2 sm:px-0">
+        <div className="w-full flex items-center gap-4 mb-8">
+          <div className="flex-1 h-px bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200" />
+          <span className="uppercase tracking-widest text-xs font-semibold text-gray-500 font-serif">Comments</span>
+          <div className="flex-1 h-px bg-gradient-to-l from-gray-200 via-gray-400 to-gray-200" />
+        </div>
+        <BlogComments blogId={blog.slug} />
+      </section>
+      {/* After the comments section, before the final newsletter CTA: */}
+      <section className="w-full flex flex-col items-center justify-center my-12">
+        <div className="max-w-4xl w-full">
+          <h3 className="text-2xl font-bold font-serif mb-6 text-gray-900 dark:text-white">Read Next</h3>
+          <div className="flex flex-col sm:flex-row gap-6">
+            {(recentBlogs.slice(0, 3)).map(blog => (
+              <a
+                key={blog.id}
+                href={`/blog/${blog.slug}`}
+                className="flex-1 bg-white dark:bg-[#18181b] rounded-xl shadow border border-gray-200 dark:border-gray-800 p-4 flex flex-col gap-3 hover:shadow-lg transition group"
+              >
+                <img
+                  src={blog.cover_image_url || '/public/placeholder.svg'}
+                  alt={blog.title}
+                  className="w-full h-32 object-cover rounded-lg mb-2"
+                  loading="lazy"
+                  sizes="160px"
+                />
+                <div className="font-bold text-lg font-serif text-gray-900 dark:text-white group-hover:underline mb-1 line-clamp-2">{blog.title}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-300 mb-1 line-clamp-2">{blog.description?.slice(0, 80)}</div>
+                <div className="text-xs text-muted-foreground font-serif">{blog.created_at ? new Date(blog.created_at).toLocaleDateString() : ''}</div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+      {/* Add a Forbes-style progress bar at the top of the page */}
       <div className="fixed top-0 left-0 w-full h-1 z-50">
         <div
-          className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-200"
+          className="h-full bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 transition-all duration-200"
           style={{ width: `${progress}%` }}
         />
       </div>
-      <motion.div
-        className="fixed top-6 left-4 z-30"
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        whileHover={{ scale: 1.05, x: -4 }}
-        transition={{ type: 'spring', stiffness: 300 }}
-      >
-        <button
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 dark:bg-gray-900/80 shadow-md border border-gray-200 dark:border-gray-800 text-sm font-medium hover:bg-blue-50 dark:hover:bg-gray-800 transition"
-          onClick={() => navigate('/blog')}
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Blogs
-        </button>
-      </motion.div>
-
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 relative">
-        <div className="relative w-full min-h-[220px] flex flex-col items-center justify-center mb-10">
-          <motion.div
-            className="absolute inset-0 z-0 bg-gradient-to-br from-blue-200/60 via-purple-100/60 to-white dark:from-gray-900/80 dark:via-gray-800/80 dark:to-gray-900/80 rounded-b-3xl"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-          />
-          <motion.h1
-            className="relative z-10 text-4xl md:text-5xl font-serif font-extrabold text-center text-gray-900 dark:text-white tracking-tight mb-4 mt-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {blog.title}
-          </motion.h1>
-          {Array.isArray(blog.tags) && blog.tags.length > 0 && (
-            <div className="relative z-10 flex flex-wrap justify-center gap-2 mb-2">
-              {blog.tags.map(tag => (
-                <Badge key={tag} className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 px-2 py-0.5 rounded-full text-xs font-medium shadow-sm">{tag}</Badge>
-              ))}
-            </div>
-          )}
-          <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground mb-2">
-            <span className="flex items-center gap-2">
-              <UserCircle className="w-6 h-6 text-blue-400" />
-              <span className="font-semibold">{blog.author_name}</span>
-            </span>
-            <span>•</span>
-            <span>{new Date(blog.created_at).toLocaleDateString()}</span>
-            {blog.reading_time && (
-              <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{blog.reading_time} min read</span>
-            )}
-          </div>
-        </div>
-        <motion.div
-          className="w-full flex justify-center mb-8"
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="relative w-full max-w-2xl">
-            <img
-              src={blog.cover_image_url}
-              alt={blog.title}
-              className="w-full rounded-2xl shadow-2xl object-cover max-h-[420px] border border-white/60 dark:border-gray-800/60"
-              loading="lazy"
-            />
-          </div>
-        </motion.div>
-        <motion.div
-          ref={contentRef}
-          className="prose lg:prose-xl max-w-none prose-neutral dark:prose-invert prose-img:rounded-xl prose-img:shadow-md prose-a:text-blue-600 dark:prose-a:text-blue-400"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-        >
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeSanitize, rehypeHighlight]}
-            components={markdownComponents}
-          >
-            {blog.content}
-          </ReactMarkdown>
-        </motion.div>
-        {showScrollTop && (
-          <button
-            className="fixed bottom-24 right-6 z-40 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition"
-            onClick={scrollToTop}
-            aria-label="Scroll to top"
-          >
-            <ArrowUp className="w-5 h-5" />
-          </button>
-        )}
-        <motion.section
-          className="mt-10 mb-8 w-full max-w-2xl mx-auto rounded-2xl bg-gradient-to-r from-blue-100/80 to-purple-100/80 dark:from-gray-800/80 dark:to-gray-900/80 shadow-xl border border-gray-200 dark:border-gray-800 p-6 flex flex-col items-center"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-        >
-          <div className="flex flex-col items-center w-full gap-2">
-            <h3 className="text-2xl font-bold mb-1 text-center">📬 Get the Best of AI Weekly</h3>
-            <p className="mb-4 text-gray-700 dark:text-gray-300 text-center text-base max-w-xl">Join 5,000+ creators staying ahead with AI insights, tools, and trends. <span className="font-semibold">No spam. Only value.</span></p>
-            <form
-              className="w-full flex flex-col sm:flex-row items-center gap-3"
-              onSubmit={e => {
-                e.preventDefault();
-                const form = e.target as HTMLFormElement;
-                const emailInput = form.elements.namedItem('email') as HTMLInputElement | null;
-                const email = emailInput?.value.trim() ?? '';
-                if (!/^\S+@\S+\.\S+$/.test(email)) {
-                  setNewsletterError('Please enter a valid email address.');
-                  return;
-                }
-                setNewsletterError('');
-                window.alert('Thank you for subscribing!');
-                form.reset();
-              }}
-            >
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="Enter your email…"
-                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-              >
-                Subscribe
-              </button>
-            </form>
-            {newsletterError && <div className="text-red-500 text-sm mt-1">{newsletterError}</div>}
-          </div>
-        </motion.section>
-        <Newsletter 
-          isOpen={newsletterOpen} 
-          onClose={() => setNewsletterOpen(false)}
-          title="Stay Ahead in AI! 🚀"
-          subtitle="Subscribe for the latest AI insights, guides, and exclusive tools."
-        />
-        <section className="w-full max-w-2xl mx-auto mt-10 mb-8">
-          <div className="flex flex-col sm:flex-row items-center gap-6 bg-white/90 dark:bg-gray-900/90 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-lg p-6">
-            <img
-              src={blog.author_image_url ?? '/logo.jpg'}
-              alt={blog.author_name}
-              className="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700 shadow-md"
-            />
-            <div className="flex-1 flex flex-col items-center sm:items-start text-center sm:text-left">
-              <div className="font-bold text-xl text-gray-900 dark:text-white mb-1">{blog.author_name}</div>
-              <div className="text-gray-500 text-sm mb-2">{blog.author_bio ?? 'AI enthusiast and contributor at AI Territory.'}</div>
-              {blog.author_social_links && typeof blog.author_social_links === 'object' && (
-                <div className="flex gap-3 mt-1">
-                  {blog.author_social_links?.twitter && (
-                    <a href={blog.author_social_links.twitter} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition" title="Twitter" aria-label="Twitter">
-                      <FaXTwitter className="w-5 h-5 text-[#1DA1F2]" />
-                    </a>
-                  )}
-                  {blog.author_social_links?.linkedin && (
-                    <a href={blog.author_social_links.linkedin} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition" title="LinkedIn" aria-label="LinkedIn">
-                      <FaLinkedin className="w-5 h-5 text-[#0077B5]" />
-                    </a>
-                  )}
-                  {blog.author_social_links?.github && (
-                    <a href={blog.author_social_links.github} target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition" title="GitHub" aria-label="GitHub">
-                      <svg className="w-5 h-5 text-gray-800 dark:text-gray-200" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.184 6.839 9.504.5.092.682-.217.682-.483 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.004.07 1.532 1.032 1.532 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.339-2.221-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.987 1.029-2.687-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.295 2.748-1.025 2.748-1.025.546 1.378.202 2.397.1 2.65.64.7 1.028 1.594 1.028 2.687 0 3.847-2.337 4.695-4.566 4.944.36.31.68.921.68 1.857 0 1.34-.012 2.422-.012 2.753 0 .268.18.579.688.481C19.138 20.2 22 16.448 22 12.021 22 6.484 17.523 2 12 2z"/></svg>
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-        <motion.section
-          className="mt-12 mb-12 flex flex-col md:flex-row items-center md:items-start gap-8 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-lg p-6"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="flex flex-col items-center w-full">
-            <div className="font-semibold text-gray-700 dark:text-gray-200 mb-2">Share This Post</div>
-            <div className="flex flex-wrap justify-center gap-3 mb-2">
-              <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#1DA1F2] hover:scale-110 transition shadow" title="Share on X" aria-label="Share on X">
-                <FaXTwitter className="w-5 h-5 text-white" />
-              </a>
-              <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#0077B5] hover:scale-110 transition shadow" title="Share on LinkedIn" aria-label="Share on LinkedIn">
-                <FaLinkedin className="w-5 h-5 text-white" />
-              </a>
-              <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + ' ' + shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#25D366] hover:scale-110 transition shadow" title="Share on WhatsApp" aria-label="Share on WhatsApp">
-                <FaWhatsapp className="w-5 h-5 text-white" />
-              </a>
-              <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#1877F3] hover:scale-110 transition shadow" title="Share on Facebook" aria-label="Share on Facebook">
-                <Facebook className="w-5 h-5 text-white" />
-              </a>
-              <button
-                onClick={() => {navigator.clipboard.writeText(shareUrl)}}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 hover:scale-110 transition shadow"
-                title="Copy Link"
-                aria-label="Copy Link"
-              >
-                <svg className="w-5 h-5 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 7h2a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2v-2m8-10H9a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V9a2 2 0 00-2-2z" /></svg>
-              </button>
-            </div>
-            <div className="text-xs text-gray-400">Share this article with your network!</div>
-          </div>
-        </motion.section>
-      {relatedBlogs.length > 0 && (
-        <motion.section
-          className="mt-12 mb-8"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
-          <div className="flex items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2">📚 Related Reads</h2>
-            {blog.category && (
-              <Link
-                to={`/blog?category=${encodeURIComponent(blog.category)}`}
-                className="text-blue-600 text-sm ml-auto hover:underline"
-              >
-                See all
-              </Link>
-            )}
-          </div>
-          <div className="flex overflow-x-auto gap-4 py-4 scroll-smooth snap-x px-1"
-            style={{ WebkitOverflowScrolling: 'touch' }}
-          >
-            {relatedBlogs.map((item) => (
-              <motion.div
-                key={item.id}
-                className="min-w-[220px] max-w-xs bg-white/90 dark:bg-gray-900/90 rounded-xl p-2 shadow-md flex-shrink-0 snap-start transition-transform duration-200 hover:scale-105 hover:shadow-lg border border-gray-200 dark:border-gray-800"
-                whileHover={{ scale: 1.04, y: -2 }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4 }}
-              >
-                <Link to={`/blog/${item.slug}`} className="block">
-                  <img
-                    src={item.cover_image_url}
-                    alt={item.title}
-                    loading="lazy"
-                    className="w-full h-32 object-cover rounded-lg mb-2 border border-gray-100 dark:border-gray-800"
-                  />
-                  <div className="font-semibold text-base mb-1 line-clamp-2">{item.title}</div>
-                  <div className="text-xs text-muted-foreground line-clamp-2 mb-1">{item.description}</div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
-      )}
-      </div>
-
-      <motion.div
-        className="max-w-6xl mx-auto px-4 pb-16"
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7, delay: 0.2 }}
-      >
-        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">📚 Next Reads: <span className="font-normal">More from AI Territory</span></h2>
-        <div className="relative">
-          <div className="pointer-events-none absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white/90 dark:from-gray-900/90 to-transparent z-10" />
-          <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white/90 dark:from-gray-900/90 to-transparent z-10" />
-          <div className="flex gap-4 overflow-x-auto scroll-smooth snap-x pb-2 px-1"
-            style={{ WebkitOverflowScrolling: 'touch' }}
-          >
-            {nextReads.map((item) => (
-              <motion.div
-                key={item.id}
-                className="min-w-[260px] max-w-xs bg-white/70 dark:bg-gray-900/70 rounded-xl shadow-2xl p-3 flex flex-col snap-start hover:shadow-2xl transition-all duration-200 backdrop-blur-md border border-gray-200 dark:border-gray-800"
-                whileHover={{ scale: 1.03, y: -4 }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4 }}
-              >
-                <Link to={`/blog/${item.slug}`} className="block">
-                  <img src={item.cover_image_url} alt={item.title} className="w-full h-36 object-cover rounded-lg mb-3" loading="lazy" />
-                  <div className="font-semibold text-lg mb-1 line-clamp-2">{item.title}</div>
-                  <div className="text-xs text-muted-foreground line-clamp-2 mb-1">{item.description}</div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-    </>
+    </div>
   );
 };
 
