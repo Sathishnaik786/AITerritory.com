@@ -183,17 +183,17 @@ const BlogDetail: React.FC = () => {
 
   // Editorial typography for main content
   const markdownComponents = {
-    h1: ({node, ...props}) => <motion.h1 initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="font-bold font-serif text-3xl sm:text-4xl md:text-5xl mt-10 mb-5 leading-tight" {...props} />,
+    h1: ({node, ...props}) => <motion.h1 initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="font-bold font-serif text-3xl sm:text-4xl md:text-5xl mt-8 mb-4 leading-tight" {...props} />,
     h2: ({node, ...props}) => {
       const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      return <motion.h2 id={id} initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="font-semibold font-serif text-2xl sm:text-3xl md:text-4xl mt-8 mb-4 leading-tight group relative">
+      return <motion.h2 id={id} initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="font-semibold font-serif text-2xl sm:text-3xl md:text-4xl mt-6 mb-3 leading-tight group relative">
         <a href={`#${id}`} className="absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition text-blue-500" aria-label="Copy section link">#</a>
         {props.children}
       </motion.h2>;
     },
     h3: ({node, ...props}) => {
       const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      return <motion.h3 id={id} initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="font-bold font-serif text-xl sm:text-2xl md:text-3xl mt-6 mb-3 leading-tight group relative uppercase tracking-wider" style={{ fontVariant: 'small-caps' }}>
+      return <motion.h3 id={id} initial={{opacity:0, y:20}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="font-bold font-serif text-xl sm:text-2xl md:text-3xl mt-4 mb-2 leading-tight group relative uppercase tracking-wider" style={{ fontVariant: 'small-caps' }}>
         <a href={`#${id}`} className="absolute -left-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition text-blue-500" aria-label="Copy section link">#</a>
         {props.children}
       </motion.h3>;
@@ -202,9 +202,9 @@ const BlogDetail: React.FC = () => {
     p: ({node, ...props}) => {
       // First paragraph as lead
       if (node?.position?.start.offset === 0) {
-        return <motion.p initial={{opacity:0, y:10}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="text-xl font-serif text-gray-700 dark:text-gray-200 my-6 leading-relaxed max-w-[700px] font-light" {...props} />;
+        return <motion.p initial={{opacity:0, y:10}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="text-xl font-serif text-gray-700 dark:text-gray-200 my-4 leading-relaxed max-w-[700px] font-light" {...props} />;
       }
-      return <motion.p initial={{opacity:0, y:10}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="my-5 font-serif leading-relaxed text-[1.15rem] max-w-[700px] text-gray-800 dark:text-gray-100" {...props} />;
+      return <motion.p initial={{opacity:0, y:10}} whileInView={{opacity:1, y:0}} viewport={{once:true}} transition={{duration:0.5}} className="my-3 font-serif leading-relaxed text-[1.15rem] max-w-[700px] text-gray-800 dark:text-gray-100" {...props} />;
     },
     img: ({node, ...props}) => (
       <motion.img
@@ -273,7 +273,7 @@ const BlogDetail: React.FC = () => {
     <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] overflow-x-hidden sm:px-2">
       {/* Title, Image, Description (minimal, no cards) */}
       {/* In the hero section, reduce top padding and make title full width on mobile */}
-      <div className="w-full bg-white dark:bg-[#171717] pt-2 pb-4 border-b border-gray-100 dark:border-gray-800">
+      <div className="w-full bg-white dark:bg-[#171717] pt-2 pb-2 border-b border-gray-100 dark:border-gray-800">
         {/* Back Button in hero section, above content */}
         <div className="max-w-4xl mx-auto px-4 flex items-center pt-2 pb-2">
           <button
@@ -330,10 +330,14 @@ const BlogDetail: React.FC = () => {
               {/* Popover for mobile, dropdown for desktop */}
               {(showShareBar) && (
                 <div
-                  className="fixed inset-0 z-50 flex items-center justify-center md:absolute md:left-1/2 md:-translate-x-1/2 md:mt-2 md:z-20 md:flex-row md:gap-2 md:bg-white md:dark:bg-[#18181b] md:rounded-full md:px-4 md:py-2 md:shadow-lg md:border md:border-gray-200 md:dark:border-gray-800 bg-black/40 md:bg-transparent"
+                  className="fixed inset-0 z-50 flex items-center justify-center md:absolute md:left-0 md:right-auto md:top-full md:mt-2 md:z-20 md:flex-row md:gap-2 md:bg-transparent bg-black/40"
                   onClick={() => setShowShareBar(false)}
                 >
-                  <div className="flex flex-row gap-2 bg-white dark:bg-[#18181b] rounded-full px-4 py-2 shadow-lg border border-gray-200 dark:border-gray-800" onClick={e => e.stopPropagation()}>
+                  <div
+                    className="flex flex-row gap-2 bg-white dark:bg-[#18181b] rounded-xl md:rounded-full px-4 py-4 md:py-2 md:px-4 shadow-lg border border-gray-200 dark:border-gray-800 w-full max-w-xs md:max-w-none md:w-auto mx-2 md:mx-0"
+                    style={{ boxSizing: 'border-box' }}
+                    onClick={e => e.stopPropagation()}
+                  >
                     <button onClick={() => handleShare('x')} aria-label="Share on X" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
                       <FaXTwitter className="w-5 h-5 text-blue-600" />
                     </button>
@@ -384,7 +388,7 @@ const BlogDetail: React.FC = () => {
         </div>
       </div>
       {/* Cover image below hero section */}
-      <div className="relative w-full max-w-6xl mx-auto mb-8">
+      <div className="relative w-full max-w-6xl mx-auto mb-4">
         <motion.img
           src={blog.cover_image_url || '/public/placeholder.svg'}
               alt={blog.title}
@@ -417,10 +421,10 @@ const BlogDetail: React.FC = () => {
         </div>
       )}
       {/* Main Content + Sidebar */}
-      <div className="w-full max-w-4xl mx-auto flex flex-col lg:flex-row gap-8 sm:gap-4 mb-8">
+      <div className="w-full max-w-4xl mx-auto flex flex-col lg:flex-row gap-4 lg:gap-8 mb-6">
         <div className="flex-1 min-w-0">
           {/* Markdown Content before CTA */}
-          <div ref={contentRef} className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-gray-900 dark:prose-headings:text-white prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-300 prose-blockquote:my-6 prose-p:my-5 prose-p:leading-relaxed prose-p:text-[1.15rem] prose-img:rounded-xl prose-img:shadow-md prose-a:text-blue-600 dark:prose-a:text-blue-400 font-sans">
+          <div ref={contentRef} className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-gray-900 dark:prose-headings:text-white prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-300 prose-blockquote:my-6 prose-p:my-4 prose-p:leading-relaxed prose-p:text-[1.15rem] prose-img:rounded-xl prose-img:shadow-md prose-a:text-blue-600 dark:prose-a:text-blue-400 font-sans">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeSanitize, rehypeHighlight]}
@@ -430,11 +434,11 @@ const BlogDetail: React.FC = () => {
             </ReactMarkdown>
           </div>
           {/* Inline Newsletter CTA (Forbes-style, minimal, no card) */}
-          <div className="w-full flex flex-col items-center justify-center my-8">
+          <div className="w-full flex flex-col items-center justify-center my-4 sm:my-2">
             <NewsletterCTA onSubscribe={handleNewsletterSubscribe} onToast={toast} />
           </div>
           {/* Markdown Content after CTA */}
-          <div className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-gray-900 dark:prose-headings:text-white prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-300 prose-blockquote:my-6 prose-p:my-5 prose-p:leading-relaxed prose-p:text-[1.15rem] prose-img:rounded-xl prose-img:shadow-md prose-a:text-blue-600 dark:prose-a:text-blue-400 font-sans">
+          <div className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-gray-900 dark:prose-headings:text-white prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-300 prose-blockquote:my-6 prose-p:my-4 prose-p:leading-relaxed prose-p:text-[1.15rem] prose-img:rounded-xl prose-img:shadow-md prose-a:text-blue-600 dark:prose-a:text-blue-400 font-sans">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeSanitize, rehypeHighlight]}
@@ -445,7 +449,7 @@ const BlogDetail: React.FC = () => {
           </div>
         </div>
         {/* Sidebar: match ToolDetailsPage style */}
-        <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8 lg:sticky lg:top-0 z-20 order-first lg:order-none mb-6 lg:mb-0 bg-gray-50 dark:bg-[#19191b] rounded-xl p-4 min-w-0">
+        <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-4 lg:gap-6 lg:sticky lg:top-0 z-20 order-first lg:order-none mb-2 lg:mb-0 bg-gray-50 dark:bg-[#19191b] rounded-xl p-4 min-w-0">
           {/* Table of Contents */}
           <BlogTOC headings={headings} activeHeading={activeHeading} />
           {/* Author Card */}
@@ -469,12 +473,12 @@ const BlogDetail: React.FC = () => {
                     </a>
                     <div className="text-xs text-muted-foreground truncate font-serif">
                       {b.created_at ? new Date(b.created_at).toLocaleDateString() : ''}
-            </div>
-          </div>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>
-        </section>
+          </section>
           {/* Share block */}
           <section>
             <h3 className="text-lg font-semibold mb-3 font-serif text-center">Share</h3>
@@ -501,8 +505,8 @@ const BlogDetail: React.FC = () => {
       {/* Mobile TOC Drawer */}
       <MobileTOCDrawer open={showTOC} onClose={() => setShowTOC(false)} headings={headings} />
       {/* Comments Section */}
-      <section className="max-w-2xl mx-auto my-16 px-2 sm:px-0" id="comments-section">
-        <div className="w-full flex items-center gap-4 mb-8">
+      <section className="max-w-2xl mx-auto my-6 sm:my-4 px-2 sm:px-0" id="comments-section">
+        <div className="w-full flex items-center gap-4 mb-4">
           <div className="flex-1 h-px bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200" />
           <span className="uppercase tracking-widest text-xs font-semibold text-gray-500 font-serif">Comments</span>
           <div className="flex-1 h-px bg-gradient-to-l from-gray-200 via-gray-400 to-gray-200" />
@@ -562,10 +566,10 @@ const BlogDetail: React.FC = () => {
       </section>
       {/* After the comments section, before the final newsletter CTA: */}
       {/* In the Read Next section, fetch and display next 6 blogs, make horizontally scrollable, and animate each card */}
-      <section className="w-full flex flex-col items-center justify-center my-12">
+      <section className="w-full flex flex-col items-start justify-center my-6 sm:my-4 pl-0 sm:pl-2">
         <div className="max-w-4xl w-full">
-          <h3 className="text-2xl font-bold font-serif mb-6 text-gray-900 dark:text-white">Read Next</h3>
-          <div className="flex gap-6 sm:gap-4 overflow-x-auto pb-2 scroll-smooth snap-x" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <h3 className="text-2xl font-bold font-serif mb-4 text-gray-900 dark:text-white pl-1 sm:pl-2">Read Next</h3>
+          <div className="flex gap-6 sm:gap-4 overflow-x-auto pb-2 scroll-smooth snap-x pl-1 sm:pl-2" style={{ WebkitOverflowScrolling: 'touch' }}>
             {(recentBlogs.slice(0, 6)).map((blog, i) => (
               <motion.a
                 key={blog.id}
