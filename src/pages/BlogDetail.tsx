@@ -18,6 +18,7 @@ import { toast } from '@/components/ui/sonner';
 import { logBlogEvent } from '../services/blogAnalyticsService';
 import { BookOpen, Book, ArrowUp } from 'lucide-react';
 import type { CodeProps } from 'react-markdown/lib/ast-to-react';
+import { supabase } from '../services/supabaseClient';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -122,7 +123,66 @@ const BlogDetail: React.FC = () => {
     });
   }, [blog]);
 
-  if (loading) return <div className="max-w-4xl mx-auto px-4 py-12">Loading...</div>;
+  // In BlogDetail component, add state for comments
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(true);
+  const [commentText, setCommentText] = useState('');
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
+
+  // Fetch comments for this blog (via backend API)
+  useEffect(() => {
+    if (!blog || !blog.slug) return;
+    setCommentsLoading(true);
+    (async () => {
+      try {
+        const res = await fetch(`/api/blogs/${blog.slug}/comments`);
+        const data = await res.json();
+        setComments(Array.isArray(data) ? data : []);
+      } catch (e) {
+        setComments([]);
+      }
+      setCommentsLoading(false);
+    })();
+  }, [blog]);
+
+  // Post comment handler (via backend API)
+  async function handleCommentSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!isSignedIn || !user?.id) {
+      toast('Please log in to comment.');
+      return;
+    }
+    if (!commentText.trim()) {
+      toast('Please enter a comment.');
+      return;
+    }
+    if (!blog || !blog.slug) return;
+    setCommentSubmitting(true);
+    try {
+      const res = await fetch(`/api/blogs/${blog.slug}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id, content: commentText }),
+      });
+      if (!res.ok) {
+        toast('Failed to post comment.');
+      } else {
+        toast('Comment posted!');
+        setCommentText('');
+        // Refresh comments
+        const commentsRes = await fetch(`/api/blogs/${blog.slug}/comments`);
+        const newComments = await commentsRes.json();
+        setComments(Array.isArray(newComments) ? newComments : []);
+      }
+    } catch (e) {
+      toast('Failed to post comment.');
+    }
+    setCommentSubmitting(false);
+  }
+
+  if (loading || !blog || !blog.slug) {
+    return <div className="max-w-4xl mx-auto px-4 py-12 text-center text-lg text-gray-500">Loading blog details...</div>;
+  }
   if (!blog) return <div className="max-w-2xl mx-auto px-4 py-16 text-center text-red-500">Blog not found.</div>;
 
   // Editorial typography for main content
@@ -216,15 +276,16 @@ const BlogDetail: React.FC = () => {
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 dark:from-[#171717] dark:via-[#191919] dark:to-[#1a1a1a] transition-all duration-500 pt-6 pb-8 sm:pt-8 sm:pb-8 overflow-x-hidden">
       {/* Title, Image, Description (minimal, no cards) */}
-      <div className="w-full bg-white dark:bg-[#171717] pt-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+      {/* In the hero section, reduce top padding and make title full width on mobile */}
+      <div className="w-full bg-white dark:bg-[#171717] pt-2 pb-4 border-b border-gray-100 dark:border-gray-800">
         {/* Breadcrumbs */}
         <div className="max-w-4xl mx-auto px-4 text-xs text-gray-500 font-serif mb-2">
           {blog.category && <span className="uppercase tracking-wider">{blog.category}</span>}
           {blog.subcategory && <span> &gt; {blog.subcategory}</span>}
         </div>
         {/* Headline */}
-        <div className="max-w-4xl mx-auto px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-4 leading-tight">
+        <div className="w-full px-2 sm:px-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-4 leading-tight w-full break-words">
             {blog.title}
           </h1>
           {/* Subtitle (if present) */}
@@ -238,7 +299,6 @@ const BlogDetail: React.FC = () => {
               <span className="text-gray-500">Senior Contributor.</span>
               <span className="hidden sm:inline">&copy; {blog.author_bio || 'Contributor bio here.'}</span>
             </div>
-            <button className="px-4 py-1.5 rounded-full border border-blue-600 text-blue-700 font-semibold text-xs hover:bg-blue-50 transition">Follow Author</button>
           </div>
           {/* Author bio (mobile) */}
           <div className="text-xs text-gray-500 font-serif mb-2 sm:hidden">{blog.author_bio || 'Contributor bio here.'}</div>
@@ -251,9 +311,57 @@ const BlogDetail: React.FC = () => {
           </div>
           {/* Action bar */}
           <div className="flex items-center gap-6 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800 pb-2 mb-2">
-            <button className="flex items-center gap-1 hover:text-blue-600 transition"><FaXTwitter className="w-4 h-4" /> Share</button>
-            <button className="flex items-center gap-1 hover:text-blue-600 transition"><FaRegCopy className="w-4 h-4" /> Save</button>
-            <button className="flex items-center gap-1 hover:text-blue-600 transition"><ArrowUp className="w-4 h-4" /> Comment 11</button>
+            {/* Share button: opens dropdown with social icons */}
+            <div className="relative group">
+              <button className="flex items-center gap-1 hover:text-blue-600 transition rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white/10 hover:bg-blue-50 dark:hover:bg-gray-800 active:scale-95">
+                <FaXTwitter className="w-4 h-4" /> Share
+              </button>
+              {/* Dropdown: social icons in circles, centered below */}
+              <div className="absolute left-1/2 -translate-x-1/2 mt-2 hidden group-hover:flex flex-row gap-2 bg-white dark:bg-[#18181b] rounded-full px-4 py-2 shadow-lg z-20 border border-gray-200 dark:border-gray-800">
+                <button onClick={() => handleShare('x')} aria-label="Share on X" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                  <FaXTwitter className="w-5 h-5 text-blue-600" />
+                </button>
+                <button onClick={() => handleShare('linkedin')} aria-label="Share on LinkedIn" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                  <FaLinkedin className="w-5 h-5 text-[#0077b5]" />
+                </button>
+                <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-green-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                  <FaWhatsapp className="w-5 h-5 text-[#25d366]" />
+                </button>
+                <button onClick={() => handleShare('facebook')} aria-label="Share on Facebook" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                  <FaFacebook className="w-5 h-5 text-[#1877f3]" />
+                </button>
+                <button onClick={() => handleShare('copy')} aria-label="Copy link" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                  <FaRegCopy className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                </button>
+              </div>
+            </div>
+            {/* Save button: bookmark, requires login */}
+            <button
+              className="flex items-center gap-1 hover:text-blue-600 transition rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white/10 hover:bg-blue-50 dark:hover:bg-gray-800 active:scale-95"
+              onClick={() => {
+                if (!isSignedIn) {
+                  // Show login modal or toast
+                  toast('Please log in to bookmark this blog.');
+                  return;
+                }
+                // Call bookmark logic here (toggle)
+                // ...
+              }}
+            >
+              <FaRegCopy className="w-4 h-4" /> Save
+            </button>
+            {/* Comment button: scroll to comment section */}
+            <button
+              className="flex items-center gap-1 hover:text-blue-600 transition rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white/10 hover:bg-blue-50 dark:hover:bg-gray-800 active:scale-95"
+              onClick={() => {
+                const commentSection = document.getElementById('comments-section');
+                if (commentSection) {
+                  commentSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            >
+              <ArrowUp className="w-4 h-4" /> Comment
+            </button>
           </div>
         </div>
       </div>
@@ -270,19 +378,6 @@ const BlogDetail: React.FC = () => {
         />
         {/* Bottom gradient overlay for contrast */}
         <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/70 to-transparent pointer-events-none rounded-b-xl" />
-        {/* Social share icons: pill-shaped, transparent, grouped, mobile-friendly */}
-        <div className="flex flex-row gap-2 items-center bg-black/40 backdrop-blur-md rounded-full px-3 py-2 shadow-lg absolute bottom-6 left-6 z-10"
-          style={{ minWidth: 120 }}>
-          <button onClick={() => handleShare('x')} aria-label="Share on X" className="rounded-full border border-white/60 p-2 bg-white/10 hover:bg-white/20 transition active:scale-95 flex items-center justify-center">
-            <FaXTwitter className="w-5 h-5 text-white" />
-          </button>
-          <button onClick={() => handleShare('linkedin')} aria-label="Share on LinkedIn" className="rounded-full border border-white/60 p-2 bg-white/10 hover:bg-white/20 transition active:scale-95 flex items-center justify-center">
-            <FaLinkedin className="w-5 h-5 text-white" />
-          </button>
-          <button onClick={() => handleShare('whatsapp')} aria-label="Share on WhatsApp" className="rounded-full border border-white/60 p-2 bg-white/10 hover:bg-white/20 transition active:scale-95 flex items-center justify-center">
-            <FaWhatsapp className="w-5 h-5 text-white" />
-          </button>
-        </div>
       </div>
       {blog.description && (
         <div className="max-w-3xl mx-auto px-2 sm:px-4 mb-8">
@@ -318,8 +413,6 @@ const BlogDetail: React.FC = () => {
           </div>
           {/* Inline Newsletter CTA (Forbes-style, minimal, no card) */}
           <div className="w-full flex flex-col items-center justify-center my-8">
-            <h3 className="text-2xl font-bold font-serif mb-1">Get the Best of AI Weekly</h3>
-            <p className="text-gray-600 dark:text-gray-300 text-base mb-4">Join 5,000+ creators staying ahead with AI insights, tools, and trends. <span className="font-semibold">No spam. Only value.</span></p>
             <NewsletterCTA onSubscribe={handleNewsletterSubscribe} onToast={toast} />
           </div>
           {/* Markdown Content after CTA */}
@@ -364,45 +457,32 @@ const BlogDetail: React.FC = () => {
               ))}
             </ul>
           </section>
-          {/* Related Blogs */}
-          <section>
-            <h3 className="text-lg font-semibold mb-3 font-serif">Related Blogs</h3>
-            <ul className="space-y-3">
-              {relatedBlogs.map(b => (
-                <li key={b.id} className="flex items-center gap-3">
-                  <img
-                    src={b.cover_image_url || '/public/placeholder.svg'}
-                    alt={b.title}
-                    className="w-10 h-10 rounded-xl object-cover border border-gray-200 dark:border-gray-700 bg-white"
-                    loading="lazy"
-                    sizes="40px"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <a href={`/blog/${b.slug}`} className="block font-medium text-blue-700 dark:text-blue-400 truncate hover:underline font-serif">
-                      {b.title}
-                    </a>
-                    <div className="text-xs text-muted-foreground truncate font-serif">
-                      {b.created_at ? new Date(b.created_at).toLocaleDateString() : ''}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
           {/* Share block */}
           <section>
-            <h3 className="text-lg font-semibold mb-3 font-serif">Share</h3>
-            <div className="flex gap-2 flex-wrap">
-              <button aria-label="Share on X" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95" onClick={() => handleShare('x')}><FaXTwitter className="w-4 h-4 text-black dark:text-white" /></button>
-              <button aria-label="Share on LinkedIn" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95" onClick={() => handleShare('linkedin')}><FaLinkedin className="w-4 h-4 text-[#0077b5]" /></button>
-              <button aria-label="Share on WhatsApp" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95" onClick={() => handleShare('whatsapp')}><FaWhatsapp className="w-4 h-4 text-[#25d366]" /></button>
+            <h3 className="text-lg font-semibold mb-3 font-serif text-center">Share</h3>
+            <div className="flex gap-3 flex-wrap justify-center">
+              <button aria-label="Share on X" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                <FaXTwitter className="w-5 h-5 text-blue-600" />
+              </button>
+              <button aria-label="Share on LinkedIn" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                <FaLinkedin className="w-5 h-5 text-[#0077b5]" />
+              </button>
+              <button aria-label="Share on WhatsApp" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-green-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                <FaWhatsapp className="w-5 h-5 text-[#25d366]" />
+              </button>
+              <button aria-label="Share on Facebook" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-blue-50 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                <FaFacebook className="w-5 h-5 text-[#1877f3]" />
+              </button>
+              <button aria-label="Copy link" className="rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white hover:bg-gray-100 dark:hover:bg-gray-800 transition active:scale-95 flex items-center justify-center">
+                <FaRegCopy className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+              </button>
             </div>
           </section>
         </aside>
       </div>
       {/* Mobile Sticky Share Bar (safe area) */}
       <div className="fixed bottom-0 left-0 w-full z-40 md:hidden flex items-center justify-around bg-white/90 dark:bg-[#18181b]/90 border-t border-gray-200 dark:border-gray-800 shadow-lg py-2 backdrop-blur-md" role="region" aria-label="Share bar" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-        <BlogLikeBookmark blogId={blog.slug} />
+        {blog && blog.slug && <BlogLikeBookmark blogId={blog.slug} />}
         <button onClick={() => handleShare('x')} className="hover:text-blue-600 transition active:scale-95" aria-label="Share on X"><FaXTwitter className="w-6 h-6" /></button>
         <button onClick={() => handleShare('linkedin')} className="hover:text-blue-600 transition active:scale-95" aria-label="Share on LinkedIn"><FaLinkedin className="w-6 h-6" /></button>
         <button onClick={() => handleShare('whatsapp')} className="hover:text-green-600 transition active:scale-95" aria-label="Share on WhatsApp"><FaWhatsapp className="w-6 h-6" /></button>
@@ -412,13 +492,64 @@ const BlogDetail: React.FC = () => {
       {/* Mobile TOC Drawer */}
       <MobileTOCDrawer open={showTOC} onClose={() => setShowTOC(false)} headings={headings} />
       {/* Comments Section */}
-      <section className="max-w-2xl mx-auto my-16 px-2 sm:px-0">
+      <section className="max-w-2xl mx-auto my-16 px-2 sm:px-0" id="comments-section">
         <div className="w-full flex items-center gap-4 mb-8">
           <div className="flex-1 h-px bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200" />
           <span className="uppercase tracking-widest text-xs font-semibold text-gray-500 font-serif">Comments</span>
           <div className="flex-1 h-px bg-gradient-to-l from-gray-200 via-gray-400 to-gray-200" />
         </div>
-        <BlogComments blogId={blog.slug} />
+        {/* Comment Box */}
+        <form onSubmit={handleCommentSubmit} className="mb-6 flex flex-col gap-2">
+          <textarea
+            className="w-full p-3 border rounded-xl min-h-[60px] font-serif text-base bg-white dark:bg-[#18181b] focus:ring-2 focus:ring-blue-400 transition"
+            placeholder={isSignedIn ? 'Write a comment...' : 'Log in to comment'}
+            value={commentText}
+            onChange={e => setCommentText(e.target.value)}
+            disabled={commentSubmitting}
+            onFocus={() => { if (!isSignedIn) toast('Please log in to comment.'); }}
+          />
+          <div className="flex items-center gap-2">
+            <button type="submit" disabled={commentSubmitting} className="px-4 py-2 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition disabled:opacity-60">{commentSubmitting ? 'Posting...' : 'Post Comment'}</button>
+            {!isSignedIn && (
+              <button type="button" onClick={() => {/* trigger login modal here */}} className="text-blue-600 underline cursor-pointer">Log in or Sign up to comment</button>
+            )}
+          </div>
+        </form>
+        {/* Comments List */}
+        {commentsLoading ? (
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-3 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : comments.length === 0 ? (
+          <div className="text-muted-foreground text-sm">No comments yet. Be the first to comment!</div>
+        ) : (
+          <ul className="space-y-4">
+            {comments.map(comment => (
+              <li key={comment.id} className="flex items-start gap-3">
+                <img
+                  src={comment.user_id ? `https://images.clerk.dev/v1/user/${comment.user_id}/profile_image?width=48` : undefined}
+                  alt={comment.user_name || 'A'}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+                />
+                <div className="flex-1 min-w-0 bg-gray-50 dark:bg-[#23232b] rounded-xl p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold text-gray-900 dark:text-white">User</span>
+                    <span className="text-xs text-muted-foreground">{new Date(comment.created_at).toLocaleDateString()}</span>
+                  </div>
+                  <div className="text-base text-gray-700 dark:text-gray-200 break-words font-serif">{comment.content}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
       {/* After the comments section, before the final newsletter CTA: */}
       {/* In the Read Next section, fetch and display next 6 blogs, make horizontally scrollable, and animate each card */}

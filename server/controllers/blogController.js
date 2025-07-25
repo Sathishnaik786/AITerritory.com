@@ -32,7 +32,7 @@ async function getBlogBySlug(req, res) {
   const { slug } = req.params;
   const { data: blog, error } = await supabase
     .from('blogs')
-    .select('title, description, cover_image_url')
+    .select('*')
     .eq('slug', slug)
     .single();
 
