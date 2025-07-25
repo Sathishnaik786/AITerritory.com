@@ -19,6 +19,19 @@ const api = axios.create({
   },
 });
 
+// Debug: Log all blog detail responses in production
+if (isProduction) {
+  api.interceptors.response.use(
+    (response) => {
+      if (response.config.url && response.config.url.startsWith('/blogs/')) {
+        console.log('Blog detail API response:', response.data);
+      }
+      return response;
+    },
+    (error) => Promise.reject(error)
+  );
+}
+
 // Request interceptor for adding auth tokens if needed
 api.interceptors.request.use(
   (config) => {
