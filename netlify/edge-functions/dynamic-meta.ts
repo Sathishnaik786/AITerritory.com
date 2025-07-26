@@ -203,6 +203,73 @@ export default async (request: Request, context: Context) => {
     html = html.replace("</head>", `\n    ${faqScript}\n    </head>`);
   }
 
+  // AI-related keywords for SEO
+  const aiKeywords = [
+    "AI Tools",
+    "AI Automation",
+    "Best AI Software",
+    "AI Productivity Tools",
+    "AI News",
+    "AI Platforms",
+    "AI Prompt Libraries",
+    "Artificial Intelligence for Business"
+  ];
+  const aiKeywordsString = aiKeywords.join(", ");
+
+  // Inject meta keywords and description for /tools/* and /blog/*
+  if ((url.pathname.startsWith("/tools/") && url.pathname !== "/tools") || (url.pathname.startsWith("/blog/") && url.pathname !== "/blog")) {
+    // Only add if not already present
+    if (!/<meta[^>]+name=["']keywords["'][^>]*>/i.test(html)) {
+      html = html.replace(
+        "</head>",
+        `\n    <meta name=\"keywords\" content=\"${aiKeywordsString}\">\n    </head>`
+      );
+    }
+    // Add meta description if missing
+    if (!/<meta[^>]+name=["']description["'][^>]*>/i.test(html)) {
+      const desc = (metaDescription ? metaDescription + ' ' : '') + aiKeywordsString;
+      html = html.replace(
+        "</head>",
+        `\n    <meta name=\"description\" content=\"${desc}\">\n    </head>`
+      );
+    }
+    // Add article:tag and og:tag meta tags
+    aiKeywords.forEach(tag => {
+      if (!html.includes(`<meta property=\"article:tag\" content=\"${tag}\">`)) {
+        html = html.replace(
+          "</head>",
+          `\n    <meta property=\"article:tag\" content=\"${tag}\">\n    </head>`
+        );
+      }
+      if (!html.includes(`<meta property=\"og:tag\" content=\"${tag}\">`)) {
+        html = html.replace(
+          "</head>",
+          `\n    <meta property=\"og:tag\" content=\"${tag}\">\n    </head>`
+        );
+      }
+    });
+  }
+
+  // Add Article schema for /blog/*
+  if (url.pathname.startsWith("/blog/") && url.pathname !== "/blog") {
+    const articleSchema = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": metaTitle,
+      "description": metaDescription,
+      "image": metaImage,
+      "author": {
+        "@type": "Organization",
+        "name": "AI Territory"
+      },
+      "keywords": aiKeywordsString,
+      "mainEntityOfPage": url.href,
+      "datePublished": new Date().toISOString()
+    };
+    const articleScript = `<script type=\"application/ld+json\">${JSON.stringify(articleSchema)}</script>`;
+    html = html.replace("</head>", `\n    ${articleScript}\n    </head>`);
+  }
+
   // Ensure only one doctype at the very top
   if (!html.trimStart().toLowerCase().startsWith('<!doctype html>')) {
     html = '<!DOCTYPE html>\n' + html;
