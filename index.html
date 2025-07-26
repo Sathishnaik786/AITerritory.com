@@ -29,6 +29,36 @@
       gtag('js', new Date());
       gtag('config', 'G-1NJDY2B92X');
     </script>
+    
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "AI Territory",
+      "url": "https://aiterritory.org",
+      "logo": "https://aiterritory.org/logo.png",
+      "sameAs": [
+        "https://www.linkedin.com/company/aiterritory",
+        "https://twitter.com/aiterritory",
+        "https://www.facebook.com/aiterritory"
+      ]
+    }
+    </script>
+    
+    <!-- WebSite Schema with Sitelinks Searchbox -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://aiterritory.org/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://aiterritory.org/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
   </head>
 
   <body>
