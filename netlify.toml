@@ -4,6 +4,16 @@
 #   [plugins.inputs]
 #   exclude = "/*"
 
+# Environment configuration for proper NODE_ENV handling
+[context.production.environment]
+  NODE_ENV = "production"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "development"
+
+[context.branch-deploy.environment]
+  NODE_ENV = "development"
+
 [[edge_functions]]
 function = "dynamic-meta"
 path = "/blog*"

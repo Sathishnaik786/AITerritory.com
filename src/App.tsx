@@ -79,6 +79,7 @@ import NewsletterSubscribersAdmin from './admin/NewsletterSubscribersAdmin';
 import { NavbarNewsletterModal } from './components/NavbarNewsletterModal';
 import { useState } from 'react';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
+import { useAuthTracking } from './hooks/useAuthTracking';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -103,6 +104,11 @@ function ThemedAppContent() {
   const location = useLocation();
   const isLandingPro = location.pathname === '/';
   const [newsletterOpen, setNewsletterOpen] = useState(false);
+  const [showNewsletterModal, setShowNewsletterModal] = useState(false);
+  
+  // Initialize auth tracking
+  useAuthTracking();
+
   return (
     <div className={`min-h-screen antialiased w-full flex flex-col`}>
         <MetaTags />
@@ -266,7 +272,9 @@ function App() {
               <Suspense fallback={<div>Loading...</div>}>
                 <ThemedAppContent />
               </Suspense>
-              <ReactQueryDevtools initialIsOpen={false} />
+              {process.env.NODE_ENV === 'development' && (
+                <ReactQueryDevtools initialIsOpen={false} />
+              )}
           </TooltipProvider>
         </BrowserRouter>
         </HelmetProvider>

@@ -18,6 +18,7 @@ import { supabase } from '@/services/supabaseClient';
 import { Tool } from '../types/tool';
 import { Review } from '../types/review';
 import { FaXTwitter, FaLinkedin, FaWhatsapp, FaFacebook } from 'react-icons/fa6';
+import { trackToolLike, trackToolBookmark, trackShare, trackCommentPosted } from '@/lib/analytics';
 
 const ToolDetailsPage: React.FC = () => {
   // All hooks at the top!
@@ -266,6 +267,14 @@ const ToolDetailsPage: React.FC = () => {
       await supabase.from('likes').insert({ tool_id: toolId, user_id: user.id });
       setLikesCount(c => c + 1);
       setUserHasLiked(true);
+      
+      // Track the like event
+      trackToolLike(
+        toolId,
+        tool?.name,
+        tool?.category,
+        user.id
+      );
     }
     setLikeLoading(false);
   };
@@ -285,6 +294,14 @@ const ToolDetailsPage: React.FC = () => {
       await supabase.from('user_bookmarks').insert({ tool_id: toolId, user_id: user.id });
       setBookmarkCount(c => c + 1);
       setUserHasBookmarked(true);
+      
+      // Track the bookmark event
+      trackToolBookmark(
+        toolId,
+        tool?.name,
+        tool?.category,
+        user.id
+      );
     }
     setBookmarkLoading(false);
   };
@@ -308,6 +325,16 @@ const ToolDetailsPage: React.FC = () => {
       created_at: new Date().toISOString(),
     });
     console.log('Supabase comment insert:', { data, error });
+    
+    // Track the comment posted event
+    trackCommentPosted(
+      'tool',
+      toolId,
+      tool?.name,
+      commentText.length,
+      user.id
+    );
+    
     setCommentText('');
     setCommentSubmitting(false);
   };
@@ -351,31 +378,43 @@ const ToolDetailsPage: React.FC = () => {
   const shareImage = tool?.image_url || '';
 
   function handleShare(platform: string) {
-    const encodedUrl = encodeURIComponent(shareUrl);
-    const encodedTitle = encodeURIComponent(shareTitle);
-    const encodedDesc = encodeURIComponent(shareDescription);
-    let url = '';
+    const url = encodeURIComponent(shareUrl);
+    const title = encodeURIComponent(shareTitle);
+    const description = encodeURIComponent(tool?.description || 'Check out this amazing AI tool!');
+    
+    // Track the share event
+    trackShare(
+      platform as 'twitter' | 'facebook' | 'linkedin' | 'whatsapp' | 'copy',
+      'tool',
+      toolId,
+      tool?.name,
+      user?.id
+    );
+    
+    let shareLink = '';
     switch (platform) {
       case 'x':
-        url = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
-        break;
-      case 'linkedin':
-        url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
-        break;
-      case 'whatsapp':
-        url = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
+      case 'twitter':
+        shareLink = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
         break;
       case 'facebook':
-        url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+        shareLink = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        break;
+      case 'linkedin':
+        shareLink = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+        break;
+      case 'whatsapp':
+        shareLink = `https://wa.me/?text=${title}%20${url}`;
         break;
       default:
-        url = shareUrl;
+        // Copy to clipboard
+        navigator.clipboard.writeText(shareUrl);
+        toast('Link copied to clipboard!');
+        return;
     }
-    // Mobile: use native share if available
-    if (typeof window !== 'undefined' && window.navigator && (window.navigator as any).share && window.innerWidth < 768) {
-      (window.navigator as any).share({ title: shareTitle, text: shareDescription, url: shareUrl });
-    } else {
-      window.open(url, '_blank', 'noopener,noreferrer');
+    
+    if (shareLink) {
+      window.open(shareLink, '_blank', 'width=600,height=400');
     }
   }
 

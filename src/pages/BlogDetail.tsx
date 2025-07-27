@@ -16,10 +16,11 @@ import { FaXTwitter, FaLinkedin, FaWhatsapp, FaFacebook, FaRegCopy } from 'react
 import NewsletterCTA from '../components/NewsletterCTA';
 import { toast } from '@/components/ui/sonner';
 import { logBlogEvent } from '../services/blogAnalyticsService';
-import { BookOpen, Book, ArrowUp, ArrowLeft } from 'lucide-react';
+import { BookOpen, Book, ArrowUp, ArrowLeft, ExternalLink, Info, AlertTriangle, Lightbulb } from 'lucide-react';
 import type { CodeProps } from 'react-markdown/lib/ast-to-react';
 import { supabase } from '../services/supabaseClient';
 import remarkEmoji from 'remark-emoji';
+import { trackShare } from '@/lib/analytics';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -234,6 +235,16 @@ const BlogDetail: React.FC = () => {
     const shareTitle = blog?.title || 'Check out this blog!';
     const encodedUrl = encodeURIComponent(shareUrl);
     const encodedTitle = encodeURIComponent(shareTitle);
+    
+    // Track the share event
+    trackShare(
+      platform as 'twitter' | 'facebook' | 'linkedin' | 'whatsapp' | 'copy',
+      'blog',
+      blog?.slug || '',
+      blog?.title,
+      isSignedIn ? user?.id : undefined
+    );
+    
     let url = '';
     switch (platform) {
       case 'x':
@@ -403,40 +414,213 @@ const BlogDetail: React.FC = () => {
         <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/70 to-transparent pointer-events-none rounded-b-xl" />
           </div>
       {blog.description && (
-        <div className="max-w-3xl mx-auto px-2 sm:px-4 mb-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 mb-12">
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkEmoji as any]}
             rehypePlugins={[rehypeSanitize]}
             components={{
-              h1: ({node, ...props}) => <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold font-serif mt-8 mb-6 leading-tight border-b border-gray-200 pb-2" {...props} />,
-              h2: ({node, ...props}) => <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif mt-10 mb-5 leading-tight border-b border-gray-100 pb-1" {...props} />,
-              h3: ({node, ...props}) => <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold font-serif mt-8 mb-3 leading-tight" {...props} />,
-              ul: ({node, ...props}) => <ul className="list-disc pl-7 my-5 space-y-2 marker:text-blue-500 text-base" {...props} />,
-              ol: ({node, ...props}) => <ol className="list-decimal pl-7 my-5 space-y-2 text-base" {...props} />,
-              li: ({node, ...props}) => <li className="mb-1 pl-1" {...props} />,
+              h1: ({node, ...props}) => {
+                const { onDrag, onDragStart, onDragEnd, ...motionProps } = props as any;
+                return (
+                  <motion.h1 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    className="text-3xl sm:text-4xl md:text-5xl font-black font-serif mt-8 mb-6 leading-tight text-gray-900 dark:text-white border-b-2 border-gray-200 dark:border-gray-700 pb-4" 
+                    {...motionProps} 
+                  />
+                );
+              },
+              h2: ({node, ...props}) => {
+                const { onDrag, onDragStart, onDragEnd, ...motionProps } = props as any;
+                return (
+                  <motion.h2 
+                    initial={{ opacity: 0, y: 25 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold font-serif mt-12 mb-6 leading-tight text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-2" 
+                    {...motionProps} 
+                  />
+                );
+              },
+              h3: ({node, ...props}) => {
+                const { onDrag, onDragStart, onDragEnd, ...motionProps } = props as any;
+                return (
+                  <motion.h3 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="text-xl sm:text-2xl md:text-3xl font-semibold font-serif mt-10 mb-4 leading-tight text-gray-800 dark:text-gray-200 uppercase tracking-wider" 
+                    style={{ fontVariant: 'small-caps' }}
+                    {...motionProps} 
+                  />
+                );
+              },
+              ul: ({node, ...props}) => {
+                const { onDrag, onDragStart, onDragEnd, ...motionProps } = props as any;
+                return (
+                  <motion.ul 
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="list-none pl-0 my-8 space-y-3 text-lg leading-relaxed" 
+                    {...motionProps} 
+                  />
+                );
+              },
+              ol: ({node, ...props}) => {
+                const { onDrag, onDragStart, onDragEnd, ...motionProps } = props as any;
+                return (
+                  <motion.ol 
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="list-decimal pl-8 my-8 space-y-3 text-lg leading-relaxed marker:font-bold marker:text-blue-600 dark:marker:text-blue-400" 
+                    {...motionProps} 
+                  />
+                );
+              },
+              li: ({node, ...props}) => (
+                <li className="mb-3 pl-4 relative before:content-['●'] before:absolute before:-left-1 before:text-blue-500 before:font-bold before:text-lg before:top-0" {...props} />
+              ),
               p: ({node, ...props}) => {
+                const { onDrag, onDragStart, onDragEnd, ...motionProps } = props as any;
                 // First paragraph as lead
                 if (node?.position?.start.offset === 0) {
-                  return <p className="text-xl sm:text-2xl font-serif text-gray-600 dark:text-gray-300 my-6 leading-8 max-w-2xl font-light">{props.children}</p>;
+                  return (
+                    <motion.p 
+                      initial={{ opacity: 0, y: 25 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-50px" }}
+                      transition={{ duration: 0.7, ease: "easeOut" }}
+                      className="text-xl sm:text-2xl font-serif text-gray-600 dark:text-gray-300 my-8 leading-9 max-w-3xl mx-auto font-semibold" 
+                      {...motionProps} 
+                    />
+                  );
                 }
-                return <p className="my-5 leading-8 text-base max-w-2xl text-gray-800 dark:text-gray-100 font-serif">{props.children}</p>;
+                return (
+                  <motion.p 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="my-6 leading-8 text-lg sm:text-xl max-w-3xl mx-auto text-gray-800 dark:text-gray-100 font-serif" 
+                    {...motionProps} 
+                  />
+                );
               },
-              hr: () => <div className="my-10 border-t border-gray-200" />,
+              hr: () => (
+                <motion.div 
+                  initial={{ opacity: 0, scaleX: 0 }}
+                  whileInView={{ opacity: 1, scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  className="my-16 border-t-2 border-gray-200 dark:border-gray-700 max-w-2xl mx-auto" 
+                />
+              ),
               a: ({href, children, ...props}) => {
                 const isInternal = href && (href.startsWith('/') || href.includes(window.location.hostname));
-                const baseClass = "font-semibold underline-offset-2 transition-colors duration-150";
-                const internalClass = "text-blue-700 underline hover:text-blue-900 border-b-2 border-blue-200 hover:border-blue-500";
-                const externalClass = "text-pink-600 hover:text-pink-800 underline";
+                const baseClass = "font-semibold underline-offset-4 transition-all duration-300 relative";
+                const internalClass = "text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-blue-600 dark:after:bg-blue-400 after:transition-all after:duration-300 hover:after:w-full";
+                const externalClass = "text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-300 inline-flex items-center gap-1.5";
+                
                 return (
                   <a
                     href={href}
-                    className={baseClass + ' ' + (isInternal ? internalClass : externalClass)}
+                    className={`${baseClass} ${isInternal ? internalClass : externalClass}`}
                     target={isInternal ? undefined : "_blank"}
                     rel={isInternal ? undefined : "noopener noreferrer"}
                   >
                     {children}
+                    {!isInternal && <ExternalLink className="w-4 h-4 inline" />}
                   </a>
                 );
+              },
+              blockquote: ({node, children, ...props}) => {
+                const { onDrag, onDragStart, onDragEnd, ...motionProps } = props as any;
+                return (
+                  <motion.blockquote 
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    className="border-l-4 border-blue-500 bg-gray-50 dark:bg-gray-800/50 pl-8 py-6 italic text-gray-700 dark:text-gray-200 my-10 rounded-r-lg shadow-sm font-serif text-lg leading-relaxed max-w-3xl mx-auto" 
+                    {...motionProps}
+                  >
+                    {children}
+                  </motion.blockquote>
+                );
+              },
+              code: function CodeComponent({ inline = false, className, children, ...rest }: CodeProps) {
+                return inline ? (
+                  <code className="bg-gray-100 dark:bg-gray-800 rounded-md px-2.5 py-1 text-sm font-mono text-pink-600 dark:text-pink-400 border border-gray-200 dark:border-gray-700" {...rest}>
+                    {children}
+                  </code>
+                ) : (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 25 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    className="my-8 max-w-4xl mx-auto"
+                  >
+                    <pre className="bg-gray-900 text-white rounded-lg p-6 overflow-x-auto text-base leading-relaxed font-mono shadow-lg border border-gray-700" {...rest}>
+                      <code className={className}>{children}</code>
+                    </pre>
+                  </motion.div>
+                );
+              },
+              // Custom callout components
+              div: ({node, className, children, ...props}) => {
+                if (className?.includes('callout')) {
+                  const type = className.includes('info') ? 'info' : 
+                              className.includes('warning') ? 'warning' : 
+                              className.includes('tip') ? 'tip' : 'info';
+                  
+                  const icons = {
+                    info: <Info className="w-6 h-6" />,
+                    warning: <AlertTriangle className="w-6 h-6" />,
+                    tip: <Lightbulb className="w-6 h-6" />
+                  };
+                  
+                  const styles = {
+                    info: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200',
+                    warning: 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-200',
+                    tip: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200'
+                  };
+                  
+                  return (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 25 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-30px" }}
+                      transition={{ duration: 0.7, ease: "easeOut" }}
+                      className={`border-l-4 pl-6 py-6 my-8 rounded-r-lg ${styles[type]} flex items-start gap-4 max-w-3xl mx-auto`}
+                    >
+                      <div className="flex-shrink-0 mt-1">
+                        {icons[type]}
+                      </div>
+                      <div className="flex-1 text-lg leading-relaxed">
+                        {children}
+                      </div>
+                    </motion.div>
+                  );
+                }
+                return <div className={className} {...props}>{children}</div>;
+              },
+              // Emoji enhancement
+              span: ({node, children, ...props}) => {
+                // Check if this span contains emoji
+                const text = children?.toString() || '';
+                if (text.match(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u)) {
+                  return <span className="text-xl align-text-bottom" {...props}>{children}</span>;
+                }
+                return <span {...props}>{children}</span>;
               },
             }}
           >

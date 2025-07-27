@@ -12,6 +12,7 @@ import { LikesService } from '../services/likesService';
 import { motion } from 'framer-motion';
 import ShareModal from './ShareModal';
 import { supabase } from '../services/supabaseClient';
+import { trackToolLike, trackToolBookmark } from '../lib/analytics';
 
 // Keep the correct props interface
 export interface ToolCardStats {
@@ -137,6 +138,14 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
         await LikesService.removeLike(tool.id, user.id);
       } else {
         await LikesService.addLike(tool.id, user.id);
+        
+        // Track the like event
+        trackToolLike(
+          tool.id,
+          tool.name,
+          tool.category,
+          user.id
+        );
       }
     } catch (error) {
       setHasLiked(hasLiked);
@@ -158,6 +167,14 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
         await bookmarkService.removeBookmark(tool.id, user.id);
       } else {
         await bookmarkService.addBookmark(tool.id, user.id);
+        
+        // Track the bookmark event
+        trackToolBookmark(
+          tool.id,
+          tool.name,
+          tool.category,
+          user.id
+        );
       }
     } catch (error) {
       setBookmarked(bookmarked);

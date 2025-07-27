@@ -8,6 +8,7 @@ import { FaTwitter } from 'react-icons/fa';
 import ShareDialog from './ShareDialog';
 import { FaLinkedin, FaFacebook, FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 import { SignInButton } from '@clerk/clerk-react';
+import { trackToolLike, trackToolBookmark, trackShare, trackCommentPosted } from '@/lib/analytics';
 
 interface Comment {
   id: string;
@@ -60,11 +61,29 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
 
   const handleLike = () => {
     if (!userSession) return toast('Please log in to like this tool.');
+    
+    // Track the like event
+    trackToolLike(
+      toolTitle, // Using toolTitle as toolId for now, should be actual toolId
+      toolTitle,
+      undefined, // toolCategory
+      userSession?.id
+    );
+    
     onLikeToggle();
   };
 
   const handleBookmark = () => {
     if (!userSession) return toast('Please log in to bookmark this tool.');
+    
+    // Track the bookmark event
+    trackToolBookmark(
+      toolTitle, // Using toolTitle as toolId for now, should be actual toolId
+      toolTitle,
+      undefined, // toolCategory
+      userSession?.id
+    );
+    
     onBookmarkToggle();
   };
 
@@ -77,12 +96,31 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
     if (!newComment.trim()) return;
     
     setIsSubmitting(true);
+    
+    // Track the comment posted event
+    trackCommentPosted(
+      'tool',
+      toolTitle, // Using toolTitle as toolId for now, should be actual toolId
+      toolTitle,
+      newComment.length,
+      userSession?.id
+    );
+    
     await onCommentSubmit(newComment); // Pass the text to the parent
     setNewComment('');
     setIsSubmitting(false);
   };
 
   const handleShare = (platform: 'twitter' | 'whatsapp' | 'copy') => {
+    // Track the share event
+    trackShare(
+      platform,
+      'tool',
+      toolTitle, // Using toolTitle as toolId for now, should be actual toolId
+      toolTitle,
+      userSession?.id
+    );
+    
     onShare(platform);
   };
 

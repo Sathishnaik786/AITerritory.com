@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { useUser, SignInButton } from '@clerk/clerk-react';
 import { Heart, Bookmark } from 'lucide-react';
+import { trackBlogLike, trackBlogBookmark } from '@/lib/analytics';
 
 interface BlogLikeBookmarkProps {
   blogId: string;
@@ -74,6 +75,14 @@ const BlogLikeBookmark: React.FC<BlogLikeBookmarkProps> = ({ blogId }) => {
         .from('blog_likes')
         .insert([{ blog_id: blogId, user_id: user.id }]);
       if (error) setError('Failed to like');
+      
+      // Track the like event
+      trackBlogLike(
+        blogId,
+        undefined, // blogTitle - would need to be passed as prop
+        undefined, // blogCategory - would need to be passed as prop
+        user.id
+      );
     }
     fetchStatus();
   }
@@ -95,6 +104,14 @@ const BlogLikeBookmark: React.FC<BlogLikeBookmarkProps> = ({ blogId }) => {
         .from('blog_bookmarks')
         .insert([{ blog_id: blogId, user_id: user.id }]);
       if (error) setError('Failed to bookmark');
+      
+      // Track the bookmark event
+      trackBlogBookmark(
+        blogId,
+        undefined, // blogTitle - would need to be passed as prop
+        undefined, // blogCategory - would need to be passed as prop
+        user.id
+      );
     }
     fetchStatus();
   }

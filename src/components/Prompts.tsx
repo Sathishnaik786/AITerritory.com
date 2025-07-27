@@ -10,6 +10,7 @@ import { useToast } from './ui/use-toast';
 import { useUser } from '@clerk/clerk-react';
 import * as promptActions from '../services/promptActionsService';
 import { motion } from 'framer-motion';
+import { trackPromptLike, trackPromptBookmark, trackCommentPosted } from '@/lib/analytics';
 
 const promptCategories = [
   'Ethereum Developer',
@@ -177,6 +178,14 @@ export default function Prompts() {
         await promptActions.unlikePrompt(openPrompt.id, user.id);
       } else {
         await promptActions.likePrompt(openPrompt.id, user.id);
+        
+        // Track the like event
+        trackPromptLike(
+          openPrompt.id,
+          openPrompt.title,
+          openPrompt.category,
+          user.id
+        );
       }
       const status = await promptActions.getPromptStatus(openPrompt.id, user.id);
       setChatStatus(status);
@@ -195,6 +204,14 @@ export default function Prompts() {
         await promptActions.unbookmarkPrompt(openPrompt.id, user.id);
       } else {
         await promptActions.bookmarkPrompt(openPrompt.id, user.id);
+        
+        // Track the bookmark event
+        trackPromptBookmark(
+          openPrompt.id,
+          openPrompt.title,
+          openPrompt.category,
+          user.id
+        );
       }
       const status = await promptActions.getPromptStatus(openPrompt.id, user.id);
       setChatStatus(status);
@@ -209,6 +226,16 @@ export default function Prompts() {
     setChatLoading(true);
     try {
       await promptActions.addComment(openPrompt.id, user.id, commentInput.trim());
+      
+      // Track the comment posted event
+      trackCommentPosted(
+        'prompt',
+        openPrompt.id,
+        openPrompt.title,
+        commentInput.trim().length,
+        user.id
+      );
+      
       setCommentInput('');
       const comments = await promptActions.getComments(openPrompt.id);
       setChatComments(comments);
