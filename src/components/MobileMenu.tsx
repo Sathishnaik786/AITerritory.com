@@ -1,24 +1,31 @@
+import React, { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { navLinks } from "../data/navLinks";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import ThemeToggle from "./ThemeToggle";
 import { NavbarNewsletterModal } from "./NavbarNewsletterModal";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
 
 interface MobileMenuProps {
   newsletterOpen: boolean;
   setNewsletterOpen: (open: boolean) => void;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export default function MobileMenu({ newsletterOpen, setNewsletterOpen }: MobileMenuProps) {
-  const [open, setOpen] = useState(false);
+export default function MobileMenu({ newsletterOpen, setNewsletterOpen, isOpen, onOpenChange }: MobileMenuProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // Use external control if provided, otherwise use internal state
+  const open = isOpen !== undefined ? isOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -135,10 +142,34 @@ export default function MobileMenu({ newsletterOpen, setNewsletterOpen }: Mobile
             )
           )}
         </motion.nav>
+        
+        {/* Authentication Buttons */}
+        <div className="px-6 py-4 border-t border-border/40">
+          <SignedOut>
+            <div className="flex gap-3">
+              <SignUpButton mode="modal">
+                <Button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-200">
+                  Sign Up
+                </Button>
+              </SignUpButton>
+              <SignInButton mode="modal">
+                <Button variant="outline" className="flex-1 font-semibold shadow-sm hover:shadow-md transition-all duration-200">
+                  Login
+                </Button>
+              </SignInButton>
+            </div>
+          </SignedOut>
+          <SignedIn>
+            <div className="flex items-center justify-center">
+              <UserButton afterSignOutUrl="/" />
+            </div>
+          </SignedIn>
+        </div>
+        
         {/* Bottom CTA or contact */}
-        <div className="mt-8 px-6 flex items-center gap-2">
+        <div className="mt-4 px-6 flex items-center gap-2">
           <div className="flex-1">
-            <div className="text-xs text-muted-foreground mb-2">Contact: <a href="mailto:info@aiterritory.org" className="underline">info@aiterritory.org</a></div>
+            <div className="text-xs text-muted-foreground mb-2">Contact: <a href="mailto:hello@aiterritory.org" className="underline">hello@aiterritory.org</a></div>
             <Button
               className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 text-white font-semibold shadow-lg hover:from-blue-700 hover:to-pink-600 hover:via-purple-700 transition-colors border-0"
               size="lg"

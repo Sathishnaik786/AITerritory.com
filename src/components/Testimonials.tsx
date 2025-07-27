@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
 import { testimonialsService, Testimonial } from '../services/testimonialsService';
 import BackgroundAnimation from './ui/BackgroundAnimation';
+import { sanitizeText } from '@/lib/sanitizeHtml';
 
 // Keyframes for left and right auto-scroll
 const styles = `
@@ -81,7 +82,7 @@ const Testimonials: React.FC = () => {
                 {/* Rating */}
                 {renderStars(t.rating)}
                 <p className="text-sm sm:text-base mb-4 sm:mb-6 text-gray-700 dark:text-[#bdbdf7]">
-                  {t.content}
+                  {sanitizeText(t.content)}
                 </p>
                 {/* User Info (no flex) */}
                 <div className="grid grid-cols-[auto_1fr] gap-3 mt-auto items-center">
@@ -131,7 +132,7 @@ const Testimonials: React.FC = () => {
                 {/* Rating */}
                 {renderStars(t.rating)}
                 <p className="text-sm sm:text-base mb-4 sm:mb-6 text-gray-700 dark:text-[#bdbdf7]">
-                  {t.content}
+                  {sanitizeText(t.content)}
                 </p>
                 {/* User Info (no flex) */}
                 <div className="grid grid-cols-[auto_1fr] gap-3 mt-auto items-center">

@@ -7,6 +7,7 @@ import rehypeHighlight from 'rehype-highlight';
 import { Button } from './ui/button';
 import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
+import { sanitizeMarkdownHtml } from '@/lib/sanitizeHtml';
 
 const CATEGORIES = [
   'AI Tools',
@@ -181,7 +182,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, i
             },
           }}
         >
-          {form.content || 'Start writing your blog content in Markdown...'}
+          {sanitizeMarkdownHtml(form.content || 'Start writing your blog content in Markdown...')}
         </ReactMarkdown>
       </div>
     </motion.div>

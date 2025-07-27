@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { sanitizeMarkdownHtml } from '@/lib/sanitizeHtml';
 
 export interface ToolDescriptionSectionProps {
   longDescription: string;
@@ -32,7 +33,7 @@ const ToolDescriptionSection: React.FC<ToolDescriptionSectionProps> = ({ longDes
             a: ({node, ...props}) => <a className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer" {...props} />,
           }}
         >
-          {longDescription}
+          {sanitizeMarkdownHtml(longDescription)}
         </ReactMarkdown>
       </div>
     </section>

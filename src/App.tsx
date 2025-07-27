@@ -28,8 +28,9 @@ import VideoToolsPage from "./pages/VideoToolsPage";
 import ArtGeneratorsPage from "./pages/ArtGeneratorsPage";
 import AudioGeneratorsPage from "./pages/AudioGeneratorsPage";
 import NewsletterPage from "./pages/NewsletterPage";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { queryClient } from './lib/queryClient';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from './components/ui/tooltip';
 import { ThemeProvider } from './components/theme-provider';
@@ -76,19 +77,13 @@ import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
 import BlogsAdmin from './admin/BlogsAdmin';
 import NewsletterSubscribersAdmin from './admin/NewsletterSubscribersAdmin';
+import CacheManagerAdmin from './admin/CacheManagerAdmin';
 import { NavbarNewsletterModal } from './components/NavbarNewsletterModal';
 import { useState } from 'react';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 import { useAuthTracking } from './hooks/useAuthTracking';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
-    },
-  },
-});
+// QueryClient is now imported from lib/queryClient.ts with persistence
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -221,6 +216,7 @@ function ThemedAppContent() {
                       <Route path="feedback" element={<FeedbackAdmin />} />
                       <Route path="blogs" element={<BlogsAdmin />} />
                       <Route path="newsletter-subscribers" element={<NewsletterSubscribersAdmin />} />
+                      <Route path="cache" element={<CacheManagerAdmin />} />
                     </Routes>
                   </AdminLayout>
                 </ProtectedRoute>

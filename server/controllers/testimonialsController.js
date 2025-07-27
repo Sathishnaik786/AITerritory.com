@@ -1,4 +1,5 @@
 const supabase = require('../config/database');
+const { sanitizeText, sanitizeHtmlContent } = require('../lib/sanitizeHtml');
 
 // POST /api/testimonials - User submits testimonial
 exports.submitTestimonial = async (req, res) => {
@@ -16,22 +17,23 @@ exports.submitTestimonial = async (req, res) => {
       });
     }
     
-    const testimonialData = {
+    // Sanitize user input
+    const sanitizedData = {
       user_id: user_id || null,
-      user_name,
-      user_role: user_role || null,
+      user_name: sanitizeText(user_name),
+      user_role: user_role ? sanitizeText(user_role) : null,
       user_avatar: user_avatar || null,
-      content,
+      content: sanitizeText(content),
       rating: rating || 5,
-      company_name: company_name || null,
+      company_name: company_name ? sanitizeText(company_name) : null,
       approved: false,
     };
     
-    console.log('Inserting testimonial data:', testimonialData);
+    console.log('Inserting testimonial data:', sanitizedData);
     
     const { data, error } = await supabase
       .from('testimonials')
-      .insert([testimonialData])
+      .insert([sanitizedData])
       .select();
 
     if (error) {

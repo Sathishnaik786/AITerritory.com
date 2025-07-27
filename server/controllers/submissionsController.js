@@ -1,5 +1,6 @@
 const supabase = require('../config/database');
 const { sendEmail } = require('../lib/resend');
+const { sanitizeText } = require('../lib/sanitizeHtml');
 
 // Generic function to get submissions
 const getSubmissions = (tableName) => async (req, res) => {
@@ -37,9 +38,9 @@ const submitContactUs = async (req, res) => {
 
     // Sanitize inputs
     const sanitizedData = {
-      name: String(name).trim().slice(0, 255),
-      email: String(email).trim().slice(0, 255),
-      message: String(message).trim().slice(0, 2000)
+      name: sanitizeText(String(name).trim().slice(0, 255)),
+      email: sanitizeText(String(email).trim().slice(0, 255)),
+      message: sanitizeText(String(message).trim().slice(0, 2000))
     };
 
     const { data, error } = await supabase
@@ -83,10 +84,10 @@ const submitAdvertiseRequest = async (req, res) => {
 
     // Sanitize inputs
     const sanitizedData = {
-      name: String(name).trim().slice(0, 255),
-      email: String(email).trim().slice(0, 255),
-      company: company ? String(company).trim().slice(0, 255) : null,
-      message: String(message).trim().slice(0, 2000)
+      name: sanitizeText(String(name).trim().slice(0, 255)),
+      email: sanitizeText(String(email).trim().slice(0, 255)),
+      company: company ? sanitizeText(String(company).trim().slice(0, 255)) : null,
+      message: sanitizeText(String(message).trim().slice(0, 2000))
     };
 
     const { data, error } = await supabase
@@ -137,10 +138,10 @@ const submitTool = async (req, res) => {
     }
     // Sanitize inputs
     const sanitizedData = {
-      email: String(email).trim().slice(0, 255),
-      tool_name: String(tool_name).trim().slice(0, 255),
-      tool_url: String(tool_url).trim().slice(0, 500),
-      youtube_url: youtube_url ? String(youtube_url).trim().slice(0, 500) : null,
+      email: sanitizeText(String(email).trim().slice(0, 255)),
+      tool_name: sanitizeText(String(tool_name).trim().slice(0, 255)),
+      tool_url: sanitizeText(String(tool_url).trim().slice(0, 500)),
+      youtube_url: youtube_url ? sanitizeText(String(youtube_url).trim().slice(0, 500)) : null,
     };
     const { data, error } = await supabase
       .from('tool_submissions')
@@ -181,10 +182,10 @@ const submitFeatureRequest = async (req, res) => {
 
     // Sanitize inputs
     const sanitizedData = {
-      name: String(name).trim().slice(0, 255),
-      email: String(email).trim().slice(0, 255),
-      feature: String(feature).trim().slice(0, 255),
-      details: details ? String(details).trim().slice(0, 2000) : null
+      name: sanitizeText(String(name).trim().slice(0, 255)),
+      email: sanitizeText(String(email).trim().slice(0, 255)),
+      feature: sanitizeText(String(feature).trim().slice(0, 255)),
+      details: details ? sanitizeText(String(details).trim().slice(0, 2000)) : null
     };
 
     const { data, error } = await supabase

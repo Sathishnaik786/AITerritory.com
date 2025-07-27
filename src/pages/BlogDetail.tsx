@@ -21,6 +21,7 @@ import type { CodeProps } from 'react-markdown/lib/ast-to-react';
 import { supabase } from '../services/supabaseClient';
 import remarkEmoji from 'remark-emoji';
 import { trackShare } from '@/lib/analytics';
+import { sanitizeMarkdownHtml } from '@/lib/sanitizeHtml';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();

@@ -3,33 +3,50 @@ const router = express.Router();
 const toolController = require('../controllers/toolController');
 const reviewsController = require('../controllers/reviewsController');
 
-// GET /api/tools - Get all tools with optional filters
-router.get('/', toolController.getAllTools);
+/*
+ * ========================================
+ * REDIS CACHING FOR TOOLS API
+ * ========================================
+ * 
+ * Cache duration: 5 minutes (300 seconds)
+ * Cache keys: tools:GET:/api/tools with query parameters
+ * 
+ * TO DISABLE CACHING:
+ * Set ENABLE_REDIS=false in your environment variables
+ * 
+ * ========================================
+ */
 
-// GET /api/tools/featured - Get featured tools
-router.get('/featured', toolController.getFeaturedTools);
+// Import cache middleware
+const { cacheMiddlewares } = require('../middleware/cacheMiddleware');
 
-// GET /api/tools/trending - Get trending tools
-router.get('/trending', toolController.getTrendingTools);
+// GET /api/tools - Get all tools with optional filters (CACHED: 5 minutes)
+router.get('/', cacheMiddlewares.tools, toolController.getAllTools);
 
-// GET /api/tools/all - Get all AI tools (active)
-router.get('/all', toolController.getAllAITools);
+// GET /api/tools/featured - Get featured tools (CACHED: 5 minutes)
+router.get('/featured', cacheMiddlewares.tools, toolController.getFeaturedTools);
 
-// Individual category endpoints (MUST come before /:id route)
-router.get('/productivity', toolController.getProductivityTools);
-router.get('/image-generators', toolController.getImageGenerators);
-router.get('/text-generators', toolController.getTextGenerators);
-router.get('/video-tools', toolController.getVideoTools);
-router.get('/ai-art-generators', toolController.getBestAIArtGenerators);
-router.get('/ai-image-generators', toolController.getBestAIImageGenerators);
-router.get('/ai-chatbots', toolController.getBestAIChatbots);
-router.get('/ai-text-generators', toolController.getBestAITextGenerators);
+// GET /api/tools/trending - Get trending tools (CACHED: 5 minutes)
+router.get('/trending', cacheMiddlewares.tools, toolController.getTrendingTools);
+
+// GET /api/tools/all - Get all AI tools (active) (CACHED: 5 minutes)
+router.get('/all', cacheMiddlewares.tools, toolController.getAllAITools);
+
+// Individual category endpoints (MUST come before /:id route) (CACHED: 5 minutes)
+router.get('/productivity', cacheMiddlewares.tools, toolController.getProductivityTools);
+router.get('/image-generators', cacheMiddlewares.tools, toolController.getImageGenerators);
+router.get('/text-generators', cacheMiddlewares.tools, toolController.getTextGenerators);
+router.get('/video-tools', cacheMiddlewares.tools, toolController.getVideoTools);
+router.get('/ai-art-generators', cacheMiddlewares.tools, toolController.getBestAIArtGenerators);
+router.get('/ai-image-generators', cacheMiddlewares.tools, toolController.getBestAIImageGenerators);
+router.get('/ai-chatbots', cacheMiddlewares.tools, toolController.getBestAIChatbots);
+router.get('/ai-text-generators', cacheMiddlewares.tools, toolController.getBestAITextGenerators);
 
 // Test direct Supabase query (bypass model logic)
 router.get('/test-direct', toolController.testSupabaseDirect);
 
-// GET /api/tools/category/:category - Get tools by category name or slug
-router.get('/category/:category', toolController.getToolsByCategoryName);
+// GET /api/tools/category/:category - Get tools by category name or slug (CACHED: 5 minutes)
+router.get('/category/:category', cacheMiddlewares.tools, toolController.getToolsByCategoryName);
 
 // GET /api/tools/:id - Get single tool by ID (MUST come after specific routes)
 router.get('/:id', toolController.getToolById);

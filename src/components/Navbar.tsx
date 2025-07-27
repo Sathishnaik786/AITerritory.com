@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { useUser, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
@@ -26,6 +27,45 @@ export function Navbar({ newsletterOpen, setNewsletterOpen }: NavbarProps) {
   const { resolvedTheme } = useTheme();
   const { user } = useUser();
   const location = useLocation();
+  const [navigationMenuOpen, setNavigationMenuOpen] = useState(false);
+  const navigationMenuRef = useRef<HTMLDivElement>(null);
+
+  // Function to close all navigation dropdowns
+  const closeAllDropdowns = () => {
+    // Close mobile menu
+    setNavigationMenuOpen(false);
+    
+    // Close desktop navigation dropdowns by removing focus from all navigation elements
+    const navigationElements = navigationMenuRef.current?.querySelectorAll('[data-state="open"]');
+    navigationElements?.forEach((element) => {
+      if (element instanceof HTMLElement) {
+        element.blur();
+      }
+    });
+    
+    // Force close by clicking outside
+    setTimeout(() => {
+      document.body.click();
+    }, 0);
+    
+    // Additional method: dispatch escape key to close dropdowns
+    setTimeout(() => {
+      const escapeEvent = new KeyboardEvent('keydown', {
+        key: 'Escape',
+        code: 'Escape',
+        keyCode: 27,
+        which: 27,
+        bubbles: true,
+        cancelable: true
+      });
+      navigationMenuRef.current?.dispatchEvent(escapeEvent);
+    }, 10);
+  };
+
+  // Close dropdowns when route changes
+  useEffect(() => {
+    closeAllDropdowns();
+  }, [location.pathname]);
 
   return (
     <nav className="w-full z-50 px-0 py-3 bg-background/95 backdrop-blur-xl border-b border-border/50 sticky top-0 shadow-sm">
@@ -34,6 +74,7 @@ export function Navbar({ newsletterOpen, setNewsletterOpen }: NavbarProps) {
         <Link 
           to="/" 
           className="flex items-center gap-3 flex-shrink-0"
+          onClick={closeAllDropdowns}
         >
           <div className="relative flex items-center gap-3">
             <img 
@@ -52,7 +93,7 @@ export function Navbar({ newsletterOpen, setNewsletterOpen }: NavbarProps) {
         </Link>
 
         {/* Desktop Navigation Menu */}
-        <div className="flex-1 justify-center hidden lg:flex">
+        <div className="flex-1 justify-center hidden lg:flex" ref={navigationMenuRef}>
           <NavigationMenu>
             <NavigationMenuList className="gap-2">
               {/* Main nav links */}
@@ -128,7 +169,12 @@ export function Navbar({ newsletterOpen, setNewsletterOpen }: NavbarProps) {
 
         {/* Mobile Menu: Only show on mobile */}
         <div className="flex lg:hidden items-center">
-          <MobileMenu newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
+          <MobileMenu 
+            newsletterOpen={newsletterOpen} 
+            setNewsletterOpen={setNewsletterOpen}
+            isOpen={navigationMenuOpen}
+            onOpenChange={setNavigationMenuOpen}
+          />
         </div>
       </div>
     </nav>

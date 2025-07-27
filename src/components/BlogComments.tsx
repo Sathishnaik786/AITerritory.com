@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabaseClient';
 import { useUser, SignInButton } from '@clerk/clerk-react';
+import { sanitizeText } from '@/lib/sanitizeHtml';
 
 interface BlogCommentsProps {
   blogId: string;
@@ -69,7 +70,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ blogId }) => {
           <ul className="space-y-4 mb-6">
             {comments.map((c) => (
               <li key={c.id} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">{c.content}</div>
+                <div className="text-sm text-gray-700 dark:text-gray-200 mb-1">{sanitizeText(c.content)}</div>
                 <div className="text-xs text-gray-400">{new Date(c.created_at).toLocaleString()}</div>
               </li>
             ))}

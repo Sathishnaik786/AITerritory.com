@@ -1,9 +1,45 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const { createClient } = require('@supabase/supabase-js');
+
+/*
+ * ========================================
+ * REDIS INTEGRATION
+ * ========================================
+ * 
+ * Redis is used for:
+ * - API response caching (5-minute TTL for /api/tools and /api/blogs)
+ * - Distributed rate limiting across multiple server instances
+ * 
+ * TO DISABLE REDIS:
+ * Set ENABLE_REDIS=false in your environment variables
+ * 
+ * ========================================
+ */
+
+// Initialize Redis client
+const { initializeRedis } = require('./lib/redis');
+
+/*
+ * ========================================
+ * AI TERRITORY API SERVER
+ * ========================================
+ * 
+ * This server provides a comprehensive API for the AI Territory platform
+ * with enhanced security, rate limiting, and CSRF protection.
+ * 
+ * SECURITY FEATURES (via middleware/security.js):
+ * - Helmet (HTTP Security Headers)
+ * - CORS (Cross-Origin Resource Sharing)
+ * - Rate Limiting (DDoS Protection)
+ * - CSRF Protection (Cross-Site Request Forgery)
+ * - CSP Violation Reporting
+ * 
+ * INSTALLATION:
+ * npm install helmet cors express-rate-limit csurf cookie-parser
+ * 
+ * ========================================
+ */
 
 const toolRoutes = require('./routes/tools');
 const categoryRoutes = require('./routes/categories');
@@ -32,69 +68,28 @@ const newsletterController = require('./controllers/newsletterController');
 const appleCarouselRoutes = require('./routes/appleCarousel');
 const blogRoutes = require('./routes/blog');
 
+// Import security middleware
+const { applySecurity } = require('./middleware/security');
+
+// Import Redis-based rate limiter
+const { redisRateLimiter } = require('./middleware/redisRateLimiter');
+
 const app = express();
 
-// --- START: Security and CORS Configuration ---
+// --- START: Security Configuration ---
 
-// 1. Set security headers with Helmet, but allow cross-origin requests
-app.use(
-  helmet({
-    crossOriginEmbedderPolicy: false,
-    crossOriginOpenerPolicy: false,
-  })
-);
+// Apply comprehensive security middleware
+applySecurity(app);
 
-// 2. Configure CORS to allow your Netlify frontend and local development
-const allowedOrigins = [
-  'https://aiterritory.netlify.app',
-  'https://www.aiterritory.netlify.app',
-  'https://aiterritory-com.netlify.app',
-  'https://www.aiterritory-com.netlify.app',
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  'http://localhost:8080',
-  'https://aiterritory-com.onrender.com'
-];
+// --- END: Security Configuration ---
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      console.log('🔄 CORS request from origin:', origin);
-      
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) {
-        console.log('✅ Allowing request with no origin');
-        return callback(null, true);
-      }
-      
-      // Check if origin is in allowed list
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        console.log('✅ Origin allowed:', origin);
-        return callback(null, true);
-      }
-      
-      // For debugging, allow all origins in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log('⚠️  Development mode: allowing origin:', origin);
-        return callback(null, true);
-      }
-      
-      console.log('❌ Origin not allowed:', origin);
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin: ' + origin;
-      return callback(new Error(msg), false);
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  })
-);
+// --- START: Redis-based Rate Limiting ---
 
-// Handle preflight requests
-app.options('*', cors());
+// Apply Redis-based rate limiting (replaces express-rate-limit)
+// This provides distributed rate limiting across multiple server instances
+app.use(redisRateLimiter);
 
-// --- END: Security and CORS Configuration ---
+// --- END: Redis-based Rate Limiting ---
 
 // Function to find available port
 const findAvailablePort = (startPort) => {
@@ -108,20 +103,7 @@ const findAvailablePort = (startPort) => {
   });
 };
 
-// Rate limiting
-const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
-const limiter = rateLimit({
-  windowMs: isDevelopment ? 1 * 60 * 1000 : 15 * 60 * 1000, // 1 minute in dev, 15 minutes in prod
-  max: isDevelopment ? 1000 : 100, // 1000 requests per minute in dev, 100 per 15 minutes in prod
-  message: {
-    error: isDevelopment 
-      ? 'Too many requests from this IP, please try again after 1 minute.'
-      : 'Too many requests from this IP, please try again after 15 minutes.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use(limiter);
+
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -191,6 +173,32 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Redis health check endpoint
+app.get('/health/redis', async (req, res) => {
+  const { getRedisStatus } = require('./lib/redis');
+  const { getRateLimitHealth } = require('./middleware/redisRateLimiter');
+  const { getCacheStats } = require('./middleware/cacheMiddleware');
+  
+  try {
+    const redisStatus = getRedisStatus();
+    const rateLimitHealth = await getRateLimitHealth();
+    const cacheStats = await getCacheStats();
+    
+    res.json({
+      redis: redisStatus,
+      rateLimit: rateLimitHealth,
+      cache: cacheStats,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to get Redis health status',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Admin endpoint - redirect to frontend admin dashboard
 app.get('/admin', (req, res) => {
   res.redirect('https://aiterritory.org/admin');
@@ -226,6 +234,10 @@ app.use('*', (req, res) => {
 // Start server with port detection
 async function startServer() {
   try {
+    // Initialize Redis before starting the server
+    console.log('🔗 Initializing Redis...');
+    await initializeRedis();
+    
     const preferredPort = parseInt(process.env.PORT) || 3003;
     const port = await findAvailablePort(preferredPort);
     
@@ -233,6 +245,7 @@ async function startServer() {
       console.log(`🚀 Server running on port ${port}`);
       console.log(`📊 Health check: http://localhost:${port}/health`);
       console.log(`🔗 API Base URL: http://localhost:${port}/api`);
+      console.log(`🔗 Redis status: ${process.env.ENABLE_REDIS === 'true' ? 'Enabled' : 'Disabled'}`);
       
       if (port !== preferredPort) {
         console.log(`⚠️  Note: Preferred port ${preferredPort} was busy, using ${port} instead`);

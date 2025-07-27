@@ -1,6 +1,15 @@
 const errorHandler = (err, req, res, next) => {
   console.error(err.stack);
 
+  // CSRF token errors
+  if (err.code === 'EBADCSRFTOKEN') {
+    return res.status(403).json({
+      error: 'CSRF token validation failed',
+      message: 'Invalid or missing CSRF token. Please refresh the page and try again.',
+      code: 'CSRF_ERROR'
+    });
+  }
+
   // Supabase specific errors
   if (err.code) {
     switch (err.code) {
