@@ -243,8 +243,7 @@ function ThemedAppContent() {
           </main>
         </div>
         <NavbarNewsletterModal isOpen={newsletterOpen} onClose={() => setNewsletterOpen(false)} />
-        {/* Only show Footer if not on LandingPro */}
-        {!isLandingPro && <Footer />}
+        <Footer />
     </div>
   );
 }

@@ -74,7 +74,7 @@ const ToolDetailsPage: React.FC = () => {
               .eq('id', toolId)
               .single();
       if (error) setError(error.message);
-      setTool(data);
+        setTool(data);
       setLoading(false);
     })();
   }, [toolId]);
@@ -474,7 +474,7 @@ const ToolDetailsPage: React.FC = () => {
                 <button className="flex items-center gap-1 text-blue-700 hover:underline text-sm font-medium">
                   {/* Comment icon here */} Comment {comments.length}
                 </button>
-              </div>
+            </div>
               <ShareDialog
                 open={shareDialogOpen}
                 onClose={() => setShareDialogOpen(false)}
@@ -499,8 +499,8 @@ const ToolDetailsPage: React.FC = () => {
           {/* Reviews Section */}
           <motion.section
             id="reviews"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.15 }}
             className="max-w-2xl mx-auto my-12"
@@ -556,7 +556,7 @@ const ToolDetailsPage: React.FC = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-semibold text-gray-900 dark:text-white">{review.user_name || 'Anonymous'}</span>
                         <span className="text-xs text-muted-foreground">{new Date(review.created_at).toLocaleDateString()}</span>
-                      </div>
+              </div>
                       <div className="flex items-center gap-1 mb-1">
                         {[1,2,3,4,5].map(star => (
                           <Star key={star} className={`w-4 h-4 ${review.rating >= star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300 dark:text-gray-600'}`} />
@@ -564,7 +564,7 @@ const ToolDetailsPage: React.FC = () => {
             </div>
                       <div className="text-base text-gray-700 dark:text-gray-200">{review.comment}</div>
                     </div>
-                  </div>
+          </div>
                 ))}
             {reviews.length > 2 && (
               <div className="flex justify-center mt-4">
@@ -608,7 +608,7 @@ const ToolDetailsPage: React.FC = () => {
                     <div className="flex-1 space-y-2">
                       <Skeleton className="h-4 w-3/4" />
                       <Skeleton className="h-3 w-2/3" />
-                    </div>
+            </div>
                   </div>
                 ))}
               </div>
@@ -629,10 +629,10 @@ const ToolDetailsPage: React.FC = () => {
                       </div>
                       <div className="text-base text-gray-700 dark:text-gray-200 break-words">{comment.comment}</div>
                     </div>
-                  </li>
-                ))}
-              </ul>
-            )}
+                </li>
+              ))}
+            </ul>
+          )}
           </section>
 
           {/* Likes/Bookmarks UI */}
@@ -658,7 +658,7 @@ const ToolDetailsPage: React.FC = () => {
                       </div>
                     </div>
                   ))}
-                </div>
+      </div>
               ) : recentBlogs.length === 0 ? (
                 <div className="text-muted-foreground text-sm">No blogs found.</div>
               ) : (
@@ -680,8 +680,8 @@ const ToolDetailsPage: React.FC = () => {
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {blog.created_at ? new Date(blog.created_at).toLocaleDateString() : ''}
-                        </div>
-                      </div>
+        </div>
+      </div>
                     </li>
                   ))}
                 </ul>
@@ -700,8 +700,8 @@ const ToolDetailsPage: React.FC = () => {
                         <Skeleton className="h-3 w-2/3" />
                       </div>
                     </div>
-                  ))}
-                </div>
+          ))}
+        </div>
               ) : relatedTools.length === 0 ? (
                 <div className="text-muted-foreground text-sm">No related tools found.</div>
               ) : (
@@ -712,8 +712,8 @@ const ToolDetailsPage: React.FC = () => {
                           src={t.image_url || '/public/placeholder.svg'}
                           alt={t.name}
                         className="w-10 h-10 rounded-xl object-cover border border-gray-200 dark:border-gray-700 bg-white"
-                          loading="lazy"
-                          />
+                loading="lazy"
+              />
                       <div className="flex-1 min-w-0">
                         <Link to={`/tools/${t.id}`} className="block font-medium text-blue-700 dark:text-blue-400 truncate hover:underline">
                           {t.name}
@@ -725,8 +725,8 @@ const ToolDetailsPage: React.FC = () => {
                     </li>
                   ))}
                 </ul>
-              )}
-            </section>
+        )}
+      </section>
             {/* Social Share Block */}
             <section>
               <h3 className="text-lg font-semibold mb-3">Share</h3>
@@ -745,7 +745,7 @@ const ToolDetailsPage: React.FC = () => {
                 >
                   <FaLinkedin className="w-5 h-5 text-[#0077b5]" />
                 </button>
-                <button
+                  <button
                   aria-label="Share on WhatsApp"
                   className="rounded-full bg-gray-100 dark:bg-gray-800 p-2 hover:bg-green-100 dark:hover:bg-gray-700 transition"
                   onClick={() => handleShare('whatsapp')}
@@ -759,16 +759,16 @@ const ToolDetailsPage: React.FC = () => {
                 >
                   <FaFacebook className="w-5 h-5 text-[#1877f3]" />
                 </button>
-            </div>
+                    </div>
             </section>
           </div>
         </aside>
-      </div>
-    </div>
+            </div>
+        </div>
   );
 };
 
-export default ToolDetailsPage;
+export default ToolDetailsPage; 
 
 // ReviewForm component (inline for now)
 function ReviewForm({ toolId, user, onReviewAdded }: { toolId: string, user: any, onReviewAdded: () => void }) {
