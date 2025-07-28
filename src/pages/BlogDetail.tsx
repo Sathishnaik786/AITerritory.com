@@ -280,7 +280,7 @@ const BlogDetail: React.FC = () => {
       <div className="w-full bg-white dark:bg-[#171717] pt-2 pb-2 border-b border-gray-100 dark:border-gray-800">
         {/* Back Button in hero section, above content */}
         <div className="max-w-4xl mx-auto px-4 flex items-center pt-2 pb-2">
-          <button
+        <button
             className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium text-base transition bg-white/80 dark:bg-[#171717]/80 rounded-full px-3 py-1 shadow"
             onClick={() => navigate(-1)}
           >
@@ -290,13 +290,13 @@ const BlogDetail: React.FC = () => {
         
         {/* All hero content in one centered container */}
         <div className="max-w-4xl mx-auto px-4">
-          {/* Breadcrumbs */}
+        {/* Breadcrumbs */}
           <div className="text-xs text-gray-500 font-serif mb-2">
-            {blog.category && <span className="uppercase tracking-wider">{blog.category}</span>}
-            {blog.subcategory && <span> &gt; {blog.subcategory}</span>}
-          </div>
+          {blog.category && <span className="uppercase tracking-wider">{blog.category}</span>}
+          {blog.subcategory && <span> &gt; {blog.subcategory}</span>}
+        </div>
           
-          {/* Headline */}
+        {/* Headline */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-4 leading-tight w-full break-words">
             {blog.title}
           </h1>
@@ -403,7 +403,7 @@ const BlogDetail: React.FC = () => {
       <div className="relative w-full max-w-4xl mx-auto mb-4">
         <motion.img
           src={blog.cover_image_url || '/public/placeholder.svg'}
-          alt={blog.title}
+              alt={blog.title}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -412,7 +412,7 @@ const BlogDetail: React.FC = () => {
         />
         {/* Bottom gradient overlay for contrast */}
         <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/70 to-transparent pointer-events-none rounded-b-xl" />
-      </div>
+          </div>
       {blog.description && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 mb-12">
           <ContentRenderer 
@@ -490,7 +490,7 @@ const BlogDetail: React.FC = () => {
               tags={blog.tags}
               title={blog.title}
             />
-          </div>
+        </div>
         </main>
         
         {/* Desktop Sidebar - Sticky */}
@@ -523,12 +523,12 @@ const BlogDetail: React.FC = () => {
                     </a>
                     <div className="text-xs text-muted-foreground truncate font-serif">
                       {b.created_at ? new Date(b.created_at).toLocaleDateString() : ''}
-                    </div>
-                  </div>
+            </div>
+          </div>
                 </li>
               ))}
             </ul>
-          </section>
+        </section>
           {/* Share block */}
           <section className="bg-gray-50 dark:bg-[#19191b] rounded-xl p-4">
             <h3 className="text-lg font-semibold mb-3 font-serif text-center">Share</h3>

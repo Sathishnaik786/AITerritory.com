@@ -7,8 +7,8 @@ const API_BASE = '/blogs'; // api.ts already has /api as base
 export const BlogService = {
   async getAll(params?: any): Promise<BlogPost[]> {
     try {
-      const res = await api.get<BlogPost[]>(API_BASE, { params });
-      return res.data;
+    const res = await api.get<BlogPost[]>(API_BASE, { params });
+    return res.data;
     } catch (error) {
       console.warn('Backend API not available, using local blog data');
       return blogPosts;
@@ -16,8 +16,8 @@ export const BlogService = {
   },
   async getBySlug(slug: string): Promise<BlogPost> {
     try {
-      const res = await api.get<BlogPost>(`${API_BASE}/${slug}`);
-      return res.data;
+    const res = await api.get<BlogPost>(`${API_BASE}/${slug}`);
+    return res.data;
     } catch (error) {
       console.warn('Backend API not available, using local blog data');
       const localBlog = blogPosts.find(blog => blog.slug === slug);
@@ -29,8 +29,8 @@ export const BlogService = {
   },
   async getByCategory(category: string): Promise<BlogPost[]> {
     try {
-      const res = await api.get<BlogPost[]>(`${API_BASE}/category/${encodeURIComponent(category)}`);
-      return res.data;
+    const res = await api.get<BlogPost[]>(`${API_BASE}/category/${encodeURIComponent(category)}`);
+    return res.data;
     } catch (error) {
       console.warn('Backend API not available, using local blog data');
       return blogPosts.filter(blog => blog.category === category);
