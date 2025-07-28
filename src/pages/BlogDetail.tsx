@@ -55,7 +55,14 @@ const BlogDetail: React.FC = () => {
     if (slug) {
       setLoading(true);
       BlogService.getBySlug(slug)
-        .then(data => setBlog(data))
+        .then(data => {
+          console.log('Blog loaded:', data);
+          setBlog(data);
+        })
+        .catch(error => {
+          console.error('Error loading blog:', error);
+          setBlog(null);
+        })
         .finally(() => setLoading(false));
     }
   }, [slug]);
@@ -195,6 +202,23 @@ const BlogDetail: React.FC = () => {
   }
   if (!blog) return <div className="max-w-2xl mx-auto px-4 py-16 text-center text-red-500">Blog not found.</div>;
 
+  // Check if blog has content
+  const hasContent = blog.content || blog.description;
+  if (!hasContent) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+        <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-red-500" />
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{blog.title}</h1>
+        <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">This blog post doesn't have any content yet.</p>
+        <button 
+          onClick={() => navigate(-1)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
 
 
   // Share handler
@@ -256,27 +280,32 @@ const BlogDetail: React.FC = () => {
       <div className="w-full bg-white dark:bg-[#171717] pt-2 pb-2 border-b border-gray-100 dark:border-gray-800">
         {/* Back Button in hero section, above content */}
         <div className="max-w-4xl mx-auto px-4 flex items-center pt-2 pb-2">
-        <button
+          <button
             className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium text-base transition bg-white/80 dark:bg-[#171717]/80 rounded-full px-3 py-1 shadow"
             onClick={() => navigate(-1)}
           >
             <ArrowLeft className="w-5 h-5" /> Back
           </button>
         </div>
-        {/* Breadcrumbs */}
-        <div className="max-w-4xl mx-auto px-4 text-xs text-gray-500 font-serif mb-2">
-          {blog.category && <span className="uppercase tracking-wider">{blog.category}</span>}
-          {blog.subcategory && <span> &gt; {blog.subcategory}</span>}
-        </div>
-        {/* Headline */}
-        <div className="w-full px-2 sm:px-4">
+        
+        {/* All hero content in one centered container */}
+        <div className="max-w-4xl mx-auto px-4">
+          {/* Breadcrumbs */}
+          <div className="text-xs text-gray-500 font-serif mb-2">
+            {blog.category && <span className="uppercase tracking-wider">{blog.category}</span>}
+            {blog.subcategory && <span> &gt; {blog.subcategory}</span>}
+          </div>
+          
+          {/* Headline */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-4 leading-tight w-full break-words">
             {blog.title}
           </h1>
+          
           {/* Subtitle (if present) */}
           {blog.subtitle && (
             <div className="text-lg italic text-gray-500 mb-3 font-serif">{blog.subtitle}</div>
           )}
+          
           {/* Byline and Follow Author */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
             <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 font-serif">
@@ -285,8 +314,10 @@ const BlogDetail: React.FC = () => {
               <span className="hidden sm:inline">&copy; {blog.author_bio || 'Contributor bio here.'}</span>
             </div>
           </div>
+          
           {/* Author bio (mobile) */}
           <div className="text-xs text-gray-500 font-serif mb-2 sm:hidden">{blog.author_bio || 'Contributor bio here.'}</div>
+          
           {/* Publication date */}
           <div className="text-xs text-gray-500 font-serif mb-4">
             Published {blog.created_at ? new Date(blog.created_at).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
@@ -294,6 +325,7 @@ const BlogDetail: React.FC = () => {
               <span>, Updated {new Date(blog.updated_at).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
             )}
           </div>
+          
           {/* Action bar */}
           <div className="flex items-center gap-6 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800 pb-2 mb-2">
             {/* Share button: opens dropdown with social icons */}
@@ -350,9 +382,9 @@ const BlogDetail: React.FC = () => {
                 // ...
               }}
             >
-              <FaRegCopy className="w-4 h-4" /> Save
+              <Book className="w-4 h-4" /> Save
             </button>
-            {/* Comment button: scroll to comment section */}
+            {/* Comment button: scroll to comments */}
             <button
               className="flex items-center gap-1 hover:text-blue-600 transition rounded-full border border-gray-300 dark:border-gray-700 p-2 bg-white/10 hover:bg-blue-50 dark:hover:bg-gray-800 active:scale-95"
               onClick={() => {
@@ -368,10 +400,10 @@ const BlogDetail: React.FC = () => {
         </div>
       </div>
       {/* Cover image below hero section */}
-      <div className="relative w-full max-w-6xl mx-auto mb-4">
+      <div className="relative w-full max-w-4xl mx-auto mb-4">
         <motion.img
           src={blog.cover_image_url || '/public/placeholder.svg'}
-              alt={blog.title}
+          alt={blog.title}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -380,7 +412,7 @@ const BlogDetail: React.FC = () => {
         />
         {/* Bottom gradient overlay for contrast */}
         <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/70 to-transparent pointer-events-none rounded-b-xl" />
-          </div>
+      </div>
       {blog.description && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 mb-12">
           <ContentRenderer 
@@ -424,8 +456,8 @@ const BlogDetail: React.FC = () => {
             ) : (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium">Content Unavailable</p>
-                <p className="text-sm">The blog content could not be loaded. Please try refreshing the page.</p>
+                <p className="text-lg font-medium">Blog Content Loading</p>
+                <p className="text-sm">Please wait while we load the blog content...</p>
               </div>
             )}
           </div>
@@ -444,8 +476,8 @@ const BlogDetail: React.FC = () => {
             ) : (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium">Content Unavailable</p>
-                <p className="text-sm">The blog content could not be loaded. Please try refreshing the page.</p>
+                <p className="text-lg font-medium">Blog Content Loading</p>
+                <p className="text-sm">Please wait while we load the blog content...</p>
               </div>
             )}
           </div>

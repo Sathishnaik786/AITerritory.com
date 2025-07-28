@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
+import rehypeRaw from 'rehype-raw';
 import { PromptBox } from './PromptBox';
 
 interface Heading {
@@ -22,29 +23,29 @@ interface CodeProps {
   children: React.ReactNode;
 }
 
-export const ContentRenderer: React.FC<ContentRendererProps> = ({ 
-  content, 
-  onHeadingsGenerated 
+export const ContentRenderer: React.FC<ContentRendererProps> = ({
+  content,
+  onHeadingsGenerated
 }) => {
   const headings = useMemo(() => {
     if (!content) return [];
-    
+
     const headingRegex = /^(#{2,3})\s+(.+)$/gm;
     const extractedHeadings: Heading[] = [];
-    
+
     let match;
     while ((match = headingRegex.exec(content)) !== null) {
       const level = match[1].length;
       const text = match[2].trim();
       const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      
+
       extractedHeadings.push({
         id,
         text,
         level
       });
     }
-    
+
     return extractedHeadings;
   }, [content]);
 
@@ -70,13 +71,13 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       const text = children?.toString() || '';
       const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       return (
-        <h1 
+        <h1
           id={id}
           className="text-3xl md:text-4xl font-bold mb-6 mt-8 text-gray-900 dark:text-white group relative scroll-mt-20"
           {...props}
         >
-          <a 
-            href={`#${id}`} 
+          <a
+            href={`#${id}`}
             className="absolute -left-6 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400"
             aria-label={`Link to ${text}`}
           >
@@ -90,13 +91,13 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       const text = children?.toString() || '';
       const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       return (
-        <h2 
+        <h2
           id={id}
           className="text-2xl md:text-3xl font-semibold mb-4 mt-6 text-gray-900 dark:text-white group relative scroll-mt-20"
           {...props}
         >
-          <a 
-            href={`#${id}`} 
+          <a
+            href={`#${id}`}
             className="absolute -left-6 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400"
             aria-label={`Link to ${text}`}
           >
@@ -110,13 +111,13 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       const text = children?.toString() || '';
       const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       return (
-        <h3 
+        <h3
           id={id}
           className="text-xl md:text-2xl font-medium mb-3 mt-5 text-gray-900 dark:text-white group relative scroll-mt-20"
           {...props}
         >
-          <a 
-            href={`#${id}`} 
+          <a
+            href={`#${id}`}
             className="absolute -left-6 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400"
             aria-label={`Link to ${text}`}
           >
@@ -127,7 +128,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       );
     },
     p: ({ children, ...props }: any) => (
-      <p 
+      <p
         className="max-w-prose text-base leading-relaxed mb-4 md:mb-6 text-gray-700 dark:text-gray-300"
         {...props}
       >
@@ -135,7 +136,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       </p>
     ),
     ul: ({ children, ...props }: any) => (
-      <ul 
+      <ul
         className="list-disc pl-6 space-y-2 mb-4 md:mb-6 text-gray-700 dark:text-gray-300"
         {...props}
       >
@@ -143,7 +144,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       </ul>
     ),
     ol: ({ children, ...props }: any) => (
-      <ol 
+      <ol
         className="list-decimal pl-6 space-y-2 mb-4 md:mb-6 text-gray-700 dark:text-gray-300"
         {...props}
       >
@@ -151,7 +152,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       </ol>
     ),
     a: ({ href, children, ...props }: any) => (
-      <a 
+      <a
         href={href}
         target="_blank"
         rel="noopener noreferrer"
@@ -162,7 +163,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       </a>
     ),
     blockquote: ({ children, ...props }: any) => (
-      <blockquote 
+      <blockquote
         className="border-l-4 border-blue-500 pl-4 italic text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-4 rounded my-6"
         {...props}
       >
@@ -170,24 +171,24 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       </blockquote>
     ),
     img: ({ src, alt, ...props }: any) => (
-      <figure className="my-6">
-        <img 
-          src={src} 
-          alt={alt || ''} 
+      <figure className="my-6 text-center">
+        <img
+          src={src}
+          alt={alt || ''}
           className="mx-auto rounded-lg shadow-md h-auto max-w-full"
           loading="lazy"
           {...props}
         />
-        {alt && (
-          <figcaption className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
-            {alt}
+        {(alt || props.title) && (
+          <figcaption className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            {alt || props.title}
           </figcaption>
         )}
       </figure>
     ),
     table: ({ children, ...props }: any) => (
       <div className="overflow-x-auto my-6">
-        <table 
+        <table
           className="w-full border-collapse text-left"
           {...props}
         >
@@ -196,7 +197,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       </div>
     ),
     th: ({ children, ...props }: any) => (
-      <th 
+      <th
         className="bg-gray-100 dark:bg-gray-800 font-semibold p-2 border border-gray-300 dark:border-gray-600"
         {...props}
       >
@@ -204,7 +205,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       </th>
     ),
     td: ({ children, ...props }: any) => (
-      <td 
+      <td
         className="p-2 border border-gray-300 dark:border-gray-600"
         {...props}
       >
@@ -212,7 +213,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       </td>
     ),
     strong: ({ children, ...props }: any) => (
-      <strong 
+      <strong
         className="font-semibold text-gray-900 dark:text-white"
         {...props}
       >
@@ -220,17 +221,34 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       </strong>
     ),
     em: ({ children, ...props }: any) => (
-      <em 
+      <em
         className="italic text-gray-800 dark:text-gray-200"
         {...props}
       >
         {children}
       </em>
     ),
+    div: ({ className, children, ...props }: any) => {
+      // Handle prompt-box div specifically
+      if (className && className.includes('prompt-box')) {
+        return (
+          <PromptBox language="text">
+            {children}
+          </PromptBox>
+        );
+      }
+
+      // Default div rendering
+      return (
+        <div className={className} {...props}>
+          {children}
+        </div>
+      );
+    },
     code: function CodeComponent({ inline = false, className, children, ...rest }: CodeProps) {
       if (inline) {
         return (
-          <code 
+          <code
             className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono text-gray-800 dark:text-gray-200"
             {...rest}
           >
@@ -238,21 +256,22 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
           </code>
         );
       }
-      
+
+      // Extract language from className (e.g., "language-javascript")
       const language = className?.replace('language-', '') || '';
       return (
         <PromptBox language={language}>
           {children}
         </PromptBox>
       );
-    }
+    },
   };
 
   return (
     <div className="content-renderer">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSanitize, rehypeHighlight]}
+        rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
         components={components}
       >
         {content}
