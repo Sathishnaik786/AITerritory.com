@@ -82,6 +82,11 @@ import { NavbarNewsletterModal } from './components/NavbarNewsletterModal';
 import { useState } from 'react';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 import { useAuthTracking } from './hooks/useAuthTracking';
+import { BackdropLoaderProvider } from './context/BackdropLoaderContext';
+import { BackdropLoaderWrapper } from './components/BackdropLoaderWrapper';
+import { BackdropLoaderTestPage } from './pages/BackdropLoaderTestPage';
+import { useRouteProgress } from './hooks/useRouteProgress';
+import { UIProgressTestAdmin } from './admin/UIProgressTestAdmin';
 
 // QueryClient is now imported from lib/queryClient.ts with persistence
 
@@ -103,6 +108,9 @@ function ThemedAppContent() {
   
   // Initialize auth tracking
   useAuthTracking();
+  
+  // Initialize route progress tracking
+  useRouteProgress();
 
   return (
     <div className={`min-h-screen antialiased w-full flex flex-col`}>
@@ -117,6 +125,7 @@ function ThemedAppContent() {
               <Route path="/home" element={<HomePage />} />
               <Route path="/ai-for-business" element={<AIBusiness />} />
               <Route path="/prompts" element={<Prompts />} />
+              <Route path="/test-backdrop-loader" element={<BackdropLoaderTestPage />} />
               
               {/* Authentication Routes */}
               <Route path="/signup" element={<CreateAccountPage />} />
@@ -217,6 +226,7 @@ function ThemedAppContent() {
                       <Route path="blogs" element={<BlogsAdmin />} />
                       <Route path="newsletter-subscribers" element={<NewsletterSubscribersAdmin />} />
                       <Route path="cache" element={<CacheManagerAdmin />} />
+                      <Route path="ui-test" element={<UIProgressTestAdmin />} />
                     </Routes>
                   </AdminLayout>
                 </ProtectedRoute>
@@ -254,25 +264,28 @@ function App() {
     >
       <BackgroundAnimation />
       <QueryClientProvider client={queryClient}>
-        <HelmetProvider>
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true
-          }}
-        >
-          <TooltipProvider>
-              <ScrollToTop />
-              <Toaster position="top-right" richColors />
-              <Suspense fallback={<div>Loading...</div>}>
-                <ThemedAppContent />
-              </Suspense>
-              {process.env.NODE_ENV === 'development' && (
-                <ReactQueryDevtools initialIsOpen={false} />
-              )}
-          </TooltipProvider>
-        </BrowserRouter>
-        </HelmetProvider>
+        <BackdropLoaderProvider>
+          <HelmetProvider>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}
+          >
+            <TooltipProvider>
+                <ScrollToTop />
+                <Toaster position="top-right" richColors />
+                <BackdropLoaderWrapper />
+                <Suspense fallback={<div>Loading...</div>}>
+                  <ThemedAppContent />
+                </Suspense>
+                {process.env.NODE_ENV === 'development' && (
+                  <ReactQueryDevtools initialIsOpen={false} />
+                )}
+            </TooltipProvider>
+          </BrowserRouter>
+          </HelmetProvider>
+        </BackdropLoaderProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

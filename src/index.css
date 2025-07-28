@@ -96,6 +96,57 @@
     @apply border-border;
   }
 
+  /* Content Renderer Styles */
+  .content-renderer {
+    @apply max-w-none;
+  }
+
+  .content-renderer h1,
+  .content-renderer h2,
+  .content-renderer h3 {
+    @apply scroll-mt-20;
+  }
+
+  .content-renderer p {
+    @apply max-w-prose;
+  }
+
+  .content-renderer img {
+    @apply mx-auto rounded-lg shadow-md max-w-full h-auto;
+  }
+
+  .content-renderer a {
+    @apply text-blue-600 hover:underline transition-colors duration-200;
+  }
+
+  .content-renderer a[target="_blank"] {
+    @apply inline-flex items-center gap-1;
+  }
+
+  .content-renderer blockquote {
+    @apply border-l-4 border-blue-500 pl-4 italic text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-4 rounded;
+  }
+
+  .content-renderer code {
+    @apply bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-sm font-mono text-pink-600 dark:text-pink-400;
+  }
+
+  .content-renderer pre {
+    @apply overflow-x-auto;
+  }
+
+  .content-renderer table {
+    @apply w-full border-collapse;
+  }
+
+  .content-renderer th {
+    @apply bg-gray-100 dark:bg-gray-800 font-semibold p-2 border text-gray-900 dark:text-white;
+  }
+
+  .content-renderer td {
+    @apply p-2 border text-gray-800 dark:text-gray-200;
+  }
+
   body {
     @apply bg-background text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;

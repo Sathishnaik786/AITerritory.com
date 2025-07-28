@@ -30,6 +30,8 @@ async function getAllBlogs(req, res) {
 // GET /api/blogs/:slug
 async function getBlogBySlug(req, res) {
   const { slug } = req.params;
+  console.log('Fetching blog with slug:', slug);
+  
   const { data: blog, error } = await supabase
     .from('blogs')
     .select('*')
@@ -37,14 +39,28 @@ async function getBlogBySlug(req, res) {
     .single();
 
   if (error && error.code === 'PGRST116') {
+    console.log('Blog not found for slug:', slug);
     return res.status(404).json({ error: 'Blog not found' });
   }
   if (error) {
+    console.error('Supabase error fetching blog:', error);
     return res.status(500).json({ error: 'Failed to fetch blog' });
   }
   if (!blog) {
+    console.log('No blog data returned for slug:', slug);
     return res.status(404).json({ error: 'Blog not found' });
   }
+  
+  console.log('Blog data fetched successfully:', {
+    id: blog.id,
+    title: blog.title,
+    slug: blog.slug,
+    hasContent: !!blog.content,
+    hasDescription: !!blog.description,
+    contentLength: blog.content?.length || 0,
+    descriptionLength: blog.description?.length || 0
+  });
+  
   res.json(blog);
 }
 
