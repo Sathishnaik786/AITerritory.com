@@ -454,9 +454,6 @@ const ToolDetailsPage: React.FC = () => {
               {/* Byline */}
               <div className="text-sm text-muted-foreground mb-1">
                 By <span className="font-semibold text-blue-700 dark:text-blue-400">{tool.author || 'Unknown Author'}</span>
-                {tool.description && (
-                  <> — {tool.name} is a {tool.description.slice(0, 60)}{tool.description.length > 60 ? '...' : ''}</>
-                )}
               </div>
               {/* Dates */}
               <div className="text-xs text-muted-foreground mb-2">
