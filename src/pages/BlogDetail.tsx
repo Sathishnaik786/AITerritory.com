@@ -391,18 +391,18 @@ const BlogDetail: React.FC = () => {
         </div>
       )}
       {/* Main Content + Sidebar */}
-      <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-4 lg:gap-8 mb-6">
+      <div className="w-full mx-auto mb-6 grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)_320px] xl:grid-cols-[280px_minmax(0,1fr)_360px] gap-0 lg:gap-8 max-w-[1600px]">
         {/* Table of Contents - Desktop */}
-        <div className="hidden lg:block lg:w-60 flex-shrink-0">
+        <aside className="hidden lg:block sticky top-20 self-start h-fit px-2">
           <TableOfContents 
             headings={headings} 
             activeHeading={activeHeading}
-            className="sticky top-20"
+            className=""
           />
-        </div>
+        </aside>
         
         {/* Main Content */}
-        <div className="flex-1 min-w-0">
+        <main className="min-w-0 w-full max-w-3xl xl:max-w-4xl mx-auto lg:mx-0 px-0 lg:px-0">
           {/* Mobile Table of Contents */}
           <div className="lg:hidden mb-6">
             <TableOfContents 
@@ -457,10 +457,9 @@ const BlogDetail: React.FC = () => {
               title={blog.title}
             />
           </div>
-        </div>
-        
+        </main>
         {/* Desktop Sidebar */}
-        <div className="hidden lg:flex lg:flex-col lg:w-80 flex-shrink-0 gap-6">
+        <aside className="hidden lg:flex flex-col w-[320px] xl:w-[360px] flex-shrink-0 gap-6 self-start">
           {/* Related Articles - Desktop */}
           <RelatedArticles
             currentSlug={blog.slug}
@@ -468,10 +467,8 @@ const BlogDetail: React.FC = () => {
             tags={blog.tags}
             title={blog.title}
           />
-          
           {/* Author Card */}
           <AuthorCard author={blog.author} />
-          
           {/* Recent Blogs */}
           <section className="bg-gray-50 dark:bg-[#19191b] rounded-xl p-4">
             <h3 className="text-lg font-semibold mb-3 font-serif">Recent Blogs</h3>
@@ -497,7 +494,6 @@ const BlogDetail: React.FC = () => {
               ))}
             </ul>
           </section>
-          
           {/* Share block */}
           <section className="bg-gray-50 dark:bg-[#19191b] rounded-xl p-4">
             <h3 className="text-lg font-semibold mb-3 font-serif text-center">Share</h3>
@@ -519,7 +515,7 @@ const BlogDetail: React.FC = () => {
               </button>
             </div>
           </section>
-        </div>
+        </aside>
       </div>
 
       {/* Comments Section */}
