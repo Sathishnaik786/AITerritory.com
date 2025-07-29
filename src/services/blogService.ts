@@ -8,7 +8,11 @@ export const BlogService = {
   async getAll(params?: any): Promise<BlogPost[]> {
     try {
     const res = await api.get<BlogPost[]>(API_BASE, { params });
-    return res.data;
+    const data = res.data;
+    if (!Array.isArray(data)) {
+      return [];
+    }
+    return data;
     } catch (error) {
       console.warn('Backend API not available, using local blog data');
       return blogPosts;

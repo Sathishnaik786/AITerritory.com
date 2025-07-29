@@ -9,6 +9,24 @@ interface SEOProps {
   article?: boolean;
   keywords?: string;
   structuredData?: Record<string, any>;
+  // Blog-specific props
+  blogData?: {
+    title: string;
+    description: string;
+    coverImage: string;
+    author: {
+      name: string;
+      bio?: string;
+      image?: string;
+    };
+    publishedAt: string;
+    modifiedAt?: string;
+    category?: string;
+    subcategory?: string;
+    tags?: string[];
+    wordCount?: number;
+    readingTime?: number;
+  };
 }
 
 const SEO: React.FC<SEOProps> = ({
@@ -18,9 +36,83 @@ const SEO: React.FC<SEOProps> = ({
   article = false,
   keywords = 'AI tools, artificial intelligence, content generation, AI platform',
   structuredData,
+  blogData,
 }) => {
   const location = useLocation();
   const canonicalUrl = `https://aiterritory.org${location.pathname}`;
+
+  // Generate structured data for blog articles
+  const generateBlogStructuredData = () => {
+    if (!blogData) return null;
+
+    const articleSchema = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": blogData.title,
+      "description": blogData.description,
+      "image": blogData.coverImage,
+      "author": {
+        "@type": "Person",
+        "name": blogData.author.name,
+        "description": blogData.author.bio,
+        "image": blogData.author.image
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "AI Territory",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://aiterritory.org/logo.jpg"
+        }
+      },
+      "datePublished": blogData.publishedAt,
+      "dateModified": blogData.modifiedAt || blogData.publishedAt,
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": canonicalUrl
+      },
+      "articleSection": blogData.category,
+      "keywords": blogData.tags?.join(', '),
+      "wordCount": blogData.wordCount,
+      "timeRequired": `PT${blogData.readingTime || 5}M`
+    };
+
+    // Breadcrumb schema
+    const breadcrumbSchema = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://aiterritory.org"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://aiterritory.org/blog"
+        },
+        ...(blogData.category ? [{
+          "@type": "ListItem",
+          "position": 3,
+          "name": blogData.category,
+          "item": `https://aiterritory.org/blog/category/${blogData.category.toLowerCase()}`
+        }] : []),
+        {
+          "@type": "ListItem",
+          "position": blogData.category ? 4 : 3,
+          "name": blogData.title,
+          "item": canonicalUrl
+        }
+      ]
+    };
+
+    return [articleSchema, breadcrumbSchema];
+  };
+
+  const blogStructuredData = generateBlogStructuredData();
 
   return (
     <Helmet>
@@ -38,6 +130,22 @@ const SEO: React.FC<SEOProps> = ({
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:image" content={image} />
       <meta property="og:site_name" content="AITerritory" />
+      <meta property="og:locale" content="en_US" />
+      
+      {/* Enhanced Open Graph for articles */}
+      {article && blogData && (
+        <>
+          <meta property="article:published_time" content={blogData.publishedAt} />
+          {blogData.modifiedAt && (
+            <meta property="article:modified_time" content={blogData.modifiedAt} />
+          )}
+          <meta property="article:author" content={blogData.author.name} />
+          <meta property="article:section" content={blogData.category} />
+          {blogData.tags?.map((tag, index) => (
+            <meta key={index} property="article:tag" content={tag} />
+          ))}
+        </>
+      )}
       
       {/* Twitter Card Meta Tags */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -46,6 +154,7 @@ const SEO: React.FC<SEOProps> = ({
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
+      <meta name="twitter:site" content="@aiterritory" />
       
       {/* Preconnect and DNS Prefetch */}
       <link rel="preconnect" href="https://aiterritory-com.onrender.com" />
@@ -59,6 +168,13 @@ const SEO: React.FC<SEOProps> = ({
           {JSON.stringify(structuredData)}
         </script>
       )}
+      
+      {/* Blog-specific structured data */}
+      {blogStructuredData?.map((schema, index) => (
+        <script key={index} type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      ))}
     </Helmet>
   );
 };

@@ -135,7 +135,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
         {children}
       </p>
     ),
-    ul: ({ children, ...props }: any) => (
+    ul: ({ children, ordered, ...props }: any) => (
       <ul
         className="list-disc pl-6 space-y-2 mb-4 md:mb-6 text-gray-700 dark:text-gray-300"
         {...props}
@@ -143,7 +143,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
         {children}
       </ul>
     ),
-    ol: ({ children, ...props }: any) => (
+    ol: ({ children, ordered, ...props }: any) => (
       <ol
         className="list-decimal pl-6 space-y-2 mb-4 md:mb-6 text-gray-700 dark:text-gray-300"
         {...props}

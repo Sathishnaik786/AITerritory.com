@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import BlogComments from '../components/BlogComments';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ThreadedComments } from '../components/ThreadedComments';
 import BlogLikeBookmark from '../components/BlogLikeBookmark';
 import AuthorCard from '../components/AuthorCard';
 import { BlogService } from '../services/blogService';
@@ -14,7 +14,7 @@ import { FaXTwitter, FaLinkedin, FaWhatsapp, FaFacebook, FaRegCopy } from 'react
 import NewsletterCTA from '../components/NewsletterCTA';
 import { toast } from '@/components/ui/sonner';
 import { logBlogEvent } from '../services/blogAnalyticsService';
-import { BookOpen, Book, ArrowUp, ArrowLeft, ExternalLink, Info, AlertTriangle, Lightbulb } from 'lucide-react';
+import { BookOpen, Book, ArrowUp, ArrowLeft, ExternalLink, Info, AlertTriangle, Lightbulb, Clock } from 'lucide-react';
 import type { CodeProps } from 'react-markdown/lib/ast-to-react';
 import { supabase } from '../services/supabaseClient';
 import remarkEmoji from 'remark-emoji';
@@ -22,12 +22,17 @@ import { trackShare } from '@/lib/analytics';
 import { sanitizeMarkdownHtml } from '@/lib/sanitizeHtml';
 import { ContentRenderer } from '../components/ContentRenderer';
 import { TableOfContents } from '../components/TableOfContents';
-import RelatedArticles from '../components/RelatedArticles';
+import { RelatedContent } from '../components/RelatedContent';
+import { ShareBar } from '../components/ShareBar';
+import SEO from '../components/SEO';
+import { OptimizedImage } from '../components/OptimizedImage';
+import { useEngagementTracker } from '../hooks/useEngagementTracker';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [blog, setBlog] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const { user, isSignedIn } = useUser();
@@ -38,22 +43,48 @@ const BlogDetail: React.FC = () => {
   const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
   // Add state and effect for scroll progress
   const [progress, setProgress] = useState(0);
+  const [showNewsletterModal, setShowNewsletterModal] = useState(false);
+  const [showShareCTA, setShowShareCTA] = useState(false);
   const navigate = useNavigate();
+
+  // Initialize engagement tracker
+  const engagementTracker = useEngagementTracker({
+    blogId: slug || '',
+    blogTitle: blog?.title || '',
+    enableScrollTracking: true,
+    enableInteractionTracking: true,
+    scrollThresholds: [25, 50, 75, 100]
+  });
+  
+  // Enhanced reading progress tracking with engagement CTAs
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       const docHeight = document.body.scrollHeight - window.innerHeight;
       const percent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       setProgress(Math.max(0, Math.min(100, percent)));
+
+      // Show newsletter modal at 70% scroll depth
+      if (percent >= 70 && !showNewsletterModal) {
+        setShowNewsletterModal(true);
+        engagementTracker.trackNewsletterSignup({ trigger: 'scroll_depth' });
+      }
+
+      // Show share CTA at 50% scroll depth
+      if (percent >= 50 && !showShareCTA) {
+        setShowShareCTA(true);
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [showNewsletterModal, showShareCTA, engagementTracker]);
 
+  // Fetch blog data with proper error handling
   useEffect(() => {
     if (slug) {
       setLoading(true);
+      setError(null);
       BlogService.getBySlug(slug)
         .then(data => {
           console.log('Blog loaded:', data);
@@ -61,6 +92,7 @@ const BlogDetail: React.FC = () => {
         })
         .catch(error => {
           console.error('Error loading blog:', error);
+          setError('Failed to load blog. Please try again.');
           setBlog(null);
         })
         .finally(() => setLoading(false));
@@ -94,6 +126,14 @@ const BlogDetail: React.FC = () => {
     return content ? splitContentForCTA(content) : ['', ''];
   }, [blog]);
 
+  // Calculate reading time
+  const readingTime = useMemo(() => {
+    if (!blog?.content) return 3; // Default fallback
+    const wordsPerMinute = 200;
+    const wordCount = blog.content.split(/\s+/).length;
+    return Math.ceil(wordCount / wordsPerMinute);
+  }, [blog?.content]);
+
   // Combine content for proper heading extraction
   const combinedContent = useMemo(() => {
     const before = contentBeforeCTA || '';
@@ -106,38 +146,63 @@ const BlogDetail: React.FC = () => {
     setHeadings(newHeadings);
   };
 
-  // Scroll spy functionality
+  // Enhanced scroll spy functionality with IntersectionObserver
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 150;
-      
-      // Find the current active heading
-      for (let i = headings.length - 1; i >= 0; i--) {
-        const element = document.getElementById(headings[i].id);
-        if (element && element.offsetTop <= scrollPosition) {
-          setActiveHeading(headings[i].id);
-          break;
-        }
-      }
-    };
+    if (headings.length === 0) return;
 
-    if (headings.length > 0) {
-      window.addEventListener('scroll', handleScroll);
-      return () => window.removeEventListener('scroll', handleScroll);
-    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveHeading(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: '-20% 0px -70% 0px',
+        threshold: 0
+      }
+    );
+
+    headings.forEach((heading) => {
+      const element = document.getElementById(heading.id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
   }, [headings]);
 
-  // (Removed scroll-based setShowShareBar effect)
+  // Prefetch related content on hover
+  const handleHeadingHover = (headingId: string) => {
+    const element = document.getElementById(headingId);
+    if (element) {
+      element.style.scrollMarginTop = '120px';
+    }
+  };
+
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // Fetch recent and related blogs
+  // Fetch recent and related blogs with prefetching
   useEffect(() => {
+    if (blog) {
     BlogService.getAll().then(all => {
+      if (!Array.isArray(all)) {
+        setRecentBlogs([]);
+        setRelatedBlogs([]);
+        return;
+      }
       setRecentBlogs(all.slice(0, 5));
       if (blog && blog.category) {
         setRelatedBlogs(all.filter(b => b.category === blog.category && b.slug !== blog.slug).slice(0, 5));
       }
+      }).catch(error => {
+        console.error('Error fetching related blogs:', error);
+        setRecentBlogs([]);
+        setRelatedBlogs([]);
     });
+    }
   }, [blog]);
 
   // In BlogDetail component, add state for comments
@@ -148,136 +213,193 @@ const BlogDetail: React.FC = () => {
 
   // Fetch comments for this blog (via backend API)
   useEffect(() => {
-    if (!blog || !blog.slug) return;
+    if (blog && blog.slug) {
     setCommentsLoading(true);
-    (async () => {
-      try {
-        const res = await fetch(`/api/blogs/${blog.slug}/comments`);
-        const data = await res.json();
-        setComments(Array.isArray(data) ? data : []);
-      } catch (e) {
-        setComments([]);
-      }
-      setCommentsLoading(false);
-    })();
+      fetch(`/api/blogs/${blog.slug}/comments/threaded`)
+        .then(res => res.json())
+        .then(data => {
+          setComments(data);
+        })
+        .catch(error => {
+          console.error('Error fetching comments:', error);
+        })
+        .finally(() => setCommentsLoading(false));
+    }
   }, [blog]);
 
-  // Post comment handler (via backend API)
+  // Handle comment submission
   async function handleCommentSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!isSignedIn || !user?.id) {
-      toast('Please log in to comment.');
+    if (!commentText.trim() || !isSignedIn) {
+      toast('Please log in to comment');
       return;
     }
-    if (!commentText.trim()) {
-      toast('Please enter a comment.');
-      return;
-    }
-    if (!blog || !blog.slug) return;
+
     setCommentSubmitting(true);
     try {
-      const res = await fetch(`/api/blogs/${blog.slug}/comments`, {
+      const response = await fetch(`/api/blogs/${blog.slug}/comments`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user.id, content: commentText }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: commentText,
+          user_id: user?.id,
+        }),
       });
-      if (!res.ok) {
-        toast('Failed to post comment.');
-      } else {
-        toast('Comment posted!');
+
+      if (response.ok) {
+        const newComment = await response.json();
+        setComments(prev => [newComment, ...prev]);
         setCommentText('');
-        // Refresh comments
-        const commentsRes = await fetch(`/api/blogs/${blog.slug}/comments`);
-        const newComments = await commentsRes.json();
-        setComments(Array.isArray(newComments) ? newComments : []);
+        toast('Comment posted successfully!');
+        
+        // Track comment event
+        engagementTracker.trackComment({
+          comment_id: newComment.id,
+          blog_slug: blog.slug,
+          content_length: commentText.length
+        });
+      } else {
+        throw new Error('Failed to post comment');
       }
-    } catch (e) {
-      toast('Failed to post comment.');
-    }
+    } catch (error) {
+      console.error('Error posting comment:', error);
+      toast('Failed to post comment. Please try again.');
+    } finally {
     setCommentSubmitting(false);
   }
-
-  if (loading || !blog || !blog.slug) {
-    return <div className="max-w-4xl mx-auto px-4 py-12 text-center text-lg text-gray-500">Loading blog details...</div>;
   }
-  if (!blog) return <div className="max-w-2xl mx-auto px-4 py-16 text-center text-red-500">Blog not found.</div>;
 
-  // Check if blog has content
-  const hasContent = blog.content || blog.description;
-  if (!hasContent) {
+  // Handle share functionality
+  function handleShare(platform: string) {
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+    const title = blog?.title || '';
+    const description = blog?.description || '';
+
+    let shareUrl = '';
+    switch (platform) {
+      case 'x':
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
+        break;
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+        break;
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        break;
+      case 'whatsapp':
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}`;
+        break;
+      case 'copy':
+        navigator.clipboard.writeText(url);
+        setCopied(true);
+        toast('Link copied to clipboard!');
+        setTimeout(() => setCopied(false), 2000);
+        return;
+      default:
+        return;
+    }
+
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'noopener,noreferrer');
+      
+      // Track share event
+      engagementTracker.trackShare({
+        platform,
+        blog_slug: blog?.slug,
+        blog_title: blog?.title
+      });
+    }
+  }
+
+  // Handle newsletter subscription
+  async function handleNewsletterSubscribe(email: string) {
+    try {
+    // TODO: Call your newsletter API or Supabase
+      engagementTracker.trackNewsletterSignup({
+        email,
+        blog_slug: blog.slug,
+        blog_title: blog.title
+      });
+      
+    toast('Subscribed! Check your inbox.');
+      setShowNewsletterModal(false);
+    } catch (error) {
+      console.error('Error subscribing to newsletter:', error);
+      toast('Failed to subscribe. Please try again.');
+    }
+  }
+
+  // Show loading state while blog data is being fetched
+  if (loading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-red-500" />
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{blog.title}</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">This blog post doesn't have any content yet.</p>
-        <button 
-          onClick={() => navigate(-1)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          Go Back
-        </button>
+      <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading blog...</p>
+        </div>
       </div>
     );
   }
 
-
-  // Share handler
-  function handleShare(platform: string) {
-    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-    const shareTitle = blog?.title || 'Check out this blog!';
-    const encodedUrl = encodeURIComponent(shareUrl);
-    const encodedTitle = encodeURIComponent(shareTitle);
-    
-    // Track the share event
-    trackShare(
-      platform as 'twitter' | 'facebook' | 'linkedin' | 'whatsapp' | 'copy',
-      'blog',
-      blog?.slug || '',
-      blog?.title,
-      isSignedIn ? user?.id : undefined
+  // Show error state if blog failed to load
+  if (error || !blog) {
+    return (
+      <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Blog Not Found</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{error || 'The blog you are looking for does not exist.'}</p>
+          <button
+            onClick={() => navigate('/blog')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Back to Blogs
+          </button>
+        </div>
+      </div>
     );
-    
-    let url = '';
-    switch (platform) {
-      case 'x':
-        url = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
-        break;
-      case 'linkedin':
-        url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
-        break;
-      case 'whatsapp':
-        url = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
-        break;
-      case 'facebook':
-        url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-        break;
-      case 'copy':
-        navigator.clipboard.writeText(shareUrl);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-        return;
-      default:
-        url = shareUrl;
-    }
-    window.open(url, '_blank', 'noopener,noreferrer');
-    logBlogEvent({ event_type: 'share', blog_id: blog.slug, user_id: isSignedIn ? user?.id : undefined, platform });
   }
 
-  // Newsletter subscribe handler
-  async function handleNewsletterSubscribe(email: string) {
-    // TODO: Call your newsletter API or Supabase
-    logBlogEvent({ event_type: 'newsletter_signup', blog_id: blog.slug, user_id: isSignedIn ? user?.id : undefined });
-    toast('Subscribed! Check your inbox.');
-  }
-
-  const wordCount = blog?.content ? blog.content.split(/\s+/).length : 0;
-  const readingTime = Math.ceil(wordCount / 200);
+  // SEO data for the blog
+  const seoData = {
+    title: blog.title,
+    description: blog.description || blog.subtitle || `Read about ${blog.title}`,
+    image: blog.cover_image_url,
+    url: `${window.location.origin}/blog/${blog.slug}`,
+    type: 'article',
+    publishedTime: blog.created_at,
+    modifiedTime: blog.updated_at,
+    author: blog.author_name,
+    section: blog.category
+  };
 
   return (
+    <>
+      {/* SEO Component with structured data */}
+      <SEO {...seoData} />
+      
     <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] overflow-x-hidden sm:px-2">
+        {/* Enhanced Reading Progress Bar */}
+        <div className="fixed top-0 left-0 w-full h-1 z-50 bg-gray-200 dark:bg-gray-800">
+          <motion.div
+            className="h-full bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500"
+            style={{ width: `${progress}%` }}
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          />
+        </div>
+
       {/* Title, Image, Description (minimal, no cards) */}
       {/* In the hero section, reduce top padding and make title full width on mobile */}
-      <div className="w-full bg-white dark:bg-[#171717] pt-2 pb-2 border-b border-gray-100 dark:border-gray-800">
+        <motion.div 
+          className="w-full bg-white dark:bg-[#171717] pt-2 pb-2 border-b border-gray-100 dark:border-gray-800"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
         {/* Back Button in hero section, above content */}
         <div className="max-w-4xl mx-auto px-4 flex items-center pt-2 pb-2">
         <button
@@ -297,13 +419,25 @@ const BlogDetail: React.FC = () => {
         </div>
           
         {/* Headline */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-4 leading-tight w-full break-words">
+          <motion.h1 
+            className="text-3xl sm:text-4xl md:text-5xl font-bold font-serif text-gray-900 dark:text-white mb-4 leading-tight w-full break-words"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+          >
             {blog.title}
-          </h1>
+          </motion.h1>
           
           {/* Subtitle (if present) */}
           {blog.subtitle && (
-            <div className="text-lg italic text-gray-500 mb-3 font-serif">{blog.subtitle}</div>
+              <motion.div 
+                className="text-lg italic text-gray-500 mb-3 font-serif"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5, ease: "easeOut" }}
+              >
+                {blog.subtitle}
+              </motion.div>
           )}
           
           {/* Byline and Follow Author */}
@@ -318,12 +452,18 @@ const BlogDetail: React.FC = () => {
           {/* Author bio (mobile) */}
           <div className="text-xs text-gray-500 font-serif mb-2 sm:hidden">{blog.author_bio || 'Contributor bio here.'}</div>
           
-          {/* Publication date */}
-          <div className="text-xs text-gray-500 font-serif mb-4">
+                      {/* Reading time and publication date */}
+          <div className="flex items-center gap-4 text-xs text-gray-500 font-serif mb-4">
+            <div className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              <span>{readingTime} min read</span>
+            </div>
+            <div>
             Published {blog.created_at ? new Date(blog.created_at).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
             {blog.updated_at && (
               <span>, Updated {new Date(blog.updated_at).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
             )}
+            </div>
           </div>
           
           {/* Action bar */}
@@ -398,31 +538,47 @@ const BlogDetail: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
-      {/* Cover image below hero section */}
-      <div className="relative w-full max-w-4xl mx-auto mb-4">
-        <motion.img
-          src={blog.cover_image_url || '/public/placeholder.svg'}
+        </motion.div>
+        
+        {/* Optimized Cover Image */}
+        <motion.div 
+          className="relative w-full max-w-4xl mx-auto mb-4"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
+        >
+          <OptimizedImage
+            src={blog.cover_image_url || '/placeholder.svg'}
               alt={blog.title}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
           className="w-full h-[220px] sm:h-[320px] md:h-[420px] lg:h-[520px] object-cover object-center rounded-none md:rounded-xl"
-          style={{ minHeight: 120 }}
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 100vw, 1200px"
+            priority={true}
         />
         {/* Bottom gradient overlay for contrast */}
         <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/70 to-transparent pointer-events-none rounded-b-xl" />
-          </div>
+        </motion.div>
+        
       {blog.description && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 mb-12">
+          <motion.div 
+            className="max-w-4xl mx-auto px-4 sm:px-6 mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
+          >
           <ContentRenderer 
             content={blog.description}
             onHeadingsGenerated={handleHeadingsGenerated}
           />
-        </div>
+          </motion.div>
       )}
+        
       {/* Main Content + Sidebar */}
-      <div className="w-full mx-auto mb-6 grid grid-cols-1 lg:grid-cols-[250px_minmax(0,1fr)_300px] xl:grid-cols-[280px_minmax(0,1fr)_320px] gap-0 lg:gap-8 max-w-[1600px]">
+        <motion.div 
+          className="w-full mx-auto mb-6 grid grid-cols-1 lg:grid-cols-[250px_minmax(0,1fr)_300px] xl:grid-cols-[280px_minmax(0,1fr)_320px] gap-0 lg:gap-8 max-w-[1600px]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
+        >
         {/* Table of Contents - Desktop */}
         <aside className="hidden lg:block sticky top-20 self-start h-fit">
           <TableOfContents 
@@ -432,9 +588,14 @@ const BlogDetail: React.FC = () => {
         </aside>
         
         {/* Main Content */}
-        <main className="min-w-0 w-full max-w-4xl xl:max-w-5xl mx-auto lg:mx-0 px-4 lg:px-0">
+          <motion.main 
+            className="min-w-0 w-full max-w-4xl xl:max-w-5xl mx-auto lg:mx-0 px-4 lg:px-0"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.0, duration: 0.6, ease: "easeOut" }}
+          >
           {/* Hidden ContentRenderer for heading extraction */}
-          <div className="hidden">
+          <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}>
             <ContentRenderer 
               content={combinedContent}
               onHeadingsGenerated={handleHeadingsGenerated}
@@ -448,7 +609,13 @@ const BlogDetail: React.FC = () => {
           />
           
           {/* Content before CTA */}
-          <div ref={contentRef} className="max-w-none">
+            <motion.div 
+              ref={contentRef} 
+              className="max-w-none"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2, duration: 0.6, ease: "easeOut" }}
+            >
             {contentBeforeCTA ? (
               <ContentRenderer 
                 content={contentBeforeCTA}
@@ -460,15 +627,25 @@ const BlogDetail: React.FC = () => {
                 <p className="text-sm">Please wait while we load the blog content...</p>
               </div>
             )}
-          </div>
+            </motion.div>
           
           {/* Inline Newsletter CTA */}
-          <div className="w-full flex flex-col items-center justify-center my-8">
+            <motion.div 
+              className="w-full flex flex-col items-center justify-center my-8"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.4, duration: 0.5, ease: "easeOut" }}
+            >
             <NewsletterCTA onSubscribe={handleNewsletterSubscribe} onToast={toast} />
-          </div>
+            </motion.div>
           
           {/* Content after CTA */}
-          <div className="max-w-none">
+            <motion.div 
+              className="max-w-none"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.6, duration: 0.6, ease: "easeOut" }}
+            >
             {contentAfterCTA ? (
               <ContentRenderer 
                 content={contentAfterCTA}
@@ -480,27 +657,39 @@ const BlogDetail: React.FC = () => {
                 <p className="text-sm">Please wait while we load the blog content...</p>
               </div>
             )}
-          </div>
+            </motion.div>
           
           {/* Mobile Related Articles */}
-          <div className="lg:hidden mt-8">
-            <RelatedArticles
+          <motion.div 
+            className="lg:hidden mt-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8, duration: 0.6, ease: "easeOut" }}
+          >
+            <RelatedContent
               currentSlug={blog.slug}
               category={blog.category}
               tags={blog.tags}
               title={blog.title}
+              variant="sidebar"
             />
-        </div>
-        </main>
+        </motion.div>
+          </motion.main>
         
         {/* Desktop Sidebar - Sticky */}
-        <aside className="hidden lg:flex flex-col w-[300px] xl:w-[320px] flex-shrink-0 gap-6 sticky top-20 self-start h-fit max-h-[calc(100vh-120px)] overflow-y-auto">
+          <motion.aside 
+            className="hidden lg:flex flex-col w-[300px] xl:w-[320px] flex-shrink-0 gap-6 sticky top-20 self-start h-fit max-h-[calc(100vh-120px)] overflow-y-auto"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.1, duration: 0.6, ease: "easeOut" }}
+          >
           {/* Related Articles - Desktop */}
-          <RelatedArticles
+            <RelatedContent
             currentSlug={blog.slug}
             category={blog.category}
             tags={blog.tags}
             title={blog.title}
+              variant="sidebar"
           />
           {/* Author Card */}
           <AuthorCard author={blog.author} />
@@ -510,11 +699,10 @@ const BlogDetail: React.FC = () => {
             <ul className="space-y-3">
               {recentBlogs.map(b => (
                 <li key={b.id} className="flex items-center gap-3">
-                  <img
-                    src={b.cover_image_url || '/public/placeholder.svg'}
+                    <OptimizedImage
+                      src={b.cover_image_url || '/placeholder.svg'}
                     alt={b.title}
                     className="w-10 h-10 rounded-xl object-cover border border-gray-200 dark:border-gray-700 bg-white"
-                    loading="lazy"
                     sizes="40px"
                   />
                   <div className="flex-1 min-w-0">
@@ -550,111 +738,140 @@ const BlogDetail: React.FC = () => {
               </button>
             </div>
           </section>
-        </aside>
-      </div>
+          </motion.aside>
+        </motion.div>
 
-      {/* Comments Section */}
-      <section className="max-w-2xl mx-auto my-6 sm:my-4 px-2 sm:px-0" id="comments-section">
-        <div className="w-full flex items-center gap-4 mb-4">
-          <div className="flex-1 h-px bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200" />
-          <span className="uppercase tracking-widest text-xs font-semibold text-gray-500 font-serif">Comments</span>
-          <div className="flex-1 h-px bg-gradient-to-l from-gray-200 via-gray-400 to-gray-200" />
-          </div>
-        {/* Comment Box */}
-        <form onSubmit={handleCommentSubmit} className="mb-6 flex flex-col gap-2">
-          <textarea
-            className="w-full p-3 border rounded-xl min-h-[60px] font-serif text-base bg-white dark:bg-[#18181b] focus:ring-2 focus:ring-blue-400 transition"
-            placeholder={isSignedIn ? 'Write a comment...' : 'Log in to comment'}
-            value={commentText}
-            onChange={e => setCommentText(e.target.value)}
-            disabled={commentSubmitting}
-            onFocus={() => { if (!isSignedIn) toast('Please log in to comment.'); }}
+        {/* Enhanced Comments Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.0, duration: 0.6, ease: "easeOut" }}
+          className="max-w-4xl mx-auto"
+        >
+          <ThreadedComments 
+            blogId={blog.slug} 
+            className=""
           />
-          <div className="flex items-center gap-2">
-            <button type="submit" disabled={commentSubmitting} className="px-4 py-2 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition disabled:opacity-60">{commentSubmitting ? 'Posting...' : 'Post Comment'}</button>
-            {!isSignedIn && (
-              <button type="button" onClick={() => {/* trigger login modal here */}} className="text-blue-600 underline cursor-pointer">Log in or Sign up to comment</button>
-            )}
-          </div>
-        </form>
-        {/* Comments List */}
-        {commentsLoading ? (
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                  <div className="h-3 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : comments.length === 0 ? (
-          <div className="text-muted-foreground text-sm">No comments yet. Be the first to comment!</div>
-        ) : (
-          <ul className="space-y-4">
-            {comments.map(comment => (
-              <li key={comment.id} className="flex items-start gap-3">
-                <img
-                  src={comment.user_id ? `https://images.clerk.dev/v1/user/${comment.user_id}/profile_image?width=48` : undefined}
-                  alt={comment.user_name || 'A'}
-                  className="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
-                />
-                <div className="flex-1 min-w-0 bg-gray-50 dark:bg-[#23232b] rounded-xl p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-gray-900 dark:text-white">User</span>
-                    <span className="text-xs text-muted-foreground">{new Date(comment.created_at).toLocaleDateString()}</span>
-                  </div>
-                  <div className="text-base text-gray-700 dark:text-gray-200 break-words font-serif">{comment.content}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-      {/* After the comments section, before the final newsletter CTA: */}
-      {/* In the Read Next section, fetch and display next 6 blogs, make horizontally scrollable, and animate each card */}
-      <section className="w-full flex flex-col items-start justify-center my-6 sm:my-4 pl-0 sm:pl-2">
-        <div className="max-w-4xl w-full">
-          <h3 className="text-2xl font-bold font-serif mb-4 text-gray-900 dark:text-white pl-1 sm:pl-2">Read Next</h3>
-          <div className="flex gap-6 sm:gap-4 overflow-x-auto pb-2 scroll-smooth snap-x pl-1 sm:pl-2" style={{ WebkitOverflowScrolling: 'touch' }}>
-            {(recentBlogs.slice(0, 6)).map((blog, i) => (
-              <motion.a
-                key={blog.id}
-                href={`/blog/${blog.slug}`}
-                className="flex-1 min-w-[260px] max-w-xs bg-white dark:bg-[#18181b] rounded-lg shadow border border-gray-200 dark:border-gray-800 p-4 flex flex-col gap-3 hover:shadow-lg transition group snap-start max-w-full min-w-0"
-                initial={{ opacity: 0, x: 40 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
+        </motion.div>
+
+        {/* Floating Share Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.2, duration: 0.5, ease: "easeOut" }}
+        >
+          <ShareBar
+            url={typeof window !== 'undefined' ? window.location.href : ''}
+            title={blog.title}
+            description={blog.description}
+            image={blog.cover_image_url}
+            variant="floating"
+            onShare={handleShare}
+          />
+        </motion.div>
+
+        {/* Scroll-based Newsletter Modal */}
+        <AnimatePresence>
+          {showNewsletterModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+              onClick={() => setShowNewsletterModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full"
+                onClick={(e) => e.stopPropagation()}
               >
-                <img
-                  src={blog.cover_image_url || '/public/placeholder.svg'}
-                  alt={blog.title}
-                  className="w-full h-32 object-cover rounded-lg mb-2 max-w-full"
-                  loading="lazy"
-                  sizes="160px"
+                <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                  Stay Updated!
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Get the latest AI insights and tutorials delivered to your inbox.
+                </p>
+                <NewsletterCTA onSubscribe={handleNewsletterSubscribe} />
+                <button
+                  onClick={() => setShowNewsletterModal(false)}
+                  className="w-full mt-3 p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  Maybe later
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Scroll-based Share CTA */}
+        <AnimatePresence>
+          {showShareCTA && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-40"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Enjoyed this article?
+                </span>
+                <ShareBar
+                  url={typeof window !== 'undefined' ? window.location.href : ''}
+                  title={blog.title}
+                  description={blog.description}
+                  image={blog.cover_image_url}
+                  variant="inline"
+                  onShare={handleShare}
                 />
-                <div className="font-bold text-lg font-serif text-gray-900 dark:text-white group-hover:underline mb-1 line-clamp-2 break-words">{blog.title}</div>
-                {/* Show short description */}
-                {blog.description && (
-                  <div className="text-sm text-gray-500 dark:text-gray-300 mb-1 line-clamp-2 break-words">{blog.description.slice(0, 80)}</div>
-                )}
-                <div className="text-xs text-muted-foreground font-serif">{blog.created_at ? new Date(blog.created_at).toLocaleDateString() : ''}</div>
-              </motion.a>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* Add a Forbes-style progress bar at the top of the page */}
-      <div className="fixed top-0 left-0 w-full h-1 z-50">
-        <div
-          className="h-full bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 transition-all duration-200"
-          style={{ width: `${progress}%` }}
-        />
+                <button
+                  onClick={() => setShowShareCTA(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  ×
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+                {/* Enhanced Related Content Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.4, duration: 0.6, ease: "easeOut" }}
+          className="max-w-6xl mx-auto my-12 px-4"
+        >
+          <RelatedContent
+            currentSlug={blog.slug}
+            category={blog.category}
+            tags={blog.tags}
+            title={blog.title}
+            variant="bottom"
+            className=""
+          />
+        </motion.div>
+        
+        {/* Premium Scroll to top button */}
+        <AnimatePresence>
+          {progress > 20 && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0, y: 20 }}
+              whileHover={{ scale: 1.1, y: -2 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={scrollToTop}
+              className="fixed bottom-6 right-6 z-40 p-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 backdrop-blur-sm border border-white/20"
+              aria-label="Scroll to top"
+            >
+              <ArrowUp className="w-5 h-5" />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+    </>
   );
 };
 
