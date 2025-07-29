@@ -63,7 +63,7 @@ const BestAIImageGeneratorsPage = () => {
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
+      if (error) return <div style={{ color: 'red' }}>Error: {error.message || 'An error occurred'}</div>;
 
   return (
     <div>

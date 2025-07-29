@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/clerk-react';
 import { toast } from '@/components/ui/sonner';
+import { useComments } from '../hooks/useComments';
 import { 
   MessageCircle, 
   Reply, 
@@ -58,9 +59,7 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
   className = '' 
 }) => {
   const { user, isSignedIn } = useUser();
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const { comments, isLoading: loading, postComment, isPosting: submitting } = useComments(blogId);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
@@ -70,29 +69,6 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
 
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
   const replyInputRef = useRef<HTMLTextAreaElement>(null);
-
-  // Fetch comments with threading
-  const fetchComments = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/blogs/${blogId}/comments/threaded`);
-      if (!response.ok) throw new Error('Failed to fetch comments');
-      
-      const data = await response.json();
-      setComments(data);
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-      toast('Failed to load comments');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (blogId) {
-      fetchComments();
-    }
-  }, [blogId]);
 
   // Submit new comment
   const handleSubmitComment = async (e: React.FormEvent) => {
@@ -108,29 +84,8 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
       return;
     }
 
-    try {
-      setSubmitting(true);
-      const response = await fetch(`/api/blogs/${blogId}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: user.id,
-          content
-        })
-      });
-
-      if (!response.ok) throw new Error('Failed to post comment');
-      
-      const newComment = await response.json();
-      setComments(prev => [newComment, ...prev]);
-      commentInputRef.current!.value = '';
-      toast('Comment posted successfully!');
-    } catch (error) {
-      console.error('Error posting comment:', error);
-      toast('Failed to post comment');
-    } finally {
-      setSubmitting(false);
-    }
+    postComment({ content });
+    commentInputRef.current!.value = '';
   };
 
   // Submit reply
@@ -147,31 +102,9 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
       return;
     }
 
-    try {
-      setSubmitting(true);
-      const response = await fetch(`/api/blogs/${blogId}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: user.id,
-          content,
-          parent_id: replyingTo
-        })
-      });
-
-      if (!response.ok) throw new Error('Failed to post reply');
-      
-      const newReply = await response.json();
-      setComments(prev => [...prev, newReply]);
-      setReplyingTo(null);
-      setReplyContent('');
-      toast('Reply posted successfully!');
-    } catch (error) {
-      console.error('Error posting reply:', error);
-      toast('Failed to post reply');
-    } finally {
-      setSubmitting(false);
-    }
+    postComment({ content, parent_id: replyingTo });
+    setReplyingTo(null);
+    setReplyContent('');
   };
 
   // Handle reaction

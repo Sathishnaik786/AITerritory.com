@@ -33,13 +33,7 @@ export const PromptBox: React.FC<PromptBoxProps> = ({ children, language = 'text
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="relative bg-gray-100 dark:bg-gray-800 rounded-lg my-6 border border-gray-200 dark:border-gray-700 overflow-hidden"
-    >
+    <motion.div className="relative bg-gray-100 dark:bg-gray-800 rounded-lg my-6 border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header with animated background */}
       <motion.div 
         className="flex justify-between items-center px-3 py-2 border-b border-gray-300 dark:border-gray-700 relative overflow-hidden"
@@ -97,16 +91,11 @@ export const PromptBox: React.FC<PromptBoxProps> = ({ children, language = 'text
       
       {/* Content with improved scrolling */}
       <div className="relative">
-        <motion.div 
-          className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1, duration: 0.3 }}
-        >
+        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
           <pre className="p-4 text-sm font-mono whitespace-pre text-gray-800 dark:text-gray-200 relative">
             <code className="block min-w-max">{children}</code>
           </pre>
-        </motion.div>
+        </div>
         
         {/* Gradient fade indicators for horizontal scroll */}
         <motion.div

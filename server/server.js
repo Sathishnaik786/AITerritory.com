@@ -240,7 +240,7 @@ async function startServer() {
     console.log('🔗 Initializing Redis...');
     await initializeRedis();
     
-    const preferredPort = parseInt(process.env.PORT) || 3003;
+    const preferredPort = parseInt(process.env.PORT) || 3001;
     const port = await findAvailablePort(preferredPort);
     
     app.listen(port, () => {

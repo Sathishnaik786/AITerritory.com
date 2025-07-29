@@ -313,17 +313,24 @@ const applySecurity = (app) => {
   app.post('/csp-violation', express.json({ type: 'application/csp-report' }), handleCSPViolation);
 
   // 7. CSRF Protection (only for state-changing methods)
-  app.use(getCSRFConfig());
-
-  // 8. CSRF Token Middleware - Send token via cookie for frontend
+  // Only apply CSRF to non-API routes
   app.use((req, res, next) => {
-    // Send CSRF token as cookie for frontend to use
-    res.cookie('XSRF-TOKEN', req.csrfToken(), {
-      httpOnly: false, // Allow JavaScript access
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 3600 // 1 hour
-    });
+    if (!req.path.startsWith('/api')) {
+      return getCSRFConfig()(req, res, next);
+    }
+    next();
+  });
+
+  // 8. CSRF Token Middleware - Send token via cookie for frontend (only for non-API routes)
+  app.use((req, res, next) => {
+    if (!req.path.startsWith('/api') && req.csrfToken) {
+      res.cookie('XSRF-TOKEN', req.csrfToken(), {
+        httpOnly: false, // Allow JavaScript access
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 3600 // 1 hour
+      });
+    }
     next();
   });
 

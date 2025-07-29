@@ -104,6 +104,12 @@ const BLOG_FIELDS = [
 // Update getAllBlogs to use only these fields and log full errors
 async function getAllBlogs(req, res) {
   try {
+    // Check if Supabase is properly configured
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.warn('Supabase not configured, returning empty array');
+      return res.json([]);
+    }
+
     const { data, error } = await supabase
       .from('blogs')
       .select(BLOG_FIELDS.join(','))
