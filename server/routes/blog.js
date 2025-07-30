@@ -43,6 +43,8 @@ router.post('/', blogController.createBlog);
 router.put('/:id', blogController.updateBlog);
 // DELETE /api/blogs/:id
 router.delete('/:id', blogController.deleteBlog);
+
+// Mount blog comments router
 router.use('/:slug/comments', blogCommentsRouter);
 
 // Get threaded comments for a blog
@@ -85,69 +87,6 @@ router.get('/:slug/comments/threaded', async (req, res) => {
     res.json(processedComments);
   } catch (error) {
     console.error('Error in threaded comments:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Post comment (enhanced for threading)
-router.post('/:slug/comments', strictLimiter, async (req, res) => {
-  try {
-    const { slug } = req.params;
-    const { user_id, content, parent_id } = req.body;
-
-    if (!user_id || !content) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    // Get blog ID first
-    const { data: blog, error: blogError } = await supabase
-      .from('blogs')
-      .select('id')
-      .eq('slug', slug)
-      .single();
-
-    if (blogError || !blog) {
-      return res.status(404).json({ error: 'Blog not found' });
-    }
-
-    // Calculate depth if this is a reply
-    let depth = 0;
-    if (parent_id) {
-      const { data: parentComment } = await supabase
-        .from('blog_comments')
-        .select('depth')
-        .eq('id', parent_id)
-        .single();
-      
-      depth = (parentComment?.depth || 0) + 1;
-      
-      // Limit depth to 3 levels
-      if (depth > 3) {
-        return res.status(400).json({ error: 'Maximum reply depth exceeded' });
-      }
-    }
-
-    // Create the comment
-    const { data: comment, error: commentError } = await supabase
-      .from('blog_comments')
-      .insert({
-        blog_id: blog.id,
-        user_id,
-        content: sanitizeHtml(content),
-        parent_id,
-        depth
-      })
-      .select()
-      .single();
-
-    if (commentError) {
-      console.error('Error creating comment:', commentError);
-      return res.status(500).json({ error: 'Failed to create comment' });
-    }
-
-    res.status(201).json(comment);
-  } catch (error) {
-    console.error('Error in post comment:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
