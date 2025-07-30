@@ -5,6 +5,18 @@ import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import { PromptBox } from './PromptBox';
+import { sanitizeMarkdownHtml } from '@/lib/sanitizeHtml';
+
+// Configure sanitization schema to only allow safe HTML elements
+const sanitizeSchema = {
+  tagNames: ['div', 'span', 'p', 'br', 'strong', 'em', 'code', 'pre', 'ul', 'ol', 'li', 'blockquote'],
+  attributes: {
+    div: ['class'],
+    span: ['class'],
+    code: ['class'],
+    pre: ['class']
+  }
+};
 
 interface Heading {
   id: string;
@@ -267,15 +279,27 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
     },
   };
 
+  // Sanitize the content to prevent any unwanted HTML from being rendered
+  const sanitizedContent = useMemo(() => {
+    if (!content) return '';
+    return sanitizeMarkdownHtml(content);
+  }, [content]);
+
   return (
-    <div className="content-renderer">
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
-        components={components}
-      >
-        {content}
-      </ReactMarkdown>
-    </div>
+    <article className="content-renderer prose prose-lg max-w-none dark:prose-invert">
+      <div className="blog-content-wrapper">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[
+            rehypeRaw, 
+            [rehypeSanitize, sanitizeSchema], 
+            rehypeHighlight
+          ]}
+          components={components}
+        >
+          {sanitizedContent}
+        </ReactMarkdown>
+      </div>
+    </article>
   );
 }; 
