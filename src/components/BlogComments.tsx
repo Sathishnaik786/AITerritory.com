@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../services/supabaseClient';
 import { useUser, SignInButton } from '@clerk/clerk-react';
 import { sanitizeText } from '@/lib/sanitizeHtml';
+import { blogInteractions } from '../services/unifiedInteractionsService';
 
 interface BlogCommentsProps {
   blogId: string;
@@ -24,13 +24,14 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ blogId }) => {
 
   async function fetchComments() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('blog_comments')
-      .select('*')
-      .eq('blog_id', blogId)
-      .order('created_at', { ascending: false });
-    if (error) setError('Failed to load comments');
-    else setComments(data || []);
+    try {
+      const data = await blogInteractions.getComments(blogId);
+      setComments(data);
+      setError('');
+    } catch (error) {
+      setError('Failed to load comments');
+      console.error('Error fetching comments:', error);
+    }
     setLoading(false);
   }
 
@@ -41,20 +42,16 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ blogId }) => {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || !user?.id) return;
     setSubmitting(true);
     setError('');
-    const { error } = await supabase.from('blog_comments').insert([
-      {
-        blog_id: blogId,
-        user_id: user?.id,
-        content: input.trim(),
-      },
-    ]);
-    if (error) setError('Failed to post comment');
-    else {
+    try {
+      await blogInteractions.addComment(blogId, user.id, input.trim());
       setInput('');
       fetchComments();
+    } catch (error) {
+      setError('Failed to post comment');
+      console.error('Error posting comment:', error);
     }
     setSubmitting(false);
   }

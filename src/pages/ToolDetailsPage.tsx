@@ -19,6 +19,7 @@ import { Tool } from '../types/tool';
 import { Review } from '../types/review';
 import { FaXTwitter, FaLinkedin, FaWhatsapp, FaFacebook } from 'react-icons/fa6';
 import { trackToolLike, trackToolBookmark, trackShare, trackCommentPosted } from '@/lib/analytics';
+import { toolInteractions } from '@/services/unifiedInteractionsService';
 
 const ToolDetailsPage: React.FC = () => {
   // All hooks at the top!
@@ -129,24 +130,21 @@ const ToolDetailsPage: React.FC = () => {
   useEffect(() => {
     if (!toolId) return;
     (async () => {
-      // Total likes
-      const { count } = await supabase
-      .from('likes')
-      .select('*', { count: 'exact', head: true })
-        .eq('tool_id', toolId);
-      setLikesCount(count || 0);
-      // User like status
-    if (user?.id) {
-        const { data } = await supabase
-        .from('likes')
-        .select('id')
-        .eq('tool_id', toolId)
-        .eq('user_id', user.id)
-          .single();
-        setUserHasLiked(!!data);
-    } else {
-      setUserHasLiked(false);
-    }
+      try {
+        // Total likes
+        const likeCount = await toolInteractions.getLikeCount(toolId);
+        setLikesCount(likeCount);
+        
+        // User like status
+        if (user?.id) {
+          const hasLiked = await toolInteractions.checkLike(toolId, user.id);
+          setUserHasLiked(hasLiked);
+        } else {
+          setUserHasLiked(false);
+        }
+      } catch (error) {
+        console.error('Error fetching likes:', error);
+      }
     })();
   }, [toolId, user?.id]);
 
@@ -154,23 +152,20 @@ const ToolDetailsPage: React.FC = () => {
   useEffect(() => {
     if (!toolId) return;
     (async () => {
-      // Total bookmarks
-      const { count } = await supabase
-        .from('user_bookmarks')
-        .select('*', { count: 'exact', head: true })
-        .eq('tool_id', toolId);
-      setBookmarkCount(count || 0);
-      // User bookmark status
-      if (user?.id) {
-    const { data } = await supabase
-          .from('user_bookmarks')
-          .select('id')
-      .eq('tool_id', toolId)
-          .eq('user_id', user.id)
-          .single();
-        setUserHasBookmarked(!!data);
-      } else {
-        setUserHasBookmarked(false);
+      try {
+        // Total bookmarks
+        const bookmarkCount = await toolInteractions.getBookmarkCount(toolId);
+        setBookmarkCount(bookmarkCount);
+        
+        // User bookmark status
+        if (user?.id) {
+          const hasBookmarked = await toolInteractions.checkBookmark(toolId, user.id);
+          setUserHasBookmarked(hasBookmarked);
+        } else {
+          setUserHasBookmarked(false);
+        }
+      } catch (error) {
+        console.error('Error fetching bookmarks:', error);
       }
     })();
   }, [toolId, user?.id]);
@@ -180,77 +175,17 @@ const ToolDetailsPage: React.FC = () => {
     if (!toolId) return;
     setCommentsLoading(true);
     (async () => {
-      const { data, error } = await supabase
-      .from('tool_comments')
-      .select('*')
-      .eq('tool_id', toolId)
-        .order('created_at', { ascending: false });
-      console.log('Supabase comments fetch:', { data, error });
-      setComments(data || []);
+      try {
+        const data = await toolInteractions.getComments(toolId);
+        setComments(data);
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+      }
       setCommentsLoading(false);
     })();
   }, [toolId]);
 
-  // Real-time comments subscription
-  useEffect(() => {
-    if (!toolId) return;
-    const channel = supabase
-      .channel('realtime:tool_comments')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'tool_comments', filter: `tool_id=eq.${toolId}` },
-        () => {
-          supabase
-            .from('tool_comments')
-            .select('*')
-            .eq('tool_id', toolId)
-            .order('created_at', { ascending: false })
-            .then(({ data }) => setComments(data || []));
-        }
-      )
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [toolId]);
 
-  // Real-time likes subscription
-  useEffect(() => {
-    if (!toolId) return;
-    const channel = supabase
-      .channel('realtime:likes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'likes', filter: `tool_id=eq.${toolId}` },
-        () => {
-          supabase
-            .from('likes')
-            .select('*', { count: 'exact', head: true })
-            .eq('tool_id', toolId)
-            .then(({ count }) => setLikesCount(count || 0));
-        }
-      )
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [toolId]);
-
-  // Real-time bookmarks subscription
-  useEffect(() => {
-    if (!toolId) return;
-    const channel = supabase
-      .channel('realtime:user_bookmarks')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'user_bookmarks', filter: `tool_id=eq.${toolId}` },
-        () => {
-          supabase
-            .from('user_bookmarks')
-            .select('*', { count: 'exact', head: true })
-            .eq('tool_id', toolId)
-            .then(({ count }) => setBookmarkCount(count || 0));
-        }
-      )
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [toolId]);
 
   // Like toggle handler
   const handleLikeToggle = async () => {
@@ -259,22 +194,27 @@ const ToolDetailsPage: React.FC = () => {
       return;
     }
     setLikeLoading(true);
-    if (userHasLiked) {
-      await supabase.from('likes').delete().eq('tool_id', toolId).eq('user_id', user.id);
-      setLikesCount(c => Math.max(0, c - 1));
-      setUserHasLiked(false);
-    } else {
-      await supabase.from('likes').insert({ tool_id: toolId, user_id: user.id });
-      setLikesCount(c => c + 1);
-      setUserHasLiked(true);
-      
-      // Track the like event
-      trackToolLike(
-        toolId,
-        tool?.name,
-        tool?.category,
-        user.id
-      );
+    try {
+      if (userHasLiked) {
+        await toolInteractions.removeLike(toolId, user.id);
+        setLikesCount(c => Math.max(0, c - 1));
+        setUserHasLiked(false);
+      } else {
+        await toolInteractions.addLike(toolId, user.id);
+        setLikesCount(c => c + 1);
+        setUserHasLiked(true);
+        
+        // Track the like event
+        trackToolLike(
+          toolId,
+          tool?.name,
+          tool?.category,
+          user.id
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      toast('Failed to update like');
     }
     setLikeLoading(false);
   };
@@ -286,22 +226,27 @@ const ToolDetailsPage: React.FC = () => {
       return;
     }
     setBookmarkLoading(true);
-    if (userHasBookmarked) {
-      await supabase.from('user_bookmarks').delete().eq('tool_id', toolId).eq('user_id', user.id);
-      setBookmarkCount(c => Math.max(0, c - 1));
-      setUserHasBookmarked(false);
-    } else {
-      await supabase.from('user_bookmarks').insert({ tool_id: toolId, user_id: user.id });
-      setBookmarkCount(c => c + 1);
-      setUserHasBookmarked(true);
-      
-      // Track the bookmark event
-      trackToolBookmark(
-        toolId,
-        tool?.name,
-        tool?.category,
-        user.id
-      );
+    try {
+      if (userHasBookmarked) {
+        await toolInteractions.removeBookmark(toolId, user.id);
+        setBookmarkCount(c => Math.max(0, c - 1));
+        setUserHasBookmarked(false);
+      } else {
+        await toolInteractions.addBookmark(toolId, user.id);
+        setBookmarkCount(c => c + 1);
+        setUserHasBookmarked(true);
+        
+        // Track the bookmark event
+        trackToolBookmark(
+          toolId,
+          tool?.name,
+          tool?.category,
+          user.id
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
+      toast('Failed to update bookmark');
     }
     setBookmarkLoading(false);
   };
@@ -318,25 +263,27 @@ const ToolDetailsPage: React.FC = () => {
       return;
     }
     setCommentSubmitting(true);
-    const { data, error } = await supabase.from('tool_comments').insert({
-      tool_id: toolId,
-      user_id: user.id,
-      comment: commentText,
-      created_at: new Date().toISOString(),
-    });
-    console.log('Supabase comment insert:', { data, error });
-    
-    // Track the comment posted event
-    trackCommentPosted(
-      'tool',
-      toolId,
-      tool?.name,
-      commentText.length,
-      user.id
-    );
-    
-    setCommentText('');
-    setCommentSubmitting(false);
+    try {
+      const data = await toolInteractions.addComment(toolId, user.id, commentText.trim());
+      
+      // Track the comment posted event
+      trackCommentPosted(
+        'tool',
+        toolId,
+        tool?.name,
+        commentText.length,
+        user.id
+      );
+      
+      setCommentText('');
+      setComments(prev => [data, ...prev]);
+      toast('Comment posted successfully!');
+    } catch (error) {
+      console.error('Error posting comment:', error);
+      toast('Failed to post comment');
+    } finally {
+      setCommentSubmitting(false);
+    }
   };
 
   // Calculate average rating

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-react';
 import { toast } from '@/components/ui/sonner';
+import { blogInteractions } from '../services/unifiedInteractionsService';
 
 interface LikeBookmarkStatus {
   likeCount: number;
@@ -10,54 +11,55 @@ interface LikeBookmarkStatus {
 
 // Fetch like and bookmark status
 const fetchLikeBookmarkStatus = async (blogId: string, userId?: string): Promise<LikeBookmarkStatus> => {
-  const url = userId 
-    ? `/api/blogs/${blogId}/likes?user_id=${userId}`
-    : `/api/blogs/${blogId}/likes`;
-  
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error('Failed to fetch like/bookmark status');
+  try {
+    const [likeCount, bookmarkCount, hasLiked, hasBookmarked] = await Promise.all([
+      blogInteractions.getLikeCount(blogId),
+      blogInteractions.getBookmarkCount(blogId),
+      userId ? blogInteractions.checkLike(blogId, userId) : Promise.resolve(false),
+      userId ? blogInteractions.checkBookmark(blogId, userId) : Promise.resolve(false),
+    ]);
+    
+    return {
+      likeCount,
+      liked: hasLiked,
+      bookmarked: hasBookmarked,
+    };
+  } catch (error) {
+    console.error('Error fetching like/bookmark status:', error);
+    return {
+      likeCount: 0,
+      liked: false,
+      bookmarked: false,
+    };
   }
-  
-  const likeData = await response.json();
-  
-  // Also fetch bookmark status
-  const bookmarkUrl = userId 
-    ? `/api/blogs/${blogId}/bookmarks?user_id=${userId}`
-    : `/api/blogs/${blogId}/bookmarks`;
-  
-  const bookmarkResponse = await fetch(bookmarkUrl);
-  const bookmarkData = bookmarkResponse.ok ? await bookmarkResponse.json() : { bookmarked: false };
-  
-  return {
-    likeCount: likeData.likeCount || 0,
-    liked: likeData.liked || false,
-    bookmarked: bookmarkData.bookmarked || false,
-  };
 };
 
 // Toggle like
 const toggleLike = async (blogId: string, userId: string): Promise<void> => {
-  const response = await fetch(`/api/blogs/${blogId}/likes`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: userId }),
-  });
-  
-  if (!response.ok) {
+  try {
+    const hasLiked = await blogInteractions.checkLike(blogId, userId);
+    if (hasLiked) {
+      await blogInteractions.removeLike(blogId, userId);
+    } else {
+      await blogInteractions.addLike(blogId, userId);
+    }
+  } catch (error) {
+    console.error('Error toggling like:', error);
     throw new Error('Failed to toggle like');
   }
 };
 
 // Toggle bookmark
 const toggleBookmark = async (blogId: string, userId: string): Promise<void> => {
-  const response = await fetch(`/api/blogs/${blogId}/bookmarks`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: userId }),
-  });
-  
-  if (!response.ok) {
+  try {
+    const hasBookmarked = await blogInteractions.checkBookmark(blogId, userId);
+    if (hasBookmarked) {
+      await blogInteractions.removeBookmark(blogId, userId);
+    } else {
+      await blogInteractions.addBookmark(blogId, userId);
+    }
+  } catch (error) {
+    console.error('Error toggling bookmark:', error);
     throw new Error('Failed to toggle bookmark');
   }
 };
