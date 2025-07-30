@@ -4,7 +4,15 @@ services:
     plan: free
     runtime: node
     buildCommand: npm run build
-    startCommand: node server/ssr.js
+    startCommand: node server/server.js
     envVars:
       - key: NODE_ENV
         value: production
+      - key: SUPABASE_URL
+        value: https://ckahkadgnaxzcfhmsdaj.supabase.co
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: PORT
+        value: 3001
+      - key: ENABLE_REDIS
+        value: false

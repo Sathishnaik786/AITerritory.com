@@ -4,7 +4,7 @@ import axios from 'axios';
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 const API_BASE_URL = isProduction 
   ? 'https://aiterritory-com.onrender.com/api'
-  : '/api';
+  : 'http://localhost:3003/api';
 
 console.log('Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
 console.log('Hostname:', window.location.hostname);
