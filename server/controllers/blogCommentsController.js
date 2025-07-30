@@ -19,7 +19,7 @@ async function getComments(req, res) {
   const { data, error } = await supabase
     .from('blog_comments')
     .select('*')
-    .eq('blog_id', slug) // Use slug as blog_id
+    .eq('blog_id', blog.id) // Use blog UUID
     .order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
@@ -47,7 +47,7 @@ async function postComment(req, res) {
   
   const { data, error } = await supabase
     .from('blog_comments')
-    .insert([{ blog_id: slug, user_id, content: sanitizedContent }]) // Use slug as blog_id
+    .insert([{ blog_id: blog.id, user_id, content: sanitizedContent }]) // Use blog UUID
     .select()
     .single();
   if (error) return res.status(500).json({ error: error.message });
