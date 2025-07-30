@@ -1,4 +1,4 @@
-const { supabase } = require('../lib/supabaseClient');
+const { supabase } = require('../lib/supabase');
 const { sanitizeText } = require('../lib/sanitizeHtml');
 
 // GET /api/blogs/:slug/comments

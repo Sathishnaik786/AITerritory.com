@@ -1,4 +1,4 @@
-const { supabase } = require('../lib/supabaseClient');
+const { supabase } = require('../lib/supabase');
 
 // Helper function to get signed URLs for Supabase storage
 async function getSignedUrl(path, expiresIn = 3600) {
