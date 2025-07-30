@@ -68,6 +68,7 @@ const newsletterController = require('./controllers/newsletterController');
 const appleCarouselRoutes = require('./routes/appleCarousel');
 const blogRoutes = require('./routes/blog');
 const commentRoutes = require('./routes/comments');
+const unifiedInteractionsRoutes = require('./routes/unifiedInteractions');
 
 // Import security middleware
 const { applySecurity } = require('./middleware/security');
@@ -135,6 +136,7 @@ app.use('/api/ai-learning-path-courses', aiLearningPathCoursesRoutes);
 app.use('/api/ai-agent-learning-resources', aiAgentLearningResourcesRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/apple-carousel', appleCarouselRoutes);
+app.use('/api/interactions', unifiedInteractionsRoutes);
 
 // Add /api/paypal webhook route
 app.use('/api/paypal', require('./routes/paypal'));
