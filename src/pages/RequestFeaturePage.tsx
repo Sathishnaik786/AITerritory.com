@@ -40,8 +40,10 @@ const RequestFeaturePage: React.FC = () => {
   return (
     <>
       <SEO
-        title="Request a Feature | AI Territory"
-        description="Have an idea for a new feature? Let us know! We are always looking for ways to improve AI Territory."
+        title="Request a Feature | AITerritory"
+        description="Submit your AI tool requests or feature ideas on AITerritory. Help us bring more powerful AI tools to the community."
+        image="/og-default.png"
+        keywords="feature request, AI tools, community feedback, AI platform improvements"
       />
       <div className="max-w-lg mx-auto py-12 px-4">
         <h1 className="text-3xl font-bold mb-6 text-center">Request a Feature</h1>

@@ -71,6 +71,24 @@ const Blog: React.FC = () => {
           >
             Discover the latest in AI, productivity, and innovation. Curated insights, guides, and tools for the modern creator.
           </motion.p>
+          <motion.div
+            className="flex flex-wrap justify-center gap-4 mt-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+          >
+            <Link to="/tools/ai-chatbots" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Explore more AI chatbots here
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link to="/tools/ai-text-generators" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Discover AI text generators
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link to="/tools/ai-image-generators" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Browse AI image generators
+            </Link>
+          </motion.div>
         </div>
       </section>
       {/* Category Filter */}

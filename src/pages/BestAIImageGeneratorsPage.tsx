@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ToolCard from '../components/ToolCard';
 import { useTags } from '../hooks/useTags';
+import SEO from '../components/SEO';
+import FAQ from '../components/FAQ';
 
 const BestAIImageGeneratorsPage = () => {
   const [tools, setTools] = useState([]);
@@ -66,8 +68,22 @@ const BestAIImageGeneratorsPage = () => {
       if (error) return <div style={{ color: 'red' }}>Error: {error.message || 'An error occurred'}</div>;
 
   return (
-    <div>
-      <h1>Best AI Image Generators</h1>
+    <>
+      <SEO
+        title="Best AI Image Generators | AITerritory"
+        description="Generate stunning images using AI-powered tools. Browse the best AI Image Generators curated by AITerritory."
+        image="/og-default.png"
+        keywords="AI image generators, image creation, AI art, text-to-image, image generation tools"
+      />
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
+            Best AI Image Generators
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Generate stunning images using AI-powered tools
+          </p>
+        </div>
       <form onSubmit={handleSearch} style={{ marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <input
           type="text"
@@ -168,7 +184,10 @@ const BestAIImageGeneratorsPage = () => {
           Next
         </button>
       </div>
-    </div>
+      
+      {/* FAQ Section */}
+      <FAQ category="ai-image-generators" />
+    </>
   );
 };
 

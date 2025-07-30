@@ -9,6 +9,8 @@ import { Search, Filter, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 import { Tool } from '../types/tool';
 
 import SEO from '../components/SEO';
+import FAQ from '../components/FAQ';
+
 const ProductivityToolsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,8 +93,10 @@ const ProductivityToolsPage = () => {
   return (
     <>
       <SEO
-        title="AI Productivity Tools | Boost Your Efficiency"
-        description="Discover the best AI-powered productivity tools to automate tasks, manage your workflow, and boost your efficiency."
+        title="AI Productivity Tools | AITerritory"
+        description="Boost your productivity with AI-powered tools curated by AITerritory. Find automation apps and AI assistants for businesses."
+        image="/og-default.png"
+        keywords="AI productivity tools, automation, workflow management, AI assistants, business efficiency"
       />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
@@ -295,6 +299,9 @@ const ProductivityToolsPage = () => {
         </div>
       )}
     </div>
+    
+    {/* FAQ Section */}
+    <FAQ category="productivity-tools" />
     </>
   );
 };

@@ -184,6 +184,23 @@ export const HomePage: React.FC = () => {
               className="w-full"
             />
           </div>
+          <div className="flex flex-wrap justify-center gap-4 text-sm">
+            <Link to="/tools/ai-chatbots" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Explore AI chatbots
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link to="/tools/ai-text-generators" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Discover text generators
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link to="/tools/ai-image-generators" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Browse image generators
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link to="/productivity-tools" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Productivity tools
+            </Link>
+          </div>
         </motion.div>
 
         {/* Featured and Trending Tools - Side by Side */}

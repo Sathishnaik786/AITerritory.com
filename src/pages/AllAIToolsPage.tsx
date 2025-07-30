@@ -12,6 +12,8 @@ import MetaTags from '../components/MetaTags';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '../services/supabaseClient'; // Adjust path
 import { ToolCard, ToolCardStats } from '../components/ToolCard'; // Import ToolCardStats
+import SEO from '../components/SEO';
+import FAQ from '../components/FAQ';
 
 const AllAIToolsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
@@ -101,11 +103,11 @@ const AllAIToolsPage = () => {
 
   return (
     <>
-      <MetaTags
+      <SEO
         title="All AI Tools | AITerritory"
-        description="Browse all AI tools on AITerritory. Discover, compare, and review the latest artificial intelligence solutions for every category and use case."
-        image="https://aiterritory.org/og-default.png"
-        url="https://aiterritory.org/all-ai-tools"
+        description="Browse all AI tools in one place. AITerritory curates the best AI-powered solutions for every industry."
+        image="/og-default.png"
+        keywords="AI tools, artificial intelligence, AI software, machine learning tools, AI applications"
       />
       <div className="container mx-auto px-4 py-8 relative">
         {/* Subtle animated background for depth */}
@@ -295,6 +297,9 @@ const AllAIToolsPage = () => {
           />
         </motion.div>
       </div>
+      
+      {/* FAQ Section */}
+      <FAQ category="all-ai-tools" />
     </>
   );
 };

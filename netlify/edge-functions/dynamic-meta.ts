@@ -26,6 +26,17 @@ const ROUTE_NAMES: Record<string, string> = {
   "/dashboard/": "Dashboard",
 };
 
+// Category-specific meta descriptions
+const CATEGORY_META_DESCRIPTIONS: Record<string, string> = {
+  "ai-chatbots": "Discover the best AI Chatbots for automation, customer support, and productivity at AITerritory. Explore top tools updated daily.",
+  "ai-text-generators": "Explore advanced AI Text Generators for content creation, blogs, and business automation. Find top-rated tools on AITerritory.",
+  "ai-image-generators": "Generate stunning images using AI-powered tools. Browse the best AI Image Generators curated by AITerritory.",
+  "ai-art-generators": "Turn ideas into beautiful artwork with AI Art Generators. Find and compare top tools for artists and designers.",
+  "productivity-tools": "Boost your productivity with AI-powered tools curated by AITerritory. Find automation apps and AI assistants for businesses.",
+  "all-ai-tools": "Browse all AI tools in one place. AITerritory curates the best AI-powered solutions for every industry.",
+  "request-feature": "Submit your AI tool requests or feature ideas on AITerritory. Help us bring more powerful AI tools to the community.",
+};
+
 export default async (request: Request, context: Context) => {
   const url = new URL(request.url);
   const apiPath = Object.keys(API_MAP).find(path => url.pathname.startsWith(path));
@@ -75,33 +86,53 @@ export default async (request: Request, context: Context) => {
       // Use direct Render backend URL
       const apiUrl = `https://aiterritory-com.onrender.com${API_MAP[apiPath]}${id}`;
       const response = await fetch(apiUrl);
-      const data = await response.json();
       
-      if (apiPath === "/categories/") {
-        metaTitle = data.name || metaTitle;
-        metaDescription = data.description || metaDescription;
-        itemName = data.name || id;
-        // No image field, use default
-      } else if (apiPath === "/tags/") {
-        metaTitle = data.name || metaTitle;
-        metaDescription = `Explore tools and content tagged with '${data.name || id}' on AITerritory.`;
-        itemName = data.name || id;
-        // No image field, use default
-      } else if (apiPath === "/youtube/") {
-        metaTitle = data.title || metaTitle;
-        metaDescription = data.description || metaDescription;
-        metaImage = data.thumbnail_url || metaImage;
-        itemName = data.title || id;
+      // Check if response is ok, if not use fallback
+      if (!response.ok) {
+        console.error(`API response not ok: ${response.status} ${response.statusText}`);
+        // Use fallback meta for 5xx errors
+        if (response.status >= 500) {
+          itemName = id || "Page";
+          // Check if we have category-specific meta description
+          if (CATEGORY_META_DESCRIPTIONS[id]) {
+            metaDescription = CATEGORY_META_DESCRIPTIONS[id];
+          }
+        } else {
+          throw new Error(`API responded with status: ${response.status}`);
+        }
       } else {
-        metaTitle = data.title || data.name || metaTitle;
-        metaImage = data.image_url || data.cover_image_url || metaImage;
-        metaDescription = data.description || metaDescription;
-        itemName = data.title || data.name || id;
+        const data = await response.json();
+        
+        if (apiPath === "/categories/") {
+          metaTitle = data.name || metaTitle;
+          metaDescription = data.description || CATEGORY_META_DESCRIPTIONS[id] || metaDescription;
+          itemName = data.name || id;
+          // No image field, use default
+        } else if (apiPath === "/tags/") {
+          metaTitle = data.name || metaTitle;
+          metaDescription = `Explore tools and content tagged with '${data.name || id}' on AITerritory.`;
+          itemName = data.name || id;
+          // No image field, use default
+        } else if (apiPath === "/youtube/") {
+          metaTitle = data.title || metaTitle;
+          metaDescription = data.description || metaDescription;
+          metaImage = data.thumbnail_url || metaImage;
+          itemName = data.title || id;
+        } else {
+          metaTitle = data.title || data.name || metaTitle;
+          metaImage = data.image_url || data.cover_image_url || metaImage;
+          metaDescription = data.description || metaDescription;
+          itemName = data.title || data.name || id;
+        }
       }
     } catch (error) {
       console.error("Edge function API fetch error:", error);
       // fallback to default meta
       itemName = id || "Page";
+      // Check if we have category-specific meta description
+      if (CATEGORY_META_DESCRIPTIONS[id]) {
+        metaDescription = CATEGORY_META_DESCRIPTIONS[id];
+      }
     }
   }
 
@@ -117,6 +148,15 @@ export default async (request: Request, context: Context) => {
   // Remove all existing OG and Twitter meta tags
   html = html.replace(/<meta[^>]+(property|name)="og:[^"]+"[^>]*>/gi, '');
   html = html.replace(/<meta[^>]+(property|name)="twitter:[^"]+"[^>]*>/gi, '');
+
+  // Add canonical tag for every page
+  const fullUrl = url.href;
+  if (!html.includes('<link rel="canonical"')) {
+    html = html.replace(
+      "</head>",
+      `\n    <link rel="canonical" href="${fullUrl}" />\n    </head>`
+    );
+  }
 
   html = html.replace(
     "</head>",
