@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../co
 import { TrendingUp, Star, Filter, X, Home, Newspaper, LogIn, ChevronDown, Layers, CreditCard, Users, Search, Wrench } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SearchBar from '../components/SearchBar';
-import { FAQ } from '../components/FAQ';
+import FAQ from '../components/FAQ';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { ScrollArea } from '../components/ui/scroll-area';

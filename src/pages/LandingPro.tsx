@@ -6,7 +6,7 @@ import { ArrowRight, Mic, Search, Image, BookOpen, Sparkles, Rocket, Newspaper }
 import SEO from '../components/SEO';
 import { useTheme } from 'next-themes';
 import { Suspense, lazy } from 'react';
-import { FAQ } from '../components/FAQ';
+import FAQ from '../components/FAQ';
 import { TagCloud } from 'react-tagcloud';
 import FeatureBentoGrid from '../components/FeatureBentoGrid';
 import UseCasesTimeline from '../components/UseCasesTimeline';
