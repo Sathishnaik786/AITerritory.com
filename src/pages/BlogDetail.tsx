@@ -344,7 +344,7 @@ const BlogDetail: React.FC = () => {
   }
 
   // Show loading state if blog data is not ready
-  if (!blog || !blog.title) {
+  if (!blog || !blog.title || !blog.description) {
     return (
       <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
         <div className="text-center">
@@ -555,7 +555,7 @@ const BlogDetail: React.FC = () => {
             <div className={`${headings.length > 0 ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
               {/* Content Renderer */}
               <ContentRenderer
-                content={combinedContent}
+                content={combinedContent || ''}
                 onHeadingsGenerated={handleHeadingsGenerated}
               />
 
@@ -569,7 +569,7 @@ const BlogDetail: React.FC = () => {
           {/* Content after CTA */}
               {contentAfterCTA && (
               <ContentRenderer 
-                content={contentAfterCTA}
+                content={contentAfterCTA || ''}
               />
               )}
 

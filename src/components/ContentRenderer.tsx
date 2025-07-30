@@ -40,13 +40,15 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
   onHeadingsGenerated
 }) => {
   const headings = useMemo(() => {
-    if (!content) return [];
+    if (!content || typeof content !== 'string') return [];
 
     const headingRegex = /^(#{2,3})\s+(.+)$/gm;
     const extractedHeadings: Heading[] = [];
 
     let match;
     while ((match = headingRegex.exec(content)) !== null) {
+      if (!match[1] || !match[2]) continue; // Skip invalid matches
+      
       const level = match[1].length;
       const text = match[2].trim();
       const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
