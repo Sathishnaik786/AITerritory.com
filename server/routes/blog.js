@@ -25,6 +25,28 @@ const { supabase } = require('../lib/supabase');
 const { sanitizeHtml } = require('../lib/sanitizeHtml');
 const { strictLimiter } = require('../middleware/rateLimiter');
 
+// Test endpoint to verify Supabase connection
+router.get('/test', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('blogs')
+      .select('count')
+      .limit(1);
+    
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+    
+    res.json({ 
+      message: 'Backend is working!',
+      supabase_connected: true,
+      blogs_count: data?.length || 0
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // GET /api/blogs (CACHED: 5 minutes)
 router.get('/', cacheMiddlewares.blogs, blogController.getAllBlogs);
 
@@ -67,7 +89,7 @@ router.get('/:slug/comments/threaded', async (req, res) => {
     const { data: comments, error: commentsError } = await supabase
       .from('blog_comments')
       .select('*')
-      .eq('blog_id', blog.id)
+      .eq('blog_id', slug)
       .order('created_at', { ascending: true });
 
     if (commentsError) {
