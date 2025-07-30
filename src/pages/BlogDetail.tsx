@@ -179,6 +179,11 @@ const BlogDetail: React.FC = () => {
   const [contentBeforeCTA, contentAfterCTA] = useMemo(() => {
     // Try content first, then description, then fallback
     const content = blog?.content || blog?.description || '';
+    console.log('Blog content for CTA split:', { 
+      content: blog?.content, 
+      description: blog?.description, 
+      finalContent: content 
+    });
     if (!content || typeof content !== 'string') {
       return ['', ''];
     }
@@ -187,12 +192,13 @@ const BlogDetail: React.FC = () => {
 
   // Calculate reading time
   const readingTime = useMemo(() => {
-    if (!blog?.content || typeof blog.content !== 'string') return 3; // Default fallback
+    const content = blog?.content || blog?.description || '';
+    if (!content || typeof content !== 'string') return 3; // Default fallback
     const wordsPerMinute = 200;
-    const words = blog.content.split(/\s+/);
+    const words = content.split(/\s+/);
     const wordCount = words ? words.length : 0;
     return Math.ceil(wordCount / wordsPerMinute);
-  }, [blog?.content]);
+  }, [blog?.content, blog?.description]);
 
   // Combine content for proper heading extraction
   const combinedContent = useMemo(() => {

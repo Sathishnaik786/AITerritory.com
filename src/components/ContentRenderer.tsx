@@ -1,22 +1,36 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, Component, ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import { PromptBox } from './PromptBox';
-import { sanitizeMarkdownHtml } from '@/lib/sanitizeHtml';
 
-// Configure sanitization schema to only allow safe HTML elements
-const sanitizeSchema = {
-  tagNames: ['div', 'span', 'p', 'br', 'strong', 'em', 'code', 'pre', 'ul', 'ol', 'li', 'blockquote'],
-  attributes: {
-    div: ['class'],
-    span: ['class'],
-    code: ['class'],
-    pre: ['class']
+// Simple Error Boundary Component
+class ErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode; fallback: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
   }
-};
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error('ContentRenderer Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+
+    return this.props.children;
+  }
+}
+
+// Note: Using default rehype-sanitize configuration for safety
 
 interface Heading {
   id: string;
@@ -39,6 +53,11 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
   content,
   onHeadingsGenerated
 }) => {
+  console.log('ContentRenderer received content:', { 
+    contentLength: content?.length, 
+    contentType: typeof content,
+    contentPreview: content?.substring(0, 100)
+  });
   const headings = useMemo(() => {
     if (!content || typeof content !== 'string') return [];
 
@@ -281,26 +300,39 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
     },
   };
 
-  // Sanitize the content to prevent any unwanted HTML from being rendered
-  const sanitizedContent = useMemo(() => {
-    if (!content) return '';
-    return sanitizeMarkdownHtml(content);
+  // Use content directly without additional sanitization
+  const processedContent = useMemo(() => {
+    if (!content || typeof content !== 'string') return '';
+    return content;
   }, [content]);
 
   return (
     <article className="content-renderer prose prose-lg max-w-none dark:prose-invert">
       <div className="blog-content-wrapper">
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[
-            rehypeRaw, 
-            [rehypeSanitize, sanitizeSchema], 
-            rehypeHighlight
-          ]}
-          components={components}
-        >
-          {sanitizedContent}
-        </ReactMarkdown>
+        {processedContent ? (
+          <ErrorBoundary fallback={
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <p className="text-lg font-medium">Error rendering content</p>
+              <p className="text-sm">There was an issue rendering this content.</p>
+            </div>
+          }>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[
+                rehypeRaw, 
+                rehypeHighlight
+              ]}
+              components={components}
+            >
+              {content}
+            </ReactMarkdown>
+          </ErrorBoundary>
+        ) : (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <p className="text-lg font-medium">No content available</p>
+            <p className="text-sm">This blog post doesn't have any content yet.</p>
+          </div>
+        )}
       </div>
     </article>
   );
