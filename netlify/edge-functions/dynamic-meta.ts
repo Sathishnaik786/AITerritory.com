@@ -37,6 +37,97 @@ const CATEGORY_META_DESCRIPTIONS: Record<string, string> = {
   "request-feature": "Submit your AI tool requests or feature ideas on AITerritory. Help us bring more powerful AI tools to the community.",
 };
 
+// Keywords and their corresponding internal links for automatic linking
+const KEYWORD_LINKS: Record<string, { url: string; title: string }> = {
+  "AI Chatbots": { url: "/categories/ai-chatbots", title: "Explore AI Chatbots on AITerritory" },
+  "Text Generators": { url: "/categories/text-generators", title: "Discover AI Text Generators on AITerritory" },
+  "Image Generators": { url: "/categories/image-generators", title: "Browse AI Image Generators on AITerritory" },
+  "Art Generators": { url: "/categories/art-generators", title: "Find AI Art Generators on AITerritory" },
+  "Productivity Tools": { url: "/categories/productivity-tools", title: "Boost productivity with AI tools on AITerritory" },
+  "AI Tools": { url: "/categories/all-ai-tools", title: "Browse all AI tools on AITerritory" },
+  "AI Territory": { url: "/", title: "Visit AITerritory homepage" },
+  "Submit Tool": { url: "/company/submit-tool", title: "Submit your AI tool to AITerritory" },
+};
+
+// Function to add internal links to content
+function addInternalLinks(content: string): string {
+  let modifiedContent = content;
+  const linkedKeywords = new Set<string>();
+
+  // Sort keywords by length (longest first) to avoid partial matches
+  const sortedKeywords = Object.keys(KEYWORD_LINKS).sort((a, b) => b.length - a.length);
+
+  for (const keyword of sortedKeywords) {
+    // Skip if already linked
+    if (linkedKeywords.has(keyword)) continue;
+
+    // Create regex to find keyword, but avoid if already in a link
+    const regex = new RegExp(`(?<!<a[^>]*>)(?<!<h1[^>]*>)(?<!<script[^>]*>)(?<!<style[^>]*>)(?<!<code[^>]*>)\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b(?!</a>)(?!</h1>)(?!</script>)(?!</style>)(?!</code>)`, 'gi');
+    
+    const match = regex.exec(modifiedContent);
+    if (match) {
+      const linkInfo = KEYWORD_LINKS[keyword];
+      const linkHtml = `<a href="${linkInfo.url}" rel="internal" title="${linkInfo.title}">${match[0]}</a>`;
+      
+      // Replace only the first occurrence
+      modifiedContent = modifiedContent.replace(match[0], linkHtml);
+      linkedKeywords.add(keyword);
+    }
+  }
+
+  return modifiedContent;
+}
+
+// Function to extract and process content from HTML
+function processHtmlContent(html: string, apiPath: string, data: any): string {
+  let processedHtml = html;
+
+  try {
+    // For blog pages, process the content/description
+    if (apiPath === "/blog/" && data.description) {
+      const processedDescription = addInternalLinks(data.description);
+      if (processedDescription !== data.description) {
+        // Update meta description with linked content
+        processedHtml = processedHtml.replace(
+          /<meta[^>]+name=["']description["'][^>]*content=["'][^"']*["'][^>]*>/gi,
+          `<meta name="description" content="${processedDescription.replace(/"/g, '&quot;')}">`
+        );
+      }
+    }
+
+    // For tool pages, process the description
+    if (apiPath === "/tools/" && data.description) {
+      const processedDescription = addInternalLinks(data.description);
+      if (processedDescription !== data.description) {
+        // Update meta description with linked content
+        processedHtml = processedHtml.replace(
+          /<meta[^>]+name=["']description["'][^>]*content=["'][^"']*["'][^>]*>/gi,
+          `<meta name="description" content="${processedDescription.replace(/"/g, '&quot;')}">`
+        );
+      }
+    }
+
+    // Process any content in the body that might contain keywords
+    // This is a more general approach for any content in the page
+    const bodyMatch = processedHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    if (bodyMatch) {
+      const bodyContent = bodyMatch[1];
+      const processedBodyContent = addInternalLinks(bodyContent);
+      
+      if (processedBodyContent !== bodyContent) {
+        processedHtml = processedHtml.replace(bodyContent, processedBodyContent);
+      }
+    }
+
+  } catch (error) {
+    console.error("Error processing internal links:", error);
+    // Return original HTML if processing fails
+    return html;
+  }
+
+  return processedHtml;
+}
+
 export default async (request: Request, context: Context) => {
   const url = new URL(request.url);
   const apiPath = Object.keys(API_MAP).find(path => url.pathname.startsWith(path));
@@ -46,6 +137,7 @@ export default async (request: Request, context: Context) => {
   let pageName = "";
   let itemName = "";
   let id = "";
+  let apiData: any = null;
 
   // Static meta tags for main/landing pages
   const staticMetaMap: Record<string, { title: string, description: string, image?: string }> = {
@@ -102,6 +194,7 @@ export default async (request: Request, context: Context) => {
         }
       } else {
         const data = await response.json();
+        apiData = data; // Store for internal linking processing
         
         if (apiPath === "/categories/") {
           metaTitle = data.name || metaTitle;
@@ -308,6 +401,12 @@ export default async (request: Request, context: Context) => {
     };
     const articleScript = `<script type=\"application/ld+json\">${JSON.stringify(articleSchema)}</script>`;
     html = html.replace("</head>", `\n    ${articleScript}\n    </head>`);
+  }
+
+  // Apply internal linking for blog and tool pages
+  if ((url.pathname.startsWith("/blog/") && url.pathname !== "/blog") || 
+      (url.pathname.startsWith("/tools/") && url.pathname !== "/tools")) {
+    html = processHtmlContent(html, apiPath || "", apiData);
   }
 
   // Ensure only one doctype at the very top
