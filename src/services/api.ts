@@ -4,7 +4,14 @@ import axios from 'axios';
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 const API_BASE_URL = isProduction 
   ? 'https://aiterritory-com.onrender.com/api'
-  : '/api';
+  : 'http://localhost:3003/api';
+
+// Debug logging for API configuration
+console.log('🔧 API Configuration:');
+console.log('  Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
+console.log('  Hostname:', window.location.hostname);
+console.log('  API Base URL:', API_BASE_URL);
+console.log('  Full URL example:', `${API_BASE_URL}/blogs/test/comments`);
 
 console.log('Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
 console.log('Hostname:', window.location.hostname);

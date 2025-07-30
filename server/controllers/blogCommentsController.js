@@ -18,13 +18,24 @@ async function getComments(req, res) {
 async function getThreadedComments(req, res) {
   const { slug } = req.params;
   
+  console.log('🔍 Server: Getting threaded comments for blog:', slug);
+  console.log('  Request URL:', req.originalUrl);
+  console.log('  Request method:', req.method);
+  console.log('  Request headers:', req.headers);
+  
   const { data, error } = await supabase
     .from('blog_comments')
     .select('*')
     .eq('blog_id', slug) // Use blog slug directly
     .order('depth', { ascending: true })
     .order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
+    
+  if (error) {
+    console.error('❌ Server: Error getting threaded comments:', error);
+    return res.status(500).json({ error: error.message });
+  }
+  
+  console.log('✅ Server: Threaded comments fetched successfully:', data.length, 'comments');
   res.json(data);
 }
 
@@ -50,8 +61,14 @@ async function postComment(req, res) {
   const { slug } = req.params;
   const { content, parent_id, user_id } = req.body;
   
+  console.log('🔍 Server: Posting comment for blog:', slug);
+  console.log('  Request body:', { content: content?.substring(0, 50) + '...', user_id, parent_id });
+  console.log('  Request URL:', req.originalUrl);
+  console.log('  Request method:', req.method);
+  
   // Validate required fields
   if (!content || !user_id) {
+    console.error('❌ Server: Missing required fields for comment');
     return res.status(400).json({ 
       error: 'Missing required fields: content and user_id are required' 
     });
@@ -87,10 +104,11 @@ async function postComment(req, res) {
     .single();
     
   if (error) {
-    console.error('Error posting comment:', error);
+    console.error('❌ Server: Error posting comment:', error);
     return res.status(500).json({ error: error.message });
   }
   
+  console.log('✅ Server: Comment posted successfully:', data.id);
   res.status(201).json(data);
 }
 
