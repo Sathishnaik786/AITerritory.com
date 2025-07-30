@@ -69,50 +69,6 @@ router.delete('/:id', blogController.deleteBlog);
 // Mount blog comments router
 router.use('/:slug/comments', blogCommentsRouter);
 
-// Get threaded comments for a blog
-router.get('/:slug/comments/threaded', async (req, res) => {
-  try {
-    const { slug } = req.params;
-    
-    // Get blog ID first
-    const { data: blog, error: blogError } = await supabase
-      .from('blogs')
-      .select('id')
-      .eq('slug', slug)
-      .single();
-
-    if (blogError || !blog) {
-      return res.status(404).json({ error: 'Blog not found' });
-    }
-
-    // Get all comments for this blog
-    const { data: comments, error: commentsError } = await supabase
-      .from('blog_comments')
-      .select('*')
-      .eq('blog_id', slug)
-      .order('created_at', { ascending: true });
-
-    if (commentsError) {
-      console.error('Error fetching comments:', commentsError);
-      return res.status(500).json({ error: 'Failed to fetch comments' });
-    }
-
-    // Process comments to include reaction_counts from the schema
-    const processedComments = comments.map(comment => {
-      return {
-        ...comment,
-        user_reactions: [], // Initialize empty array for user reactions
-        reaction_counts: comment.reaction_counts || {}
-      };
-    });
-
-    res.json(processedComments);
-  } catch (error) {
-    console.error('Error in threaded comments:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
 // Blog likes endpoints
 router.get('/:slug/likes', async (req, res) => {
   try {

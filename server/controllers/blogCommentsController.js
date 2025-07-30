@@ -31,18 +31,49 @@ async function getThreadedComments(req, res) {
 // POST /api/blogs/:slug/comments
 async function postComment(req, res) {
   const { slug } = req.params;
-  const { user_id, content } = req.body;
-  if (!user_id || !content) return res.status(400).json({ error: 'Missing user_id or content' });
+  const { content, parent_id, user_id } = req.body;
+  
+  // Validate required fields
+  if (!content || !user_id) {
+    return res.status(400).json({ 
+      error: 'Missing required fields: content and user_id are required' 
+    });
+  }
   
   // Sanitize the content before saving
   const sanitizedContent = sanitizeText(content);
   
+  // Calculate depth based on parent_id
+  let depth = 0;
+  if (parent_id) {
+    const { data: parentComment } = await supabase
+      .from('blog_comments')
+      .select('depth')
+      .eq('id', parent_id)
+      .single();
+    
+    if (parentComment) {
+      depth = Math.min(parentComment.depth + 1, 3); // Max depth of 3
+    }
+  }
+  
   const { data, error } = await supabase
     .from('blog_comments')
-    .insert([{ blog_id: slug, user_id, content: sanitizedContent }]) // Use blog slug directly
+    .insert([{ 
+      blog_id: slug, 
+      user_id, 
+      content: sanitizedContent,
+      parent_id: parent_id || null,
+      depth
+    }])
     .select()
     .single();
-  if (error) return res.status(500).json({ error: error.message });
+    
+  if (error) {
+    console.error('Error posting comment:', error);
+    return res.status(500).json({ error: error.message });
+  }
+  
   res.status(201).json(data);
 }
 

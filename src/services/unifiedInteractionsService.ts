@@ -241,7 +241,7 @@ export const blogInteractions = {
   // Get blog comments
   async getComments(blogId: string): Promise<CommentResponse[]> {
     try {
-      const response = await api.get(`/interactions/blogs/${blogId}/comments`);
+      const response = await api.get(`/blogs/${blogId}/comments/threaded`);
       return response.data;
     } catch (error) {
       console.error('Error getting blog comments:', error);
@@ -252,7 +252,7 @@ export const blogInteractions = {
   // Add blog comment
   async addComment(blogId: string, user_id: string, content: string): Promise<CommentResponse> {
     try {
-      const response = await api.post(`/interactions/blogs/${blogId}/comments`, { user_id, content });
+      const response = await api.post(`/blogs/${blogId}/comments`, { user_id, content });
       return response.data;
     } catch (error) {
       console.error('Error adding blog comment:', error);

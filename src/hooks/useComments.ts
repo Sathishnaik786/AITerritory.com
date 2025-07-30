@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/components/ui/sonner';
+import { useUser } from '@clerk/clerk-react';
 
 interface Comment {
   id: string;
@@ -18,6 +19,7 @@ interface Comment {
 interface CommentMutation {
   content: string;
   parent_id?: string;
+  user_id: string;
 }
 
 // Fetch comments for a blog
@@ -46,6 +48,7 @@ const postComment = async ({ blogId, comment }: { blogId: string; comment: Comme
 
 export const useComments = (blogId: string) => {
   const queryClient = useQueryClient();
+  const { user } = useUser();
   
   // Query for fetching comments
   const {
@@ -62,7 +65,15 @@ export const useComments = (blogId: string) => {
 
   // Mutation for posting comments
   const postCommentMutation = useMutation({
-    mutationFn: (comment: CommentMutation) => postComment({ blogId, comment }),
+    mutationFn: (comment: Omit<CommentMutation, 'user_id'>) => {
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+      return postComment({ 
+        blogId, 
+        comment: { ...comment, user_id: user.id } 
+      });
+    },
     onMutate: async (newComment) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['comments', blogId] });
@@ -74,7 +85,7 @@ export const useComments = (blogId: string) => {
       const optimisticComment: Comment = {
         id: `temp-${Date.now()}`,
         blog_id: blogId,
-        user_id: 'current-user', // Will be replaced with actual user ID
+        user_id: user?.id || 'current-user',
         content: newComment.content,
         created_at: new Date().toISOString(),
         parent_id: newComment.parent_id,

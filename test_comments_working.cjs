@@ -19,6 +19,11 @@ const req = http.request(options, (res) => {
   
   res.on('end', () => {
     console.log('Response:', data);
+    if (res.statusCode === 200) {
+      console.log('✅ Comments API is working!');
+    } else {
+      console.log('❌ Comments API is not working');
+    }
   });
 });
 

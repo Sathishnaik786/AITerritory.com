@@ -59,7 +59,7 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
   className = '' 
 }) => {
   const { user, isSignedIn } = useUser();
-  const { comments, isLoading: loading, postComment, isPosting: submitting } = useComments(blogId);
+  const { comments, isLoading: loading, postComment, isPosting: submitting, refetch } = useComments(blogId);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
@@ -127,7 +127,7 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
       if (!response.ok) throw new Error('Failed to add reaction');
       
       // Refresh comments to get updated reaction counts
-      fetchComments();
+      refetch();
     } catch (error) {
       console.error('Error adding reaction:', error);
       toast('Failed to add reaction');
