@@ -15,7 +15,7 @@ import { Separator } from '../components/ui/separator';
 import ThemeToggle from '../components/ThemeToggle';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import { Category } from '../types/category';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import MetaTags from '../components/MetaTags';
 import { JsonLd } from 'react-schemaorg';
 import { Organization, FAQPage } from 'schema-dts';
