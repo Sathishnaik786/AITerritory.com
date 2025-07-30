@@ -30,10 +30,10 @@ interface Comment {
   created_at: string;
   parent_id?: string;
   depth: number;
-  reaction_counts: Record<string, number>;
-  is_moderated: boolean;
+  reaction_counts?: Record<string, number> | null;
+  is_moderated?: boolean;
   moderation_reason?: string;
-  flagged_count: number;
+  flagged_count?: number;
   user_reactions?: string[];
   reply_count?: number;
 }
@@ -239,7 +239,7 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
             
             {/* Comment actions */}
             <div className="flex items-center gap-2">
-              {comment.flagged_count > 0 && (
+              {comment.flagged_count && (
                 <span className="text-xs text-red-500 bg-red-100 dark:bg-red-900/20 px-2 py-1 rounded">
                   {comment.flagged_count} flagged
                 </span>
@@ -272,8 +272,8 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
           <div className="flex items-center gap-4 mb-3">
             <div className="flex items-center gap-1">
               {REACTION_TYPES.map(({ type, icon: Icon, label }) => {
-                const count = comment.reaction_counts[type] || 0;
-                const isReacted = comment.user_reactions?.includes(type);
+                const count = (comment.reaction_counts?.[type] || 0);
+                const isReacted = comment.user_reactions?.includes(type) || false;
                 
                 return (
                   <motion.button

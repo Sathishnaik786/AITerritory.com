@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThreadedComments } from '../components/ThreadedComments';
 import BlogLikeBookmark from '../components/BlogLikeBookmark';
-import AuthorCard from '../components/AuthorCard';
+import BlogLikeButton from '../components/BlogLikeButton';
+import BlogBookmarkButton from '../components/BlogBookmarkButton';
 import { BlogService } from '../services/blogService';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -14,7 +15,7 @@ import { FaXTwitter, FaLinkedin, FaWhatsapp, FaFacebook, FaRegCopy } from 'react
 import NewsletterCTA from '../components/NewsletterCTA';
 import { toast } from '@/components/ui/sonner';
 import { logBlogEvent } from '../services/blogAnalyticsService';
-import { BookOpen, Book, ArrowUp, ArrowLeft, ExternalLink, Info, AlertTriangle, Lightbulb, Clock } from 'lucide-react';
+import { BookOpen, Book, ArrowUp, ArrowLeft, ExternalLink, Info, AlertTriangle, Lightbulb, Clock, MessageCircle, Share2 } from 'lucide-react';
 import type { CodeProps } from 'react-markdown/lib/ast-to-react';
 import { supabase } from '../services/supabaseClient';
 import remarkEmoji from 'remark-emoji';
@@ -39,6 +40,17 @@ const BlogDetail: React.FC = () => {
   const { user, isSignedIn } = useUser();
   const [showShareBar, setShowShareBar] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [commentsCount, setCommentsCount] = useState(0);
+
+  // Fetch comments count
+  useEffect(() => {
+    if (blog?.slug) {
+      fetch(`/api/blogs/${blog.slug}/comments/count`)
+        .then(res => res.json())
+        .then(data => setCommentsCount(data.count || 0))
+        .catch(err => console.error('Error fetching comments count:', err));
+    }
+  }, [blog?.slug]);
   // In BlogDetail component, add state for recentBlogs and relatedBlogs
   const [recentBlogs, setRecentBlogs] = useState<any[]>([]);
   const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
@@ -213,8 +225,6 @@ const BlogDetail: React.FC = () => {
   const handleHeadingHover = (headingId: string) => {
     setActiveHeading(headingId);
   };
-
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
   
   // Scroll to comments section
   const scrollToComments = () => {
@@ -418,53 +428,44 @@ const BlogDetail: React.FC = () => {
                   hour: '2-digit', 
                   minute: '2-digit' 
                 }) : '28 Jul 2025, 12:56 pm'}
-          </div>
-          </div>
-          
-                          {/* Action Buttons */}
-              <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                <button
-                  className="flex items-center gap-2 hover:text-blue-600 transition rounded-lg border border-gray-300 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  onClick={() => setShowShareBar((prev) => !prev)}
-                >
-                  <FaXTwitter className="w-4 h-4" /> Share
-                </button>
-                
-                {/* Save/Bookmark Button with Clerk Integration */}
-                {isSignedIn ? (
-                  <button
-                    className="flex items-center gap-2 hover:text-blue-600 transition rounded-lg border border-gray-300 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-                    onClick={() => {
-                      // TODO: Implement bookmark functionality
-                      toast('Bookmark feature coming soon!');
-                    }}
-                  >
-                    <Book className="w-4 h-4" /> Save
-                  </button>
-                ) : (
-                  <SignInButton mode="modal">
-                    <button className="flex items-center gap-2 hover:text-blue-600 transition rounded-lg border border-gray-300 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <Book className="w-4 h-4" /> Save
-                    </button>
-                  </SignInButton>
-                )}
-                
-                {/* Comment Button with Clerk Integration */}
-                {isSignedIn ? (
-                  <button
-                    className="flex items-center gap-2 hover:text-blue-600 transition rounded-lg border border-gray-300 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-                    onClick={scrollToComments}
-                  >
-                    <ArrowUp className="w-4 h-4" /> Comment
-                  </button>
-                ) : (
-                  <SignInButton mode="modal">
-                    <button className="flex items-center gap-2 hover:text-blue-600 transition rounded-lg border border-gray-300 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <ArrowUp className="w-4 h-4" /> Comment
-                    </button>
-                  </SignInButton>
-                )}
               </div>
+            </div>
+
+            {/* Unified Action Buttons */}
+            <div className="flex items-center gap-3 mb-6">
+              {/* Like Button */}
+              <BlogLikeButton blogId={blog.slug} />
+              
+              {/* Comment Button */}
+              {isSignedIn ? (
+                <button
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  onClick={scrollToComments}
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  <span className="text-sm font-medium">{commentsCount}</span>
+                </button>
+              ) : (
+                <SignInButton mode="modal">
+                  <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <MessageCircle className="w-5 h-5" />
+                    <span className="text-sm font-medium">{commentsCount}</span>
+                  </button>
+                </SignInButton>
+              )}
+              
+              {/* Share Button */}
+              <button
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                onClick={() => setShowShareBar((prev) => !prev)}
+              >
+                <Share2 className="w-5 h-5" />
+                <span className="text-sm font-medium">Share</span>
+              </button>
+              
+              {/* Save Button */}
+              <BlogBookmarkButton blogId={blog.slug} />
+            </div>
 
             {/* Share Dropdown */}
             {showShareBar && (
@@ -546,26 +547,6 @@ const BlogDetail: React.FC = () => {
                 content={contentAfterCTA}
               />
               )}
-
-              {/* Author Card */}
-              {blog.author_name && (
-                <div className="mt-12">
-                  <AuthorCard
-                    author={{
-                      name: blog.author_name,
-                      bio: blog.author_bio,
-                      author_image_url: blog.author_image_url
-                    }}
-                  />
-                </div>
-              )}
-
-              {/* Blog Interactions */}
-              <div className="mt-8 flex flex-wrap items-center justify-between gap-4 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <BlogLikeBookmark
-                  blogId={blog.slug}
-                />
-              </div>
 
               {/* Comments Section */}
               <div id="comments-section" className="mt-12">
@@ -650,24 +631,6 @@ const BlogDetail: React.FC = () => {
           category={blog.category}
           tags={blog.tags}
         />
-        
-        {/* Premium Scroll to top button */}
-        <AnimatePresence>
-          {progress > 20 && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0, y: 20 }}
-              whileHover={{ scale: 1.1, y: -2 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={scrollToTop}
-              className="fixed bottom-6 right-6 z-40 p-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 backdrop-blur-sm border border-white/20"
-              aria-label="Scroll to top"
-            >
-              <ArrowUp className="w-5 h-5" />
-            </motion.button>
-          )}
-        </AnimatePresence>
       </div>
     </>
   );

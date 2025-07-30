@@ -1,26 +1,21 @@
 import React from 'react';
 import { useUser, SignInButton } from '@clerk/clerk-react';
-import { Heart, Bookmark } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useLikesAndBookmarks } from '../hooks/useLikesAndBookmarks';
 
-interface BlogLikeBookmarkProps {
+interface BlogLikeButtonProps {
   blogId: string;
-  commentsCount?: number;
 }
 
-const BlogLikeBookmark: React.FC<BlogLikeBookmarkProps> = ({ blogId, commentsCount = 0 }) => {
+const BlogLikeButton: React.FC<BlogLikeButtonProps> = ({ blogId }) => {
   const { user, isSignedIn } = useUser();
   const {
     likeCount,
-    bookmarkCount,
     liked,
-    bookmarked,
     isLoading: loading,
     error,
     toggleLike,
-    toggleBookmark,
     isTogglingLike,
-    isTogglingBookmark,
   } = useLikesAndBookmarks(blogId);
 
   return (
@@ -48,32 +43,9 @@ const BlogLikeBookmark: React.FC<BlogLikeBookmarkProps> = ({ blogId, commentsCou
         </SignInButton>
       )}
       
-      {/* Bookmark Button */}
-      {isSignedIn ? (
-        <button
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 ${bookmarked ? 'text-blue-600 border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
-          onClick={() => toggleBookmark()}
-          disabled={loading || isTogglingBookmark}
-          aria-label={bookmarked ? 'Remove Bookmark' : 'Bookmark'}
-        >
-          <Bookmark className={`w-5 h-5 ${bookmarked ? 'fill-blue-600 text-blue-600' : ''}`} />
-          <span className="text-sm font-medium">{bookmarkCount}</span>
-        </button>
-      ) : (
-        <SignInButton mode="modal">
-          <button
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-            aria-label="Bookmark"
-          >
-            <Bookmark className="w-5 h-5" />
-            <span className="text-sm font-medium">{bookmarkCount}</span>
-          </button>
-        </SignInButton>
-      )}
-      
       {error && <span className="text-red-500 text-sm ml-2">{error.message || 'An error occurred'}</span>}
     </>
   );
 };
 
-export default BlogLikeBookmark; 
+export default BlogLikeButton; 

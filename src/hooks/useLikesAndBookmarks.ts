@@ -5,6 +5,7 @@ import { blogInteractions } from '../services/unifiedInteractionsService';
 
 interface LikeBookmarkStatus {
   likeCount: number;
+  bookmarkCount: number;
   liked: boolean;
   bookmarked: boolean;
 }
@@ -21,6 +22,7 @@ const fetchLikeBookmarkStatus = async (blogId: string, userId?: string): Promise
     
     return {
       likeCount,
+      bookmarkCount,
       liked: hasLiked,
       bookmarked: hasBookmarked,
     };
@@ -28,6 +30,7 @@ const fetchLikeBookmarkStatus = async (blogId: string, userId?: string): Promise
     console.error('Error fetching like/bookmark status:', error);
     return {
       likeCount: 0,
+      bookmarkCount: 0,
       liked: false,
       bookmarked: false,
     };
@@ -137,6 +140,7 @@ export const useLikesAndBookmarks = (blogId: string) => {
 
   return {
     likeCount: status.likeCount,
+    bookmarkCount: status.bookmarkCount,
     liked: status.liked,
     bookmarked: status.bookmarked,
     isLoading,

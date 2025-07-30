@@ -28,6 +28,23 @@ async function getThreadedComments(req, res) {
   res.json(data);
 }
 
+// GET /api/blogs/:slug/comments/count
+async function getCommentsCount(req, res) {
+  const { slug } = req.params;
+  
+  const { count, error } = await supabase
+    .from('blog_comments')
+    .select('*', { count: 'exact', head: true })
+    .eq('blog_id', slug);
+    
+  if (error) {
+    console.error('Error getting comments count:', error);
+    return res.status(500).json({ error: error.message });
+  }
+  
+  res.json({ count: count || 0 });
+}
+
 // POST /api/blogs/:slug/comments
 async function postComment(req, res) {
   const { slug } = req.params;
@@ -77,4 +94,4 @@ async function postComment(req, res) {
   res.status(201).json(data);
 }
 
-module.exports = { getComments, getThreadedComments, postComment }; 
+module.exports = { getComments, getThreadedComments, getCommentsCount, postComment }; 

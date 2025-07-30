@@ -12,8 +12,12 @@ interface Comment {
   created_at: string;
   parent_id?: string;
   depth: number;
-  reaction_counts?: Record<string, number>;
+  reaction_counts?: Record<string, number> | null;
   user_reactions?: string[];
+  is_moderated?: boolean;
+  moderation_reason?: string;
+  flagged_count?: number;
+  reply_count?: number;
 }
 
 interface CommentMutation {
@@ -92,6 +96,8 @@ export const useComments = (blogId: string) => {
         depth: newComment.parent_id ? 1 : 0,
         reaction_counts: {},
         user_reactions: [],
+        is_moderated: false,
+        flagged_count: 0,
       };
 
       queryClient.setQueryData(['comments', blogId], (old: Comment[] = []) => {
