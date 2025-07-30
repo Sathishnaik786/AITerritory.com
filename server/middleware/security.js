@@ -32,6 +32,8 @@ const allowedOrigins = [
   'https://www.aiterritory.netlify.app',
   'https://aiterritory-com.netlify.app',
   'https://www.aiterritory-com.netlify.app',
+  'https://aiterritory.org',
+  'https://www.aiterritory.org',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:3000',

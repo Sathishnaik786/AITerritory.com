@@ -2,8 +2,10 @@ import axios from 'axios';
 
 // API Configuration - Force Render URL in production
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+
+// In production, use direct backend URL to avoid proxy issues
 const API_BASE_URL = isProduction 
-  ? 'https://aiterritory-com.onrender.com/api'
+  ? 'https://aiterritory-com.onrender.com/api'  // Use direct backend URL
   : 'http://localhost:3003/api';
 
 // Debug logging for API configuration
@@ -12,6 +14,7 @@ console.log('  Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
 console.log('  Hostname:', window.location.hostname);
 console.log('  API Base URL:', API_BASE_URL);
 console.log('  Full URL example:', `${API_BASE_URL}/blogs/test/comments`);
+console.log('  Current URL:', window.location.href);
 
 console.log('Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
 console.log('Hostname:', window.location.hostname);
@@ -63,7 +66,16 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('API Response Error:', error.response?.status, error.config?.url, error.message);
+    console.error('❌ API Response Error:', error.response?.status, error.config?.url, error.message);
+    console.error('  Full error:', error);
+    
+    // Log specific error types
+    if (error.code === 'ERR_NETWORK') {
+      console.error('  Network error - possible CORS issue');
+    }
+    if (error.response?.status === 404) {
+      console.error('  404 Not Found - check if endpoint exists');
+    }
     if (error.response?.status === 401) {
       // Handle unauthorized access
       localStorage.removeItem('auth_token');
