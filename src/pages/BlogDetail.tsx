@@ -162,7 +162,13 @@ const BlogDetail: React.FC = () => {
 
   // Helper: Split content for inline CTA
   function splitContentForCTA(content: string, percent: number = 0.3) {
+    if (!content || typeof content !== 'string') {
+      return ['', ''];
+    }
     const paragraphs = content.split(/\n{2,}/);
+    if (!paragraphs || paragraphs.length === 0) {
+      return ['', ''];
+    }
     const splitIndex = Math.floor(paragraphs.length * percent);
     return [
       paragraphs.slice(0, splitIndex).join('\n\n'),
@@ -173,14 +179,18 @@ const BlogDetail: React.FC = () => {
   const [contentBeforeCTA, contentAfterCTA] = useMemo(() => {
     // Try content first, then description, then fallback
     const content = blog?.content || blog?.description || '';
-    return content ? splitContentForCTA(content) : ['', ''];
+    if (!content || typeof content !== 'string') {
+      return ['', ''];
+    }
+    return splitContentForCTA(content);
   }, [blog]);
 
   // Calculate reading time
   const readingTime = useMemo(() => {
-    if (!blog?.content) return 3; // Default fallback
+    if (!blog?.content || typeof blog.content !== 'string') return 3; // Default fallback
     const wordsPerMinute = 200;
-    const wordCount = blog.content.split(/\s+/).length;
+    const words = blog.content.split(/\s+/);
+    const wordCount = words ? words.length : 0;
     return Math.ceil(wordCount / wordsPerMinute);
   }, [blog?.content]);
 
@@ -188,6 +198,9 @@ const BlogDetail: React.FC = () => {
   const combinedContent = useMemo(() => {
     const before = contentBeforeCTA || '';
     const after = contentAfterCTA || '';
+    if (!before && !after) {
+      return '';
+    }
     return before + (after ? '\n\n' + after : '');
   }, [contentBeforeCTA, contentAfterCTA]);
 
@@ -330,8 +343,20 @@ const BlogDetail: React.FC = () => {
     );
   }
 
+  // Show loading state if blog data is not ready
+  if (!blog || !blog.title) {
+    return (
+      <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading blog content...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Show error state if blog failed to load
-  if (error || !blog) {
+  if (error || !blog || !blog.title) {
   return (
       <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
         <div className="text-center">
