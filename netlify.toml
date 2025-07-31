@@ -7,16 +7,13 @@
 # Environment configuration for proper NODE_ENV handling
 [context.production.environment]
   NODE_ENV = "production"
+  NETLIFY_KV_STORE_ID = "your-kv-store-id" # Replace with actual KV store ID
 
 [context.deploy-preview.environment]
   NODE_ENV = "development"
 
 [context.branch-deploy.environment]
   NODE_ENV = "development"
-
-# KV Storage for caching
-[context.production.environment]
-  NETLIFY_KV_STORE_ID = "your-kv-store-id" # Replace with actual KV store ID
 
 # Edge Functions configuration
 [[edge_functions]]

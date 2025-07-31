@@ -19,6 +19,7 @@
     "test:canonical-comprehensive": "node scripts/test-canonical-comprehensive.js",
     "test:category-pages": "node scripts/test-category-pages.js",
     "test:breadcrumbs": "node scripts/test-breadcrumbs.js",
+    "validate:netlify": "node scripts/validate-netlify-toml.js",
     "cache:stats": "node scripts/cache-stats.js",
     "cache:clear": "node scripts/clear-cache.js"
   },
