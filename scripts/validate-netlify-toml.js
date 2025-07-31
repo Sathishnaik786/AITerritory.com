@@ -5,8 +5,12 @@
  * This script checks the TOML file before deployment to catch any issues
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function validateNetlifyToml() {
   console.log('🔍 Validating netlify.toml file...');
@@ -68,13 +72,17 @@ function validateNetlifyToml() {
     // Check for common issues
     const issues = [];
     
-    // Check for duplicate sections
-    const sections = content.match(/^\[([^\]]+)\]/gm);
-    if (sections) {
+    // Check for duplicate regular sections (not array sections)
+    const regularSections = content.match(/^\[([^\]]+)\]/gm);
+    if (regularSections) {
       const sectionCounts = {};
-      sections.forEach(section => {
+      regularSections.forEach(section => {
         const sectionName = section.slice(1, -1);
-        sectionCounts[sectionName] = (sectionCounts[sectionName] || 0) + 1;
+        // Only count non-array sections as duplicates (array sections use [[ ]])
+        // Skip sections that contain dots (like context.production.environment)
+        if (!sectionName.includes('.') && !sectionName.includes('edge_functions') && !sectionName.includes('redirects')) {
+          sectionCounts[sectionName] = (sectionCounts[sectionName] || 0) + 1;
+        }
       });
       
       Object.entries(sectionCounts).forEach(([section, count]) => {
@@ -116,8 +124,6 @@ function validateNetlifyToml() {
 }
 
 // Run validation if this script is executed directly
-if (require.main === module) {
-  validateNetlifyToml();
-}
+validateNetlifyToml();
 
-module.exports = validateNetlifyToml; 
+export default validateNetlifyToml; 

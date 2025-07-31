@@ -1,12 +1,226 @@
 import { Context } from "@netlify/edge-functions";
-import { 
-  getFromCache, 
-  setToCache, 
-  revalidateCache, 
-  shouldCachePath,
-  getCacheTTL,
-  getStaleWhileRevalidateTTL
-} from "./cache-utils";
+
+// Cache utilities for Netlify Edge Functions
+// Implements stale-while-revalidate strategy with 12-hour cache duration
+
+interface CacheEntry {
+  html: string;
+  timestamp: number;
+  etag: string;
+}
+
+interface CacheConfig {
+  ttl: number; // Time to live in milliseconds (12 hours = 43200000ms)
+  staleWhileRevalidate: number; // How long to serve stale content while revalidating (1 hour = 3600000ms)
+}
+
+const CACHE_CONFIG: CacheConfig = {
+  ttl: 12 * 60 * 60 * 1000, // 12 hours
+  staleWhileRevalidate: 60 * 60 * 1000, // 1 hour
+};
+
+// Generate cache key from URL path
+function generateCacheKey(path: string): string {
+  return `page-cache:${path.replace(/[^a-zA-Z0-9/-]/g, '_')}`;
+}
+
+// Generate ETag for content
+function generateETag(content: string): string {
+  const hash = content.split('').reduce((a, b) => {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+  return `"${Math.abs(hash).toString(16)}"`;
+}
+
+// Check if cache entry is fresh
+function isCacheFresh(timestamp: number): boolean {
+  return Date.now() - timestamp < CACHE_CONFIG.ttl;
+}
+
+// Check if cache entry is stale but still usable for revalidation
+function isCacheStaleButUsable(timestamp: number): boolean {
+  const age = Date.now() - timestamp;
+  return age >= CACHE_CONFIG.ttl && age < (CACHE_CONFIG.ttl + CACHE_CONFIG.staleWhileRevalidate);
+}
+
+// Get cached HTML content
+async function getFromCache(path: string): Promise<{ html: string; isStale: boolean } | null> {
+  try {
+    const cacheKey = generateCacheKey(path);
+    console.log(`🔍 Checking cache for: ${path} (key: ${cacheKey})`);
+
+    // Try to get from Netlify KV store
+    const cached = await NETLIFY_KV.get(cacheKey, { type: 'json' }) as CacheEntry | null;
+    
+    if (!cached) {
+      console.log(`❌ Cache miss for: ${path}`);
+      return null;
+    }
+
+    const isFresh = isCacheFresh(cached.timestamp);
+    const isStaleButUsable = isCacheStaleButUsable(cached.timestamp);
+
+    if (isFresh) {
+      console.log(`✅ Cache hit (fresh) for: ${path}`);
+      return { html: cached.html, isStale: false };
+    }
+
+    if (isStaleButUsable) {
+      console.log(`⚠️ Cache hit (stale but usable) for: ${path}`);
+      return { html: cached.html, isStale: true };
+    }
+
+    console.log(`🗑️ Cache expired for: ${path}`);
+    return null;
+
+  } catch (error) {
+    console.error(`❌ Cache read error for ${path}:`, error);
+    return null;
+  }
+}
+
+// Save HTML content to cache
+async function setToCache(path: string, html: string): Promise<void> {
+  try {
+    const cacheKey = generateCacheKey(path);
+    const etag = generateETag(html);
+    
+    const cacheEntry: CacheEntry = {
+      html,
+      timestamp: Date.now(),
+      etag,
+    };
+
+    // Save to Netlify KV store
+    await NETLIFY_KV.put(cacheKey, JSON.stringify(cacheEntry), {
+      expirationTtl: CACHE_CONFIG.ttl / 1000, // Convert to seconds
+    });
+
+    console.log(`💾 Cached HTML for: ${path} (${html.length} bytes)`);
+
+  } catch (error) {
+    console.error(`❌ Cache write error for ${path}:`, error);
+  }
+}
+
+// Revalidate cache in background
+async function revalidateCache(path: string, fetchFreshContent: () => Promise<string>): Promise<void> {
+  try {
+    console.log(`🔄 Background revalidation for: ${path}`);
+    const freshHtml = await fetchFreshContent();
+    await setToCache(path, freshHtml);
+    console.log(`✅ Background revalidation completed for: ${path}`);
+  } catch (error) {
+    console.error(`❌ Background revalidation failed for ${path}:`, error);
+  }
+}
+
+// Invalidate cache entry
+async function invalidateCache(path: string): Promise<void> {
+  try {
+    const cacheKey = generateCacheKey(path);
+    await NETLIFY_KV.delete(cacheKey);
+    console.log(`🗑️ Invalidated cache for: ${path}`);
+  } catch (error) {
+    console.error(`❌ Cache invalidation error for ${path}:`, error);
+  }
+}
+
+// Get cache statistics
+async function getCacheStats(): Promise<{
+  totalEntries: number;
+  freshEntries: number;
+  staleEntries: number;
+  expiredEntries: number;
+}> {
+  try {
+    const list = await NETLIFY_KV.list({ prefix: 'page-cache:' });
+    const stats = { totalEntries: 0, freshEntries: 0, staleEntries: 0, expiredEntries: 0 };
+    
+    for (const key of list.keys) {
+      const cached = await NETLIFY_KV.get(key.name, { type: 'json' }) as CacheEntry | null;
+      if (cached) {
+        stats.totalEntries++;
+        if (isCacheFresh(cached.timestamp)) {
+          stats.freshEntries++;
+        } else if (isCacheStaleButUsable(cached.timestamp)) {
+          stats.staleEntries++;
+        } else {
+          stats.expiredEntries++;
+        }
+      }
+    }
+    
+    return stats;
+  } catch (error) {
+    console.error('❌ Cache stats error:', error);
+    return { totalEntries: 0, freshEntries: 0, staleEntries: 0, expiredEntries: 0 };
+  }
+}
+
+// Pre-cache multiple paths
+async function preCachePaths(paths: string[], fetchContent: (path: string) => Promise<string>): Promise<void> {
+  console.log(`🚀 Pre-caching ${paths.length} paths...`);
+  
+  const batchSize = 5; // Process in batches to avoid overwhelming the system
+  for (let i = 0; i < paths.length; i += batchSize) {
+    const batch = paths.slice(i, i + batchSize);
+    const promises = batch.map(async (path) => {
+      try {
+        const html = await fetchContent(path);
+        await setToCache(path, html);
+        console.log(`✅ Pre-cached: ${path}`);
+      } catch (error) {
+        console.error(`❌ Pre-cache failed for ${path}:`, error);
+      }
+    });
+    
+    await Promise.allSettled(promises);
+    
+    // Small delay between batches
+    if (i + batchSize < paths.length) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+  
+  console.log(`🎉 Pre-caching completed for ${paths.length} paths`);
+}
+
+// Cache configuration constants
+const CATEGORY_PATHS = [
+  '/categories/ai-chatbots',
+  '/categories/ai-text-generators',
+  '/categories/ai-image-generators',
+  '/categories/ai-art-generators',
+  '/categories/productivity-tools',
+  '/categories/all-ai-tools',
+  '/categories/video-tools',
+];
+
+const TOOL_PATHS = [
+  '/tools/all-resources',
+  '/tools/ai-text-generators',
+  '/tools/ai-image-generators',
+  '/tools/ai-chatbots',
+  '/tools/chatgpt',
+  '/tools/midjourney',
+];
+
+// Check if path should be cached
+function shouldCachePath(path: string): boolean {
+  return CATEGORY_PATHS.includes(path) || TOOL_PATHS.includes(path);
+}
+
+// Get cache TTL in seconds
+function getCacheTTL(): number {
+  return CACHE_CONFIG.ttl / 1000;
+}
+
+// Get stale-while-revalidate TTL in seconds
+function getStaleWhileRevalidateTTL(): number {
+  return CACHE_CONFIG.staleWhileRevalidate / 1000;
+}
 
 const API_MAP: Record<string, string> = {
   "/tools/": "/api/tools/",
