@@ -12,7 +12,15 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "kill-ports": "npx kill-port 3001 3002 3003 8080"
+    "kill-ports": "npx kill-port 3001 3002 3003 8080",
+    "test:cache": "node scripts/test-cache.js",
+    "test:pre-cache": "node scripts/pre-cache.js",
+    "test:canonical": "node scripts/test-canonical.js",
+    "test:canonical-comprehensive": "node scripts/test-canonical-comprehensive.js",
+    "test:category-pages": "node scripts/test-category-pages.js",
+    "test:breadcrumbs": "node scripts/test-breadcrumbs.js",
+    "cache:stats": "node scripts/cache-stats.js",
+    "cache:clear": "node scripts/clear-cache.js"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.31.9",

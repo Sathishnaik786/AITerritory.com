@@ -1,4 +1,12 @@
 import { Context } from "@netlify/edge-functions";
+import { 
+  getFromCache, 
+  setToCache, 
+  revalidateCache, 
+  shouldCachePath,
+  getCacheTTL,
+  getStaleWhileRevalidateTTL
+} from "./cache-utils";
 
 const API_MAP: Record<string, string> = {
   "/tools/": "/api/tools/",
@@ -28,12 +36,14 @@ const ROUTE_NAMES: Record<string, string> = {
 
 // Category-specific meta descriptions
 const CATEGORY_META_DESCRIPTIONS: Record<string, string> = {
-  "ai-chatbots": "Discover the best AI Chatbots for automation, customer support, and productivity at AITerritory. Explore top tools updated daily.",
-  "ai-text-generators": "Explore advanced AI Text Generators for content creation, blogs, and business automation. Find top-rated tools on AITerritory.",
-  "ai-image-generators": "Generate stunning images using AI-powered tools. Browse the best AI Image Generators curated by AITerritory.",
-  "ai-art-generators": "Turn ideas into beautiful artwork with AI Art Generators. Find and compare top tools for artists and designers.",
-  "productivity-tools": "Boost your productivity with AI-powered tools curated by AITerritory. Find automation apps and AI assistants for businesses.",
-  "all-ai-tools": "Browse all AI tools in one place. AITerritory curates the best AI-powered solutions for every industry.",
+  "ai-chatbots": "Discover the best AI Chatbots for automation, customer support, and productivity at AITerritory. Explore top tools updated daily with detailed reviews and comparisons.",
+  "ai-text-generators": "Explore advanced AI Text Generators for content creation, blogs, and business automation. Find top-rated AI writing tools and content generators on AITerritory.",
+  "ai-image-generators": "Generate stunning images using AI-powered tools. Browse the best AI Image Generators and art creation software curated by AITerritory with detailed comparisons.",
+  "ai-art-generators": "Turn ideas into beautiful artwork with AI Art Generators. Find and compare top digital art tools for artists and designers on AITerritory.",
+  "productivity-tools": "Boost your productivity with AI-powered tools curated by AITerritory. Find automation apps, AI assistants, and business tools for enhanced efficiency.",
+  "all-ai-tools": "Browse all AI tools in one place. AITerritory curates the most comprehensive collection of AI-powered solutions for every industry and use case.",
+  "video-tools": "Create stunning videos with AI-powered video generation tools. Discover the best AI video creators and editing software on AITerritory.",
+  "ai-for-business": "Transform your business with AI-powered solutions. Find the best AI business tools, automation software, and productivity enhancers on AITerritory.",
   "request-feature": "Submit your AI tool requests or feature ideas on AITerritory. Help us bring more powerful AI tools to the community.",
 };
 
@@ -48,6 +58,131 @@ const KEYWORD_LINKS: Record<string, { url: string; title: string }> = {
   "AI Territory": { url: "/", title: "Visit AITerritory homepage" },
   "Submit Tool": { url: "/company/submit-tool", title: "Submit your AI tool to AITerritory" },
 };
+
+// Function to generate comprehensive breadcrumb schema
+function generateBreadcrumbSchema(path: string, url: URL, apiData: any): any {
+  // Don't generate breadcrumbs for homepage
+  if (path === "/" || path === "/home") {
+    return null;
+  }
+
+  const breadcrumbItems = [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://aiterritory.org/"
+    }
+  ];
+
+  let currentPosition = 2;
+  let currentPath = "";
+
+  // Parse path segments
+  const pathSegments = path.split('/').filter(segment => segment.length > 0);
+  
+  for (let i = 0; i < pathSegments.length; i++) {
+    const segment = pathSegments[i];
+    currentPath += `/${segment}`;
+    
+    let itemName = "";
+    let itemUrl = `https://aiterritory.org${currentPath}`;
+
+    // Determine the name and URL based on path type
+    if (i === 0) {
+      // First level (categories, tools, blog, etc.)
+      switch (segment) {
+        case "categories":
+          itemName = "Categories";
+          break;
+        case "tools":
+          itemName = "Tools";
+          break;
+        case "blog":
+          itemName = "Blog";
+          break;
+        case "prompts":
+          itemName = "Prompts";
+          break;
+        case "tags":
+          itemName = "Tags";
+          break;
+        case "resources":
+          itemName = "Resources";
+          break;
+        case "ai-automation":
+          itemName = "AI Automation";
+          break;
+        case "ai-tutorials":
+          itemName = "AI Tutorials";
+          break;
+        case "youtube":
+          itemName = "YouTube";
+          break;
+        case "dashboard":
+          itemName = "Dashboard";
+          break;
+        case "company":
+          itemName = "Company";
+          break;
+        case "all-ai-tools":
+          itemName = "All AI Tools";
+          break;
+        case "text-generators":
+          itemName = "Text Generators";
+          break;
+        case "image-generators":
+          itemName = "Image Generators";
+          break;
+        case "video-tools":
+          itemName = "Video Tools";
+          break;
+        case "productivity-tools":
+          itemName = "Productivity Tools";
+          break;
+        case "ai-for-business":
+          itemName = "AI for Business";
+          break;
+        default:
+          itemName = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+      }
+    } else {
+      // Second level and beyond (specific items)
+      if (apiData && apiData.name) {
+        itemName = apiData.name;
+      } else if (apiData && apiData.title) {
+        itemName = apiData.title;
+      } else {
+        // Format the segment name
+        itemName = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
+      }
+    }
+
+    breadcrumbItems.push({
+      "@type": "ListItem",
+      "position": currentPosition,
+      "name": itemName,
+      "item": itemUrl
+    });
+
+    currentPosition++;
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": breadcrumbItems
+  };
+}
+
+// Function to generate breadcrumb script for fallback HTML
+function generateBreadcrumbScript(path: string): string {
+  const breadcrumbSchema = generateBreadcrumbSchema(path, new URL(`https://aiterritory.org${path}`), null);
+  if (breadcrumbSchema) {
+    return `<script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>`;
+  }
+  return "";
+}
 
 // Function to add internal links to content
 function addInternalLinks(content: string): string {
@@ -128,113 +263,103 @@ function processHtmlContent(html: string, apiPath: string, data: any): string {
   return processedHtml;
 }
 
-export default async (request: Request, context: Context) => {
-  const url = new URL(request.url);
-  const apiPath = Object.keys(API_MAP).find(path => url.pathname.startsWith(path));
+// Function to get meta data from API with comprehensive error handling
+async function getMetaFromAPI(path: string): Promise<any> {
+  const apiPath = Object.keys(API_MAP).find(route => path.startsWith(route));
+  
+  if (!apiPath) {
+    console.log(`🔍 No API mapping found for path: ${path}`);
+    return null;
+  }
+
+  const id = path.replace(apiPath, "");
+  const apiUrl = `https://aiterritory-com.onrender.com${API_MAP[apiPath]}${id}`;
+  
+  console.log(`📡 Fetching meta from API: ${apiUrl}`);
+  
+  try {
+    const response = await fetch(apiUrl, {
+      headers: {
+        'User-Agent': 'AITerritory-Edge-Function/1.0',
+        'Accept': 'application/json'
+      },
+      // Add timeout to prevent hanging requests
+      signal: AbortSignal.timeout(10000) // 10 second timeout
+    });
+
+    if (!response.ok) {
+      console.error(`❌ API Error: ${response.status} ${response.statusText} for ${apiUrl}`);
+      
+      // For 5xx errors, return null to trigger fallback
+      if (response.status >= 500) {
+        console.warn(`⚠️ Server error (${response.status}), using fallback meta`);
+        return null;
+      }
+      
+      throw new Error(`API responded with status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`✅ Successfully fetched meta for: ${path}`);
+    return data;
+    
+  } catch (error) {
+    console.error(`❌ API fetch error for ${path}:`, error);
+    return null;
+  }
+}
+
+// Function to generate full HTML page with meta, schema, and content
+async function generateFullHtmlPage(path: string, apiData: any): Promise<string> {
+  const url = new URL(`https://aiterritory.org${path}`);
   let metaTitle = "AITerritory - AI Tools & Insights";
   let metaImage = url.origin + "/og-default.png";
   let metaDescription = "Discover the best AI tools and blog posts on AITerritory.";
   let pageName = "";
   let itemName = "";
   let id = "";
-  let apiData: any = null;
 
-  // Static meta tags for main/landing pages
-  const staticMetaMap: Record<string, { title: string, description: string, image?: string }> = {
-    "/ai-for-business": {
-      title: "AI for Business | AITerritory",
-      description: "Explore how AI is transforming business operations, strategy, and growth. Discover tools, guides, and case studies.",
-      image: url.origin + "/og-default.png"
-    },
-    "/blog": {
-      title: "AI Blog | AITerritory",
-      description: "Read the latest articles, news, and insights about AI, tools, and productivity on AITerritory.",
-      image: url.origin + "/og-default.png"
-    },
-    "/prompts": {
-      title: "AI Prompts | AITerritory",
-      description: "Discover, share, and use the best AI prompts for ChatGPT, Midjourney, and more on AITerritory.",
-      image: url.origin + "/og-default.png"
-    },
-    "/resources/ai-agents": {
-      title: "AI Agents Resources | AITerritory",
-      description: "Find the best resources, guides, and tools for building and using AI agents.",
-      image: url.origin + "/og-default.png"
-    },
-    // Add more static routes as needed
-  };
-
-  if (staticMetaMap[url.pathname]) {
-    metaTitle = staticMetaMap[url.pathname].title;
-    metaDescription = staticMetaMap[url.pathname].description;
-    metaImage = staticMetaMap[url.pathname].image || metaImage;
-  }
+  const apiPath = Object.keys(API_MAP).find(route => path.startsWith(route));
 
   if (apiPath) {
-    try {
-      id = url.pathname.replace(apiPath, "");
-      pageName = ROUTE_NAMES[apiPath] || "Page";
-      
-      // Use direct Render backend URL
-      const apiUrl = `https://aiterritory-com.onrender.com${API_MAP[apiPath]}${id}`;
-      const response = await fetch(apiUrl);
-      
-      // Check if response is ok, if not use fallback
-      if (!response.ok) {
-        console.error(`API response not ok: ${response.status} ${response.statusText}`);
-        // Use fallback meta for 5xx errors
-        if (response.status >= 500) {
-          itemName = id || "Page";
-          // Check if we have category-specific meta description
-          if (CATEGORY_META_DESCRIPTIONS[id]) {
-            metaDescription = CATEGORY_META_DESCRIPTIONS[id];
-          }
-        } else {
-          throw new Error(`API responded with status: ${response.status}`);
-        }
+    id = path.replace(apiPath, "");
+    pageName = ROUTE_NAMES[apiPath] || "Page";
+    
+    if (apiData) {
+      if (apiPath === "/categories/") {
+        metaTitle = apiData.name || metaTitle;
+        metaDescription = apiData.description || CATEGORY_META_DESCRIPTIONS[id] || metaDescription;
+        itemName = apiData.name || id;
+      } else if (apiPath === "/tags/") {
+        metaTitle = apiData.name || metaTitle;
+        metaDescription = `Explore tools and content tagged with '${apiData.name || id}' on AITerritory.`;
+        itemName = apiData.name || id;
+      } else if (apiPath === "/youtube/") {
+        metaTitle = apiData.title || metaTitle;
+        metaDescription = apiData.description || metaDescription;
+        metaImage = apiData.thumbnail_url || metaImage;
+        itemName = apiData.title || id;
       } else {
-        const data = await response.json();
-        apiData = data; // Store for internal linking processing
-        
-        if (apiPath === "/categories/") {
-          metaTitle = data.name || metaTitle;
-          metaDescription = data.description || CATEGORY_META_DESCRIPTIONS[id] || metaDescription;
-          itemName = data.name || id;
-          // No image field, use default
-        } else if (apiPath === "/tags/") {
-          metaTitle = data.name || metaTitle;
-          metaDescription = `Explore tools and content tagged with '${data.name || id}' on AITerritory.`;
-          itemName = data.name || id;
-          // No image field, use default
-        } else if (apiPath === "/youtube/") {
-          metaTitle = data.title || metaTitle;
-          metaDescription = data.description || metaDescription;
-          metaImage = data.thumbnail_url || metaImage;
-          itemName = data.title || id;
-        } else {
-          metaTitle = data.title || data.name || metaTitle;
-          metaImage = data.image_url || data.cover_image_url || metaImage;
-          metaDescription = data.description || metaDescription;
-          itemName = data.title || data.name || id;
-        }
+        metaTitle = apiData.title || apiData.name || metaTitle;
+        metaImage = apiData.image_url || apiData.cover_image_url || metaImage;
+        metaDescription = apiData.description || metaDescription;
+        itemName = apiData.title || apiData.name || id;
       }
-    } catch (error) {
-      console.error("Edge function API fetch error:", error);
-      // fallback to default meta
+    } else {
+      // Fallback for when API data is not available
       itemName = id || "Page";
-      // Check if we have category-specific meta description
       if (CATEGORY_META_DESCRIPTIONS[id]) {
         metaDescription = CATEGORY_META_DESCRIPTIONS[id];
       }
     }
   }
 
-  // Always ensure metaImage is set to /og-default.png if missing or empty
+  // Always ensure metaImage is set
   if (!metaImage) {
     metaImage = url.origin + "/og-default.png";
   }
 
-  // Fetch original HTML
+  // Fetch original HTML template
   const htmlResponse = await fetch(url.origin);
   let html = await htmlResponse.text();
 
@@ -243,56 +368,33 @@ export default async (request: Request, context: Context) => {
   html = html.replace(/<meta[^>]+(property|name)="twitter:[^"]+"[^>]*>/gi, '');
 
   // Add canonical tag for every page
-  const fullUrl = url.href;
-  if (!html.includes('<link rel="canonical"')) {
-    html = html.replace(
-      "</head>",
-      `\n    <link rel="canonical" href="${fullUrl}" />\n    </head>`
-    );
-  }
-
+  const canonicalUrl = generateCanonicalUrl(path, url);
+  
+  // Remove any existing canonical tags to avoid duplicates
+  html = html.replace(/<link[^>]+rel=["']canonical["'][^>]*>/gi, '');
+  
+  // Add the canonical tag with proper escaping
+  const escapedCanonicalUrl = canonicalUrl.replace(/"/g, '&quot;');
   html = html.replace(
     "</head>",
-    `\n    <meta property=\"og:title\" content=\"${metaTitle} | AI Territory\">\n    <meta property=\"og:image\" content=\"${metaImage}\">\n    <meta property=\"og:description\" content=\"${metaDescription}\">\n    <meta property=\"og:url\" content=\"${url.href}\">\n    <meta name=\"twitter:card\" content=\"summary_large_image\">\n    <meta name=\"twitter:title\" content=\"${metaTitle} | AI Territory\">\n    <meta name=\"twitter:description\" content=\"${metaDescription}\">\n    <meta name=\"twitter:image\" content=\"${metaImage}\">\n    </head>`
+    `\n    <link rel="canonical" href="${escapedCanonicalUrl}" />\n    </head>`
   );
 
-  // Add Breadcrumb Schema for inner pages (not home page)
-  if (url.pathname !== "/" && url.pathname !== "/home") {
-    const breadcrumbSchema = {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://aiterritory.org/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": pageName || "Page",
-          "item": url.href
-        }
-      ]
-    };
+  // Add meta tags
+  html = html.replace(
+    "</head>",
+    `\n    <meta property=\"og:title\" content=\"${metaTitle} | AI Territory\">\n    <meta property=\"og:image\" content=\"${metaImage}\">\n    <meta property=\"og:description\" content=\"${metaDescription}\">\n    <meta property=\"og:url\" content=\"${canonicalUrl}\">\n    <meta name=\"twitter:card\" content=\"summary_large_image\">\n    <meta name=\"twitter:title\" content=\"${metaTitle} | AI Territory\">\n    <meta name=\"twitter:description\" content=\"${metaDescription}\">\n    <meta name=\"twitter:image\" content=\"${metaImage}\">\n    </head>`
+  );
 
-    // If we have a specific item name (from API), add it as a third level
-    if (itemName && itemName !== pageName) {
-      breadcrumbSchema.itemListElement.push({
-        "@type": "ListItem",
-        "position": 3,
-        "name": itemName,
-        "item": url.href
-      });
-    }
-
+  // Generate comprehensive breadcrumb schema for all eligible pages
+  const breadcrumbSchema = generateBreadcrumbSchema(path, url, apiData);
+  if (breadcrumbSchema) {
     const breadcrumbScript = `<script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>`;
     html = html.replace("</head>", `\n    ${breadcrumbScript}\n    </head>`);
   }
 
   // Add FAQ Schema for blog detail pages
-  if (url.pathname.startsWith("/blog/") && url.pathname !== "/blog") {
+  if (path.startsWith("/blog/") && path !== "/blog") {
     const faqSchema = {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -350,7 +452,7 @@ export default async (request: Request, context: Context) => {
   const aiKeywordsString = aiKeywords.join(", ");
 
   // Inject meta keywords and description for /tools/* and /blog/*
-  if ((url.pathname.startsWith("/tools/") && url.pathname !== "/tools") || (url.pathname.startsWith("/blog/") && url.pathname !== "/blog")) {
+  if ((path.startsWith("/tools/") && path !== "/tools") || (path.startsWith("/blog/") && path !== "/blog")) {
     // Only add if not already present
     if (!/<meta[^>]+name=["']keywords["'][^>]*>/i.test(html)) {
       html = html.replace(
@@ -384,7 +486,7 @@ export default async (request: Request, context: Context) => {
   }
 
   // Add Article schema for /blog/*
-  if (url.pathname.startsWith("/blog/") && url.pathname !== "/blog") {
+  if (path.startsWith("/blog/") && path !== "/blog") {
     const articleSchema = {
       "@context": "https://schema.org",
       "@type": "Article",
@@ -404,8 +506,8 @@ export default async (request: Request, context: Context) => {
   }
 
   // Apply internal linking for blog and tool pages
-  if ((url.pathname.startsWith("/blog/") && url.pathname !== "/blog") || 
-      (url.pathname.startsWith("/tools/") && url.pathname !== "/tools")) {
+  if ((path.startsWith("/blog/") && path !== "/blog") || 
+      (path.startsWith("/tools/") && path !== "/tools")) {
     html = processHtmlContent(html, apiPath || "", apiData);
   }
 
@@ -414,7 +516,271 @@ export default async (request: Request, context: Context) => {
     html = '<!DOCTYPE html>\n' + html;
   }
 
-  return new Response(html, {
-    headers: { "Content-Type": "text/html" },
-  });
-};
+  return html;
+}
+
+// Function to generate canonical URL
+function generateCanonicalUrl(path: string, url: URL): string {
+  try {
+    // For homepage, use the root domain
+    if (path === "/" || path === "/home") {
+      return "https://aiterritory.org/";
+    }
+    
+    // For all other pages, use the current URL but ensure it's HTTPS and no www
+    const canonicalUrl = new URL(url.href);
+    canonicalUrl.protocol = "https:";
+    canonicalUrl.hostname = canonicalUrl.hostname.replace(/^www\./, "");
+    
+    // Remove query parameters to avoid duplicate content issues
+    canonicalUrl.search = "";
+    
+    // Ensure trailing slash for directory-like paths (optional)
+    if (path.endsWith("/") && !canonicalUrl.pathname.endsWith("/")) {
+      canonicalUrl.pathname += "/";
+    }
+    
+    return canonicalUrl.href;
+  } catch (error) {
+    console.error("Error generating canonical URL:", error);
+    // Fallback to homepage if there's an error
+    return "https://aiterritory.org/";
+  }
+}
+
+// Function to generate fallback HTML with meta
+function generateHtmlWithMeta(meta: { title: string; description: string; canonical: string; image?: string }, path?: string) {
+  const defaultImage = "https://aiterritory.org/og-default.png";
+  
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${meta.title}</title>
+  <meta name="description" content="${meta.description}" />
+  <link rel="canonical" href="${meta.canonical}" />
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="${meta.title}" />
+  <meta property="og:description" content="${meta.description}" />
+  <meta property="og:url" content="${meta.canonical}" />
+  <meta property="og:image" content="${meta.image || defaultImage}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AI Territory" />
+  
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${meta.title}" />
+  <meta name="twitter:description" content="${meta.description}" />
+  <meta name="twitter:image" content="${meta.image || defaultImage}" />
+  
+  <!-- Additional SEO Meta Tags -->
+  <meta name="robots" content="index, follow" />
+  <meta name="keywords" content="AI Tools, AI Automation, Best AI Software, AI Productivity Tools, AI News, AI Platforms" />
+  
+  ${path && path !== "/" && path !== "/home" ? generateBreadcrumbScript(path) : ""}
+  
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      line-height: 1.6; 
+      margin: 0; 
+      padding: 20px; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container { 
+      max-width: 600px; 
+      text-align: center; 
+      background: rgba(255,255,255,0.1);
+      padding: 40px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    h1 { 
+      font-size: 2.5rem; 
+      margin-bottom: 20px; 
+      background: linear-gradient(45deg, #fff, #f0f0f0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    p { 
+      font-size: 1.2rem; 
+      margin-bottom: 30px; 
+      opacity: 0.9;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+    .fallback-notice {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin-top: 30px;
+      padding: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>${meta.title}</h1>
+    <p>${meta.description}</p>
+    <a href="https://aiterritory.org" class="btn">Visit AI Territory</a>
+    <div class="fallback-notice">
+      This is a fallback page. The main site is loading...
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+export default async function handler(req: Request) {
+  const url = new URL(req.url);
+  const path = url.pathname;
+
+  console.log(`🚀 Edge Function called for: ${path}`);
+
+  // Check if this path should be cached
+  if (shouldCachePath(path)) {
+    console.log(`📦 Cache-enabled path: ${path}`);
+    
+    // Try to get from cache first
+    const cachedResult = await getFromCache(path);
+    
+    if (cachedResult) {
+      // Add cache headers
+      const headers = new Headers({
+        "content-type": "text/html",
+        "Cache-Control": `public, max-age=${getCacheTTL()}, stale-while-revalidate=${getStaleWhileRevalidateTTL()}`,
+        "X-Cache": cachedResult.isStale ? "STALE" : "HIT",
+      });
+
+      // If cache is stale, trigger background revalidation
+      if (cachedResult.isStale) {
+        console.log(`🔄 Triggering background revalidation for: ${path}`);
+        
+        // Don't await this - let it run in background
+        revalidateCache(path, async () => {
+          try {
+            const apiData = await getMetaFromAPI(path);
+            return await generateFullHtmlPage(path, apiData);
+          } catch (error) {
+            console.error(`❌ Background revalidation failed for ${path}:`, error);
+            // Return the stale content if revalidation fails
+            return cachedResult.html;
+          }
+        });
+      }
+
+      console.log(`✅ Serving from cache: ${path}`);
+      return new Response(cachedResult.html, { headers });
+    }
+  }
+
+  // Cache miss or non-cacheable path - generate fresh content
+  console.log(`🔄 Cache miss, generating fresh content for: ${path}`);
+
+  let pageMeta: any = null;
+  let status = 200;
+
+  try {
+    // Attempt to get API-driven meta data
+    pageMeta = await getMetaFromAPI(path);
+  } catch (error) {
+    console.error("❌ Edge Function Meta Error:", error);
+    status = 500;
+  }
+
+  // If API failed or returned nothing -> fallback
+  if (!pageMeta) {
+    console.warn(`⚠️ Using fallback meta for: ${path}`);
+
+    // Determine page type for better fallback content
+    let pageType = "AI Tools";
+    let pageDescription = "Explore top AI tools, chatbots, image generators, text generators, and productivity apps at AI Territory.";
+    
+    if (path.includes("/categories")) {
+      pageType = "AI Categories";
+      pageDescription = "Browse curated AI tool categories including chatbots, text generators, image generators, and productivity tools.";
+    } else if (path.includes("/blog")) {
+      pageType = "AI Blog";
+      pageDescription = "Read the latest AI news, tutorials, and insights from AI Territory.";
+    } else if (path.includes("/tools")) {
+      pageType = "AI Tools";
+      pageDescription = "Discover and compare the best AI tools for your needs at AI Territory.";
+    }
+
+    const defaultMeta = {
+      title: `AI Territory - Explore ${pageType}`,
+      description: pageDescription,
+      canonical: generateCanonicalUrl(path, new URL(`https://aiterritory.org${path}`)),
+      image: "https://aiterritory.org/og-default.png"
+    };
+
+    // Return static fallback HTML (200 OK)
+    console.log(`✅ Returning fallback HTML for: ${path}`);
+    return new Response(generateHtmlWithMeta(defaultMeta, path), {
+      headers: { "content-type": "text/html" },
+      status: 200, // ensure success
+    });
+  }
+
+  // Generate full HTML page with API data
+  try {
+    const fullHtml = await generateFullHtmlPage(path, pageMeta);
+    
+    // Cache the generated HTML if it's a cacheable path
+    if (shouldCachePath(path)) {
+      console.log(`💾 Caching generated HTML for: ${path}`);
+      await setToCache(path, fullHtml);
+    }
+
+    // Add cache headers for cacheable paths
+    const headers = new Headers({
+      "content-type": "text/html",
+    });
+
+    if (shouldCachePath(path)) {
+      headers.set("Cache-Control", `public, max-age=${getCacheTTL()}, stale-while-revalidate=${getStaleWhileRevalidateTTL()}`);
+      headers.set("X-Cache", "MISS");
+    }
+
+    console.log(`✅ Returning dynamic HTML for: ${path}`);
+    return new Response(fullHtml, { headers, status: 200 });
+    
+  } catch (error) {
+    console.error(`❌ Error generating HTML for ${path}:`, error);
+    
+    // Fallback to static content
+    const defaultMeta = {
+      title: "AI Territory - AI Tools & Insights",
+      description: "Discover the best AI tools and blog posts on AITerritory.",
+      canonical: generateCanonicalUrl(path, new URL(`https://aiterritory.org${path}`)),
+      image: "https://aiterritory.org/og-default.png"
+    };
+
+    return new Response(generateHtmlWithMeta(defaultMeta, path), {
+      headers: { "content-type": "text/html" },
+      status: 200,
+    });
+  }
+}

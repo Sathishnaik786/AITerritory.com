@@ -14,6 +14,11 @@
 [context.branch-deploy.environment]
   NODE_ENV = "development"
 
+# KV Storage for caching
+[context.production.environment]
+  NETLIFY_KV_STORE_ID = "your-kv-store-id" # Replace with actual KV store ID
+
+# Edge Functions configuration
 [[edge_functions]]
 function = "dynamic-meta"
 path = "/blog*"
@@ -54,6 +59,41 @@ path = "/youtube*"
 function = "dynamic-meta"
 path = "/dashboard*"
 
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/company*"
+
+# Direct category page routes
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/all-ai-tools*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/text-generators*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/image-generators*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/video-tools*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/productivity-tools*"
+
+[[edge_functions]]
+function = "dynamic-meta"
+path = "/ai-for-business*"
+
+# Post-build script for pre-caching
+[build]
+  command = "npm run build"
+  publish = "dist"
+  post_processing = "node scripts/pre-cache.js"
+
 [[redirects]]
 from = "/api/*"
 to = "https://aiterritory-com.onrender.com/api/:splat"
@@ -84,4 +124,25 @@ force = true
 from = "http://www.aiterritory.org/*"
 to = "https://aiterritory.org/:splat"
 status = 301
+force = true
+
+# Remove query parameters from specific pages to prevent duplicate content
+[[redirects]]
+from = "/tools/ai-text-generators*"
+to = "/tools/ai-text-generators"
+status = 301
+force = true
+
+[[redirects]]
+from = "/company/request-feature*"
+to = "/company/request-feature"
+status = 301
+force = true
+
+# General query parameter cleanup for all pages
+[[redirects]]
+from = "/*"
+to = "/:splat"
+status = 200
+conditions = {query = {utm_source = ".*", utm_medium = ".*", utm_campaign = ".*", utm_term = ".*", utm_content = ".*", gclid = ".*", fbclid = ".*", _ga = ".*", _gl = ".*"}}
 force = true

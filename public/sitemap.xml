@@ -145,34 +145,39 @@
   <url>
     <loc>https://aiterritory.org/categories/all-ai-tools</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   
   <!-- Direct Tool Category Pages -->
   <url>
     <loc>https://aiterritory.org/all-ai-tools</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://aiterritory.org/productivity-tools</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://aiterritory.org/image-generators</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://aiterritory.org/text-generators</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://aiterritory.org/video-tools</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://aiterritory.org/ai-for-business</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   
   <!-- Tool Collection Pages -->

@@ -104,10 +104,10 @@ const AllAIToolsPage = () => {
   return (
     <>
       <SEO
-        title="All AI Tools | AITerritory"
-        description="Browse all AI tools in one place. AITerritory curates the best AI-powered solutions for every industry."
+        title="All AI Tools - Complete Directory of Artificial Intelligence Tools | AITerritory"
+        description="Discover the most comprehensive collection of AI tools, generators, and artificial intelligence software. Browse 1000+ AI-powered solutions for business, creativity, and productivity. Find the perfect AI tool for your needs with detailed reviews and comparisons."
         image="/og-default.png"
-        keywords="AI tools, artificial intelligence, AI software, machine learning tools, AI applications"
+        keywords="AI tools, artificial intelligence tools, AI generators, AI software, machine learning tools, AI applications, AI business tools, AI productivity tools, artificial intelligence software"
       />
       <div className="container mx-auto px-4 py-8 relative">
         {/* Subtle animated background for depth */}
@@ -130,6 +130,29 @@ const AllAIToolsPage = () => {
           <p className="text-lg text-muted-foreground">
             Discover and explore our comprehensive collection of AI tools
           </p>
+        </motion.div>
+
+        {/* Enhanced Intro Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: 'easeOut', delay: 0.2 }}
+          className="mb-8 relative z-10"
+        >
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-lg p-6 border border-blue-200/50 dark:border-blue-800/50">
+            <div className="prose prose-lg max-w-none dark:prose-invert">
+              <p className="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4">
+                Welcome to the most comprehensive directory of <strong>AI tools</strong> and <strong>artificial intelligence software</strong> available today. Our curated collection features over 1000 cutting-edge AI-powered solutions designed to transform how you work, create, and innovate.
+              </p>
+              <p className="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4">
+                Whether you're looking for <strong>AI generators</strong> for content creation, <strong>AI business tools</strong> for productivity, or specialized <strong>AI applications</strong> for your industry, you'll find exactly what you need. Each tool has been carefully reviewed and tested to ensure quality, reliability, and value for your specific use case.
+              </p>
+              <p className="text-base leading-relaxed text-gray-700 dark:text-gray-300">
+                Explore our categories including <strong>AI chatbots</strong>, <strong>text generators</strong>, <strong>image generators</strong>, <strong>video tools</strong>, <strong>productivity tools</strong>, and more. Use the search and filters below to find the perfect AI solution for your needs.
+              </p>
+            </div>
+          </div>
         </motion.div>
         {/* Search and Filters */}
         <motion.div

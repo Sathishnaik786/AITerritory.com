@@ -25,29 +25,37 @@ const FAQ: React.FC<FAQProps> = ({ category, className = "" }) => {
     "ai-text-generators": [
       {
         question: "What can AI text generators create?",
-        answer: "AI text generators can create blog posts, marketing copy, emails, social media content, and creative writing with advanced language models."
+        answer: "AI text generators can create blog posts, marketing copy, emails, social media content, product descriptions, creative writing, and technical documentation. They use advanced language models to generate human-like text for various content needs."
       },
       {
         question: "How do AI text generators help with SEO?",
-        answer: "AI text generators can create SEO-optimized content with proper keywords, meta descriptions, and engaging headlines to improve search rankings."
+        answer: "AI text generators can create SEO-optimized content with proper keywords, meta descriptions, engaging headlines, and structured content that improves search rankings. They help maintain consistent content quality while saving time on research and writing."
       },
       {
         question: "Are AI text generators suitable for business use?",
-        answer: "Yes, many AI text generators are designed for business applications including content marketing, customer communication, and product descriptions."
+        answer: "Yes, many AI text generators are specifically designed for business applications including content marketing, customer communication, product descriptions, and automated copywriting. They can significantly improve content creation efficiency for businesses of all sizes."
+      },
+      {
+        question: "How do I choose the best AI text generator for my needs?",
+        answer: "Consider your specific use case, content type, budget, and required features. Look for tools that offer the right balance of quality, customization options, and ease of use for your particular content creation needs."
       }
     ],
     "ai-image-generators": [
       {
         question: "How do AI image generators work?",
-        answer: "AI image generators use deep learning models to create images from text descriptions, converting your ideas into visual artwork."
+        answer: "AI image generators use deep learning models and neural networks to create images from text descriptions. They analyze your prompts and generate visual artwork by understanding patterns from millions of training images, converting your ideas into stunning visuals."
       },
       {
         question: "What's the difference between free and paid AI image generators?",
-        answer: "Free generators often have limited features and lower quality, while paid versions offer higher resolution, more styles, and commercial usage rights."
+        answer: "Free generators often have limited features, lower resolution outputs, and restricted usage rights. Paid versions typically offer higher resolution, more artistic styles, commercial usage rights, and advanced features like batch generation and custom training."
       },
       {
         question: "Can I use AI-generated images commercially?",
-        answer: "It depends on the tool and license. Some AI image generators allow commercial use, while others require additional licensing for business purposes."
+        answer: "It depends on the specific tool and license. Some AI image generators allow commercial use with their paid plans, while others require additional licensing for business purposes. Always check the terms of service for each tool before using generated images commercially."
+      },
+      {
+        question: "What types of images can AI generators create?",
+        answer: "AI image generators can create various types of images including photorealistic scenes, artistic paintings, illustrations, concept art, product mockups, social media graphics, and more. The range depends on the specific tool and its training data."
       }
     ],
     "ai-art-generators": [
@@ -81,15 +89,19 @@ const FAQ: React.FC<FAQProps> = ({ category, className = "" }) => {
     "all-ai-tools": [
       {
         question: "How do I choose the right AI tool for my needs?",
-        answer: "Consider your specific use case, budget, and required features. AITerritory provides detailed comparisons and reviews to help you make informed decisions."
+        answer: "Consider your specific use case, budget, and required features. AITerritory provides detailed comparisons and reviews to help you make informed decisions. Look for tools that match your industry, team size, and technical requirements."
       },
       {
         question: "What are the most popular AI tool categories?",
-        answer: "Popular categories include chatbots, image generators, text generators, productivity tools, and video creation tools based on current trends."
+        answer: "Popular categories include AI chatbots for customer service, text generators for content creation, image generators for visual content, video tools for multimedia, and productivity tools for business automation. Each category serves specific business and creative needs."
+      },
+      {
+        question: "Are AI tools suitable for small businesses?",
+        answer: "Yes, many AI tools offer affordable plans and features specifically designed for small business needs. From AI chatbots for customer support to productivity tools for workflow automation, there are cost-effective solutions for every business size."
       },
       {
         question: "How often are AI tools updated on AITerritory?",
-        answer: "We regularly update our AI tool listings with the latest releases, features, and user reviews to keep you informed of the newest options."
+        answer: "We regularly update our AI tool listings with the latest releases, features, and user reviews to keep you informed of the newest options. Our team continuously monitors the AI landscape to ensure you have access to the most current and effective tools."
       }
     ]
   };
