@@ -657,11 +657,24 @@ const BlogDetail: React.FC = () => {
           )}
         </AnimatePresence>
                 {/* You Might Also Like Section */}
-        <YouMightAlsoLike
-          currentSlug={blog.slug}
-          category={blog.category}
-          tags={blog.tags}
-        />
+        {blog && (
+          <>
+            {(() => {
+              console.log('🔍 Blog data for YouMightAlsoLike:', {
+                slug: blog.slug,
+                category: blog.category,
+                tags: blog.tags,
+                title: blog.title
+              });
+              return null;
+            })()}
+            <YouMightAlsoLike
+              currentSlug={blog.slug}
+              category={blog.category}
+              tags={blog.tags}
+            />
+          </>
+        )}
       </div>
     </>
   );

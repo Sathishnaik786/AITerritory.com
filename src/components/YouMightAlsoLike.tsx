@@ -8,12 +8,17 @@ interface BlogPost {
   id: string;
   title: string;
   slug: string;
-  description: string;
-  cover_image_url: string;
-  author_name: string;
+  description?: string;
+  summary?: string;
+  cover_image_url?: string;
+  bannerImage?: string;
+  author_name?: string;
+  author?: string;
   category?: string;
-  created_at: string;
+  created_at?: string;
+  date?: string;
   reading_time?: number;
+  readTime?: number;
   tags?: string[];
 }
 
@@ -22,6 +27,22 @@ interface YouMightAlsoLikeProps {
   category?: string;
   tags?: string[];
 }
+
+// Helper function to normalize blog data from different sources
+const normalizeBlogData = (blog: any): BlogPost => {
+  return {
+    id: blog.id,
+    title: blog.title,
+    slug: blog.slug,
+    description: blog.description || blog.summary || '',
+    cover_image_url: blog.cover_image_url || blog.bannerImage || '',
+    author_name: blog.author_name || blog.author || '',
+    category: blog.category || '',
+    created_at: blog.created_at || blog.date || '',
+    reading_time: blog.reading_time || blog.readTime || 3,
+    tags: blog.tags || []
+  };
+};
 
 export const YouMightAlsoLike: React.FC<YouMightAlsoLikeProps> = ({ 
   currentSlug, 
@@ -54,8 +75,12 @@ export const YouMightAlsoLike: React.FC<YouMightAlsoLikeProps> = ({
         const allBlogs = await BlogService.getAll();
         console.log('📚 Total blogs fetched:', allBlogs.length);
         
+        // Normalize all blog data
+        const normalizedBlogs = allBlogs.map(normalizeBlogData);
+        console.log('📚 Normalized blogs:', normalizedBlogs.length);
+        
         // Filter out current blog
-        const otherBlogs = allBlogs.filter(blog => blog.slug !== currentSlug);
+        const otherBlogs = normalizedBlogs.filter(blog => blog.slug !== currentSlug);
         console.log('📚 Other blogs (excluding current):', otherBlogs.length);
         
         // Get related blogs based on category and tags
