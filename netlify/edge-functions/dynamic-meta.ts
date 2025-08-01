@@ -207,6 +207,20 @@ const TOOL_PATHS = [
   '/tools/midjourney',
 ];
 
+// Disallowed paths for robots meta
+const DISALLOWED_PATHS = [
+  '/auth/',
+  '/dashboard/',
+  '/settings/',
+  '/admin/',
+  '/company/request-feature',
+];
+
+// Duplicate content paths that should be noindex
+const DUPLICATE_PATHS = [
+  '/company/request-feature',
+];
+
 // Check if path should be cached
 function shouldCachePath(path: string): boolean {
   return CATEGORY_PATHS.includes(path) || TOOL_PATHS.includes(path);
@@ -389,6 +403,66 @@ function generateBreadcrumbSchema(path: string, url: URL, apiData: any): any {
   };
 }
 
+// Function to generate ItemList schema for category pages
+function generateItemListSchema(path: string, apiData: any): any {
+  if (!path.startsWith('/categories/') || !apiData) {
+    return null;
+  }
+
+  // This would ideally fetch the actual items from the API
+  // For now, we'll create a basic structure
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": `${apiData.name || 'Category'} - AI Tools`,
+    "description": apiData.description || `Browse ${apiData.name || 'category'} AI tools`,
+    "url": `https://aiterritory.org${path}`,
+    "numberOfItems": apiData.itemCount || 0,
+    "itemListElement": [] // Would be populated with actual items
+  };
+}
+
+// Function to generate WebPage schema for static pages
+function generateWebPageSchema(path: string, apiData: any): any {
+  // Skip for dynamic pages that have their own schemas
+  if (path.startsWith('/blog/') || path.startsWith('/tools/') || path.startsWith('/categories/')) {
+    return null;
+  }
+
+  let pageName = "";
+  let pageDescription = "";
+
+  // Determine page type
+  if (path === "/") {
+    pageName = "AI Territory - AI Tools & Insights";
+    pageDescription = "Discover the best AI tools and blog posts on AITerritory.";
+  } else if (path.startsWith("/company/")) {
+    pageName = "Company - AI Territory";
+    pageDescription = "Learn about AI Territory and our mission to curate the best AI tools.";
+  } else if (path.startsWith("/prompts/")) {
+    pageName = "AI Prompts - AI Territory";
+    pageDescription = "Explore AI prompts and templates for various use cases.";
+  } else {
+    // Generic page
+    pageName = "AI Territory";
+    pageDescription = "AI Territory - Your guide to the best AI tools and resources.";
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": pageName,
+    "description": pageDescription,
+    "url": `https://aiterritory.org${path}`,
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "AI Territory",
+      "url": "https://aiterritory.org"
+    },
+    "breadcrumb": generateBreadcrumbSchema(path, new URL(`https://aiterritory.org${path}`), apiData)
+  };
+}
+
 // Function to generate breadcrumb script for fallback HTML
 function generateBreadcrumbScript(path: string): string {
   const breadcrumbSchema = generateBreadcrumbSchema(path, new URL(`https://aiterritory.org${path}`), null);
@@ -477,7 +551,7 @@ function processHtmlContent(html: string, apiPath: string, data: any): string {
   return processedHtml;
 }
 
-// Function to get meta data from API with comprehensive error handling
+// Function to get meta data from API with comprehensive error handling and caching
 async function getMetaFromAPI(path: string): Promise<any> {
   const apiPath = Object.keys(API_MAP).find(route => path.startsWith(route));
   
@@ -491,22 +565,43 @@ async function getMetaFromAPI(path: string): Promise<any> {
   
   console.log(`📡 Fetching meta from API: ${apiUrl}`);
   
+  // Try to get cached API response first
+  const apiCacheKey = `api-cache:${apiUrl}`;
+  try {
+    const cachedApiData = await NETLIFY_KV.get(apiCacheKey, { type: 'json' });
+    if (cachedApiData && (Date.now() - cachedApiData.timestamp) < 3600000) { // 1 hour cache
+      console.log(`✅ API cache hit for: ${path}`);
+      return cachedApiData.data;
+    }
+  } catch (error) {
+    console.log(`❌ API cache miss for: ${path}`);
+  }
+  
   try {
     const response = await fetch(apiUrl, {
       headers: {
         'User-Agent': 'AITerritory-Edge-Function/1.0',
         'Accept': 'application/json'
       },
-      // Add timeout to prevent hanging requests
-      signal: AbortSignal.timeout(10000) // 10 second timeout
+      // Add timeout to prevent hanging requests (8 seconds as requested)
+      signal: AbortSignal.timeout(8000) // 8 second timeout
     });
 
     if (!response.ok) {
       console.error(`❌ API Error: ${response.status} ${response.statusText} for ${apiUrl}`);
       
-      // For 5xx errors, return null to trigger fallback
+      // For 5xx errors, try to serve cached response
       if (response.status >= 500) {
-        console.warn(`⚠️ Server error (${response.status}), using fallback meta`);
+        console.warn(`⚠️ Server error (${response.status}), trying cached response`);
+        try {
+          const cachedApiData = await NETLIFY_KV.get(apiCacheKey, { type: 'json' });
+          if (cachedApiData) {
+            console.log(`✅ Serving cached API response for: ${path}`);
+            return cachedApiData.data;
+          }
+        } catch (cacheError) {
+          console.error(`❌ Failed to get cached API response:`, cacheError);
+        }
         return null;
       }
       
@@ -515,12 +610,66 @@ async function getMetaFromAPI(path: string): Promise<any> {
 
     const data = await response.json();
     console.log(`✅ Successfully fetched meta for: ${path}`);
+    
+    // Cache the API response for 1 hour
+    try {
+      await NETLIFY_KV.put(apiCacheKey, JSON.stringify({
+        data,
+        timestamp: Date.now()
+      }), {
+        expirationTtl: 3600 // 1 hour
+      });
+      console.log(`💾 Cached API response for: ${path}`);
+    } catch (cacheError) {
+      console.error(`❌ Failed to cache API response:`, cacheError);
+    }
+    
     return data;
     
   } catch (error) {
     console.error(`❌ API fetch error for ${path}:`, error);
+    
+    // Try to serve cached response on error
+    try {
+      const cachedApiData = await NETLIFY_KV.get(apiCacheKey, { type: 'json' });
+      if (cachedApiData) {
+        console.log(`✅ Serving cached API response on error for: ${path}`);
+        return cachedApiData.data;
+      }
+    } catch (cacheError) {
+      console.error(`❌ Failed to get cached API response on error:`, cacheError);
+    }
+    
     return null;
   }
+}
+
+// Function to determine robots meta content
+function getRobotsMeta(path: string): string {
+  // Check if path should be noindex
+  const shouldNoIndex = DISALLOWED_PATHS.some(disallowed => path.startsWith(disallowed)) ||
+                       DUPLICATE_PATHS.some(duplicate => path.startsWith(duplicate));
+  
+  if (shouldNoIndex) {
+    console.log(`🤖 Robots meta: noindex,follow for ${path}`);
+    return "noindex,follow";
+  }
+  
+  // For category, blog, tool, and homepage URLs, ensure index,follow
+  const shouldIndex = path.startsWith('/categories/') || 
+                     path.startsWith('/blog/') || 
+                     path.startsWith('/tools/') || 
+                     path === '/' || 
+                     path === '/home';
+  
+  if (shouldIndex) {
+    console.log(`🤖 Robots meta: index,follow for ${path}`);
+    return "index,follow";
+  }
+  
+  // Default to index,follow for other pages
+  console.log(`🤖 Robots meta: index,follow (default) for ${path}`);
+  return "index,follow";
 }
 
 // Function to generate full HTML page with meta, schema, and content
@@ -594,6 +743,14 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
     `\n    <link rel="canonical" href="${escapedCanonicalUrl}" />\n    </head>`
   );
 
+  // Add robots meta tag
+  const robotsMeta = getRobotsMeta(path);
+  html = html.replace(/<meta[^>]+name=["']robots["'][^>]*>/gi, ''); // Remove existing robots meta
+  html = html.replace(
+    "</head>",
+    `\n    <meta name="robots" content="${robotsMeta}" />\n    </head>`
+  );
+
   // Add meta tags
   html = html.replace(
     "</head>",
@@ -605,6 +762,20 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
   if (breadcrumbSchema) {
     const breadcrumbScript = `<script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>`;
     html = html.replace("</head>", `\n    ${breadcrumbScript}\n    </head>`);
+  }
+
+  // Generate ItemList schema for category pages
+  const itemListSchema = generateItemListSchema(path, apiData);
+  if (itemListSchema) {
+    const itemListScript = `<script type="application/ld+json">${JSON.stringify(itemListSchema)}</script>`;
+    html = html.replace("</head>", `\n    ${itemListScript}\n    </head>`);
+  }
+
+  // Generate WebPage schema for static pages
+  const webPageSchema = generateWebPageSchema(path, apiData);
+  if (webPageSchema) {
+    const webPageScript = `<script type="application/ld+json">${JSON.stringify(webPageSchema)}</script>`;
+    html = html.replace("</head>", `\n    ${webPageScript}\n    </head>`);
   }
 
   // Add FAQ Schema for blog detail pages
@@ -870,8 +1041,13 @@ function generateHtmlWithMeta(meta: { title: string; description: string; canoni
 export default async function handler(req: Request) {
   const url = new URL(req.url);
   const path = url.pathname;
+  const startTime = Date.now();
 
   console.log(`🚀 Edge Function called for: ${path}`);
+
+  // Log robots meta decision
+  const robotsMeta = getRobotsMeta(path);
+  console.log(`🤖 Robots meta decision for ${path}: ${robotsMeta}`);
 
   // Check if this path should be cached
   if (shouldCachePath(path)) {
@@ -881,12 +1057,12 @@ export default async function handler(req: Request) {
     const cachedResult = await getFromCache(path);
     
     if (cachedResult) {
-      // Add cache headers
-      const headers = new Headers({
-        "content-type": "text/html",
-        "Cache-Control": `public, max-age=${getCacheTTL()}, stale-while-revalidate=${getStaleWhileRevalidateTTL()}`,
-        "X-Cache": cachedResult.isStale ? "STALE" : "HIT",
-      });
+          // Add cache headers with improved caching strategy (12 hours)
+    const headers = new Headers({
+      "content-type": "text/html",
+      "Cache-Control": "public, max-age=43200, stale-while-revalidate=86400",
+      "X-Cache": cachedResult.isStale ? "STALE" : "HIT",
+    });
 
       // If cache is stale, trigger background revalidation
       if (cachedResult.isStale) {
@@ -905,7 +1081,8 @@ export default async function handler(req: Request) {
         });
       }
 
-      console.log(`✅ Serving from cache: ${path}`);
+      const responseTime = Date.now() - startTime;
+      console.log(`✅ Serving from cache: ${path} (${responseTime}ms)`);
       return new Response(cachedResult.html, { headers });
     }
   }
@@ -951,7 +1128,8 @@ export default async function handler(req: Request) {
     };
 
     // Return static fallback HTML (200 OK)
-    console.log(`✅ Returning fallback HTML for: ${path}`);
+    const responseTime = Date.now() - startTime;
+    console.log(`✅ Returning fallback HTML for: ${path} (${responseTime}ms)`);
     return new Response(generateHtmlWithMeta(defaultMeta, path), {
       headers: { "content-type": "text/html" },
       status: 200, // ensure success
@@ -974,11 +1152,12 @@ export default async function handler(req: Request) {
     });
 
     if (shouldCachePath(path)) {
-      headers.set("Cache-Control", `public, max-age=${getCacheTTL()}, stale-while-revalidate=${getStaleWhileRevalidateTTL()}`);
+      headers.set("Cache-Control", "public, max-age=43200, stale-while-revalidate=86400");
       headers.set("X-Cache", "MISS");
     }
 
-    console.log(`✅ Returning dynamic HTML for: ${path}`);
+    const responseTime = Date.now() - startTime;
+    console.log(`✅ Returning dynamic HTML for: ${path} (${responseTime}ms)`);
     return new Response(fullHtml, { headers, status: 200 });
     
   } catch (error) {
@@ -992,6 +1171,8 @@ export default async function handler(req: Request) {
       image: "https://aiterritory.org/og-default.png"
     };
 
+    const responseTime = Date.now() - startTime;
+    console.log(`✅ Returning fallback HTML on error for: ${path} (${responseTime}ms)`);
     return new Response(generateHtmlWithMeta(defaultMeta, path), {
       headers: { "content-type": "text/html" },
       status: 200,

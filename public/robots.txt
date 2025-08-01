@@ -22,4 +22,22 @@ Disallow: /settings/
 Disallow: /admin/
 Allow: /
 
+# Allow other major search engines
+User-agent: Slurp
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /admin/
+Allow: /
+
+User-agent: DuckDuckBot
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /admin/
+Allow: /
+
+# Crawl delay for all bots (1 second)
+Crawl-delay: 1
+
 Sitemap: https://aiterritory.org/sitemap.xml

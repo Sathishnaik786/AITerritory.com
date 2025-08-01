@@ -1,51 +1,25 @@
-import { supabase } from './supabaseClient';
 import { BlogPost } from '../types/blog';
 import { blogPosts } from '../data/blogPosts';
 
-// Fields that exist in your blogs table
-const BLOG_FIELDS = [
-  'id',
-  'title',
-  'slug',
-  'description',
-  'cover_image_url',
-  'content',
-  'author_name',
-  'tags',
-  'created_at',
-  'featured',
-  'category',
-  'reading_time'
-];
+// API base URL - adjust based on your backend setup
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export const BlogService = {
   async getAll(params?: any): Promise<BlogPost[]> {
     try {
-      if (!supabase) {
-        console.warn('Supabase not configured, using local blog data');
-        return blogPosts;
-      }
-
-      const { data, error } = await supabase
-        .from('blogs')
-        .select(BLOG_FIELDS.join(','))
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Supabase error fetching blogs:', error);
+      const response = await fetch(`${API_BASE_URL}/api/blogs`);
+      
+      if (!response.ok) {
+        console.error('Backend API error:', response.status, response.statusText);
         console.warn('Falling back to local blog data');
         return blogPosts;
       }
 
-      if (!data || data.length === 0) {
-        console.warn('No blogs found in Supabase, using local blog data');
-        return blogPosts;
-      }
-
-      console.log('Fetched blogs from Supabase:', data.length);
+      const data = await response.json();
+      console.log('Fetched blogs from backend API:', data.length);
       return data;
     } catch (error) {
-      console.error('Error fetching blogs from Supabase:', error);
+      console.error('Error fetching blogs from backend API:', error);
       console.warn('Falling back to local blog data');
       return blogPosts;
     }
@@ -53,23 +27,13 @@ export const BlogService = {
 
   async getBySlug(slug: string): Promise<BlogPost> {
     try {
-      if (!supabase) {
-        console.warn('Supabase not configured, using local blog data');
-        const localBlog = blogPosts.find(blog => blog.slug === slug);
-        if (!localBlog) {
+      const response = await fetch(`${API_BASE_URL}/api/blogs/${slug}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
           throw new Error('Blog not found');
         }
-        return localBlog;
-      }
-
-      const { data: blog, error } = await supabase
-        .from('blogs')
-        .select(BLOG_FIELDS.join(','))
-        .eq('slug', slug)
-        .single();
-
-      if (error) {
-        console.error('Supabase error fetching blog:', error);
+        console.error('Backend API error:', response.status, response.statusText);
         console.warn('Falling back to local blog data');
         const localBlog = blogPosts.find(blog => blog.slug === slug);
         if (!localBlog) {
@@ -78,19 +42,11 @@ export const BlogService = {
         return localBlog;
       }
 
-      if (!blog) {
-        console.warn('Blog not found in Supabase, checking local data');
-        const localBlog = blogPosts.find(blog => blog.slug === slug);
-        if (!localBlog) {
-          throw new Error('Blog not found');
-        }
-        return localBlog;
-      }
-
-      console.log('Fetched blog from Supabase:', blog.title);
-      return blog;
+      const data = await response.json();
+      console.log('Fetched blog from backend API:', data.title);
+      return data;
     } catch (error) {
-      console.error('Error fetching blog from Supabase:', error);
+      console.error('Error fetching blog from backend API:', error);
       console.warn('Falling back to local blog data');
       const localBlog = blogPosts.find(blog => blog.slug === slug);
       if (!localBlog) {
@@ -102,75 +58,137 @@ export const BlogService = {
 
   async getByCategory(category: string): Promise<BlogPost[]> {
     try {
-      if (!supabase) {
-        console.warn('Supabase not configured, using local blog data');
-        return blogPosts.filter(blog => blog.category === category);
-      }
-
-      const { data, error } = await supabase
-        .from('blogs')
-        .select(BLOG_FIELDS.join(','))
-        .eq('category', category)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Supabase error fetching blogs by category:', error);
+      const response = await fetch(`${API_BASE_URL}/api/blogs/category/${encodeURIComponent(category)}`);
+      
+      if (!response.ok) {
+        console.error('Backend API error:', response.status, response.statusText);
         console.warn('Falling back to local blog data');
         return blogPosts.filter(blog => blog.category === category);
       }
 
-      if (!data || data.length === 0) {
-        console.warn('No blogs found in Supabase for category:', category);
-        return blogPosts.filter(blog => blog.category === category);
-      }
-
-      console.log('Fetched blogs from Supabase for category:', category, data.length);
+      const data = await response.json();
+      console.log('Fetched blogs from backend API for category:', category, data.length);
       return data;
     } catch (error) {
-      console.error('Error fetching blogs by category from Supabase:', error);
+      console.error('Error fetching blogs by category from backend API:', error);
       console.warn('Falling back to local blog data');
       return blogPosts.filter(blog => blog.category === category);
     }
   },
 
   async create(blog: Partial<BlogPost>): Promise<BlogPost> {
-    if (!supabase) {
-      throw new Error('Supabase not configured');
+    try {
+      // Prepare data according to your Supabase schema
+      const blogData = {
+        title: blog.title,
+        slug: blog.slug,
+        description: blog.description,
+        cover_image_url: blog.cover_image_url,
+        content: blog.content,
+        author_name: blog.author_name,
+        tags: blog.tags || [],
+        category: blog.category,
+        reading_time: blog.reading_time,
+        featured: blog.featured || false,
+        published: blog.published || false
+      };
+
+      const response = await fetch(`${API_BASE_URL}/api/blogs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(blogData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Blog created successfully:', data.title);
+      return data;
+    } catch (error) {
+      console.error('Error creating blog:', error);
+      throw error;
     }
-    const { data, error } = await supabase
-      .from('blogs')
-      .insert(blog)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
   },
 
   async update(blog: Partial<BlogPost>): Promise<BlogPost> {
-    if (!supabase) {
-      throw new Error('Supabase not configured');
+    try {
+      if (!blog.id) {
+        throw new Error('Blog ID is required for update');
+      }
+
+      // Prepare data according to your Supabase schema
+      const blogData = {
+        title: blog.title,
+        slug: blog.slug,
+        description: blog.description,
+        cover_image_url: blog.cover_image_url,
+        content: blog.content,
+        author_name: blog.author_name,
+        tags: blog.tags || [],
+        category: blog.category,
+        reading_time: blog.reading_time,
+        featured: blog.featured,
+        published: blog.published
+      };
+
+      const response = await fetch(`${API_BASE_URL}/api/blogs/${blog.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(blogData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Blog updated successfully:', data.title);
+      return data;
+    } catch (error) {
+      console.error('Error updating blog:', error);
+      throw error;
     }
-    const { data, error } = await supabase
-      .from('blogs')
-      .update(blog)
-      .eq('id', blog.id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
   },
 
   async delete(id: string): Promise<void> {
-    if (!supabase) {
-      throw new Error('Supabase not configured');
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      console.log('Blog deleted successfully:', id);
+    } catch (error) {
+      console.error('Error deleting blog:', error);
+      throw error;
     }
-    const { error } = await supabase
-      .from('blogs')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
   },
+
+  // Helper method to test backend connection
+  async testBackend(): Promise<{ connected: boolean; message: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/blogs/test`);
+      
+      if (!response.ok) {
+        return { connected: false, message: `Backend error: ${response.status}` };
+      }
+
+      const data = await response.json();
+      return { connected: true, message: data.message };
+    } catch (error) {
+      return { connected: false, message: `Connection failed: ${error}` };
+    }
+  }
 }; 

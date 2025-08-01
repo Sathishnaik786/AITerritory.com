@@ -6,6 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { BlogEditor } from '../components/admin/BlogEditor';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Eye, Edit, Trash2, Plus, ExternalLink } from 'lucide-react';
 
 const emptyBlog: Partial<BlogPost> = {
   title: '',
@@ -15,6 +19,10 @@ const emptyBlog: Partial<BlogPost> = {
   author_name: '',
   category: '',
   reading_time: '',
+  tags: [],
+  slug: '',
+  featured: false,
+  published: false,
 };
 
 const BlogsAdmin: React.FC = () => {
@@ -34,28 +42,41 @@ const BlogsAdmin: React.FC = () => {
   const addBlogMutation = useMutation({
     mutationFn: BlogService.create,
     onSuccess: () => {
-      toast.success('Blog created!');
+      toast.success('Blog created successfully!');
       queryClient.invalidateQueries(['blogs']);
       setModalOpen(false);
+      setForm(emptyBlog);
     },
-    onError: () => toast.error('Failed to create blog'),
+    onError: (error) => {
+      console.error('Failed to create blog:', error);
+      toast.error('Failed to create blog. Please try again.');
+    },
   });
+
   const updateBlogMutation = useMutation({
     mutationFn: BlogService.update,
     onSuccess: () => {
-      toast.success('Blog updated!');
+      toast.success('Blog updated successfully!');
       queryClient.invalidateQueries(['blogs']);
       setModalOpen(false);
+      setForm(emptyBlog);
     },
-    onError: () => toast.error('Failed to update blog'),
+    onError: (error) => {
+      console.error('Failed to update blog:', error);
+      toast.error('Failed to update blog. Please try again.');
+    },
   });
+
   const deleteBlogMutation = useMutation({
     mutationFn: BlogService.delete,
     onSuccess: () => {
-      toast.success('Blog deleted!');
+      toast.success('Blog deleted successfully!');
       queryClient.invalidateQueries(['blogs']);
     },
-    onError: () => toast.error('Failed to delete blog'),
+    onError: (error) => {
+      console.error('Failed to delete blog:', error);
+      toast.error('Failed to delete blog. Please try again.');
+    },
   });
 
   // Handlers
@@ -64,63 +85,170 @@ const BlogsAdmin: React.FC = () => {
     setForm(emptyBlog);
     setModalOpen(true);
   };
+
   const handleEdit = (blog: BlogPost) => {
     setEditingBlog(blog);
-    setForm(blog);
+    setForm({
+      ...blog,
+      tags: Array.isArray(blog.tags) ? blog.tags : [],
+    });
     setModalOpen(true);
   };
+
   const handleDelete = (blog: BlogPost) => {
-    if (window.confirm(`Are you sure you want to delete "${blog.title}"?`)) {
+    if (window.confirm(`Are you sure you want to delete "${blog.title}"? This action cannot be undone.`)) {
       deleteBlogMutation.mutate(blog.id);
     }
   };
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    if (editingBlog) {
-      updateBlogMutation.mutate({ ...form, id: editingBlog.id } as BlogPost);
-    } else {
-      addBlogMutation.mutate(form as BlogPost);
+
+    try {
+      // Generate slug if not provided
+      if (!form.slug && form.title) {
+        form.slug = form.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+      }
+
+      // Calculate reading time if not provided
+      if (!form.reading_time && form.content) {
+        const wordCount = form.content.split(/\s+/).length;
+        const readingTime = Math.ceil(wordCount / 200); // 200 words per minute
+        form.reading_time = readingTime;
+      }
+
+      // Ensure reading_time is a number
+      if (form.reading_time && typeof form.reading_time === 'string') {
+        form.reading_time = parseInt(form.reading_time);
+      }
+
+      if (editingBlog) {
+        await updateBlogMutation.mutateAsync({ ...form, id: editingBlog.id } as BlogPost);
+      } else {
+        await addBlogMutation.mutateAsync(form as BlogPost);
+      }
+    } catch (error) {
+      console.error('Error saving blog:', error);
+    } finally {
+      setIsSaving(false);
     }
-    setIsSaving(false);
+  };
+
+  const handleCancel = () => {
+    setModalOpen(false);
+    setForm(emptyBlog);
+    setEditingBlog(null);
+  };
+
+  const handleViewBlog = (blog: BlogPost) => {
+    const url = `/blog/${blog.slug}`;
+    window.open(url, '_blank');
   };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
-      <h1 className="text-2xl font-bold mb-6">Manage Blogs</h1>
-      <Button className="mb-4" onClick={handleAdd}>Add New Blog</Button>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Manage Blogs</h1>
+        <Button onClick={handleAdd} className="flex items-center gap-2">
+          <Plus className="w-4 h-4" />
+          Add New Blog
+        </Button>
+      </div>
+
       <Card>
         <CardHeader>
-          <CardTitle>All Blogs</CardTitle>
+          <CardTitle>All Blogs ({blogs?.length || 0})</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <Skeleton className="h-8 w-1/4 mt-1" />
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
           ) : blogs && blogs.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead>
                   <tr>
-                    <th className="px-4 py-2 text-left">Title</th>
-                    <th className="px-4 py-2 text-left">Category</th>
-                    <th className="px-4 py-2 text-left">Author</th>
-                    <th className="px-4 py-2 text-left">Created</th>
-                    <th className="px-4 py-2 text-left">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Author</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Created</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                   {blogs.map((blog: BlogPost) => (
-                    <tr key={blog.id} className="border-b dark:border-gray-700">
-                      <td className="px-4 py-2 font-medium">{blog.title}</td>
-                      <td className="px-4 py-2">{blog.category || 'Uncategorized'}</td>
-                      <td className="px-4 py-2">{blog.author_name}</td>
-                      <td className="px-4 py-2">{new Date(blog.created_at).toLocaleDateString()}</td>
-                      <td className="px-4 py-2 flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => handleEdit(blog)}>Edit</Button>
-                        <Button size="sm" variant="destructive" onClick={() => handleDelete(blog)}>Delete</Button>
+                    <tr key={blog.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                      <td className="px-4 py-4">
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-white">{blog.title}</div>
+                          {blog.tags && blog.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {blog.tags.slice(0, 3).map((tag, index) => (
+                                <Badge key={index} variant="secondary" className="text-xs">
+                                  {tag}
+                                </Badge>
+                              ))}
+                              {blog.tags.length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{blog.tags.length - 3}
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-900 dark:text-gray-100">
+                        {blog.category || 'Uncategorized'}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-900 dark:text-gray-100">
+                        {blog.author_name}
+                      </td>
+                      <td className="px-4 py-4">
+                        <Badge variant={blog.published ? "default" : "secondary"}>
+                          {blog.published ? 'Published' : 'Draft'}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        {new Date(blog.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleViewBlog(blog)}
+                            className="flex items-center gap-1"
+                          >
+                            <Eye className="w-3 h-3" />
+                            View
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(blog)}
+                            className="flex items-center gap-1"
+                          >
+                            <Edit className="w-3 h-3" />
+                            Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDelete(blog)}
+                            className="flex items-center gap-1"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            Delete
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -128,63 +256,33 @@ const BlogsAdmin: React.FC = () => {
               </table>
             </div>
           ) : (
-            <div>No blogs found.</div>
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <div className="text-lg font-medium mb-2">No blogs found</div>
+              <div className="text-sm">Get started by creating your first blog post.</div>
+            </div>
           )}
         </CardContent>
       </Card>
-      {/* Modal for Add/Edit */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <form onSubmit={handleSave} className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-lg shadow-lg">
-            <h2 className="text-xl font-bold mb-4">{editingBlog ? 'Edit Blog' : 'Add Blog'}</h2>
-            <div className="mb-3">
-              <label className="block mb-1 font-medium">Title</label>
-              <input name="title" value={form.title} onChange={handleFormChange} className="w-full border rounded px-3 py-2" required />
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1 font-medium">Description</label>
-              <textarea name="description" value={form.description} onChange={handleFormChange} className="w-full border rounded px-3 py-2" required />
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1 font-medium">Cover Image URL</label>
-              <input name="cover_image_url" value={form.cover_image_url} onChange={handleFormChange} className="w-full border rounded px-3 py-2" />
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1 font-medium">Content</label>
-              <textarea name="content" value={form.content} onChange={handleFormChange} className="w-full border rounded px-3 py-2" required rows={5} />
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1 font-medium">Author</label>
-              <input name="author_name" value={form.author_name} onChange={handleFormChange} className="w-full border rounded px-3 py-2" required />
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1 font-medium">Category</label>
-              <input name="category" value={form.category} onChange={handleFormChange} className="w-full border rounded px-3 py-2" required />
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1 font-medium">Reading Time</label>
-              <input name="reading_time" value={form.reading_time} onChange={handleFormChange} className="w-full border rounded px-3 py-2" />
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1 font-medium">Slug (optional)</label>
-              <input name="slug" value={form.slug || ''} onChange={handleFormChange} className="w-full border rounded px-3 py-2" />
-            </div>
-            <div className="mb-3">
-              <label className="block mb-1 font-medium">Tags (comma separated)</label>
-              <input
-                name="tags"
-                value={Array.isArray(form.tags) ? form.tags.join(', ') : (form.tags || '')}
-                onChange={e => setForm({ ...form, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
-                className="w-full border rounded px-3 py-2"
-              />
-            </div>
-            <div className="flex gap-2 justify-end mt-4">
-              <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={isSaving}>{editingBlog ? 'Update' : 'Create'}</Button>
-            </div>
-          </form>
-        </div>
-      )}
+
+      {/* Enhanced Modal with BlogEditor */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="max-w-7xl h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">
+              {editingBlog ? 'Edit Blog' : 'Create New Blog'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <BlogEditor
+              form={form}
+              setForm={setForm}
+              onSave={handleSave}
+              isSaving={isSaving}
+              onCancel={handleCancel}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

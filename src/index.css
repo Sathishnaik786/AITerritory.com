@@ -327,3 +327,128 @@ textarea:focus-visible {
     -ms-text-size-adjust: 100%;
   }
 }
+
+/* Premium WYSIWYG Editor Styles */
+.premium-editor {
+  @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm;
+}
+
+.premium-editor .CodeMirror {
+  @apply font-mono text-sm leading-relaxed;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.premium-editor .CodeMirror-focused {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+.premium-editor .CodeMirror-cursor {
+  @apply border-l-2 border-blue-500;
+}
+
+.premium-editor .CodeMirror-selected {
+  @apply bg-blue-100 dark:bg-blue-900/30;
+}
+
+/* Toolbar Styles */
+.premium-toolbar {
+  @apply bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm;
+}
+
+.premium-toolbar .toolbar-button {
+  @apply h-8 w-8 p-0 rounded-md transition-colors;
+}
+
+.premium-toolbar .toolbar-button:hover {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+.premium-toolbar .toolbar-button.active {
+  @apply bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400;
+}
+
+/* Content Typography Matching BlogDetailPage */
+.premium-editor h1 {
+  @apply text-3xl md:text-4xl font-bold mb-6 mt-8 text-gray-900 dark:text-white;
+}
+
+.premium-editor h2 {
+  @apply text-2xl md:text-3xl font-semibold mb-4 mt-6 text-gray-900 dark:text-white;
+}
+
+.premium-editor h3 {
+  @apply text-xl md:text-2xl font-medium mb-3 mt-5 text-gray-900 dark:text-white;
+}
+
+.premium-editor p {
+  @apply max-w-prose text-base leading-relaxed mb-4 md:mb-6 text-gray-700 dark:text-gray-300;
+}
+
+.premium-editor ul {
+  @apply list-disc pl-6 space-y-2 mb-4 md:mb-6 text-gray-700 dark:text-gray-300;
+}
+
+.premium-editor ol {
+  @apply list-decimal pl-6 space-y-2 mb-4 md:mb-6 text-gray-700 dark:text-gray-300;
+}
+
+.premium-editor a {
+  @apply text-blue-600 hover:underline dark:text-blue-400;
+}
+
+.premium-editor blockquote {
+  @apply border-l-4 border-blue-500 pl-4 italic text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 p-4 rounded my-6;
+}
+
+.premium-editor code {
+  @apply bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono text-gray-800 dark:text-gray-200;
+}
+
+.premium-editor pre {
+  @apply bg-gray-900 text-white rounded-lg p-4 overflow-x-auto my-4 text-sm;
+}
+
+/* Auto-save indicator animation */
+@keyframes pulse-save {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.auto-save-indicator {
+  animation: pulse-save 2s ease-in-out infinite;
+}
+
+/* Mobile responsive toolbar */
+@media (max-width: 768px) {
+  .premium-toolbar {
+    @apply overflow-x-auto;
+  }
+  
+  .premium-toolbar .toolbar-group {
+    @apply flex-shrink-0;
+  }
+}
+
+/* Enhanced scrollbar for editor */
+.premium-editor .CodeMirror-scrollbar-filler {
+  @apply bg-transparent;
+}
+
+.premium-editor .CodeMirror-simplescroll-horizontal div,
+.premium-editor .CodeMirror-simplescroll-vertical div {
+  @apply bg-gray-300 dark:bg-gray-600 rounded;
+}
+
+/* Focus states for accessibility */
+.premium-editor .toolbar-button:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Dark mode transitions */
+.premium-editor * {
+  @apply transition-colors duration-200;
+}
