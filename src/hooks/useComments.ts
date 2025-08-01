@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/components/ui/sonner';
 import { useUser } from '@clerk/clerk-react';
+import api from '../services/api';
 
 interface Comment {
   id: string;
@@ -28,26 +29,14 @@ interface CommentMutation {
 
 // Fetch comments for a blog
 const fetchComments = async (blogId: string): Promise<Comment[]> => {
-  const response = await fetch(`/api/blogs/${blogId}/comments/threaded`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch comments');
-  }
-  return response.json();
+  const response = await api.get(`/blogs/${blogId}/comments/threaded`);
+  return response.data;
 };
 
 // Post a new comment
 const postComment = async ({ blogId, comment }: { blogId: string; comment: CommentMutation }): Promise<Comment> => {
-  const response = await fetch(`/api/blogs/${blogId}/comments`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(comment),
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to post comment');
-  }
-  
-  return response.json();
+  const response = await api.post(`/blogs/${blogId}/comments`, comment);
+  return response.data;
 };
 
 export const useComments = (blogId: string) => {

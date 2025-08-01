@@ -5,12 +5,23 @@ const { sanitizeText } = require('../lib/sanitizeHtml');
 async function getComments(req, res) {
   const { slug } = req.params;
   
+  console.log('🔍 Server: Getting comments for blog:', slug);
+  console.log('  Request URL:', req.originalUrl);
+  console.log('  Request method:', req.method);
+  console.log('  Request params:', req.params);
+  
   const { data, error } = await supabase
     .from('blog_comments')
     .select('*')
     .eq('blog_id', slug) // Use blog slug directly
     .order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
+    
+  if (error) {
+    console.error('❌ Server: Error getting comments:', error);
+    return res.status(500).json({ error: error.message });
+  }
+  
+  console.log('✅ Server: Comments fetched successfully:', data.length, 'comments');
   res.json(data);
 }
 
@@ -43,16 +54,22 @@ async function getThreadedComments(req, res) {
 async function getCommentsCount(req, res) {
   const { slug } = req.params;
   
+  console.log('🔍 Server: Getting comments count for blog:', slug);
+  console.log('  Request URL:', req.originalUrl);
+  console.log('  Request method:', req.method);
+  console.log('  Request params:', req.params);
+  
   const { count, error } = await supabase
     .from('blog_comments')
     .select('*', { count: 'exact', head: true })
     .eq('blog_id', slug);
     
   if (error) {
-    console.error('Error getting comments count:', error);
+    console.error('❌ Server: Error getting comments count:', error);
     return res.status(500).json({ error: error.message });
   }
   
+  console.log('✅ Server: Comments count fetched successfully:', count || 0);
   res.json({ count: count || 0 });
 }
 

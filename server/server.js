@@ -58,7 +58,6 @@ const sharesRoutes = require('./routes/shares');
 const testimonialsRoutes = require('./routes/testimonials');
 const promptsRoutes = require('./routes/prompts');
 const promptActionsRoutes = require('./routes/promptActions');
-const feedbackRouter = require('./routes/feedback');
 const reviewsRoutes = require('./routes/reviews');
 const aiLearningPathCoursesRoutes = require('./routes/ai-learning-path-courses');
 const aiAgentLearningResourcesRoutes = require('./routes/ai-agent-learning-resources');
@@ -66,8 +65,6 @@ const adminRoutes = require('./routes/admin');
 const adminAuth = require('./middleware/adminAuth');
 const newsletterController = require('./controllers/newsletterController');
 const appleCarouselRoutes = require('./routes/appleCarousel');
-const blogRoutes = require('./routes/blog');
-const commentRoutes = require('./routes/comments');
 const unifiedInteractionsRoutes = require('./routes/unifiedInteractions');
 
 // Import security middleware
@@ -113,8 +110,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Routes
 app.use('/api/tools', toolRoutes);
-app.use('/api/blogs', blogRoutes);
-app.use('/api/comments', commentRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/business-functions', businessRoutes);
@@ -130,7 +125,6 @@ app.use('/api/shares', sharesRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
 app.use('/api/prompts', promptsRoutes);
 app.use('/api/prompt-actions', promptActionsRoutes);
-app.use('/api/feedback', feedbackRouter);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/ai-learning-path-courses', aiLearningPathCoursesRoutes);
 app.use('/api/ai-agent-learning-resources', aiAgentLearningResourcesRoutes);

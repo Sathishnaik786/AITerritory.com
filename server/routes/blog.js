@@ -67,7 +67,13 @@ router.put('/:id', blogController.updateBlog);
 router.delete('/:id', blogController.deleteBlog);
 
 // Mount blog comments router
-router.use('/:slug/comments', blogCommentsRouter);
+router.use('/:slug/comments', (req, res, next) => {
+  console.log('🔍 Server: Blog comments route hit');
+  console.log('  URL:', req.originalUrl);
+  console.log('  Method:', req.method);
+  console.log('  Slug:', req.params.slug);
+  next();
+}, blogCommentsRouter);
 
 // Blog likes endpoints
 router.get('/:slug/likes', async (req, res) => {

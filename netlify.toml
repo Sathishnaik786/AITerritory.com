@@ -91,6 +91,19 @@ path = "/ai-for-business*"
   publish = "dist"
   post_processing = "node scripts/pre-cache.js"
 
+# API redirects to backend
+[[redirects]]
+from = "/api/blogs/*"
+to = "https://aiterritory-com.onrender.com/api/blogs/:splat"
+status = 200
+force = true
+
+[[redirects]]
+from = "/api/comments/*"
+to = "https://aiterritory-com.onrender.com/api/comments/:splat"
+status = 200
+force = true
+
 [[redirects]]
 from = "/api/*"
 to = "https://aiterritory-com.onrender.com/api/:splat"

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { sanitizeText } from '@/lib/sanitizeHtml';
 import { OptimizedImage } from './OptimizedImage';
+import api from '../services/api';
 
 interface Comment {
   id: string;
@@ -115,17 +116,11 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
     }
 
     try {
-      const response = await fetch(`/api/comments/${commentId}/reactions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: user.id,
-          reaction_type: reactionType
-        })
+      const response = await api.post(`/comments/${commentId}/reactions`, {
+        user_id: user.id,
+        reaction_type: reactionType
       });
 
-      if (!response.ok) throw new Error('Failed to add reaction');
-      
       // Refresh comments to get updated reaction counts
       refetch();
     } catch (error) {
@@ -147,17 +142,11 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
     }
 
     try {
-      const response = await fetch(`/api/comments/${commentId}/report`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reporter_user_id: user.id,
-          report_reason: reportReason,
-          report_details: reportDetails
-        })
+      await api.post(`/comments/${commentId}/report`, {
+        reporter_user_id: user.id,
+        report_reason: reportReason,
+        report_details: reportDetails
       });
-
-      if (!response.ok) throw new Error('Failed to report comment');
       
       setShowReportModal(null);
       setReportReason('');

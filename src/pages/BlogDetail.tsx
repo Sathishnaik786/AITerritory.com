@@ -45,10 +45,11 @@ const BlogDetail: React.FC = () => {
   // Fetch comments count
   useEffect(() => {
     if (blog?.slug) {
-      fetch(`/api/blogs/${blog.slug}/comments/count`)
-        .then(res => res.json())
-        .then(data => setCommentsCount(data.count || 0))
-        .catch(err => console.error('Error fetching comments count:', err));
+      import('../services/api').then(({ default: api }) => {
+        api.get(`/blogs/${blog.slug}/comments/count`)
+          .then(res => setCommentsCount(res.data.count || 0))
+          .catch(err => console.error('Error fetching comments count:', err));
+      });
     }
   }, [blog?.slug]);
   // In BlogDetail component, add state for recentBlogs and relatedBlogs

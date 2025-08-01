@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// API Configuration - Force Render URL in production
+// API Configuration - Always use direct backend URL for API calls
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 
-// In production, use direct backend URL to avoid proxy issues
+// Use direct backend URL to avoid proxy issues
 const API_BASE_URL = isProduction 
   ? 'https://aiterritory-com.onrender.com/api'  // Use direct backend URL
   : 'http://localhost:3003/api';
@@ -15,10 +15,6 @@ console.log('  Hostname:', window.location.hostname);
 console.log('  API Base URL:', API_BASE_URL);
 console.log('  Full URL example:', `${API_BASE_URL}/blogs/test/comments`);
 console.log('  Current URL:', window.location.href);
-
-console.log('Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
-console.log('Hostname:', window.location.hostname);
-console.log('API Base URL:', API_BASE_URL);
 
 // Create axios instance with default config
 const api = axios.create({
