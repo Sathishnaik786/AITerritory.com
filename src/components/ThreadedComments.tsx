@@ -60,7 +60,7 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
   className = '' 
 }) => {
   const { user, isSignedIn } = useUser();
-  const { comments, isLoading: loading, postComment, isPosting: submitting, refetch } = useComments(blogId);
+  const { comments, postComment, refetch } = useComments(blogId);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
@@ -330,10 +330,9 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
                 <div className="flex items-center gap-2 mt-2">
                   <button
                     type="submit"
-                    disabled={submitting}
-                    className="px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                    className="px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700"
                   >
-                    {submitting ? 'Posting...' : 'Post Reply'}
+                    Post Reply
                   </button>
                   <button
                     type="button"
@@ -416,10 +415,9 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
               </div>
               <button
                 type="submit"
-                disabled={submitting}
-                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
               >
-                {submitting ? 'Posting...' : 'Post Comment'}
+                Post Comment
               </button>
             </div>
           </form>
@@ -436,25 +434,7 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
       )}
 
       {/* Comments list */}
-      {loading ? (
-        <div className="space-y-4">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 animate-pulse">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full" />
-                <div className="space-y-2">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24" />
-                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded" />
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : comments.length > 0 ? (
+      {comments.length > 0 ? (
         <div className="space-y-4">
           {comments.filter(comment => !comment.parent_id).map((comment) => renderComment(comment))}
         </div>

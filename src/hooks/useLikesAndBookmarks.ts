@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-react';
-import { toast } from '@/components/ui/sonner';
 import { blogInteractions } from '../services/unifiedInteractionsService';
 
 interface LikeBookmarkStatus {
@@ -105,7 +104,7 @@ export const useLikesAndBookmarks = (blogId: string) => {
       if (context?.previousStatus) {
         queryClient.setQueryData(queryKey, context.previousStatus);
       }
-      toast('Failed to update like');
+      // Silent error handling - no toast
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
@@ -131,7 +130,7 @@ export const useLikesAndBookmarks = (blogId: string) => {
       if (context?.previousStatus) {
         queryClient.setQueryData(queryKey, context.previousStatus);
       }
-      toast('Failed to update bookmark');
+      // Silent error handling - no toast
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
@@ -143,11 +142,11 @@ export const useLikesAndBookmarks = (blogId: string) => {
     bookmarkCount: status.bookmarkCount,
     liked: status.liked,
     bookmarked: status.bookmarked,
-    isLoading,
+    isLoading: false, // Remove loading state
     error,
     toggleLike: toggleLikeMutation.mutate,
     toggleBookmark: toggleBookmarkMutation.mutate,
-    isTogglingLike: toggleLikeMutation.isPending,
-    isTogglingBookmark: toggleBookmarkMutation.isPending,
+    isTogglingLike: false, // Remove loading state
+    isTogglingBookmark: false, // Remove loading state
   };
 }; 

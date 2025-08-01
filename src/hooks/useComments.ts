@@ -106,17 +106,15 @@ export const useComments = (blogId: string) => {
       // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: ['comments', blogId] });
     },
-    onSuccess: () => {
-      toast('Comment posted successfully!');
-    },
+    // Remove success toast - make it silent
   });
 
   return {
     comments,
-    isLoading,
+    isLoading: false, // Remove loading state
     error,
     refetch,
     postComment: postCommentMutation.mutate,
-    isPosting: postCommentMutation.isPending,
+    isPosting: false, // Remove loading state
   };
 }; 
