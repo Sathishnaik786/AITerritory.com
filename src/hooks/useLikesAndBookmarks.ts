@@ -71,7 +71,7 @@ export const useLikesAndBookmarks = (blogId: string) => {
   const queryClient = useQueryClient();
   const queryKey = ['likes-bookmarks', blogId, user?.id];
 
-  // Query for fetching status
+  // Query for fetching status - allow unlogged users to see counts
   const {
     data: status = { likeCount: 0, liked: false, bookmarked: false },
     isLoading,
@@ -79,7 +79,7 @@ export const useLikesAndBookmarks = (blogId: string) => {
   } = useQuery({
     queryKey,
     queryFn: () => fetchLikeBookmarkStatus(blogId, user?.id),
-    enabled: !!blogId && !!user?.id,
+    enabled: !!blogId, // Allow all users to see counts, not just signed-in users
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
   });

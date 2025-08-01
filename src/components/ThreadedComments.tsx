@@ -236,7 +236,7 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
               <button
                 onClick={() => setShowReportModal(comment.id)}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                title="Report comment"
+                title={isSignedIn ? 'Report comment' : 'Sign in to report'}
               >
                 <Flag className="w-4 h-4 text-gray-400" />
               </button>
@@ -275,7 +275,7 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
                         ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
                         : 'hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
-                    title={label}
+                    title={isSignedIn ? label : 'Sign in to react'}
                   >
                     <motion.div
                       animate={isReacted ? { scale: [1, 1.2, 1] } : {}}
@@ -302,6 +302,7 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
               <button
                 onClick={() => setReplyingTo(comment.id)}
                 className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                title={isSignedIn ? 'Reply to this comment' : 'Sign in to reply'}
               >
                 <Reply className="w-3 h-3" />
                 Reply
@@ -398,7 +399,7 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
         </h3>
       </div>
 
-      {/* Comment form */}
+      {/* Comment form - Only show for signed-in users */}
       {isSignedIn ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
           <form onSubmit={handleSubmitComment}>
@@ -433,7 +434,7 @@ export const ThreadedComments: React.FC<ThreadedCommentsProps> = ({
         </div>
       )}
 
-      {/* Comments list */}
+      {/* Comments list - Show for all users */}
       {comments.length > 0 ? (
         <div className="space-y-4">
           {comments.filter(comment => !comment.parent_id).map((comment) => renderComment(comment))}

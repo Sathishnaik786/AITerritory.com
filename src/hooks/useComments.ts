@@ -43,7 +43,7 @@ export const useComments = (blogId: string) => {
   const queryClient = useQueryClient();
   const { user } = useUser();
   
-  // Query for fetching comments
+  // Query for fetching comments - allow unlogged users to see comments
   const {
     data: comments = [],
     isLoading,
@@ -52,6 +52,7 @@ export const useComments = (blogId: string) => {
   } = useQuery({
     queryKey: ['comments', blogId],
     queryFn: () => fetchComments(blogId),
+    enabled: !!blogId, // Allow all users to see comments, not just signed-in users
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
