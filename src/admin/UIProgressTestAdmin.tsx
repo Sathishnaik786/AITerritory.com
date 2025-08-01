@@ -14,7 +14,7 @@ export const UIProgressTestAdmin: React.FC = () => {
   const [config, setConfig] = useState({
     color: '#ff0000',
     height: 3,
-    showPercentage: true,
+    showPercentage: false,
     speed: 300,
   });
 

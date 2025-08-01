@@ -6,7 +6,7 @@ export const progressConfig = {
   height: 3,
   
   // Show percentage text overlay
-  showPercentage: true,
+  showPercentage: false,
   
   // Animation speed in milliseconds
   speed: 300,

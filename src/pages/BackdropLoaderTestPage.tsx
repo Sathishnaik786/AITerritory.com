@@ -9,7 +9,7 @@ import { Label } from '../components/ui/label';
 
 export const BackdropLoaderTestPage: React.FC = () => {
   const { data: tools, isLoading, refetch } = useTools();
-  const [showPercentage, setShowPercentage] = React.useState(true);
+  const [showPercentage, setShowPercentage] = React.useState(false);
   const [progressState, setProgressState] = React.useState(getProgressState());
 
   const handleProgressTest = async () => {
