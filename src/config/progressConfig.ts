@@ -25,4 +25,14 @@ export const progressConfig = {
   
   // Maximum progress before completion
   maxProgress: 95,
+  
+  // Backdrop loader settings
+  backdropLoader: {
+    // Only show for page-level operations, not user interactions
+    showForMutations: false,
+    // Minimum query count to trigger loader
+    minQueryCount: 1,
+    // Debounce delay for backdrop loader
+    debounceDelay: 500,
+  },
 }; 

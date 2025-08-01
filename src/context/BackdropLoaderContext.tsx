@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { startProgress, stopProgress, incrementProgress, setProgress } from '../lib/progressBar';
+import { progressConfig } from '../config/progressConfig';
 
 interface BackdropLoaderContextType {
   isBackdropLoading: boolean;
@@ -49,19 +50,28 @@ export const BackdropLoaderProvider: React.FC<BackdropLoaderProviderProps> = ({ 
     }
   }, [manualLoading]);
 
-  // TanStack Query integration with debouncing and progress tracking
+  // TanStack Query integration - only for page-level operations
   useEffect(() => {
     let activeRequests = 0;
     let progressInterval: NodeJS.Timeout | null = null;
+    let lastQueryCount = 0;
 
     const checkQueryState = debounce(() => {
       const isFetching = queryClient.isFetching();
       const isMutating = queryClient.isMutating();
-      const hasActiveQueries = isFetching > 0 || isMutating > 0;
+      
+      // Only show loader for significant operations (not likes, bookmarks, comments)
+      // Check if there are any active queries that are NOT mutations (mutations are usually likes, bookmarks, etc.)
+      const hasSignificantQueries = isFetching >= progressConfig.backdropLoader.minQueryCount && 
+                                  (progressConfig.backdropLoader.showForMutations ? true : isMutating === 0);
+      
+      // Additional check: only show for new queries, not ongoing ones
+      const isNewQuery = isFetching > lastQueryCount;
+      lastQueryCount = isFetching;
       
       // Track active requests for progress
-      if (hasActiveQueries && activeRequests === 0) {
-        activeRequests = isFetching + isMutating;
+      if (hasSignificantQueries && isNewQuery && activeRequests === 0) {
+        activeRequests = isFetching;
         startProgress();
         
         // Start progress simulation
@@ -70,7 +80,7 @@ export const BackdropLoaderProvider: React.FC<BackdropLoaderProviderProps> = ({ 
             incrementProgress(5);
           }
         }, 300);
-      } else if (!hasActiveQueries && activeRequests > 0) {
+      } else if (!hasSignificantQueries && activeRequests > 0) {
         activeRequests = 0;
         if (progressInterval) {
           clearInterval(progressInterval);
@@ -79,8 +89,9 @@ export const BackdropLoaderProvider: React.FC<BackdropLoaderProviderProps> = ({ 
         stopProgress();
       }
       
-      setIsBackdropLoading(hasActiveQueries || manualLoading);
-    }, 300);
+      // Only show backdrop for significant operations or manual loading
+      setIsBackdropLoading(hasSignificantQueries || manualLoading);
+    }, progressConfig.backdropLoader.debounceDelay);
 
     // Initial check
     checkQueryState();
@@ -90,9 +101,25 @@ export const BackdropLoaderProvider: React.FC<BackdropLoaderProviderProps> = ({ 
       checkQueryState();
     });
 
-    // Subscribe to mutation cache changes
+    // Subscribe to mutation cache changes (but don't trigger loader for mutations)
     const mutationUnsubscribe = queryClient.getMutationCache().subscribe(() => {
-      checkQueryState();
+      // Don't trigger loader for mutations (likes, bookmarks, comments)
+      // Only check for significant queries
+      const isFetching = queryClient.isFetching();
+      const isMutating = queryClient.isMutating();
+      const hasSignificantQueries = isFetching >= progressConfig.backdropLoader.minQueryCount && 
+                                  (progressConfig.backdropLoader.showForMutations ? true : isMutating === 0);
+      
+      if (!hasSignificantQueries && activeRequests > 0) {
+        activeRequests = 0;
+        if (progressInterval) {
+          clearInterval(progressInterval);
+          progressInterval = null;
+        }
+        stopProgress();
+      }
+      
+      setIsBackdropLoading(hasSignificantQueries || manualLoading);
     });
 
     return () => {

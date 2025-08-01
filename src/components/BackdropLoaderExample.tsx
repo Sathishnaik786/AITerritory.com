@@ -3,11 +3,24 @@ import { useBackdropLoader } from '../context/BackdropLoaderContext';
 import { Button } from './ui/button';
 
 export const BackdropLoaderExample: React.FC = () => {
-  const { showLoader, hideLoader, toggleLoader } = useBackdropLoader();
+  const { showLoader, hideLoader } = useBackdropLoader();
 
   const handleManualLoader = async () => {
     showLoader();
     // Simulate an API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    hideLoader();
+  };
+
+  const handleUserInteraction = async () => {
+    // Simulate a user interaction (like, bookmark, comment) - should NOT trigger backdrop
+    console.log('User interaction - backdrop should NOT show');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  };
+
+  const handlePageLoad = async () => {
+    // Simulate a page-level operation - should trigger backdrop
+    showLoader();
     await new Promise(resolve => setTimeout(resolve, 2000));
     hideLoader();
   };
@@ -20,11 +33,14 @@ export const BackdropLoaderExample: React.FC = () => {
       <Button onClick={hideLoader} variant="outline">
         Hide Loader
       </Button>
-      <Button onClick={toggleLoader} variant="outline">
-        Toggle Loader
-      </Button>
       <Button onClick={handleManualLoader} variant="default">
-        Simulate API Call
+        Simulate Page Load (2s)
+      </Button>
+      <Button onClick={handleUserInteraction} variant="outline">
+        Simulate User Action (1s)
+      </Button>
+      <Button onClick={handlePageLoad} variant="outline">
+        Simulate Page Operation (2s)
       </Button>
     </div>
   );
