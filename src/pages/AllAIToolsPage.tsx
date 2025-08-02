@@ -14,6 +14,7 @@ import { supabase } from '../services/supabaseClient'; // Adjust path
 import { ToolCard, ToolCardStats } from '../components/ToolCard'; // Import ToolCardStats
 import SEO from '../components/SEO';
 import FAQ from '../components/FAQ';
+import { ResourcePageSkeleton } from '../components/SkeletonLoader';
 
 const AllAIToolsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
@@ -91,6 +92,10 @@ const AllAIToolsPage = () => {
     setSelectedTag('');
     setSortBy('newest');
   };
+
+  if (loading) {
+    return <ResourcePageSkeleton />;
+  }
 
   if (error) return (
     <div className="container mx-auto px-4 py-8">

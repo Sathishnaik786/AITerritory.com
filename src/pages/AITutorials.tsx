@@ -10,6 +10,7 @@ import { FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 import { SiDiscord } from 'react-icons/si';
 import { Instagram } from 'lucide-react';
 import SEO from '../components/SEO';
+import { BusinessPageSkeleton } from '../components/SkeletonLoader';
 
 const AITutorials = () => {
   const featuredTutorials = [

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { submitToolForm } from '../services/submissionService';
 import SEO from '../components/SEO';
+import { SubmitToolPageSkeleton } from '../components/SkeletonLoader';
 
 const SubmitToolPage: React.FC = () => {
   const [form, setForm] = useState({
@@ -74,7 +75,10 @@ const SubmitToolPage: React.FC = () => {
         title="Submit Your AI Tool | AI Territory"
         description="Get your AI tool featured on AI Territory and reach thousands of potential users. Fast-track your listing with instant approval and homepage featuring."
       />
-      <div className="min-h-screen bg-gradient-to-b from-[#181c2a] to-[#232946] flex items-center justify-center py-8 px-2">
+      {loading ? (
+        <SubmitToolPageSkeleton />
+      ) : (
+        <div className="min-h-screen bg-gradient-to-b from-[#181c2a] to-[#232946] flex items-center justify-center py-8 px-2">
         <div className="w-full max-w-5xl flex flex-col md:flex-row gap-8 bg-[#181c2a] rounded-2xl shadow-2xl p-6 md:p-12">
           {/* Main Form */}
           <div className="flex-1">
@@ -198,6 +202,7 @@ const SubmitToolPage: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
     </>
   );
 };

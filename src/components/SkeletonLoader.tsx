@@ -188,4 +188,203 @@ export const NavigationSkeleton: React.FC = () => {
   );
 };
 
+// New specialized skeletons for the requested pages
+export const ResourcePageSkeleton: React.FC = () => {
+  return (
+    <div className="container mx-auto px-4 py-8 space-y-8">
+      {/* Header skeleton */}
+      <div className="text-center space-y-4">
+        <div className="h-12 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+        <div className="h-6 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+      </div>
+
+      {/* Search and filters skeleton */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+        <div className="space-y-2">
+          <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+        
+        <div className="flex gap-4">
+          <div className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="space-y-2">
+              <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Results header skeleton */}
+      <div className="flex items-center justify-between">
+        <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      </div>
+
+      {/* Tools grid skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 space-y-3">
+            <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-2/3" />
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2" />
+          </div>
+        ))}
+      </div>
+
+      {/* Pagination skeleton */}
+      <div className="flex justify-center items-center gap-2">
+        <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        <div className="flex gap-1">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index} className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          ))}
+        </div>
+        <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      </div>
+    </div>
+  );
+};
+
+export const ToolCardSkeleton: React.FC<{ count?: number; variant?: 'default' | 'featured' | 'compact' }> = ({ 
+  count = 6, 
+  variant = 'default' 
+}) => {
+  const getCardClasses = () => {
+    switch (variant) {
+      case 'featured':
+        return 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700';
+      case 'compact':
+        return 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700';
+      default:
+        return 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700';
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {Array.from({ length: count }).map((_, index) => (
+        <div key={index} className={`rounded-lg shadow-sm border p-4 space-y-3 ${getCardClasses()}`}>
+          <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-2/3" />
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2" />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-4 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export const BusinessPageSkeleton: React.FC = () => {
+  return (
+    <div className="container mx-auto px-4 py-8 space-y-8">
+      {/* Hero section skeleton */}
+      <div className="text-center space-y-6">
+        <div className="h-12 w-80 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+        <div className="h-6 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+        <div className="h-6 w-72 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+      </div>
+
+      {/* Stats skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div key={index} className="text-center space-y-2">
+            <div className="h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+          </div>
+        ))}
+      </div>
+
+      {/* Content sections skeleton */}
+      <div className="space-y-8">
+        {Array.from({ length: 3 }).map((_, sectionIndex) => (
+          <div key={sectionIndex} className="space-y-4">
+            <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-3">
+                  <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export const ContactPageSkeleton: React.FC = () => {
+  return (
+    <div className="container mx-auto px-4 py-8 space-y-8">
+      {/* Header skeleton */}
+      <div className="text-center space-y-4">
+        <div className="h-12 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+        <div className="h-6 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+      </div>
+
+      {/* Contact form skeleton */}
+      <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+          <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const SubmitToolPageSkeleton: React.FC = () => {
+  return (
+    <div className="container mx-auto px-4 py-8 space-y-8">
+      {/* Header skeleton */}
+      <div className="text-center space-y-4">
+        <div className="h-12 w-80 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+        <div className="h-6 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+      </div>
+
+      {/* Form skeleton */}
+      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-6">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <div key={index} className="space-y-2">
+            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+        ))}
+        <div className="space-y-2">
+          <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      </div>
+    </div>
+  );
+};
+
 export default SkeletonLoader; 

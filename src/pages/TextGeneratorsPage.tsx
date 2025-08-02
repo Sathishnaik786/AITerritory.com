@@ -10,6 +10,7 @@ import { Tool } from '../types/tool';
 
 import SEO from '../components/SEO';
 import FAQ from '../components/FAQ';
+import { ResourcePageSkeleton } from '../components/SkeletonLoader';
 const TextGeneratorsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,6 +80,10 @@ const TextGeneratorsPage = () => {
     setSortBy('newest');
     setPage(1);
   };
+
+  if (loading) {
+    return <ResourcePageSkeleton />;
+  }
 
   if (error) return (
     <div className="container mx-auto px-4 py-8">

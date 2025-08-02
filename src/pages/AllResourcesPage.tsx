@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Search, Filter, ChevronLeft, ChevronRight, Library } from 'lucide-react';
 import { Tool } from '../types/tool';
+import { ResourcePageSkeleton } from '../components/SkeletonLoader';
 
 const AllResourcesPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
@@ -77,6 +78,10 @@ const AllResourcesPage = () => {
     setSortBy('newest');
     setPage(1);
   };
+
+  if (loading) {
+    return <ResourcePageSkeleton />;
+  }
 
   if (error) return (
     <div className="container mx-auto px-4 py-8">

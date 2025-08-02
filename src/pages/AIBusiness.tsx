@@ -5,6 +5,7 @@ import { useBusinessFunctions } from '../hooks/useBusinessFunctions';
 import { useTools } from '../hooks/useTools';
 import { ToolGrid } from '../components/ToolGrid';
 import SEO from '../components/SEO';
+import { BusinessPageSkeleton } from '../components/SkeletonLoader';
 
 const iconMap: Record<string, React.ElementType> = {
   Edit,
@@ -123,7 +124,7 @@ const renderCircularProgress = (percentage: number) => {
 const AIBusiness = () => {
   const { data: businessFunctions, isLoading } = useBusinessFunctions();
   
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <BusinessPageSkeleton />;
   if (!businessFunctions) return <div>No business functions found.</div>;
 
   return (

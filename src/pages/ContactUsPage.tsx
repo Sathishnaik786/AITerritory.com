@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { submitContactForm } from '../services/submissionService';
 import SEO from '../components/SEO';
+import { ContactPageSkeleton } from '../components/SkeletonLoader';
 
 const ContactUsPage: React.FC = () => {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -43,7 +44,10 @@ const ContactUsPage: React.FC = () => {
         title="Contact Us | AI Territory"
         description="Get in touch with the AI Territory team. We'd love to hear from you!"
       />
-      <div className="max-w-lg mx-auto py-12 px-4">
+      {loading ? (
+        <ContactPageSkeleton />
+      ) : (
+        <div className="max-w-lg mx-auto py-12 px-4">
         <h1 className="text-3xl font-bold mb-6 text-center">Contact Us</h1>
         <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-8 flex flex-col gap-4">
           <input
@@ -83,6 +87,7 @@ const ContactUsPage: React.FC = () => {
           {error && <div className="text-red-600 text-center mt-2">{error}</div>}
         </form>
       </div>
+      )}
     </>
   );
 };

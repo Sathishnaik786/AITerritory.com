@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Search, Filter, ChevronLeft, ChevronRight, Video } from 'lucide-react';
 import { Tool } from '../types/tool';
 import SEO from '../components/SEO';
+import { ResourcePageSkeleton } from '../components/SkeletonLoader';
 
 const VideoToolsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
@@ -78,6 +79,10 @@ const VideoToolsPage = () => {
     setSortBy('newest');
     setPage(1);
   };
+
+  if (loading) {
+    return <ResourcePageSkeleton />;
+  }
 
   if (error) return (
     <div className="container mx-auto px-4 py-8">
