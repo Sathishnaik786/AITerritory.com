@@ -5,6 +5,7 @@ import { BlogPost } from '../types/blog';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { BlogCardSkeleton } from '../components/SkeletonLoader';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 
 import SEO from '../components/SEO';
 const CATEGORIES = [
@@ -106,6 +107,9 @@ const Blog: React.FC = () => {
         description="Explore the latest in AI, productivity, and innovation. Discover curated insights, in-depth guides, and reviews of the best AI tools."
       />
       <div className="container mx-auto px-4 py-12">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs />
+        
         {/* Hero Section - Hide on mobile */}
         <section className="w-full py-12 md:py-16 hidden sm:block">
         <div className="max-w-3xl mx-auto px-4 text-center">

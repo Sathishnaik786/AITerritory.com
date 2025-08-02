@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { YouTubeThumbnail } from '../components/YouTubeThumbnail';
 import { AiLearningPathCourses } from '../components/AiLearningPathCourses';
 import { Newsletter } from '../components/Newsletter';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 import { useState } from 'react';
 import { FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 import { SiDiscord } from 'react-icons/si';
@@ -155,6 +156,9 @@ const AITutorials = () => {
         description="Master artificial intelligence with our comprehensive tutorials, from beginner-friendly guides to advanced techniques in ChatGPT, and more."
       />
       <div className="container mx-auto px-4 py-8">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs />
+        
         {/* Hero Section */}
         <div className="text-center mb-16">
         <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

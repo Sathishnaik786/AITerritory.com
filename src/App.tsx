@@ -119,7 +119,6 @@ function ThemedAppContent() {
         <MetaTags />
         <div className="relative min-h-screen flex flex-col items-center w-full">
           <Navbar newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
-          <BreadcrumbsWithIcons />
           <ScrollToTopButton />
           <main className={`flex-1 w-full min-h-screen`}>
             <Routes>

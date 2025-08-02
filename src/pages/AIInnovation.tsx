@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useAIInnovations, useAIResearchPapers } from '../hooks/useAIInnovations';
 import { motion } from 'framer-motion';
 import { Newsletter } from '../components/Newsletter';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 import { useState } from 'react';
 import { FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 import { SiDiscord } from 'react-icons/si';
@@ -55,6 +56,9 @@ const AIInnovation = () => {
         description="Stay at the forefront of artificial intelligence with the latest breakthroughs, research, and technological advancements shaping the future of AI."
       />
       <div className="container mx-auto px-4 py-8">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs />
+        
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}

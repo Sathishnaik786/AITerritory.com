@@ -38,7 +38,7 @@ const ImageGeneratorsPage = () => {
     params.append('page', String(page));
     params.append('pageSize', String(pageSize));
     
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3004/api';
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003/api';
     fetch(`${apiBaseUrl}/tools/image-generators?${params.toString()}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch tools');

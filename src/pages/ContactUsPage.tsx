@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { submitContactForm } from '../services/submissionService';
 import SEO from '../components/SEO';
 import { ContactPageSkeleton } from '../components/SkeletonLoader';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 
 const ContactUsPage: React.FC = () => {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -48,7 +49,10 @@ const ContactUsPage: React.FC = () => {
         <ContactPageSkeleton />
       ) : (
         <div className="max-w-lg mx-auto py-12 px-4">
-        <h1 className="text-3xl font-bold mb-6 text-center">Contact Us</h1>
+          {/* Breadcrumbs */}
+          <PageBreadcrumbs />
+          
+          <h1 className="text-3xl font-bold mb-6 text-center">Contact Us</h1>
         <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-8 flex flex-col gap-4">
           <input
             type="text"

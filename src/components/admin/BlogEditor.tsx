@@ -13,26 +13,19 @@ import { Switch } from '../ui/switch';
 import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
 import { Card, CardContent } from '../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
-import SimpleMDE from 'react-simplemde-editor';
-import 'simplemde/dist/simplemde.min.css';
 import { sanitizeMarkdownHtml } from '@/lib/sanitizeHtml';
 import { ContentRenderer } from '../ContentRenderer';
 import { PromptBox } from '../PromptBox';
+import { LexicalEditorComponent } from '../LexicalEditor';
 import { 
-  Eye, EyeOff, Upload, X, Save, RotateCcw, 
-  Bold, Italic, Underline, Strikethrough, 
-  Heading1, Heading2, Heading3, List, ListOrdered, 
-  AlignLeft, AlignCenter, AlignRight, 
-  Code, Quote, Link, Image, 
-  CheckSquare, Square, 
+  Eye, EyeOff, X, Save, RotateCcw, 
   Copy, Check,
   Type, Hash, List as ListIcon,
   AlignJustify,
   MessageSquare,
-  FileImage,
-  Link as LinkIcon
+  FileImage
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -58,8 +51,6 @@ export interface BlogEditorProps {
 }
 
 export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, isSaving, onCancel }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [showPreview, setShowPreview] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [wordCount, setWordCount] = useState(0);
@@ -91,17 +82,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, i
     return () => clearInterval(interval);
   }, [form.content]);
 
-  // Handle image upload and preview
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        setForm({ ...form, cover_image_url: ev.target?.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+
 
   // Handle tag management
   const addTag = () => {
@@ -128,373 +109,18 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, i
     }
   };
 
-  // Enhanced toolbar with keyboard shortcuts
-  const handleToolbarAction = (action: string) => {
-    const editor = document.querySelector('.CodeMirror') as any;
-    if (!editor) return;
 
-    const cm = editor.CodeMirror;
-    const selection = cm.getSelection();
-    
-    switch (action) {
-      case 'bold':
-        cm.replaceSelection(`**${selection}**`);
-        break;
-      case 'italic':
-        cm.replaceSelection(`*${selection}*`);
-        break;
-      case 'underline':
-        cm.replaceSelection(`<u>${selection}</u>`);
-        break;
-      case 'strikethrough':
-        cm.replaceSelection(`~~${selection}~~`);
-        break;
-      case 'h1':
-        cm.replaceSelection(`# ${selection}`);
-        break;
-      case 'h2':
-        cm.replaceSelection(`## ${selection}`);
-        break;
-      case 'h3':
-        cm.replaceSelection(`### ${selection}`);
-        break;
-      case 'bullet':
-        cm.replaceSelection(`- ${selection}`);
-        break;
-      case 'numbered':
-        cm.replaceSelection(`1. ${selection}`);
-        break;
-      case 'quote':
-        cm.replaceSelection(`> ${selection}`);
-        break;
-      case 'code':
-        cm.replaceSelection(`\`\`\`\n${selection}\n\`\`\``);
-        break;
-      case 'link':
-        const url = prompt('Enter URL:');
-        if (url) {
-          cm.replaceSelection(`[${selection}](${url})`);
-        }
-        break;
-      case 'image':
-        const imageUrl = prompt('Enter image URL:');
-        if (imageUrl) {
-          cm.replaceSelection(`![${selection}](${imageUrl})`);
-        }
-        break;
-    }
-  };
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        switch (e.key) {
-          case 'b':
-            e.preventDefault();
-            handleToolbarAction('bold');
-            break;
-          case 'i':
-            e.preventDefault();
-            handleToolbarAction('italic');
-            break;
-          case 'u':
-            e.preventDefault();
-            handleToolbarAction('underline');
-            break;
-          case 'k':
-            e.preventDefault();
-            handleToolbarAction('link');
-            break;
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Premium Toolbar */}
-      <div className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center space-x-2">
-            {/* Text Formatting */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('bold')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Bold className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Bold (Ctrl+B)</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('italic')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Italic className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Italic (Ctrl+I)</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('underline')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Underline className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Underline (Ctrl+U)</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('strikethrough')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Strikethrough className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Strikethrough</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <Separator orientation="vertical" className="h-6" />
-
-            {/* Headings */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('h1')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Heading1 className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Heading 1</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('h2')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Heading2 className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Heading 2</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('h3')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Heading3 className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Heading 3</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <Separator orientation="vertical" className="h-6" />
-
-            {/* Lists */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('bullet')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Bullet List</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('numbered')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <ListOrdered className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Numbered List</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <Separator orientation="vertical" className="h-6" />
-
-            {/* Alignment */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('align-left')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <AlignLeft className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Align Left</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('align-center')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <AlignCenter className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Align Center</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('align-right')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <AlignRight className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Align Right</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <Separator orientation="vertical" className="h-6" />
-
-            {/* Blocks */}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('quote')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Quote className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Quote Block</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('code')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Code className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Code Block</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('link')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <LinkIcon className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Insert Link (Ctrl+K)</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolbarAction('image')}
-                    className="h-8 w-8 p-0"
-                  >
-                    <Image className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Insert Image</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-
-          {/* Preview Toggle */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant={showPreview ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setShowPreview(!showPreview)}
-                  className="flex items-center gap-2"
-                >
-                  {showPreview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  {showPreview ? 'Edit' : 'Preview'}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Toggle Preview Mode</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      </div>
+    <form onSubmit={onSave} className="flex flex-col min-h-full">
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-hidden">
-        <Tabs value={showPreview ? "preview" : "edit"} className="h-full">
-          <TabsContent value="edit" className="h-full mt-0">
-            <div className="h-full flex flex-col">
-              {/* Form Fields */}
-              <div className="p-6 space-y-6">
+      <div className="flex-1 flex flex-col">
+        <div className="h-full flex split-screen">
+          {/* Left Side - Editor */}
+          <div className="flex-1 flex flex-col editor-panel">
+            {/* Form Fields */}
+            <div className="p-6 space-y-6">
                 {/* Basic Information */}
                 <Card>
                   <CardContent className="p-6">
@@ -524,14 +150,14 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, i
 
                     <div className="space-y-2 mt-4">
                       <Label htmlFor="description">Description *</Label>
-                      <Textarea
-                        id="description"
-                        value={form.description || ''}
-                        onChange={e => setForm({ ...form, description: e.target.value })}
-                        placeholder="Brief description of the blog post"
-                        rows={3}
-                        required
-                      />
+                      <div className="border rounded-md">
+                        <LexicalEditorComponent
+                          value={form.description || ''}
+                          onChange={(val) => setForm({ ...form, description: val })}
+                          placeholder="Brief description of the blog post (supports rich formatting)"
+                          className="min-h-[120px] max-h-[200px]"
+                        />
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -567,32 +193,33 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, i
                 <Card>
                   <CardContent className="p-6">
                     <h3 className="text-lg font-semibold mb-4">Cover Image</h3>
-                    <div className="space-y-2">
-                      <Label>Cover Image</Label>
-                      <div className="flex items-center gap-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="flex items-center gap-2"
-                        >
-                          <Upload className="w-4 h-4" />
-                          Upload Image
-                        </Button>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          ref={fileInputRef}
-                          onChange={handleImageChange}
-                          className="hidden"
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="cover-image-url">Cover Image URL</Label>
+                        <Input
+                          id="cover-image-url"
+                          value={form.cover_image_url || ''}
+                          onChange={e => setForm({ ...form, cover_image_url: e.target.value })}
+                          placeholder="https://example.com/image.jpg"
                         />
-                        {form.cover_image_url && (
-                          <div className="relative">
+                      </div>
+                      
+                      {form.cover_image_url && (
+                        <div className="space-y-2">
+                          <Label>Cover Image Preview</Label>
+                          <div className="relative inline-block">
                             <img
                               src={form.cover_image_url}
                               alt="Cover Preview"
-                              className="w-20 h-20 object-cover rounded-lg border"
+                              className="w-32 h-32 object-cover rounded-lg border"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              }}
                             />
+                            <div className="hidden w-32 h-32 bg-gray-100 dark:bg-gray-800 rounded-lg border flex items-center justify-center text-gray-500 text-sm">
+                              Invalid Image URL
+                            </div>
                             <Button
                               type="button"
                               variant="destructive"
@@ -603,14 +230,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, i
                               <X className="w-3 h-3" />
                             </Button>
                           </div>
-                        )}
-                      </div>
-                      {form.cover_image_url && (
-                        <Input
-                          value={form.cover_image_url}
-                          onChange={e => setForm({ ...form, cover_image_url: e.target.value })}
-                          placeholder="Or enter image URL directly"
-                        />
+                        </div>
                       )}
                     </div>
                   </CardContent>
@@ -673,51 +293,34 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, i
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="status">Status</Label>
-                        <Select value={form.published ? 'published' : 'draft'} onValueChange={value => setForm({ ...form, published: value === 'published' })}>
+                        <Label htmlFor="featured">Featured</Label>
+                        <Select value={form.featured ? 'featured' : 'not-featured'} onValueChange={value => setForm({ ...form, featured: value === 'featured' })}>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="draft">Draft</SelectItem>
-                            <SelectItem value="published">Published</SelectItem>
+                            <SelectItem value="not-featured">Not Featured</SelectItem>
+                            <SelectItem value="featured">Featured</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-2 mt-4">
-                      <Switch
-                        id="featured"
-                        checked={form.featured || false}
-                        onCheckedChange={checked => setForm({ ...form, featured: checked })}
-                      />
-                      <Label htmlFor="featured">Featured Post</Label>
-                    </div>
+
                   </CardContent>
                 </Card>
               </div>
 
               {/* Editor */}
-              <div className="flex-1 px-6 pb-6">
+              <div className="flex-1 px-6 pb-6 min-h-[400px]">
                 <Card className="h-full">
                   <CardContent className="p-0 h-full">
                     <div className="h-full">
-                      <SimpleMDE
-                        id="blog-content-mde"
+                      <LexicalEditorComponent
                         value={form.content || ''}
-                        onChange={val => setForm({ ...form, content: val })}
-                        options={{
-                          spellChecker: true,
-                          placeholder: 'Start writing your blog...',
-                          minHeight: '400px',
-                          status: false,
-                          theme: document.documentElement.classList.contains('dark') ? 'abcdef' : 'default',
-                          autofocus: false,
-                          autosave: { enabled: false },
-                          previewRender: (plainText) => '', // We use our own preview
-                          toolbar: false, // We use our custom toolbar
-                        }}
+                        onChange={(val) => setForm({ ...form, content: val })}
+                        placeholder="Start writing your blog..."
+                        className="h-full"
                       />
                     </div>
                   </CardContent>
@@ -747,40 +350,113 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, i
                 </div>
               </div>
             </div>
-          </TabsContent>
+          </div>
 
-          {/* Preview Mode */}
-          <TabsContent value="preview" className="h-full mt-0">
-            <div className="h-full overflow-y-auto p-6">
-              <div className="max-w-4xl mx-auto">
-                <ContentRenderer content={form.content || 'Start writing your blog...'} />
+          {/* Right Side - Live Preview */}
+          <div className="w-1/2 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 preview-panel">
+            <div className="h-full flex flex-col">
+              {/* Preview Header */}
+              <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      Live Preview
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      See how your blog will look when published
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const previewPanel = document.querySelector('.preview-panel');
+                      if (previewPanel) {
+                        previewPanel.classList.toggle('hidden');
+                        const editorPanel = document.querySelector('.editor-panel');
+                        if (editorPanel) {
+                          editorPanel.classList.toggle('w-full');
+                        }
+                      }
+                    }}
+                    className="text-xs"
+                  >
+                    Toggle Preview
+                  </Button>
+                </div>
+              </div>
+
+              {/* Preview Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="max-w-2xl mx-auto">
+                  {/* Blog Header Preview */}
+                  {form.title && (
+                    <div className="mb-8">
+                      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                        {form.title}
+                      </h1>
+                      {form.description && (
+                        <div className="text-lg text-gray-600 dark:text-gray-300 mb-4 prose prose-sm max-w-none">
+                          <ContentRenderer content={form.description} />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                        {form.author_name && (
+                          <span>By {form.author_name}</span>
+                        )}
+                        {form.category && (
+                          <span>• {form.category}</span>
+                        )}
+                        {readingTime > 0 && (
+                          <span>• {readingTime} min read</span>
+                        )}
+                      </div>
+                      {form.cover_image_url && (
+                        <div className="mt-4">
+                          <img
+                            src={form.cover_image_url}
+                            alt="Cover"
+                            className="w-full h-48 object-cover rounded-lg"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Blog Content Preview */}
+                  <div className="prose prose-gray dark:prose-invert max-w-none">
+                    <ContentRenderer content={form.content || 'Start writing your blog...'} />
+                  </div>
+                </div>
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4">
-        <div className="flex gap-2 justify-end">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isSaving} className="flex items-center gap-2">
-            {isSaving ? (
-              <>
-                <RotateCcw className="w-4 h-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                {form.id ? 'Update Blog' : 'Create Blog'}
-              </>
-            )}
-          </Button>
+          </div>
         </div>
-      </div>
-    </div>
+
+        {/* Action Buttons */}
+        <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4">
+          <div className="flex gap-2 justify-end">
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSaving} className="flex items-center gap-2">
+              {isSaving ? (
+                <>
+                  <RotateCcw className="w-4 h-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  {form.id ? 'Update Blog' : 'Create Blog'}
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+    </form>
   );
 }; 

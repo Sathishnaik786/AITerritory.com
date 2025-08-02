@@ -23,7 +23,6 @@ const emptyBlog: Partial<BlogPost> = {
   tags: [],
   slug: '',
   featured: false,
-  published: false,
 };
 
 const BlogsAdmin: React.FC = () => {
@@ -311,13 +310,13 @@ const BlogsAdmin: React.FC = () => {
 
       {/* Enhanced Modal with BlogEditor */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-7xl h-[90vh] overflow-hidden">
-          <DialogHeader>
+        <DialogContent className="max-w-7xl h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-xl font-bold">
               {editingBlog ? 'Edit Blog' : 'Create New Blog'}
             </DialogTitle>
           </DialogHeader>
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto">
             <BlogEditor
               form={form}
               setForm={setForm}

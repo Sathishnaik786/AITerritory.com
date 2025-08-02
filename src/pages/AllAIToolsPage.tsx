@@ -15,6 +15,8 @@ import { ToolCard, ToolCardStats } from '../components/ToolCard'; // Import Tool
 import SEO from '../components/SEO';
 import FAQ from '../components/FAQ';
 import { ResourcePageSkeleton } from '../components/SkeletonLoader';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
+import api from '../services/api';
 
 const AllAIToolsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
@@ -40,11 +42,9 @@ const AllAIToolsPage = () => {
     if (selectedTag) params.append('tag', selectedTag);
     if (sortBy) params.append('sort', sortBy);
     params.append('limit', '1000');
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3004/api';
     try {
-      const toolsRes = await fetch(`${apiBaseUrl}/tools?${params.toString()}`);
-      if (!toolsRes.ok) throw new Error('Failed to fetch tools');
-      const fetchedTools = await toolsRes.json();
+      const toolsRes = await api.get(`/tools?${params.toString()}`);
+      const fetchedTools = toolsRes.data;
       const toolsData = fetchedTools.tools || fetchedTools;
       setTools(toolsData);
       if (toolsData.length > 0) {
@@ -115,6 +115,9 @@ const AllAIToolsPage = () => {
         keywords="AI tools, artificial intelligence tools, AI generators, AI software, machine learning tools, AI applications, AI business tools, AI productivity tools, artificial intelligence software"
       />
       <div className="container mx-auto px-4 py-8 relative">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs />
+        
         {/* Subtle animated background for depth */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}

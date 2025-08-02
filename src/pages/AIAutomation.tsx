@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { YouTubeThumbnail } from '../components/YouTubeThumbnail';
 import { Newsletter } from '../components/Newsletter';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 import { useState } from 'react';
 import { FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 import { SiDiscord } from 'react-icons/si';
@@ -87,6 +88,9 @@ const AIAutomation = () => {
         description="Discover how AI can automate your workflows, streamline processes, and boost productivity. Explore popular tools like Zapier AI, Make.com, and n8n."
       />
       <div className="container mx-auto px-4 py-8">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs />
+        
         {/* Hero Section */}
         <div className="text-center mb-16">
         <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

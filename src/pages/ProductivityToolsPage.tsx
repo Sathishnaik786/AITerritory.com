@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Search, Filter, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 import { Tool } from '../types/tool';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 
 import SEO from '../components/SEO';
 import FAQ from '../components/FAQ';
@@ -39,7 +40,7 @@ const ProductivityToolsPage = () => {
     params.append('page', String(page));
     params.append('pageSize', String(pageSize));
     
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3004/api';
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003/api';
     fetch(`${apiBaseUrl}/tools/productivity?${params.toString()}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch tools');
@@ -104,6 +105,9 @@ const ProductivityToolsPage = () => {
         keywords="AI productivity tools, automation, workflow management, AI assistants, business efficiency"
       />
       <div className="container mx-auto px-4 py-8">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs />
+        
         {/* Header */}
         <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4 flex items-center justify-center gap-3">

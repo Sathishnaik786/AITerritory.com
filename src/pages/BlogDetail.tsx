@@ -30,6 +30,7 @@ import { OptimizedImage } from '../components/OptimizedImage';
 import { useEngagementTracker } from '../hooks/useEngagementTracker';
 import { NewsletterService } from '../services/newsletterService';
 import { BlogDetailSkeleton } from '../components/SkeletonLoader';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -140,6 +141,9 @@ const BlogDetail: React.FC = () => {
       BlogService.getBySlug(slug)
         .then(data => {
           console.log('Blog loaded:', data);
+          console.log('Blog title:', data?.title);
+          console.log('Blog description:', data?.description);
+          console.log('Blog content:', data?.content);
           setBlog(data);
         })
         .catch(error => {
@@ -179,8 +183,8 @@ const BlogDetail: React.FC = () => {
   }
 
   const [contentBeforeCTA, contentAfterCTA] = useMemo(() => {
-    // Try content first, then description, then fallback
-    const content = blog?.content || blog?.description || '';
+    // Only use content, not description (description is rendered separately)
+    const content = blog?.content || '';
     console.log('Blog content for CTA split:', { 
       content: blog?.content, 
       description: blog?.description, 
@@ -194,13 +198,13 @@ const BlogDetail: React.FC = () => {
 
   // Calculate reading time
   const readingTime = useMemo(() => {
-    const content = blog?.content || blog?.description || '';
+    const content = blog?.content || '';
     if (!content || typeof content !== 'string') return 3; // Default fallback
     const wordsPerMinute = 200;
     const words = content.split(/\s+/);
     const wordCount = words ? words.length : 0;
     return Math.ceil(wordCount / wordsPerMinute);
-  }, [blog?.content, blog?.description]);
+  }, [blog?.content]);
 
   // Combine content for proper heading extraction
   const combinedContent = useMemo(() => {
@@ -352,7 +356,7 @@ const BlogDetail: React.FC = () => {
   }
 
   // Show loading state if blog data is not ready
-  if (!blog || !blog.title || !blog.description) {
+  if (loading) {
     return (
       <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717]">
         <BlogDetailSkeleton />
@@ -361,14 +365,33 @@ const BlogDetail: React.FC = () => {
   }
 
   // Show error state if blog failed to load
-  if (error || !blog || !blog.title) {
-  return (
+  if (error) {
+    return (
       <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
         <div className="text-center">
           <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Blog Not Found</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{error || 'The blog you are looking for does not exist.'}</p>
-        <button
+          <button
+            onClick={() => navigate('/blog')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Back to Blogs
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if blog is null but not loading
+  if (!blog) {
+    return (
+      <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Blog Not Found</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">The blog you are looking for does not exist.</p>
+          <button
             onClick={() => navigate('/blog')}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
@@ -398,6 +421,9 @@ const BlogDetail: React.FC = () => {
       <SEO {...seoData} />
       
     <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] overflow-x-hidden sm:px-2">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs />
+        
         {/* Enhanced Reading Progress Bar */}
         <div className="fixed top-0 left-0 w-full h-1 z-50 bg-gray-200 dark:bg-gray-800">
           <motion.div
@@ -541,48 +567,59 @@ const BlogDetail: React.FC = () => {
 
         
         
-        {/* Main Content */}
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Table of Contents */}
-            {headings.length > 0 && (
-              <div className="lg:col-span-1">
-                <div className="sticky top-24">
-          <TableOfContents 
-            headings={headings} 
-            activeHeading={activeHeading}
-          />
+        {/* Main Content - Single Vertical Layout */}
+        <div className="w-full">
+          <div className="max-w-4xl mx-auto px-4 py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              {/* Table of Contents */}
+              {headings.length > 0 && (
+                <div className="lg:col-span-1">
+                  <div className="sticky top-24">
+                    <TableOfContents 
+                      headings={headings} 
+                      activeHeading={activeHeading}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
-          
-            {/* Content */}
-            <div className={`${headings.length > 0 ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
-              {/* Content Renderer */}
-              <ContentRenderer
-                content={combinedContent || ''}
-                onHeadingsGenerated={handleHeadingsGenerated}
-              />
-
-              {/* Inline Newsletter CTA (only show if user is not subscribed) */}
-              {!isUserSubscribed && (
-                <div className="my-8">
-            <NewsletterCTA onSubscribe={handleNewsletterSubscribe} onToast={toast} />
-          </div>
               )}
-          
-          {/* Content after CTA */}
-              {contentAfterCTA && (
-              <ContentRenderer 
-                content={contentAfterCTA || ''}
-              />
-              )}
+            
+              {/* Content */}
+              <div className={`${headings.length > 0 ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
+                {/* Blog Description */}
+                {blog.description && (
+                  <div className="mb-8">
+                    <div className="text-lg text-gray-600 dark:text-gray-300 prose prose-sm max-w-none">
+                      <ContentRenderer content={blog.description} />
+                    </div>
+                  </div>
+                )}
 
-              {/* Comments Section */}
-              <div id="comments-section" className="mt-12">
-                <ThreadedComments
-                  blogId={blog.slug}
+                {/* Content Renderer */}
+                <ContentRenderer
+                  content={combinedContent || ''}
+                  onHeadingsGenerated={handleHeadingsGenerated}
                 />
+
+                {/* Inline Newsletter CTA (only show if user is not subscribed) */}
+                {!isUserSubscribed && (
+                  <div className="my-8">
+                    <NewsletterCTA onSubscribe={handleNewsletterSubscribe} onToast={toast} />
+                  </div>
+                )}
+            
+                {/* Content after CTA */}
+                {contentAfterCTA && (
+                  <ContentRenderer 
+                    content={contentAfterCTA || ''}
+                  />
+                )}
+
+                {/* Comments Section */}
+                <div id="comments-section" className="mt-12">
+                  <ThreadedComments
+                    blogId={blog.slug}
+                  />
+                </div>
               </div>
             </div>
           </div>

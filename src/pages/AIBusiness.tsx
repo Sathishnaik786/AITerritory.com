@@ -6,6 +6,7 @@ import { useTools } from '../hooks/useTools';
 import { ToolGrid } from '../components/ToolGrid';
 import SEO from '../components/SEO';
 import { BusinessPageSkeleton } from '../components/SkeletonLoader';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 
 const iconMap: Record<string, React.ElementType> = {
   Edit,
@@ -134,6 +135,9 @@ const AIBusiness = () => {
         description="Discover how businesses are using AI across functions like marketing, sales, and operations. Find the best tools and courses to get started."
       />
       <main className="container mx-auto px-4 py-12">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs />
+        
         <header className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
             AI Use by <span className="text-blue-600">Business Function</span>

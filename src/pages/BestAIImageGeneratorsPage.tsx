@@ -18,7 +18,7 @@ const BestAIImageGeneratorsPage = () => {
   const [pageSize] = useState(12);
   const [totalPages, setTotalPages] = useState(1);
 
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3004/api';
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003/api';
 
   const fetchTools = () => {
     setLoading(true);

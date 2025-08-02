@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-// API Configuration - Always use direct backend URL for API calls
+// API Configuration - Use proxy in development, direct URL in production
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 
-// Use direct backend URL to avoid proxy issues
+// Use proxy in development to avoid CORS issues, direct URL in production
 const API_BASE_URL = isProduction 
-  ? 'https://aiterritory-com.onrender.com/api'  // Use direct backend URL
-  : 'http://localhost:3003/api';
+  ? 'https://aiterritory-com.onrender.com/api'  // Use direct backend URL in production
+  : '/api';  // Use proxy in development
 
 // Debug logging for API configuration
 console.log('🔧 API Configuration:');

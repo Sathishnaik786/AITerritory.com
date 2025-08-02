@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { YouTubeVideoPlayer } from '../components/YouTubeVideoPlayer';
 import { AIAgentLearningResources } from '../components/AIAgentLearningResources';
 import { Newsletter } from '../components/Newsletter';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 import { useState } from 'react';
 import { FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 import { SiDiscord } from 'react-icons/si';
@@ -90,6 +91,9 @@ const AIAgents = () => {
         description="Explore the most powerful autonomous AI agents like AutoGPT, BabyAGI, and GPT Engineer. Automate tasks, generate content, and solve complex problems."
       />
       <div className="container mx-auto px-4 py-8">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs />
+        
         {/* Hero Section */}
         <div className="text-center mb-16">
         <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

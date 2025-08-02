@@ -23,6 +23,7 @@ import { supabase } from '../services/supabaseClient'; // Adjust path if needed
 import { Tool } from '../types/tool';
 import { ToolCard, ToolCardStats } from '../components/ToolCard';
 import { useUser } from '@clerk/clerk-react';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 
 const Testimonials = lazy(() => import('../components/Testimonials'));
 
@@ -162,6 +163,9 @@ export const HomePage: React.FC = () => {
       />
     <div className="w-full overflow-x-hidden">
       <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-10">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs />
+        
         {/* Hero Section */}
         <motion.div
           className="text-center mb-12 px-4"

@@ -249,7 +249,6 @@ async function createBlog(req, res) {
     
     // Set default values
     blog.created_at = new Date().toISOString();
-    blog.published = blog.published !== undefined ? blog.published : false;
     
     const { data, error } = await supabase
       .from('blogs')
@@ -283,7 +282,15 @@ async function updateBlog(req, res) {
       updates.reading_time = estimateReadingTime(updates.content);
     }
     
-    updates.updated_at = new Date().toISOString();
+    // Remove published field if it exists (not in schema)
+    if (updates.published !== undefined) {
+      delete updates.published;
+    }
+    
+    // Remove updated_at if it doesn't exist in schema
+    if (updates.updated_at !== undefined) {
+      delete updates.updated_at;
+    }
     
     const { data, error } = await supabase
       .from('blogs')

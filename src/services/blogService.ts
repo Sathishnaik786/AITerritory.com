@@ -92,8 +92,7 @@ export const BlogService = {
         tags: blog.tags || [],
         category: blog.category,
         reading_time: blog.reading_time,
-        featured: blog.featured || false,
-        published: blog.published || false
+        featured: blog.featured || false
       };
 
       const response = await fetch(`${API_BASE_URL}/blogs`, {
@@ -135,8 +134,7 @@ export const BlogService = {
         tags: blog.tags || [],
         category: blog.category,
         reading_time: blog.reading_time,
-        featured: blog.featured,
-        published: blog.published
+        featured: blog.featured
       };
 
       const response = await fetch(`${API_BASE_URL}/blogs/${blog.id}`, {

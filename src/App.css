@@ -1,8 +1,12 @@
+/* Import the fonts from fonts.css */
+@import './assets/fonts.css';
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  font-family: 'Playfair Display', serif;  /* Apply the font globally */
 }
 
 .logo {
