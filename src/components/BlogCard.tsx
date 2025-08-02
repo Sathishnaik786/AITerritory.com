@@ -18,11 +18,19 @@ export const BlogCard: React.FC<BlogCardProps> = ({
   className = ''
 }) => {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    try {
+      if (!dateString) return 'Unknown Date';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid Date';
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid Date';
+    }
   };
 
   const cardVariants = {
@@ -48,7 +56,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
   const displayCategory = post.category || 'Uncategorized';
   const displaySummary = post.description || 'No summary available.';
   const displayDate = post.created_at;
-  const displayReadingTime = post.reading_time || '';
+  const displayReadingTime = post.reading_time ? `${post.reading_time} min` : '';
   // readTime is not available; we can omit or show a placeholder
   // const displayReadTime = post.readTime ? `${post.readTime} min` : '';
 
