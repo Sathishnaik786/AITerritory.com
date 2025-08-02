@@ -119,6 +119,13 @@ to = "/.netlify/functions/pingSitemaps"
 status = 200
 force = true
 
+# Cache clearing endpoint
+[[redirects]]
+from = "/clear-cache"
+to = "/blog?deploy=clear-cache"
+status = 200
+force = true
+
 # API redirects to backend
 [[redirects]]
 from = "/api/blogs/*"

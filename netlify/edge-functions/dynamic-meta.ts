@@ -92,9 +92,10 @@ async function setToCache(path: string, html: string): Promise<void> {
       etag,
     };
 
-    // Save to Netlify KV store
+    // Save to Netlify KV store with dynamic TTL
+    const cacheTTL = getCacheTTL(path);
     await NETLIFY_KV.put(cacheKey, JSON.stringify(cacheEntry), {
-      expirationTtl: CACHE_CONFIG.ttl / 1000, // Convert to seconds
+      expirationTtl: cacheTTL, // Use dynamic TTL
     });
 
     console.log(`💾 Cached HTML for: ${path} (${html.length} bytes)`);
@@ -124,6 +125,23 @@ async function invalidateCache(path: string): Promise<void> {
     console.log(`🗑️ Invalidated cache for: ${path}`);
   } catch (error) {
     console.error(`❌ Cache invalidation error for ${path}:`, error);
+  }
+}
+
+// Invalidate all blog cache entries
+async function invalidateBlogCache(): Promise<void> {
+  try {
+    console.log(`🗑️ Invalidating all blog cache entries...`);
+    const list = await NETLIFY_KV.list({ prefix: 'page-cache:/blog/' });
+    
+    for (const key of list.keys) {
+      await NETLIFY_KV.delete(key.name);
+      console.log(`🗑️ Invalidated blog cache: ${key.name}`);
+    }
+    
+    console.log(`✅ Blog cache invalidation completed`);
+  } catch (error) {
+    console.error(`❌ Blog cache invalidation error:`, error);
   }
 }
 
@@ -207,6 +225,11 @@ const TOOL_PATHS = [
   '/tools/midjourney',
 ];
 
+// Blog paths that should have shorter cache duration
+const BLOG_PATHS = [
+  '/blog/',
+];
+
 // Disallowed paths for robots meta
 const DISALLOWED_PATHS = [
   '/auth/',
@@ -226,14 +249,25 @@ function shouldCachePath(path: string): boolean {
   return CATEGORY_PATHS.includes(path) || TOOL_PATHS.includes(path);
 }
 
-// Get cache TTL in seconds
-function getCacheTTL(): number {
-  return CACHE_CONFIG.ttl / 1000;
+// Check if path is a blog path (should have shorter cache)
+function isBlogPath(path: string): boolean {
+  return path.startsWith('/blog/') && path !== '/blog';
 }
 
-// Get stale-while-revalidate TTL in seconds
-function getStaleWhileRevalidateTTL(): number {
-  return CACHE_CONFIG.staleWhileRevalidate / 1000;
+// Get cache TTL in seconds - shorter for blog content
+function getCacheTTL(path: string): number {
+  if (isBlogPath(path)) {
+    return 30 * 60; // 30 minutes for blog content
+  }
+  return CACHE_CONFIG.ttl / 1000; // Default 12 hours for other content
+}
+
+// Get stale-while-revalidate TTL in seconds - shorter for blog content
+function getStaleWhileRevalidateTTL(path: string): number {
+  if (isBlogPath(path)) {
+    return 5 * 60; // 5 minutes for blog content
+  }
+  return CACHE_CONFIG.staleWhileRevalidate / 1000; // Default 1 hour for other content
 }
 
 const API_MAP: Record<string, string> = {
@@ -1045,6 +1079,14 @@ export default async function handler(req: Request) {
 
   console.log(`🚀 Edge Function called for: ${path}`);
 
+  // Check for deployment cache invalidation
+  const deploymentId = url.searchParams.get('deploy');
+  if (deploymentId && deploymentId === 'clear-cache') {
+    console.log(`🔄 Deployment detected, clearing blog cache...`);
+    await invalidateBlogCache();
+    return new Response('Cache cleared', { status: 200 });
+  }
+
   // Log robots meta decision
   const robotsMeta = getRobotsMeta(path);
   console.log(`🤖 Robots meta decision for ${path}: ${robotsMeta}`);
@@ -1057,10 +1099,12 @@ export default async function handler(req: Request) {
     const cachedResult = await getFromCache(path);
     
     if (cachedResult) {
-          // Add cache headers with improved caching strategy (12 hours)
+          // Add cache headers with dynamic TTL based on path
+    const cacheTTL = getCacheTTL(path);
+    const staleWhileRevalidateTTL = getStaleWhileRevalidateTTL(path);
     const headers = new Headers({
       "content-type": "text/html",
-      "Cache-Control": "public, max-age=43200, stale-while-revalidate=86400",
+      "Cache-Control": `public, max-age=${cacheTTL}, stale-while-revalidate=${staleWhileRevalidateTTL}`,
       "X-Cache": cachedResult.isStale ? "STALE" : "HIT",
     });
 
@@ -1146,13 +1190,15 @@ export default async function handler(req: Request) {
       await setToCache(path, fullHtml);
     }
 
-    // Add cache headers for cacheable paths
+    // Add cache headers for cacheable paths with dynamic TTL
     const headers = new Headers({
       "content-type": "text/html",
     });
 
     if (shouldCachePath(path)) {
-      headers.set("Cache-Control", "public, max-age=43200, stale-while-revalidate=86400");
+      const cacheTTL = getCacheTTL(path);
+      const staleWhileRevalidateTTL = getStaleWhileRevalidateTTL(path);
+      headers.set("Cache-Control", `public, max-age=${cacheTTL}, stale-while-revalidate=${staleWhileRevalidateTTL}`);
       headers.set("X-Cache", "MISS");
     }
 

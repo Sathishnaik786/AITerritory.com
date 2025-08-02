@@ -1,2 +1,6 @@
-/blog/*    https://aiterritory-com.onrender.com/blog/:splat    200
+# Blog routes - serve dynamically with cache clearing capability
+/blog/*    /blog/:splat    200
+/clear-cache    /blog?deploy=clear-cache    200
+
+# All other routes
 /*         /index.html                                         200 
