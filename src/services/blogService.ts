@@ -1,13 +1,16 @@
 import { BlogPost } from '../types/blog';
 import { blogPosts } from '../data/blogPosts';
 
-// API base URL - adjust based on your backend setup
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// API base URL - use the same configuration as main API service
+const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+const API_BASE_URL = isProduction 
+  ? 'https://aiterritory-com.onrender.com/api'  // Use direct backend URL
+  : 'http://localhost:3003/api';
 
 export const BlogService = {
   async getAll(params?: any): Promise<BlogPost[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/blogs`);
+      const response = await fetch(`${API_BASE_URL}/blogs`);
       
       if (!response.ok) {
         console.error('Backend API error:', response.status, response.statusText);
@@ -27,7 +30,7 @@ export const BlogService = {
 
   async getBySlug(slug: string): Promise<BlogPost> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/blogs/${slug}`);
+      const response = await fetch(`${API_BASE_URL}/blogs/${slug}`);
       
       if (!response.ok) {
         if (response.status === 404) {
@@ -58,7 +61,7 @@ export const BlogService = {
 
   async getByCategory(category: string): Promise<BlogPost[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/blogs/category/${encodeURIComponent(category)}`);
+      const response = await fetch(`${API_BASE_URL}/blogs/category/${encodeURIComponent(category)}`);
       
       if (!response.ok) {
         console.error('Backend API error:', response.status, response.statusText);
@@ -93,7 +96,7 @@ export const BlogService = {
         published: blog.published || false
       };
 
-      const response = await fetch(`${API_BASE_URL}/api/blogs`, {
+      const response = await fetch(`${API_BASE_URL}/blogs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -136,7 +139,7 @@ export const BlogService = {
         published: blog.published
       };
 
-      const response = await fetch(`${API_BASE_URL}/api/blogs/${blog.id}`, {
+      const response = await fetch(`${API_BASE_URL}/blogs/${blog.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -160,7 +163,7 @@ export const BlogService = {
 
   async delete(id: string): Promise<void> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/blogs/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/blogs/${id}`, {
         method: 'DELETE',
       });
 
@@ -179,7 +182,7 @@ export const BlogService = {
   // Helper method to test backend connection
   async testBackend(): Promise<{ connected: boolean; message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/blogs/test`);
+      const response = await fetch(`${API_BASE_URL}/blogs/test`);
       
       if (!response.ok) {
         return { connected: false, message: `Backend error: ${response.status}` };

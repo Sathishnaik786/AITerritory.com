@@ -20,15 +20,31 @@ export const BlogCard: React.FC<BlogCardProps> = ({
   const formatDate = (dateString: string) => {
     try {
       if (!dateString) return 'Unknown Date';
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return 'Invalid Date';
+      
+      // Handle ISO date strings with timezone offsets
+      let date: Date;
+      
+      // If the date string contains timezone offset (like +00:00), parse it properly
+      if (dateString.includes('+') || dateString.includes('-') && dateString.length > 20) {
+        // Remove the timezone offset for parsing
+        const dateWithoutOffset = dateString.split(/[+-]/)[0];
+        date = new Date(dateWithoutOffset + 'Z'); // Add Z to treat as UTC
+      } else {
+        date = new Date(dateString);
+      }
+      
+      if (isNaN(date.getTime())) {
+        console.error('Invalid date string:', dateString);
+        return 'Invalid Date';
+      }
+      
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
       });
     } catch (error) {
-      console.error('Error formatting date:', error);
+      console.error('Error formatting date:', error, 'Date string:', dateString);
       return 'Invalid Date';
     }
   };
@@ -52,13 +68,11 @@ export const BlogCard: React.FC<BlogCardProps> = ({
   const fallbackImage =
     'https://placehold.co/600x400?text=No+Image';
   const displayImage = post.cover_image_url || fallbackImage;
-  const displayAuthor = post.author_name || 'Unknown Author';
+  const displayAuthor = post.author_name || post.author || 'Unknown Author';
   const displayCategory = post.category || 'Uncategorized';
-  const displaySummary = post.description || 'No summary available.';
-  const displayDate = post.created_at;
-  const displayReadingTime = post.reading_time ? `${post.reading_time} min` : '';
-  // readTime is not available; we can omit or show a placeholder
-  // const displayReadTime = post.readTime ? `${post.readTime} min` : '';
+  const displaySummary = post.description || post.summary || 'No summary available.';
+  const displayDate = post.created_at || post.date;
+  const displayReadingTime = post.reading_time ? `${post.reading_time} min` : (post.readTime ? `${post.readTime} min` : '');
 
   if (variant === 'compact') {
     return (
