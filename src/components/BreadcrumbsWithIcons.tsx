@@ -343,16 +343,16 @@ export const BreadcrumbsWithIcons: React.FC = () => {
       />
       
       <div className="w-full bg-background/30 backdrop-blur-sm border-b border-border/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-2">
           <Breadcrumb>
-            <BreadcrumbList className="text-xs sm:text-sm">
+            <BreadcrumbList className="text-xs">
               {breadcrumbs.map((item, index) => (
                 <React.Fragment key={item.href}>
                   <BreadcrumbItem>
                     {item.isCurrentPage ? (
                       <BreadcrumbPage className="flex items-center gap-1">
                         {item.icon}
-                        <span className="hidden sm:inline">{item.label}</span>
+                        <span className="inline">{item.label}</span>
                         {isLoadingBlog && location.pathname.startsWith('/blog/') && index === breadcrumbs.length - 1 && (
                           <span className="text-muted-foreground text-xs">Loading...</span>
                         )}
@@ -361,7 +361,7 @@ export const BreadcrumbsWithIcons: React.FC = () => {
                       <BreadcrumbLink asChild>
                         <Link to={item.href} className="flex items-center gap-1 hover:text-foreground transition-colors">
                           {item.icon}
-                          <span className="hidden sm:inline">{item.label}</span>
+                          <span className="inline">{item.label}</span>
                         </Link>
                       </BreadcrumbLink>
                     )}
