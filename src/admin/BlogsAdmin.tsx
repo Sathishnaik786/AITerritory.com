@@ -5,6 +5,7 @@ import { BlogPost } from '../types/blog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SkeletonLoader } from '../components/SkeletonLoader';
 import { toast } from 'sonner';
 import { BlogEditor } from '../components/admin/BlogEditor';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -165,10 +166,54 @@ const BlogsAdmin: React.FC = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="space-y-4">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Author</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Created</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                      <td className="px-4 py-4">
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-48" />
+                          <div className="flex gap-1">
+                            <Skeleton className="h-5 w-12" />
+                            <Skeleton className="h-5 w-16" />
+                            <Skeleton className="h-5 w-10" />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <Skeleton className="h-4 w-24" />
+                      </td>
+                      <td className="px-4 py-4">
+                        <Skeleton className="h-4 w-32" />
+                      </td>
+                      <td className="px-4 py-4">
+                        <Skeleton className="h-6 w-20 rounded-full" />
+                      </td>
+                      <td className="px-4 py-4">
+                        <Skeleton className="h-4 w-20" />
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex gap-2">
+                          <Skeleton className="h-8 w-16" />
+                          <Skeleton className="h-8 w-16" />
+                          <Skeleton className="h-8 w-16" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : blogs && blogs.length > 0 ? (
             <div className="overflow-x-auto">

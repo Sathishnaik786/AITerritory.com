@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { OptimizedImage } from './OptimizedImage';
+import { BlogCardSkeleton, NavigationSkeleton } from './SkeletonLoader';
 
 interface RelatedArticle {
   id: string;
@@ -257,26 +258,9 @@ export const RelatedContent: React.FC<RelatedContentProps> = ({
     </div>
   );
 
-  // Loading skeleton
+  // Loading skeleton - now using the reusable component
   const LoadingSkeleton = ({ count = 3, compact = false }) => (
-    <div className="space-y-4">
-      {Array.from({ length: count }).map((_, index) => (
-        <div
-          key={index}
-          className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden ${
-            compact ? 'flex items-center gap-3 p-3' : ''
-          }`}
-        >
-          <div className={`bg-gray-200 dark:bg-gray-700 animate-pulse ${
-            compact ? 'w-16 h-16' : 'h-32'
-          }`} />
-          <div className={compact ? 'flex-1 space-y-2' : 'p-4 space-y-2'}>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-2/3" />
-          </div>
-        </div>
-      ))}
-    </div>
+    <BlogCardSkeleton count={count} compact={compact} />
   );
 
   // Render based on variant
@@ -284,10 +268,7 @@ export const RelatedContent: React.FC<RelatedContentProps> = ({
     return (
       <div className={className}>
         {isLoadingNavigation ? (
-          <div className="flex items-center justify-between gap-4 py-8">
-            <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse flex-1" />
-            <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse flex-1" />
-          </div>
+          <NavigationSkeleton />
         ) : (
           <NavigationComponent />
         )}

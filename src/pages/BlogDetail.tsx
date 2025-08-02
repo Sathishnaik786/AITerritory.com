@@ -29,6 +29,7 @@ import SEO from '../components/SEO';
 import { OptimizedImage } from '../components/OptimizedImage';
 import { useEngagementTracker } from '../hooks/useEngagementTracker';
 import { NewsletterService } from '../services/newsletterService';
+import { BlogDetailSkeleton } from '../components/SkeletonLoader';
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -353,11 +354,8 @@ const BlogDetail: React.FC = () => {
   // Show loading state if blog data is not ready
   if (!blog || !blog.title || !blog.description) {
     return (
-      <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading blog content...</p>
-        </div>
+      <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717]">
+        <BlogDetailSkeleton />
       </div>
     );
   }

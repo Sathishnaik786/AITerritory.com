@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useUser, SignInButton } from '@clerk/clerk-react';
 import { sanitizeText } from '@/lib/sanitizeHtml';
 import { blogInteractions } from '../services/unifiedInteractionsService';
+import { CommentsSkeleton } from './SkeletonLoader';
 
 interface BlogCommentsProps {
   blogId: string;
@@ -60,7 +61,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ blogId }) => {
     <section className="mt-12 mb-8 w-full max-w-2xl mx-auto">
       <h3 className="text-xl font-bold mb-4">Comments</h3>
       {loading ? (
-        <div className="text-gray-500">Loading comments…</div>
+        <CommentsSkeleton count={3} />
       ) : (
         <>
           {comments.length === 0 && <div className="text-gray-400 mb-4">No comments yet. Be the first to comment!</div>}
