@@ -1,5 +1,6 @@
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
+import { BreadcrumbsWithIcons } from './components/BreadcrumbsWithIcons';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HomePage } from "./pages/HomePage";
 import NotFound from "./pages/NotFound";
@@ -11,6 +12,7 @@ import AIAutomation from "./pages/AIAutomation";
 import AIAgents from "./pages/AIAgents";
 import AllResources from "./pages/AllResources";
 import ResourceCategoryPage from "./pages/ResourceCategoryPage";
+import Resources from "./pages/Resources";
 import ContactUsPage from "./pages/ContactUsPage";
 import AdvertisePage from "./pages/AdvertisePage";
 import SubmitToolPage from "./pages/SubmitToolPage";
@@ -117,6 +119,7 @@ function ThemedAppContent() {
         <MetaTags />
         <div className="relative min-h-screen flex flex-col items-center w-full">
           <Navbar newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
+          <BreadcrumbsWithIcons />
           <ScrollToTopButton />
           <main className={`flex-1 w-full min-h-screen`}>
             <Routes>
@@ -131,6 +134,7 @@ function ThemedAppContent() {
               <Route path="/signup" element={<CreateAccountPage />} />
               
               {/* Routes for Resources dropdown */}
+              <Route path="/resources" element={<Resources />} />
               <Route path="/resources/ai-agents" element={<AIAgents />} />
               <Route path="/resources/ai-innovation" element={<AIInnovation />} />
               <Route path="/resources/ai-tutorials" element={<AITutorials />} />
