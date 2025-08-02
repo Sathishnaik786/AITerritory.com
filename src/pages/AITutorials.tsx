@@ -13,6 +13,9 @@ import SEO from '../components/SEO';
 import { BusinessPageSkeleton } from '../components/SkeletonLoader';
 
 const AITutorials = () => {
+  // Add loading state for demonstration
+  const [isLoading, setIsLoading] = useState(false);
+  
   const featuredTutorials = [
     {
       title: "ChatGPT for Beginners",
@@ -140,6 +143,10 @@ const AITutorials = () => {
     { name: 'Instagram', icon: Instagram, url: 'https://taap.it/e51U32', color: 'bg-gradient-to-r from-[#E4405F] to-[#833AB4] hover:from-[#C13584] hover:to-[#833AB4]' },
     { name: 'Twitter', icon: FaXTwitter, url: 'https://taap.it/UYrKPV', color: 'bg-black hover:bg-gray-800' },
   ];
+
+  if (isLoading) {
+    return <BusinessPageSkeleton />;
+  }
 
   return (
     <>

@@ -82,7 +82,7 @@ const AIInnovation = () => {
         >
           <h2 className="text-3xl font-bold mb-8">Latest Innovations</h2>
           {loadingInnovations ? (
-            <div>Loading innovations...</div>
+            <BusinessPageSkeleton />
           ) : errorInnovations ? (
             <div className="text-red-500">Failed to load innovations.</div>
           ) : (
@@ -226,9 +226,9 @@ const AIInnovation = () => {
           className="mb-16"
         >
           <h2 className="text-3xl font-bold mb-8">Featured Research Papers</h2>
-          {loadingPapers ? (
-            <div>Loading research papers...</div>
-          ) : errorPapers ? (
+                      {loadingPapers ? (
+              <BusinessPageSkeleton />
+            ) : errorPapers ? (
             <div className="text-red-500">Failed to load research papers.</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
