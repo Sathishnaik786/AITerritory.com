@@ -61,12 +61,14 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
   const headings = useMemo(() => {
     if (!content || typeof content !== 'string') return [];
 
-    const headingRegex = /^(#{2,3})\s+(.+)$/gm;
+    // Handle both markdown and HTML headings
     const extractedHeadings: Heading[] = [];
 
+    // First try markdown headings (for backward compatibility)
+    const markdownHeadingRegex = /^(#{2,3})\s+(.+)$/gm;
     let match;
-    while ((match = headingRegex.exec(content)) !== null) {
-      if (!match[1] || !match[2]) continue; // Skip invalid matches
+    while ((match = markdownHeadingRegex.exec(content)) !== null) {
+      if (!match[1] || !match[2]) continue;
       
       const level = match[1].length;
       const text = match[2].trim();
@@ -77,6 +79,24 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
         text,
         level
       });
+    }
+
+    // If no markdown headings found, try HTML headings
+    if (extractedHeadings.length === 0) {
+      const htmlHeadingRegex = /<h([2-3])[^>]*>(.*?)<\/h[2-3]>/gi;
+      while ((match = htmlHeadingRegex.exec(content)) !== null) {
+        if (!match[1] || !match[2]) continue;
+        
+        const level = parseInt(match[1]);
+        const text = match[2].replace(/<[^>]*>/g, '').trim(); // Remove any nested HTML tags
+        const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+        extractedHeadings.push({
+          id,
+          text,
+          level
+        });
+      }
     }
 
     return extractedHeadings;

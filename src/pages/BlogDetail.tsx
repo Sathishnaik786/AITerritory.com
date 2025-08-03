@@ -569,11 +569,11 @@ const BlogDetail: React.FC = () => {
         
         {/* Main Content - Single Vertical Layout */}
         <div className="w-full">
-          <div className="max-w-4xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              {/* Table of Contents */}
+          <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="flex flex-col lg:flex-row gap-8">
+              {/* Table of Contents - Sticky Sidebar */}
               {headings.length > 0 && (
-                <div className="lg:col-span-1">
+                <div className="lg:w-80 xl:w-96 lg:flex-shrink-0">
                   <div className="sticky top-24">
                     <TableOfContents 
                       headings={headings} 
@@ -583,8 +583,8 @@ const BlogDetail: React.FC = () => {
                 </div>
               )}
             
-              {/* Content */}
-              <div className={`${headings.length > 0 ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
+              {/* Content - Flexible Width */}
+              <div className="flex-1 min-w-0 overflow-hidden">
                 {/* Blog Description */}
                 {blog.description && (
                   <div className="mb-8">
@@ -594,9 +594,9 @@ const BlogDetail: React.FC = () => {
                   </div>
                 )}
 
-                {/* Content Renderer */}
+                {/* Content Renderer - Render full content once */}
                 <ContentRenderer
-                  content={combinedContent || ''}
+                  content={blog?.content || ''}
                   onHeadingsGenerated={handleHeadingsGenerated}
                 />
 
@@ -605,13 +605,6 @@ const BlogDetail: React.FC = () => {
                   <div className="my-8">
                     <NewsletterCTA onSubscribe={handleNewsletterSubscribe} onToast={toast} />
                   </div>
-                )}
-            
-                {/* Content after CTA */}
-                {contentAfterCTA && (
-                  <ContentRenderer 
-                    content={contentAfterCTA || ''}
-                  />
                 )}
 
                 {/* Comments Section */}

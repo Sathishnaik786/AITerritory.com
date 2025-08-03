@@ -107,9 +107,9 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="hidden lg:block sticky top-24 self-start h-fit max-h-[calc(100vh-120px)] overflow-y-auto"
+      className="hidden lg:block sticky top-24 self-start h-fit max-h-[calc(100vh-120px)] overflow-y-auto w-full"
     >
-      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 min-w-[280px]">
+      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 w-full">
         <motion.div 
           className="flex items-center gap-2 mb-4"
           initial={{ opacity: 0, y: -10 }}
