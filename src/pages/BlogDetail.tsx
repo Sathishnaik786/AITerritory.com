@@ -420,7 +420,8 @@ const BlogDetail: React.FC = () => {
       {/* SEO Component with structured data */}
       <SEO {...seoData} />
       
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] overflow-x-hidden sm:px-2">
+      {/* Default Blog Detail Layout */}
+      <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] overflow-x-hidden">
         {/* Breadcrumbs */}
         <PageBreadcrumbs />
         
@@ -435,7 +436,7 @@ const BlogDetail: React.FC = () => {
           />
         </div>
           
-                {/* Hero Section */}
+        {/* Hero Section */}
         <motion.div 
           className="w-full bg-white dark:bg-[#171717] border-b border-gray-100 dark:border-gray-800"
           initial={{ opacity: 0, y: 20 }}
@@ -458,8 +459,8 @@ const BlogDetail: React.FC = () => {
 
             {/* Title */}
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
-            {blog.title}
-          </h1>
+              {blog.title}
+            </h1>
           
             {/* Author Information */}
             <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 mb-2">
@@ -542,8 +543,8 @@ const BlogDetail: React.FC = () => {
                   <button onClick={() => handleShare('copy')} className="rounded-full border border-gray-300 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                     <FaRegCopy className="w-5 h-5 text-gray-700 dark:text-gray-200" />
                   </button>
-        </div>
-      </div>
+                </div>
+              </div>
             )}
           </div>
         </motion.div>
@@ -616,7 +617,25 @@ const BlogDetail: React.FC = () => {
               </div>
             </div>
           </div>
-        </div> {/* <-- Add this closing div for the main content wrapper */}
+        </div>
+
+        {/* You Might Also Like Section */}
+        <div className="w-full bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+          <div className="max-w-7xl mx-auto px-4 py-12">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                You Might Also Like
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                Discover more insights and tutorials
+              </p>
+            </div>
+            <YouMightAlsoLike 
+              currentBlogSlug={blog.slug}
+              category={blog.category}
+            />
+          </div>
+        </div>
 
         {/* Scroll-based Newsletter Modal */}
         <AnimatePresence>
@@ -685,25 +704,6 @@ const BlogDetail: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-                {/* You Might Also Like Section */}
-        {blog && (
-          <>
-            {(() => {
-              console.log('🔍 Blog data for YouMightAlsoLike:', {
-                slug: blog.slug,
-                category: blog.category,
-                tags: blog.tags,
-                title: blog.title
-              });
-              return null;
-            })()}
-            <YouMightAlsoLike
-              currentSlug={blog.slug}
-              category={blog.category}
-              tags={blog.tags}
-            />
-          </>
-        )}
       </div>
     </>
   );
