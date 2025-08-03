@@ -7,6 +7,33 @@ import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 
+// Simple Error Boundary Component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; fallback: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error('Lexical Editor Error Boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+
+    return this.props.children;
+  }
+}
+
 
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -501,6 +528,7 @@ export const LexicalEditorComponent: React.FC<LexicalEditorProps> = ({
     theme,
     onError: (error: Error) => {
       console.error('Lexical Editor Error:', error);
+      // Don't throw the error, just log it
     },
     nodes: [
       LinkNode,
@@ -514,29 +542,31 @@ export const LexicalEditorComponent: React.FC<LexicalEditorProps> = ({
 
   return (
     <div className={`lexical-editor ${className}`}>
-      <LexicalComposer initialConfig={initialConfig}>
-        <ToolbarPlugin />
-        <div className="editor-content-area">
-          <RichTextPlugin
-            contentEditable={
-              <ContentEditable
-                className="editor-content-editable"
-                placeholder={placeholder}
-              />
-            }
-            placeholder={
-              <div className="editor-placeholder">
-                {placeholder}
-              </div>
-            }
-          />
-          <HistoryPlugin />
-          <AutoFocusPlugin />
-          <LinkPlugin />
-          <ListPlugin />
-          <LexicalHtmlPlugin initialHtml={value} onChange={onChange} />
-        </div>
-      </LexicalComposer>
+      <ErrorBoundary fallback={<div className="p-4 text-red-500">Editor failed to load. Please refresh the page.</div>}>
+        <LexicalComposer initialConfig={initialConfig}>
+          <ToolbarPlugin />
+          <div className="editor-content-area">
+            <RichTextPlugin
+              contentEditable={
+                <ContentEditable
+                  className="editor-content-editable"
+                  placeholder={placeholder}
+                />
+              }
+              placeholder={
+                <div className="editor-placeholder">
+                  {placeholder}
+                </div>
+              }
+            />
+            <HistoryPlugin />
+            <AutoFocusPlugin />
+            <LinkPlugin />
+            <ListPlugin />
+            <LexicalHtmlPlugin initialHtml={value} onChange={onChange} />
+          </div>
+        </LexicalComposer>
+      </ErrorBoundary>
     </div>
   );
 };

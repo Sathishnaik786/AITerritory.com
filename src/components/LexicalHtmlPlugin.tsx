@@ -64,8 +64,15 @@ export const LexicalHtmlPlugin: React.FC<LexicalHtmlPluginProps> = ({
           editorState.read(() => {
             const root = $getRoot();
             if (root && root.getChildrenSize() > 0) {
-              const html = $generateHtmlFromNodes(editor, root);
-              onChange(html);
+              try {
+                const html = $generateHtmlFromNodes(editor, root);
+                onChange(html);
+              } catch (htmlError) {
+                console.error('Error generating HTML from nodes:', htmlError);
+                // Try alternative approach
+                const textContent = root.getTextContent();
+                onChange(textContent ? `<p>${textContent}</p>` : '');
+              }
             } else {
               onChange('');
             }
