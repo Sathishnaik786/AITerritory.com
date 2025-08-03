@@ -500,13 +500,14 @@ export const LexicalEditorComponent: React.FC<LexicalEditorProps> = ({
     namespace: 'BlogEditor',
     theme,
     onError: (error: Error) => {
-      console.error(error);
+      console.error('Lexical Editor Error:', error);
     },
     nodes: [
       LinkNode,
       ListNode,
       ListItemNode,
     ],
+    editorState: undefined,
   };
 
 

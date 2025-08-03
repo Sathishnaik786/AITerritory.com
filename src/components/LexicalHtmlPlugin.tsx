@@ -21,7 +21,7 @@ export const LexicalHtmlPlugin: React.FC<LexicalHtmlPluginProps> = ({
 
   // Load initial HTML content
   useEffect(() => {
-    if (initialHtml) {
+    if (initialHtml && initialHtml.trim() !== '') {
       try {
         editor.update(() => {
           const root = $getRoot();
@@ -33,10 +33,25 @@ export const LexicalHtmlPlugin: React.FC<LexicalHtmlPluginProps> = ({
 
           // Convert HTML to Lexical nodes
           const nodes = $generateNodesFromDOM(editor, tempDiv);
-          root.append(...nodes);
+          if (nodes && nodes.length > 0) {
+            root.append(...nodes);
+          } else {
+            // Fallback to empty paragraph
+            const paragraph = $createParagraphNode();
+            paragraph.append($createTextNode(''));
+            root.append(paragraph);
+          }
         });
       } catch (error) {
         console.error('Error loading initial HTML:', error);
+        // Fallback to empty content
+        editor.update(() => {
+          const root = $getRoot();
+          root.clear();
+          const paragraph = $createParagraphNode();
+          paragraph.append($createTextNode(''));
+          root.append(paragraph);
+        });
       }
     }
   }, [editor, initialHtml]);
@@ -48,11 +63,17 @@ export const LexicalHtmlPlugin: React.FC<LexicalHtmlPluginProps> = ({
         try {
           editorState.read(() => {
             const root = $getRoot();
-            const html = $generateHtmlFromNodes(editor, root);
-            onChange(html);
+            if (root && root.getChildrenSize() > 0) {
+              const html = $generateHtmlFromNodes(editor, root);
+              onChange(html);
+            } else {
+              onChange('');
+            }
           });
         } catch (error) {
           console.error('Error generating HTML:', error);
+          // Fallback to empty content
+          onChange('');
         }
       });
 

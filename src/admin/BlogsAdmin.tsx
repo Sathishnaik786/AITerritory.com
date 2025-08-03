@@ -310,7 +310,10 @@ const BlogsAdmin: React.FC = () => {
 
       {/* Enhanced Modal with BlogEditor */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-7xl h-[90vh] flex flex-col">
+        <DialogContent 
+          className="max-w-7xl h-[90vh] flex flex-col"
+          aria-describedby="blog-editor-description"
+        >
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-xl font-bold">
               {editingBlog ? 'Edit Blog' : 'Create New Blog'}
@@ -324,6 +327,9 @@ const BlogsAdmin: React.FC = () => {
               isSaving={isSaving}
               onCancel={handleCancel}
             />
+          </div>
+          <div id="blog-editor-description" className="sr-only">
+            {editingBlog ? 'Edit existing blog post content and settings' : 'Create a new blog post with rich text editor'}
           </div>
         </DialogContent>
       </Dialog>
