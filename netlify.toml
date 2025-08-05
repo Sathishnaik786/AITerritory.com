@@ -15,6 +15,19 @@
 [context.branch-deploy.environment]
   NODE_ENV = "development"
 
+# Build configuration
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_ENV = "production"
+
+# Functions configuration
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 # Edge Functions configuration
 [[edge_functions]]
 function = "dynamic-meta"
@@ -85,53 +98,41 @@ path = "/productivity-tools*"
 function = "dynamic-meta"
 path = "/ai-for-business*"
 
-# Post-build script for pre-caching and sitemap pinging
-[build]
-  command = "npm run build"
-  publish = "dist"
-  post_processing = "node scripts/pre-cache.js && node scripts/post-build-ping.js"
+# Security headers for all pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.aiterritory.org https://*.clerk.accounts.dev https://js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https: blob:;
+      connect-src 'self' https://aiterritory-com.onrender.com https://clerk.aiterritory.org https://*.clerk.accounts.dev https://api.stripe.com wss://*.clerk.accounts.dev https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co https://www.google-analytics.com https://www.googletagmanager.com;
+      frame-src https://js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com;
+      worker-src 'self' blob:;
+    """
 
-# Post-build hook to ping search engines
-[build.environment]
-  NODE_ENV = "production"
+# Cache headers for static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
-# Functions configuration
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
-# Post-build hook for sitemap pinging
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
-
-# Custom post-build hook
-[build.processing]
-  skip_processing = false
-
-# Post-build command to ping search engines
-[build.processing.html]
-  pretty_urls = true
-
-# Add post-build hook for sitemap pinging
-[[redirects]]
-from = "/.netlify/functions/pingSitemaps"
-to = "/.netlify/functions/pingSitemaps"
-status = 200
-force = true
-
-# Cache clearing endpoint
-[[redirects]]
-from = "/clear-cache"
-to = "/blog?deploy=clear-cache"
-status = 200
-force = true
-
-# API redirects to backend
-[[redirects]]
-from = "/api/blogs/*"
-to = "https://aiterritory-com.onrender.com/api/blogs/:splat"
-status = 200
-force = true
+[[headers]]
+  for = "/(.*).(js|css|webp|svg|jpg|jpeg|png|woff2|woff|ttf|eot)"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
 # Redirects for removed fallback pages
 [[redirects]]
@@ -159,68 +160,74 @@ force = true
   to = "/"
   status = 301
 
+# API redirects to backend
 [[redirects]]
-from = "/api/comments/*"
-to = "https://aiterritory-com.onrender.com/api/comments/:splat"
-status = 200
-force = true
+  from = "/api/blogs/*"
+  to = "https://aiterritory-com.onrender.com/api/blogs/:splat"
+  status = 200
+  force = true
 
 [[redirects]]
-from = "/api/*"
-to = "https://aiterritory-com.onrender.com/api/:splat"
-status = 200
-force = true
+  from = "/api/comments/*"
+  to = "https://aiterritory-com.onrender.com/api/comments/:splat"
+  status = 200
+  force = true
 
-# Ensure sitemap.xml is always served from public/
 [[redirects]]
-from = "/sitemap.xml"
-to = "/sitemap.xml"
-status = 200
-force = true
+  from = "/api/*"
+  to = "https://aiterritory-com.onrender.com/api/:splat"
+  status = 200
+  force = true
 
-# Ensure robots.txt is served with correct headers
-[[headers]]
-for = "/robots.txt"
-  [headers.values]
-  Cache-Control = "public, max-age=86400"
-  Content-Type = "text/plain"
+# Blog redirects
+[[redirects]]
+  from = "/blog/*"
+  to = "https://aiterritory-com.onrender.com/blog/:splat"
+  status = 200
+  force = true
 
 # 301 redirects for www and http versions
 [[redirects]]
-from = "http://aiterritory.org/*"
-to = "https://aiterritory.org/:splat"
-status = 301
-force = true
+  from = "http://aiterritory.org/*"
+  to = "https://aiterritory.org/:splat"
+  status = 301
+  force = true
 
 [[redirects]]
-from = "https://www.aiterritory.org/*"
-to = "https://aiterritory.org/:splat"
-status = 301
-force = true
+  from = "https://www.aiterritory.org/*"
+  to = "https://aiterritory.org/:splat"
+  status = 301
+  force = true
 
 [[redirects]]
-from = "http://www.aiterritory.org/*"
-to = "https://aiterritory.org/:splat"
-status = 301
-force = true
+  from = "http://www.aiterritory.org/*"
+  to = "https://aiterritory.org/:splat"
+  status = 301
+  force = true
 
 # Remove query parameters from specific pages to prevent duplicate content
 [[redirects]]
-from = "/tools/ai-text-generators*"
-to = "/tools/ai-text-generators"
-status = 301
-force = true
+  from = "/tools/ai-text-generators*"
+  to = "/tools/ai-text-generators"
+  status = 301
+  force = true
 
 [[redirects]]
-from = "/company/request-feature*"
-to = "/company/request-feature"
-status = 301
-force = true
+  from = "/company/request-feature*"
+  to = "/company/request-feature"
+  status = 301
+  force = true
 
 # General query parameter cleanup for all pages
 [[redirects]]
-from = "/*"
-to = "/:splat"
-status = 200
-conditions = {query = {utm_source = ".*", utm_medium = ".*", utm_campaign = ".*", utm_term = ".*", utm_content = ".*", gclid = ".*", fbclid = ".*", _ga = ".*", _gl = ".*"}}
-force = true
+  from = "/*"
+  to = "/:splat"
+  status = 200
+  conditions = {query = {utm_source = ".*", utm_medium = ".*", utm_campaign = ".*", utm_term = ".*", utm_content = ".*", gclid = ".*", fbclid = ".*", _ga = ".*", _gl = ".*"}}
+  force = true
+
+# Catch-all redirect for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
