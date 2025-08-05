@@ -1,5 +1,23 @@
 const { supabase } = require('../lib/supabaseClient');
 
+// Helper to recursively stringify all values in an object/array
+function deepStringify(obj) {
+  if (Array.isArray(obj)) return obj.map(deepStringify);
+  if (obj && typeof obj === 'object') {
+    const out = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const val = obj[key];
+        if (val === null || val === undefined) out[key] = '';
+        else if (typeof val === 'object') out[key] = JSON.stringify(val);
+        else out[key] = String(val);
+      }
+    }
+    return out;
+  }
+  return obj;
+}
+
 // Fields to return to frontend
 const BLOG_FIELDS = [
   'id',
@@ -24,7 +42,7 @@ async function getAllBlogs(req, res) {
   if (error) {
     return res.status(500).json({ error: 'Failed to fetch blogs' });
   }
-  res.json(data);
+  res.json(deepStringify(data));
 }
 
 // GET /api/blogs/:slug
@@ -46,7 +64,7 @@ async function getBlogBySlug(req, res) {
   if (!data) {
     return res.status(404).json({ error: 'Blog not found' });
   }
-  res.json(data);
+  res.json(deepStringify(data));
 }
 
 // GET /api/blogs/category/:category
@@ -62,7 +80,7 @@ async function getBlogsByCategory(req, res) {
     console.error('Supabase error:', error); // Log the real error
     return res.status(500).json({ error: 'Failed to fetch blogs by category', details: error.message || error });
   }
-  res.json(data);
+  res.json(deepStringify(data));
 }
 
 // Helper to slugify a string
@@ -105,7 +123,7 @@ async function createBlog(req, res) {
   if (error) {
     return res.status(500).json({ error: 'Failed to create blog', details: error.message || error });
   }
-  res.status(201).json(data);
+  res.status(201).json(deepStringify(data));
 }
 
 // PUT /api/blogs/:id
@@ -135,7 +153,7 @@ async function updateBlog(req, res) {
   if (error) {
     return res.status(500).json({ error: 'Failed to update blog', details: error.message || error });
   }
-  res.json(data);
+  res.json(deepStringify(data));
 }
 
 // DELETE /api/blogs/:id

@@ -31,7 +31,7 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
       {/* Top Row: Logo, Verified, Name, Rating */}
       <div className="flex items-center gap-2 sm:gap-3 mb-2">
         {imageSrc ? (
-          <img loading="lazy" src={imageSrc} alt={tool.name} className="w-12 h-12 object-contain rounded-lg flex-shrink-0" />
+          <img loading="lazy" src={imageSrc} alt={tool.name} className="w-12 h-12 object-contain rounded-lg flex-shrink-0 transition-opacity duration-500 ease-in-out blur-sm hover:blur-0" />
         ) : (
           <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-xl font-bold">
             {tool.name.charAt(0)}

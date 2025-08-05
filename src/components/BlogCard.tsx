@@ -67,7 +67,8 @@ export const BlogCard: React.FC<BlogCardProps> = ({
               <img
                 src={displayImage}
                 alt={post.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+                className="w-full h-full object-cover group-hover:scale-105 transition-opacity duration-500 ease-in-out blur-sm hover:blur-0"
               />
             </div>
             <CardContent className="p-3 sm:p-4 md:p-5">
@@ -116,6 +117,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
               <img
                 src={displayImage}
                 alt={post.title}
+                loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -167,7 +169,8 @@ export const BlogCard: React.FC<BlogCardProps> = ({
             <img
               src={displayImage}
               alt={post.title}
-              className="w-full h-full object-cover rounded-xl group-hover:scale-105 group-hover:brightness-110 transition-transform transition-filter duration-300"
+              loading="lazy"
+              className="w-full h-full object-cover rounded-xl group-hover:scale-105 group-hover:brightness-110 transition-opacity duration-500 ease-in-out blur-sm hover:blur-0"
             />
           </div>
           <CardContent className="p-4 sm:p-5">

@@ -17,7 +17,16 @@ export default defineConfig(({ mode }) => ({
     react(),
     sitemap({
       hostname: 'https://aiterritory.org',
-      exclude: ['/auth/**', '/dashboard/**', '/settings/**'],
+      exclude: [
+        '/auth/**', 
+        '/dashboard/**', 
+        '/settings/**',
+        '/resources/best-ai-3d-generators',
+        '/company/update-tool',
+        '/company/skill-leap',
+        '/categories/art-generators',
+        '/categories/audio-generators'
+      ],
     }),
     viteCompression({ algorithm: 'brotliCompress' }),
   ].filter(Boolean),

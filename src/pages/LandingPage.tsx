@@ -120,7 +120,7 @@ const LandingPage: React.FC = () => {
               style={{ y: floatY }}
               className="absolute -top-10 right-10 z-20 hidden md:block"
             >
-              <img src="/public/placeholder.svg" alt="Floating AI" className="w-24 h-24 opacity-80 drop-shadow-xl" />
+              <img src="/public/placeholder.svg" alt="Floating AI" className="w-24 h-24 opacity-80 drop-shadow-xl" width={96} height={96} />
             </motion.div>
             <img
               src={ogImage}

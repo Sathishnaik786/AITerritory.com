@@ -131,6 +131,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
                 <img
                   src={imageError ? '/placeholder.svg' : (tool.image_url || '/placeholder.svg')}
                   alt={tool.name}
+                  loading="lazy"
                   className="w-12 h-12 rounded-xl object-cover flex-shrink-0 ring-2 ring-purple-200 dark:ring-purple-700 shadow-lg"
                   onError={() => setImageError(true)}
                 />
@@ -202,7 +203,8 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, variant = 'default' })
           <img
             src={imageError ? '/placeholder.svg' : (tool.image_url || '/placeholder.svg')}
             alt={tool.name}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            loading="lazy"
+            className="w-full h-full object-cover transition-opacity duration-500 ease-in-out blur-sm hover:blur-0 group-hover:scale-110"
             onError={() => setImageError(true)}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

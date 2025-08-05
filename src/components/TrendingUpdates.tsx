@@ -112,7 +112,8 @@ export function TrendingUpdates() {
                   <img
                     src={update.image}
                     alt={update.title}
-                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-opacity duration-500 ease-in-out blur-sm hover:blur-0"
                   />
                   <div className="absolute top-4 left-4">
                     <span className="px-3 py-1 text-sm font-medium bg-primary/90 text-primary-foreground rounded-full">
@@ -127,6 +128,7 @@ export function TrendingUpdates() {
                   <img
                     src={update.companyLogo}
                     alt={update.companyName}
+                    loading="lazy"
                     className="w-8 h-8 rounded-full object-cover border border-white/20"
                   />
                   <span className="text-sm font-medium text-muted-foreground">

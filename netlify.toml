@@ -44,6 +44,32 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Redirects for removed fallback pages
+[[redirects]]
+  from = "/resources/best-ai-3d-generators"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/company/update-tool"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/company/skill-leap"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/art-generators"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/categories/audio-generators"
+  to = "/"
+  status = 301
+
 [[redirects]]
   from = "/blog/*"
   to = "https://aiterritory-com.onrender.com/blog/:splat"

@@ -17,7 +17,8 @@ const ToolListItem: React.FC<ToolListItemProps> = ({ tool, bookmarks = 0, upvote
           <img
             src={tool.image_url || tool.image}
             alt={tool.name}
-            className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+            loading="lazy"
+            className="w-12 h-12 rounded-lg object-cover flex-shrink-0 transition-opacity duration-500 ease-in-out blur-sm hover:blur-0"
           />
         ) : (
           <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-2xl font-bold text-gray-500">

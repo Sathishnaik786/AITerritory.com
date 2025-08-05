@@ -1,6 +1,7 @@
 import React from 'react';
 import SimpleToolCard from '../components/SimpleToolCard';
 import { useTools } from '../hooks/useTools';
+import { Helmet } from 'react-helmet-async';
 
 interface ResourceCategoryPageProps {
   title: string;
@@ -16,33 +17,53 @@ const ResourceCategoryPage: React.FC<ResourceCategoryPageProps> = ({ title, filt
 
   const { data: tools = [], isLoading, isError } = useTools(filters);
 
-  return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          {title}
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          Explore the best AI tools for {title.toLowerCase()}.
-        </p>
-      </div>
+  // Determine if this page should be indexed
+  const hasTools = tools.length > 0;
+  const shouldIndex = hasTools && !isLoading && !isError;
 
-      {isLoading ? (
-        <p className="text-center text-lg col-span-full">Loading...</p>
-      ) : isError ? (
-        <p className="text-center text-lg col-span-full text-red-500">Failed to load tools.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {tools.length > 0 ? (
-            tools.map((tool: any) => (
-              <SimpleToolCard key={tool.id} tool={tool} />
-            ))
-          ) : (
-            <p className="text-center text-lg col-span-full">No tools found for this category.</p>
-          )}
+  return (
+    <>
+      <Helmet>
+        <title>{title} - AI Territory</title>
+        <meta name="description" content={`Explore the best AI tools for ${title.toLowerCase()}. Discover top-rated AI solutions and tools.`} />
+        {!shouldIndex && (
+          <meta name="robots" content="noindex, follow" />
+        )}
+        <link rel="canonical" href={`https://aiterritory.org/resources/${title.toLowerCase().replace(/\s+/g, '-')}`} />
+      </Helmet>
+      
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            {title}
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Explore the best AI tools for {title.toLowerCase()}.
+          </p>
         </div>
-      )}
-    </div>
+
+        {isLoading ? (
+          <p className="text-center text-lg col-span-full">Loading...</p>
+        ) : isError ? (
+          <p className="text-center text-lg col-span-full text-red-500">Failed to load tools.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {tools.length > 0 ? (
+              tools.map((tool: any) => (
+                <SimpleToolCard key={tool.id} tool={tool} />
+              ))
+            ) : (
+              <div className="col-span-full text-center">
+                <p className="text-lg text-muted-foreground mb-4">No tools found for this category.</p>
+                <p className="text-sm text-muted-foreground">
+                  Check back soon for new AI tools in this category.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

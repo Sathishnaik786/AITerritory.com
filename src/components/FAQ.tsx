@@ -25,6 +25,26 @@ const faqData = [
   }
 ];
 
+// Error Boundary for debugging
+class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any}> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: any, info: any) {
+    console.error('ErrorBoundary caught error:', error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{color: 'red'}}>FAQ Error: {String(this.state.error)}</div>;
+    }
+    return this.props.children;
+  }
+}
+
 export const FAQ: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -32,48 +52,54 @@ export const FAQ: React.FC = () => {
     setOpenIndex(openIndex === idx ? null : idx);
   };
 
+  // Add console.log before every .map()
+  console.log('faqData', faqData);
+
   return (
-    <section className="relative w-full py-16 flex flex-col items-center justify-center min-h-[80vh] bg-transparent overflow-hidden">
-      <BackgroundAnimation />
-      <div className="relative z-10 flex flex-col items-center w-full max-w-2xl px-4">
-        {/* FAQ Section Label */}
-        <span className="mb-4 px-5 py-1 rounded-full bg-white/40 dark:bg-[#18182a]/40 text-[#8b5cf6] text-xs font-semibold tracking-wider border border-[#e5e7eb]/40 dark:border-[#2a2a40]/40 backdrop-blur-sm">
-          FAQ'S SECTION
-        </span>
-        {/* Heading */}
-        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2 text-center">
-          Some Common FAQ's
-        </h2>
-        {/* Subheading */}
-        <p className="text-base sm:text-lg text-gray-600 dark:text-[#7c7c9a] mb-10 text-center">
-          Get answers to your questions and learn about our platform
-        </p>
-        {/* FAQ List */}
-        <div className="w-full flex flex-col gap-4">
-          {faqData.map((item, idx) => (
-            <div
-              key={idx}
-              className={`rounded-2xl bg-white/30 dark:bg-[#18182a]/30 shadow-lg transition-all duration-200 backdrop-blur-md ${openIndex === idx ? 'ring-2 ring-[#8b5cf6]' : ''}`}
-            >
-              <button
-                className="w-full flex items-center justify-between px-6 py-4 text-left text-gray-900 dark:text-white font-medium text-base sm:text-lg focus:outline-none"
-                onClick={() => handleToggle(idx)}
-                aria-expanded={openIndex === idx}
-              >
-                <span>{item.question}</span>
-                <ChevronDown className={`w-6 h-6 ml-2 transition-transform duration-200 ${openIndex === idx ? 'rotate-180' : ''} text-[#8b5cf6]`} />
-              </button>
+    <ErrorBoundary>
+      <section className="relative w-full py-16 flex flex-col items-center justify-center min-h-[80vh] bg-transparent overflow-hidden">
+        <BackgroundAnimation />
+        <div className="relative z-10 flex flex-col items-center w-full max-w-2xl px-4">
+          {/* FAQ Section Label */}
+          <span className="mb-4 px-5 py-1 rounded-full bg-white/40 dark:bg-[#18182a]/40 text-[#8b5cf6] text-xs font-semibold tracking-wider border border-[#e5e7eb]/40 dark:border-[#2a2a40]/40 backdrop-blur-sm">
+            FAQ'S SECTION
+          </span>
+          {/* Heading */}
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+            Some Common FAQ's
+          </h2>
+          {/* Subheading */}
+          <p className="text-base sm:text-lg text-gray-600 dark:text-[#7c7c9a] mb-10 text-center">
+            Get answers to your questions and learn about our platform
+          </p>
+          {/* FAQ List */}
+          <div className="w-full flex flex-col gap-4">
+            {console.log('Rendering faqData.map', faqData)}
+            {faqData.map((item, idx) => (
               <div
-                className={`overflow-hidden transition-all duration-300 px-6 ${openIndex === idx ? 'max-h-40 py-2' : 'max-h-0 py-0'}`}
+                key={idx}
+                className={`rounded-2xl bg-white/30 dark:bg-[#18182a]/30 shadow-lg transition-all duration-200 backdrop-blur-md ${openIndex === idx ? 'ring-2 ring-[#8b5cf6]' : ''}`}
               >
-                <p className="text-sm sm:text-base leading-relaxed text-gray-700 dark:text-[#bdbdf7]">
-                  {item.answer}
-                </p>
+                <button
+                  className="w-full flex items-center justify-between px-6 py-4 text-left text-gray-900 dark:text-white font-medium text-base sm:text-lg focus:outline-none"
+                  onClick={() => handleToggle(idx)}
+                  aria-expanded={openIndex === idx}
+                >
+                  <span>{item.question}</span>
+                  <ChevronDown className={`w-6 h-6 ml-2 transition-transform duration-200 ${openIndex === idx ? 'rotate-180' : ''} text-[#8b5cf6]`} />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 px-6 ${openIndex === idx ? 'max-h-40 py-2' : 'max-h-0 py-0'}`}
+                >
+                  <p className="text-sm sm:text-base leading-relaxed text-gray-700 dark:text-[#bdbdf7]">
+                    {item.answer}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </ErrorBoundary>
   );
 }; 

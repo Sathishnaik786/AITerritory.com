@@ -4,6 +4,8 @@ import { BlogService } from '../services/blogService';
 import { BlogPost } from '../types/blog';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
+const BlogCardsGrid = lazy(() => import('@/components/BlogCardsGrid'));
 
 const CATEGORIES = [
   'All',
@@ -109,31 +111,10 @@ const Blog: React.FC = () => {
           </div>
         </motion.section>
       )}
-      {/* Blog Cards - Mobile Vertical Scroll Snap */}
-      <section className="py-4">
-        {/* Mobile: Vertical scroll snap carousel */}
-        <div
-          className="overflow-y-auto scroll-smooth snap-y snap-mandatory flex flex-col gap-4 py-8 hide-scrollbar sm:hidden"
-          style={{ height: '80vh', scrollPaddingTop: '2rem', scrollPaddingBottom: '2rem' }}
-        >
-          {rest.map((post) => (
-            <div
-              key={post.id}
-              className="snap-center mx-auto w-[90vw] max-w-md rounded-xl bg-white dark:bg-gray-900 shadow-md p-4 mt-8 mb-8"
-            >
-              <BlogCard post={post} />
-            </div>
-          ))}
-        </div>
-        {/* Desktop/Tablet: Grid */}
-        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 hidden sm:grid">
-          {rest.map((post) => (
-            <div key={post.id}>
-              <BlogCard post={post} />
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Blog Cards Grid Section */}
+      <Suspense fallback={<div className="text-center py-10">Loading blog posts...</div>}>
+        <BlogCardsGrid posts={rest} />
+      </Suspense>
     </div>
   );
 };

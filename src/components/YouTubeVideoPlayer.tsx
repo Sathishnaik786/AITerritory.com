@@ -55,7 +55,8 @@ export function YouTubeVideoPlayer({ videoId, title, className = '' }: YouTubeVi
         <img
           src={thumbnailUrl}
           alt={title}
-          className="w-full h-full object-cover rounded-lg"
+          loading="lazy"
+          className="w-full h-full object-cover rounded-lg transition-opacity duration-500 ease-in-out blur-sm hover:blur-0"
           onError={(e) => {
             // Fallback to lower quality thumbnail if maxresdefault is not available
             const target = e.target as HTMLImageElement;

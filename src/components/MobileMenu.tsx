@@ -30,7 +30,7 @@ export default function MobileMenu({ newsletterOpen, setNewsletterOpen }: Mobile
       <SheetContent side="right" className="bg-white dark:bg-zinc-900 px-0 pt-0 pb-6 w-80 max-w-full">
         {/* Logo at the top */}
         <div className="flex items-center gap-3 px-6 pt-6 pb-2 border-b border-border/40">
-          <img src="/logo.jpg" alt="AI Territory Logo" className="h-9 w-9 rounded-xl object-cover ring-2 ring-blue-200 dark:ring-blue-800 shadow-sm" />
+          <img src="/logo.jpg" alt="AI Territory Logo" loading="lazy" className="h-9 w-9 rounded-xl object-cover ring-2 ring-blue-200 dark:ring-blue-800 shadow-sm" />
           <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-blue-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
             AI Territory
           </span>

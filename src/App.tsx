@@ -16,8 +16,7 @@ import AdvertisePage from "./pages/AdvertisePage";
 import SubmitToolPage from "./pages/SubmitToolPage";
 import YouTubeChannelPage from "./pages/YouTubeChannelPage";
 import RequestFeaturePage from "./pages/RequestFeaturePage";
-import UpdateToolPage from "./pages/UpdateToolPage";
-import SkillLeapPage from "./pages/SkillLeapPage";
+
 import CreateAccountPage from "./pages/CreateAccountPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
@@ -25,8 +24,7 @@ import ProductivityToolsPage from "./pages/ProductivityToolsPage";
 import ImageGeneratorsPage from "./pages/ImageGeneratorsPage";
 import TextGeneratorsPage from "./pages/TextGeneratorsPage";
 import VideoToolsPage from "./pages/VideoToolsPage";
-import ArtGeneratorsPage from "./pages/ArtGeneratorsPage";
-import AudioGeneratorsPage from "./pages/AudioGeneratorsPage";
+
 import NewsletterPage from "./pages/NewsletterPage";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -100,33 +98,46 @@ function SEO() {
   const canonicalUrl = `https://aiterritory.org${location.pathname}`;
   return (
     <Helmet>
-    <title>AI Territory</title>
-    <meta name="description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
-    <meta name="robots" content="index, follow" />
-    
-    {/* Open Graph */}
-    <meta property="og:title" content="AI Territory" />
-    <meta property="og:description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:image" content="https://aiterritory.org/og-image.png" />
-    <meta property="og:site_name" content="AITerritory" />
-    
-    {/* Twitter Card */}
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta property="twitter:domain" content="aiterritory.org" />
-    <meta property="twitter:url" content={canonicalUrl} />
-    <meta name="twitter:title" content="AI Territory" />
-    <meta name="twitter:description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
-    <meta name="twitter:image" content="https://aiterritory.org/og-image.png" />
-    
-    {/* Canonical */}
-    <link rel="canonical" href={canonicalUrl} />
-    <link rel="preconnect" href="https://aiterritory-com.onrender.com" />
-    <link rel="dns-prefetch" href="https://aiterritory-com.onrender.com" />
-    <link rel="preconnect" href="https://api.openai.com" />
-    <link rel="dns-prefetch" href="https://api.openai.com" />
-  </Helmet>  
+      <title>AI Territory</title>
+      <meta name="description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
+      <meta name="robots" content="index, follow" />
+      {/* Open Graph */}
+      <meta property="og:title" content="AI Territory" />
+      <meta property="og:description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:image" content="https://aiterritory.org/og-image.png" />
+      <meta property="og:site_name" content="AITerritory" />
+      {/* Twitter Card */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta property="twitter:domain" content="aiterritory.org" />
+      <meta property="twitter:url" content={canonicalUrl} />
+      <meta name="twitter:title" content="AI Territory" />
+      <meta name="twitter:description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
+      <meta name="twitter:image" content="https://aiterritory.org/og-image.png" />
+      {/* Canonical */}
+      <link rel="canonical" href={canonicalUrl} />
+      <link rel="preconnect" href="https://aiterritory-com.onrender.com" />
+      <link rel="dns-prefetch" href="https://aiterritory-com.onrender.com" />
+      <link rel="preconnect" href="https://api.openai.com" />
+      <link rel="dns-prefetch" href="https://api.openai.com" />
+      {/* Preconnect and preload Google Fonts */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" media="print" onLoad="this.media='all'" />
+      {/* Defer Analytics or Chat Scripts */}
+      <script async defer src="https://www.googletagmanager.com/gtag/js?id=YOUR_GA_ID" />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'YOUR_GA_ID');
+          `,
+        }}
+      />
+    </Helmet>
   );
 }
 
@@ -161,7 +172,6 @@ function ThemedAppContent() {
               <Route path="/resources/best-ai-image-generators" element={<ResourceCategoryPage title="Best AI Image Generators" filterTag="Image Generation" />} />
               <Route path="/resources/best-ai-chatbots" element={<ResourceCategoryPage title="Best AI Chatbots" filterTag="Chatbot" />} />
               <Route path="/resources/best-ai-text-generators" element={<ResourceCategoryPage title="Best AI Text Generators" filterTag="Language Model" />} />
-              <Route path="/resources/best-ai-3d-generators" element={<ResourceCategoryPage title="Best AI 3D Generators" filterTag="3D" />} />
               <Route path="/resources/all-resources" element={<AllResources />} />
 
               {/* Protected Routes - Require Authentication */}
@@ -193,12 +203,6 @@ function ThemedAppContent() {
                   <RequestFeaturePage />
                 </ProtectedRoute>
               } />
-              <Route path="/company/update-tool" element={
-                <ProtectedRoute>
-                  <UpdateToolPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/company/skill-leap" element={<SkillLeapPage />} />
               
               {/* Legacy routes for backward compatibility */}
               <Route path="/company/create-account" element={<CreateAccountPage />} />
@@ -208,8 +212,6 @@ function ThemedAppContent() {
               <Route path="/categories/image-generators" element={<ImageGeneratorsPage />} />
               <Route path="/categories/text-generators" element={<TextGeneratorsPage />} />
               <Route path="/categories/video-tools" element={<VideoToolsPage />} />
-              <Route path="/categories/art-generators" element={<ArtGeneratorsPage />} />
-              <Route path="/categories/audio-generators" element={<AudioGeneratorsPage />} />
               <Route path="/categories/all-ai-tools" element={<AllAIToolsPage />} />
 
               {/* Direct routes for easier access */}
@@ -276,6 +278,33 @@ function ThemedAppContent() {
   );
 }
 
+// Global Error Boundary
+class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any, errorInfo: any}> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error, errorInfo: null };
+  }
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error('GlobalErrorBoundary caught error:', error, errorInfo);
+    this.setState({ errorInfo });
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ color: 'red', padding: 24 }}>
+          <h1>Global App Error</h1>
+          <pre>{String(this.state.error)}</pre>
+          {this.state.errorInfo && <pre>{this.state.errorInfo.componentStack}</pre>}
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function App() {
   return (
     <ThemeProvider
@@ -296,9 +325,11 @@ function App() {
             <HelmetProvider>
               <ScrollToTop />
               <Toaster position="top-right" richColors />
-              <Suspense fallback={<div>Loading...</div>}>
-                <ThemedAppContent />
-              </Suspense>
+              <GlobalErrorBoundary>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <ThemedAppContent />
+                </Suspense>
+              </GlobalErrorBoundary>
               <ReactQueryDevtools initialIsOpen={false} />
             </HelmetProvider>
           </TooltipProvider>

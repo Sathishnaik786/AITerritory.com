@@ -1,5 +1,23 @@
 const supabase = require('../config/database');
 
+// Helper to recursively stringify all values in an object/array
+function deepStringify(obj) {
+  if (Array.isArray(obj)) return obj.map(deepStringify);
+  if (obj && typeof obj === 'object') {
+    const out = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const val = obj[key];
+        if (val === null || val === undefined) out[key] = '';
+        else if (typeof val === 'object') out[key] = JSON.stringify(val);
+        else out[key] = String(val);
+      }
+    }
+    return out;
+  }
+  return obj;
+}
+
 // POST /api/testimonials - User submits testimonial
 exports.submitTestimonial = async (req, res) => {
   try {
@@ -40,7 +58,7 @@ exports.submitTestimonial = async (req, res) => {
     }
 
     console.log('Successfully inserted testimonial:', data);
-    res.status(201).json(data);
+    res.status(201).json(deepStringify(data));
   } catch (err) {
     console.error('Unexpected error in submitTestimonial:', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -55,7 +73,7 @@ exports.getApprovedTestimonials = async (req, res) => {
     .eq('approved', true)
     .order('id', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  res.json(deepStringify(data));
 };
 
 // PATCH /api/testimonials/:id/approve - Admin approves testimonial

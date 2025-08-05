@@ -39,7 +39,7 @@ export function Footer() {
           {/* Brand & Social */}
           <div className="flex-1 min-w-0 flex flex-col gap-6 items-center lg:items-start text-center lg:text-left">
             <Link to="/" className="flex items-center space-x-3 mb-2 justify-center lg:justify-start">
-              <img src="/logo.jpg" alt="AI Territory Logo" className="h-10 w-10 rounded-full object-cover border-2 border-blue-600" loading="lazy" />
+              <img src="/logo.jpg" alt="AI Territory Logo" loading="lazy" className="h-10 w-10 rounded-full object-cover border-2 border-blue-600" />
               <span className="text-xl font-extrabold text-foreground tracking-tight">AI Territory</span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs lg:max-w-sm mb-2 mx-auto lg:mx-0">

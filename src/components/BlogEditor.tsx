@@ -64,7 +64,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, i
               <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
               <Button type="button" onClick={() => fileInputRef.current?.click()}>Upload Image</Button>
               {form.cover_image_url && (
-                <img src={form.cover_image_url} alt="Cover Preview" className="w-20 h-20 object-cover rounded-lg border ml-2" />
+                <img src={form.cover_image_url} alt="Cover Preview" loading="lazy" className="w-20 h-20 object-cover rounded-lg border ml-2 transition-opacity duration-500 ease-in-out blur-sm hover:blur-0" />
               )}
             </div>
           </div>
@@ -141,7 +141,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, i
             h3: ({node, ...props}) => <h3 className="text-xl md:text-2xl font-semibold mt-6 mb-2" {...props} />,
             strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-white" {...props} />,
             a: ({node, ...props}) => <a className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer" {...props} />,
-            img: ({node, ...props}) => <img className="rounded-xl my-4 shadow-md max-w-full" {...props} alt={props.alt || ''} />,
+            img: ({node, ...props}) => <img loading="lazy" className="rounded-xl my-4 shadow-md max-w-full transition-opacity duration-500 ease-in-out blur-sm hover:blur-0" {...props} alt={props.alt || ''} />,
             code({node, inline, className, children, ...props}: {node: any, inline?: boolean, className?: string, children: React.ReactNode}) {
               return !inline ? (
                 <pre className="bg-gray-900 text-white rounded-lg p-4 overflow-x-auto my-4 text-sm"><code {...props}>{children}</code></pre>
