@@ -1,14 +1,20 @@
 import axios from 'axios';
 
-// API Configuration - Force Render URL in production
+// API Configuration - Use proxy in development, direct URL in production
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-const API_BASE_URL = isProduction 
-  ? 'https://aiterritory-com.onrender.com/api'
-  : '/api';
 
-console.log('Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
-console.log('Hostname:', window.location.hostname);
-console.log('API Base URL:', API_BASE_URL);
+// Use proxy in development to avoid CORS issues, direct URL in production
+const API_BASE_URL = isProduction 
+  ? 'https://aiterritory-com.onrender.com/api'  // Use direct backend URL in production
+  : '/api';  // Use proxy in development
+
+// Debug logging for API configuration
+console.log('🔧 API Configuration:');
+console.log('  Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
+console.log('  Hostname:', window.location.hostname);
+console.log('  API Base URL:', API_BASE_URL);
+console.log('  Full URL example:', `${API_BASE_URL}/blogs/test/comments`);
+console.log('  Current URL:', window.location.href);
 
 // Create axios instance with default config
 const api = axios.create({
@@ -18,6 +24,19 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Debug: Log all blog detail responses in production
+if (isProduction) {
+  api.interceptors.response.use(
+    (response) => {
+      if (response.config.url && response.config.url.startsWith('/blogs/')) {
+        console.log('Blog detail API response:', response.data);
+      }
+      return response;
+    },
+    (error) => Promise.reject(error)
+  );
+}
 
 // Request interceptor for adding auth tokens if needed
 api.interceptors.request.use(
@@ -43,7 +62,16 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('API Response Error:', error.response?.status, error.config?.url, error.message);
+    console.error('❌ API Response Error:', error.response?.status, error.config?.url, error.message);
+    console.error('  Full error:', error);
+    
+    // Log specific error types
+    if (error.code === 'ERR_NETWORK') {
+      console.error('  Network error - possible CORS issue');
+    }
+    if (error.response?.status === 404) {
+      console.error('  404 Not Found - check if endpoint exists');
+    }
     if (error.response?.status === 401) {
       // Handle unauthorized access
       localStorage.removeItem('auth_token');

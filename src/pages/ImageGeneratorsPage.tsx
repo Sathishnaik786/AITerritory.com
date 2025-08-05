@@ -8,6 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Search, Filter, ChevronLeft, ChevronRight, Image } from 'lucide-react';
 import { Tool } from '../types/tool';
 
+import SEO from '../components/SEO';
+import FAQ from '../components/FAQ';
+import { ResourcePageSkeleton } from '../components/SkeletonLoader';
 const ImageGeneratorsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +38,7 @@ const ImageGeneratorsPage = () => {
     params.append('page', String(page));
     params.append('pageSize', String(pageSize));
     
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3004/api';
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003/api';
     fetch(`${apiBaseUrl}/tools/image-generators?${params.toString()}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch tools');
@@ -78,6 +81,10 @@ const ImageGeneratorsPage = () => {
     setPage(1);
   };
 
+  if (loading) {
+    return <ResourcePageSkeleton />;
+  }
+
   if (error) return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center text-red-600">
@@ -88,16 +95,40 @@ const ImageGeneratorsPage = () => {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
+    <>
+      <SEO
+        title="AI Image Generators - Best AI Art & Visual Creation Tools | AITerritory"
+        description="Discover the top AI image generators and art creation tools for creating stunning visuals, digital art, and graphics from text prompts. Compare features, styles, and pricing of the best AI art generators."
+        image="/og-default.png"
+        keywords="AI image generators, AI art generators, visual creation tools, AI art software, image generation, AI art creation, digital art tools, AI visual generators"
+      />
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4 flex items-center justify-center gap-3">
           <Image className="w-8 h-8 text-purple-500" />
-          Image Generators
+          AI Image Generators
         </h1>
         <p className="text-lg text-muted-foreground">
           Create stunning visuals with AI-powered image generation tools
         </p>
+      </div>
+
+      {/* Enhanced Intro Content */}
+      <div className="mb-8">
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-lg p-6 border border-purple-200/50 dark:border-purple-800/50">
+          <div className="prose prose-lg max-w-none dark:prose-invert">
+            <p className="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4">
+              Unleash your creativity with the latest <strong>AI image generators</strong> and <strong>AI art generators</strong>. These revolutionary <strong>visual creation tools</strong> use advanced machine learning to transform your text descriptions into stunning artwork, illustrations, and graphics in seconds.
+            </p>
+            <p className="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4">
+              Whether you're a designer, marketer, content creator, or artist, our curated collection of <strong>AI art software</strong> offers powerful <strong>image generation</strong> capabilities for every creative need. From photorealistic images to artistic styles, these <strong>AI art creation</strong> tools can bring your ideas to life with unprecedented ease and quality.
+            </p>
+            <p className="text-base leading-relaxed text-gray-700 dark:text-gray-300">
+              Explore <strong>digital art tools</strong> that support various artistic styles, from classical paintings to modern digital art. These <strong>AI visual generators</strong> are perfect for creating marketing materials, social media content, concept art, and personal projects. Each tool has been carefully selected for its quality, features, and user experience.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -289,6 +320,10 @@ const ImageGeneratorsPage = () => {
         </div>
       )}
     </div>
+    
+    {/* FAQ Section */}
+    <FAQ category="ai-image-generators" />
+    </>
   );
 };
 

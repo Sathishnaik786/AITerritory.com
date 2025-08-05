@@ -1,10 +1,16 @@
 import React from 'react';
+import SEO from '../components/SEO';
 
 const NewsletterPage: React.FC = () => {
   return (
-    <div className="container mx-auto px-4 py-12 text-center">
-      <img src="https://via.placeholder.com/150" alt="Newsletter" className="mx-auto mb-6 rounded-lg" loading="lazy" width={150} height={150} />
-      <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Subscribe to Our Newsletter</h1>
+    <>
+      <SEO
+        title="Subscribe to the AI Territory Newsletter"
+        description="Get the latest AI tool updates, news, and exclusive insights directly to your inbox."
+      />
+      <div className="container mx-auto px-4 py-12 text-center">
+        <img src="https://via.placeholder.com/150" alt="Newsletter" className="mx-auto mb-6 rounded-lg" loading="lazy" />
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Subscribe to Our Newsletter</h1>
       <p className="text-lg text-muted-foreground mb-6">
         Get the latest AI tool updates, news, and exclusive insights directly to your inbox.
       </p>
@@ -22,6 +28,7 @@ const NewsletterPage: React.FC = () => {
         </button>
       </form>
     </div>
+    </>
   );
 };
 

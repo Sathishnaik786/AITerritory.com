@@ -6,6 +6,7 @@ import { FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 import { SiDiscord } from 'react-icons/si';
 import { Instagram } from 'lucide-react';
 import Prompts from '../components/Prompts';
+import SEO from '../components/SEO';
 
 const PromptsPage = () => {
   const [newsletterOpen, setNewsletterOpen] = useState(false);
@@ -19,9 +20,14 @@ const PromptsPage = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      {/* Newsletter CTA Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white mb-12">
+    <>
+      <SEO
+        title="AI Prompts Library | AI Territory"
+        description="Unlock the power of AI with our extensive library of prompts for various tasks. Get expert tips and creative inspiration."
+      />
+      <div className="container mx-auto px-4 py-12">
+        {/* Newsletter CTA Section */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white mb-12">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Unlock the Power of AI Prompts</h2>
           <p className="mb-6">
@@ -43,6 +49,7 @@ const PromptsPage = () => {
       {/* Prompts List Section */}
       <Prompts />
     </div>
+    </>
   );
 };
 

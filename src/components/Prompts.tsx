@@ -10,6 +10,8 @@ import { useToast } from './ui/use-toast';
 import { useUser } from '@clerk/clerk-react';
 import * as promptActions from '../services/promptActionsService';
 import { motion } from 'framer-motion';
+import { trackPromptLike, trackPromptBookmark, trackCommentPosted } from '@/lib/analytics';
+import { sanitizeText } from '@/lib/sanitizeHtml';
 
 const promptCategories = [
   'Ethereum Developer',
@@ -177,6 +179,14 @@ export default function Prompts() {
         await promptActions.unlikePrompt(openPrompt.id, user.id);
       } else {
         await promptActions.likePrompt(openPrompt.id, user.id);
+        
+        // Track the like event
+        trackPromptLike(
+          openPrompt.id,
+          openPrompt.title,
+          openPrompt.category,
+          user.id
+        );
       }
       const status = await promptActions.getPromptStatus(openPrompt.id, user.id);
       setChatStatus(status);
@@ -195,6 +205,14 @@ export default function Prompts() {
         await promptActions.unbookmarkPrompt(openPrompt.id, user.id);
       } else {
         await promptActions.bookmarkPrompt(openPrompt.id, user.id);
+        
+        // Track the bookmark event
+        trackPromptBookmark(
+          openPrompt.id,
+          openPrompt.title,
+          openPrompt.category,
+          user.id
+        );
       }
       const status = await promptActions.getPromptStatus(openPrompt.id, user.id);
       setChatStatus(status);
@@ -209,6 +227,16 @@ export default function Prompts() {
     setChatLoading(true);
     try {
       await promptActions.addComment(openPrompt.id, user.id, commentInput.trim());
+      
+      // Track the comment posted event
+      trackCommentPosted(
+        'prompt',
+        openPrompt.id,
+        openPrompt.title,
+        commentInput.trim().length,
+        user.id
+      );
+      
       setCommentInput('');
       const comments = await promptActions.getComments(openPrompt.id);
       setChatComments(comments);
@@ -337,7 +365,7 @@ export default function Prompts() {
                                     }}><FaRegCopy size={18} className="sm:w-5 sm:h-5" /></button>
                                   </div>
                                 </div>
-                                <div className={`text-sm sm:text-base ${cardDesc} mb-4 sm:mb-6`}>{prompt.description}</div>
+                                <div className={`text-sm sm:text-base ${cardDesc} mb-4 sm:mb-6`}>{sanitizeText(prompt.description)}</div>
                                 <div className="flex items-end justify-between mt-auto">
                                   <span className={`${authorBg} text-xs`}>{prompt.author}</span>
                                 </div>
@@ -359,7 +387,7 @@ export default function Prompts() {
         <Dialog open={!!openPrompt} onOpenChange={() => setOpenPrompt(null)}>
           <DialogContent className={`${dialogBg} ${dialogText} max-w-lg w-[95vw] sm:w-auto`}>
             <DialogTitle className="text-lg sm:text-xl">{openPrompt.title}</DialogTitle>
-            <div className="mt-4 text-sm sm:text-base whitespace-pre-line">{openPrompt.description}</div>
+            <div className="mt-4 text-sm sm:text-base whitespace-pre-line">{sanitizeText(openPrompt.description)}</div>
             <div className="mt-4 flex items-center gap-3 sm:gap-4">
               <Button
                 size="icon"
@@ -390,7 +418,7 @@ export default function Prompts() {
                 {chatComments.length === 0 && <div className="text-gray-400 text-sm">No comments yet.</div>}
                 {chatComments.map((c, i) => (
                   <div key={c.id || i} className="bg-gray-100 dark:bg-gray-800 rounded-lg px-3 py-2 text-sm">
-                    <span className="font-semibold text-blue-600 dark:text-blue-400">{c.user_id}</span>: {c.comment}
+                    <span className="font-semibold text-blue-600 dark:text-blue-400">{sanitizeText(c.user_id)}</span>: {sanitizeText(c.comment)}
                   </div>
                 ))}
               </div>
@@ -417,7 +445,7 @@ export default function Prompts() {
         <Dialog open={!!openRead} onOpenChange={() => setOpenRead(null)}>
           <DialogContent className={`${dialogBg} ${dialogText} max-w-lg w-[95vw] sm:w-auto`}>
             <DialogTitle className="text-lg sm:text-xl">Read Prompt</DialogTitle>
-            <div className="mt-4 text-sm sm:text-base whitespace-pre-line">{openRead.description}</div>
+            <div className="mt-4 text-sm sm:text-base whitespace-pre-line">{sanitizeText(openRead.description)}</div>
             <div className="mt-4 text-xs text-gray-400">{openRead.author}</div>
             <Button className="mt-4" onClick={() => setOpenRead(null)}>Close</Button>
           </DialogContent>

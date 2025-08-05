@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Mail, Megaphone, PlusSquare, Lightbulb, Users, Bot, Rocket, BookOpen } from 'lucide-react';
+import { Home, Mail, Megaphone, PlusSquare, Lightbulb, Users, Bot, Rocket, BookOpen, Database } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -35,6 +35,10 @@ const contentNav = [
   { label: 'AI Tutorials', icon: BookOpen, to: '/admin/ai-tutorials' },
   { label: 'Feedback', icon: Lightbulb, to: '/admin/feedback' },
   { label: 'Blogs', icon: BookOpen, to: '/admin/blogs' },
+];
+
+const systemNav = [
+  { label: 'Cache Manager', icon: Database, to: '/admin/cache' },
 ];
 
 const AdminSidebarNav = () => {
@@ -77,6 +81,22 @@ const AdminSidebarNav = () => {
         <SidebarGroupLabel>Content</SidebarGroupLabel>
         <SidebarMenu>
           {contentNav.map((item) => (
+            <SidebarMenuItem key={item.to}>
+              <Link to={item.to}>
+                <SidebarMenuButton isActive={location.pathname === item.to}>
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.label}
+                </SidebarMenuButton>
+      </Link>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+      <SidebarSeparator />
+      <SidebarGroup>
+        <SidebarGroupLabel>System</SidebarGroupLabel>
+        <SidebarMenu>
+          {systemNav.map((item) => (
             <SidebarMenuItem key={item.to}>
               <Link to={item.to}>
                 <SidebarMenuButton isActive={location.pathname === item.to}>

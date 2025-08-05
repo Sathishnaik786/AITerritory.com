@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { supabase } = require('../lib/supabase');
 const { v4: uuidv4 } = require('uuid');
+const { sanitizeText } = require('../lib/sanitizeHtml');
 
 // CREATE
 router.post('/', async (req, res) => {
@@ -9,9 +10,19 @@ router.post('/', async (req, res) => {
   if (!type || !message) {
     return res.status(400).json({ error: 'Type and message are required.' });
   }
+  
+  // Sanitize inputs
+  const sanitizedData = {
+    id: uuidv4(),
+    type: sanitizeText(type),
+    message: sanitizeText(message),
+    email: email ? sanitizeText(email) : null,
+    created_at: new Date().toISOString()
+  };
+  
   const { error } = await supabase
     .from('feedback')
-    .insert([{ id: uuidv4(), type, message, email: email || null, created_at: new Date().toISOString() }]);
+    .insert([sanitizedData]);
   if (error) return res.status(500).json({ error: error.message });
   res.status(201).json({ success: true });
 });
@@ -36,9 +47,17 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { type, message, email } = req.body;
+  
+  // Sanitize inputs
+  const sanitizedData = {
+    type: sanitizeText(type),
+    message: sanitizeText(message),
+    email: email ? sanitizeText(email) : null
+  };
+  
   const { data, error } = await supabase
     .from('feedback')
-    .update({ type, message, email })
+    .update(sanitizedData)
     .eq('id', id)
     .select();
   if (error) return res.status(500).json({ error: error.message });

@@ -1,105 +1,176 @@
-import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
-import BackgroundAnimation from './ui/BackgroundAnimation';
+import React from 'react';
 
-const faqData = [
-  {
-    question: "What is AI Territory?",
-    answer: "AI Territory is a curated directory of AI tools, resources, and insights to help creators, businesses, and enthusiasts stay ahead in the world of artificial intelligence."
-  },
-  {
-    question: "How can I submit a new AI tool or resource?",
-    answer: "You can submit your AI tool or resource using the 'Submit Tool' page on our website. Our team will review your submission before it appears in the directory."
-  },
-  {
-    question: "Is there a cost to use the tools listed on AI Territory?",
-    answer: "Most tools listed are free to explore. Some may have premium features or pricing, which will be indicated on their detail pages."
-  },
-  {
-    question: "How do I subscribe to the AI Territory newsletter?",
-    answer: "Simply enter your email address in the newsletter section and click 'Subscribe' to receive weekly updates on the latest AI tools and trends."
-  },
-  {
-    question: "How can I contact support or provide feedback?",
-    answer: "You can reach out to us via the 'Contact Us' page or use the feedback form available on the website. We value your input!"
-  }
-];
-
-// Error Boundary for debugging
-class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any}> {
-  constructor(props: any) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-  static getDerivedStateFromError(error: any) {
-    return { hasError: true, error };
-  }
-  componentDidCatch(error: any, info: any) {
-    console.error('ErrorBoundary caught error:', error, info);
-  }
-  render() {
-    if (this.state.hasError) {
-      return <div style={{color: 'red'}}>FAQ Error: {String(this.state.error)}</div>;
-    }
-    return this.props.children;
-  }
+interface FAQProps {
+  category?: string;
+  className?: string;
 }
 
-export const FAQ: React.FC = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const handleToggle = (idx: number) => {
-    setOpenIndex(openIndex === idx ? null : idx);
+const FAQ: React.FC<FAQProps> = ({ category, className = "" }) => {
+  // Category-specific FAQ questions
+  const categoryFAQs: Record<string, Array<{ question: string; answer: string }>> = {
+    "ai-chatbots": [
+      {
+        question: "What are AI chatbots used for?",
+        answer: "AI chatbots are used for customer support, sales, and automating conversations using natural language processing."
+      },
+      {
+        question: "Which AI chatbot is the best?",
+        answer: "There are many great AI chatbots including ChatGPT, Claude, and Jasper. Check AITerritory's list for the top options."
+      },
+      {
+        question: "Are AI chatbots free to use?",
+        answer: "Some AI chatbots offer free tiers, while others have paid plans for advanced features and enterprise use."
+      }
+    ],
+    "ai-text-generators": [
+      {
+        question: "What can AI text generators create?",
+        answer: "AI text generators can create blog posts, marketing copy, emails, social media content, product descriptions, creative writing, and technical documentation. They use advanced language models to generate human-like text for various content needs."
+      },
+      {
+        question: "How do AI text generators help with SEO?",
+        answer: "AI text generators can create SEO-optimized content with proper keywords, meta descriptions, engaging headlines, and structured content that improves search rankings. They help maintain consistent content quality while saving time on research and writing."
+      },
+      {
+        question: "Are AI text generators suitable for business use?",
+        answer: "Yes, many AI text generators are specifically designed for business applications including content marketing, customer communication, product descriptions, and automated copywriting. They can significantly improve content creation efficiency for businesses of all sizes."
+      },
+      {
+        question: "How do I choose the best AI text generator for my needs?",
+        answer: "Consider your specific use case, content type, budget, and required features. Look for tools that offer the right balance of quality, customization options, and ease of use for your particular content creation needs."
+      }
+    ],
+    "ai-image-generators": [
+      {
+        question: "How do AI image generators work?",
+        answer: "AI image generators use deep learning models and neural networks to create images from text descriptions. They analyze your prompts and generate visual artwork by understanding patterns from millions of training images, converting your ideas into stunning visuals."
+      },
+      {
+        question: "What's the difference between free and paid AI image generators?",
+        answer: "Free generators often have limited features, lower resolution outputs, and restricted usage rights. Paid versions typically offer higher resolution, more artistic styles, commercial usage rights, and advanced features like batch generation and custom training."
+      },
+      {
+        question: "Can I use AI-generated images commercially?",
+        answer: "It depends on the specific tool and license. Some AI image generators allow commercial use with their paid plans, while others require additional licensing for business purposes. Always check the terms of service for each tool before using generated images commercially."
+      },
+      {
+        question: "What types of images can AI generators create?",
+        answer: "AI image generators can create various types of images including photorealistic scenes, artistic paintings, illustrations, concept art, product mockups, social media graphics, and more. The range depends on the specific tool and its training data."
+      }
+    ],
+    "ai-art-generators": [
+      {
+        question: "What styles can AI art generators create?",
+        answer: "AI art generators can create various styles including digital art, paintings, illustrations, concept art, and artistic interpretations of your ideas."
+      },
+      {
+        question: "How do AI art generators help artists?",
+        answer: "AI art generators can inspire creativity, speed up the ideation process, and help artists explore new styles and techniques efficiently."
+      },
+      {
+        question: "Are AI art generators replacing human artists?",
+        answer: "No, AI art generators are tools that complement human creativity. They help artists explore new possibilities and work more efficiently."
+      }
+    ],
+    "productivity-tools": [
+      {
+        question: "How do AI productivity tools improve workflow?",
+        answer: "AI productivity tools automate repetitive tasks, provide intelligent suggestions, and help teams collaborate more effectively with smart features."
+      },
+      {
+        question: "Can AI productivity tools integrate with existing software?",
+        answer: "Many AI productivity tools offer integrations with popular platforms like Slack, Notion, and Google Workspace for seamless workflow."
+      },
+      {
+        question: "Are AI productivity tools suitable for small businesses?",
+        answer: "Yes, many AI productivity tools offer affordable plans and features specifically designed for small business needs and budgets."
+      }
+    ],
+    "all-ai-tools": [
+      {
+        question: "How do I choose the right AI tool for my needs?",
+        answer: "Consider your specific use case, budget, and required features. AITerritory provides detailed comparisons and reviews to help you make informed decisions. Look for tools that match your industry, team size, and technical requirements."
+      },
+      {
+        question: "What are the most popular AI tool categories?",
+        answer: "Popular categories include AI chatbots for customer service, text generators for content creation, image generators for visual content, video tools for multimedia, and productivity tools for business automation. Each category serves specific business and creative needs."
+      },
+      {
+        question: "Are AI tools suitable for small businesses?",
+        answer: "Yes, many AI tools offer affordable plans and features specifically designed for small business needs. From AI chatbots for customer support to productivity tools for workflow automation, there are cost-effective solutions for every business size."
+      },
+      {
+        question: "How often are AI tools updated on AITerritory?",
+        answer: "We regularly update our AI tool listings with the latest releases, features, and user reviews to keep you informed of the newest options. Our team continuously monitors the AI landscape to ensure you have access to the most current and effective tools."
+      }
+    ]
   };
 
-  // Add console.log before every .map()
-  console.log('faqData', faqData);
+  // Default FAQ questions
+  const defaultFAQs = [
+    {
+      question: "What is AITerritory?",
+      answer: "AITerritory is a comprehensive platform that curates and reviews the best AI tools, providing detailed comparisons and insights to help you find the perfect AI solution for your needs."
+    },
+    {
+      question: "How do I find the right AI tool?",
+      answer: "Browse our curated categories, read detailed reviews, compare features and pricing, and use our search and filter options to find the perfect AI tool for your specific use case."
+    },
+    {
+      question: "Are the AI tools on AITerritory free?",
+      answer: "We list both free and paid AI tools with detailed pricing information. Many tools offer free tiers with premium features available for paid plans."
+    },
+    {
+      question: "Can I submit my AI tool to AITerritory?",
+      answer: "Yes! We welcome submissions of new AI tools. Visit our submit tool page to share your AI solution with our community and get it reviewed by our team."
+    }
+  ];
+
+  const faqs = category && categoryFAQs[category] ? categoryFAQs[category] : defaultFAQs;
 
   return (
-    <ErrorBoundary>
-      <section className="relative w-full py-16 flex flex-col items-center justify-center min-h-[80vh] bg-transparent overflow-hidden">
-        <BackgroundAnimation />
-        <div className="relative z-10 flex flex-col items-center w-full max-w-2xl px-4">
-          {/* FAQ Section Label */}
-          <span className="mb-4 px-5 py-1 rounded-full bg-white/40 dark:bg-[#18182a]/40 text-[#8b5cf6] text-xs font-semibold tracking-wider border border-[#e5e7eb]/40 dark:border-[#2a2a40]/40 backdrop-blur-sm">
-            FAQ'S SECTION
-          </span>
-          {/* Heading */}
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2 text-center">
-            Some Common FAQ's
+    <section className={`py-12 bg-gray-50 dark:bg-gray-900 ${className}`}>
+      <div className="container mx-auto px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">
+            Frequently Asked Questions
           </h2>
-          {/* Subheading */}
-          <p className="text-base sm:text-lg text-gray-600 dark:text-[#7c7c9a] mb-10 text-center">
-            Get answers to your questions and learn about our platform
-          </p>
-          {/* FAQ List */}
-          <div className="w-full flex flex-col gap-4">
-            {console.log('Rendering faqData.map', faqData)}
-            {faqData.map((item, idx) => (
-              <div
-                key={idx}
-                className={`rounded-2xl bg-white/30 dark:bg-[#18182a]/30 shadow-lg transition-all duration-200 backdrop-blur-md ${openIndex === idx ? 'ring-2 ring-[#8b5cf6]' : ''}`}
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <details
+                key={index}
+                className="group bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
               >
-                <button
-                  className="w-full flex items-center justify-between px-6 py-4 text-left text-gray-900 dark:text-white font-medium text-base sm:text-lg focus:outline-none"
-                  onClick={() => handleToggle(idx)}
-                  aria-expanded={openIndex === idx}
-                >
-                  <span>{item.question}</span>
-                  <ChevronDown className={`w-6 h-6 ml-2 transition-transform duration-200 ${openIndex === idx ? 'rotate-180' : ''} text-[#8b5cf6]`} />
-                </button>
-                <div
-                  className={`overflow-hidden transition-all duration-300 px-6 ${openIndex === idx ? 'max-h-40 py-2' : 'max-h-0 py-0'}`}
-                >
-                  <p className="text-sm sm:text-base leading-relaxed text-gray-700 dark:text-[#bdbdf7]">
-                    {item.answer}
+                <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {faq.question}
+                  </h3>
+                  <svg
+                    className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </summary>
+                <div className="px-4 pb-4">
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                    {faq.answer}
                   </p>
                 </div>
-              </div>
+              </details>
             ))}
           </div>
         </div>
-      </section>
-    </ErrorBoundary>
+      </div>
+    </section>
   );
-}; 
+};
+
+export default FAQ;

@@ -1,5 +1,6 @@
 const Review = require('../models/Review');
 const Tool = require('../models/Tool');
+const { sanitizeText } = require('../lib/sanitizeHtml');
 
 // GET /api/tools/:toolId/reviews
 async function getReviews(req, res, next) {
@@ -25,8 +26,8 @@ async function addReview(req, res, next) {
       return res.status(400).json({ error: 'Rating must be 1-5' });
     }
     // Sanitize input
-    user_name = String(user_name).trim().slice(0, 50);
-    comment = String(comment).trim().slice(0, 1000);
+    user_name = sanitizeText(String(user_name).trim().slice(0, 50));
+    comment = sanitizeText(String(comment).trim().slice(0, 1000));
     // Prevent duplicate review by user_name for this tool
     const existing = await Review.findByUserNameAndToolId(user_name, toolId);
     if (existing) {

@@ -1,4 +1,4 @@
-import React, { useState, Suspense, lazy, Dispatch, SetStateAction, useEffect } from 'react';
+import React, { useState, Suspense, lazy, Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import { useTools, useFeaturedTools, useTrendingTools } from '../hooks/useTools';
 import { useCategories } from '../hooks/useCategories';
 import { CategoryFilter } from '../components/CategoryFilter';
@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../co
 import { TrendingUp, Star, Filter, X, Home, Newspaper, LogIn, ChevronDown, Layers, CreditCard, Users, Search, Wrench } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SearchBar from '../components/SearchBar';
-import { FAQ } from '../components/FAQ';
+import FAQ from '../components/FAQ';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { ScrollArea } from '../components/ui/scroll-area';
@@ -15,7 +15,15 @@ import { Separator } from '../components/ui/separator';
 import ThemeToggle from '../components/ThemeToggle';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import { Category } from '../types/category';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import MetaTags from '../components/MetaTags';
+import { JsonLd } from 'react-schemaorg';
+import { Organization, FAQPage } from 'schema-dts';
+import { supabase } from '../services/supabaseClient'; // Adjust path if needed
+import { Tool } from '../types/tool';
+import { ToolCard, ToolCardStats } from '../components/ToolCard';
+import { useUser } from '@clerk/clerk-react';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 
 const Testimonials = lazy(() => import('../components/Testimonials'));
 
@@ -67,6 +75,53 @@ export const HomePage: React.FC = () => {
   const { data: trendingTools, isLoading: trendingLoading } = useTrendingTools();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const navigate = useNavigate();
+  const { user } = useUser();
+
+  const [stats, setStats] = useState<Record<string, ToolCardStats>>({});
+
+  // Combine all tools into one list to fetch stats for all of them at once
+  const allTools = useMemo(() => {
+    const combined = [...(tools || []), ...(featuredTools || []), ...(trendingTools || [])];
+    // Remove duplicates
+    return combined.filter((tool, index, self) => 
+      index === self.findIndex((t) => t.id === tool.id)
+    );
+  }, [tools, featuredTools, trendingTools]);
+
+  useEffect(() => {
+    const fetchAllStats = async () => {
+      if (allTools.length === 0) return;
+      
+      const toolIds = allTools.map(t => t.id);
+      
+      // Fetch likes and bookmarks in parallel
+      const [likesRes, bookmarksRes] = await Promise.all([
+        supabase.from('likes').select('tool_id, user_id').in('tool_id', toolIds),
+        supabase.from('user_bookmarks').select('tool_id, user_id').in('tool_id', toolIds)
+      ]);
+
+      const likes = likesRes.data || [];
+      const bookmarks = bookmarksRes.data || [];
+      
+      // Process the data into a stats map
+      const statsMap: Record<string, ToolCardStats> = {};
+      allTools.forEach(tool => {
+        const toolLikes = likes.filter(l => l.tool_id === tool.id);
+        const toolBookmarks = bookmarks.filter(b => b.tool_id === tool.id);
+        
+        statsMap[tool.id] = {
+          likes: toolLikes.length,
+          bookmarks: toolBookmarks.length,
+          userHasLiked: user ? toolLikes.some(l => l.user_id === user.id) : false,
+          userHasBookmarked: user ? toolBookmarks.some(b => b.user_id === user.id) : false,
+        };
+      });
+      
+      setStats(statsMap);
+    };
+    
+    fetchAllStats();
+  }, [allTools, user]);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -83,9 +138,34 @@ export const HomePage: React.FC = () => {
     setIsSidebarOpen(false);
   };
 
+  // Organization schema for homepage
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "AI Territory",
+    "url": "https://aiterritory.org",
+    "logo": "https://aiterritory.org/logo.jpg",
+    "sameAs": [
+      "https://twitter.com/aiterritory",
+      "https://www.facebook.com/aiterritory",
+      "https://www.linkedin.com/company/aiterritory"
+    ],
+    "description": "AI Territory is a curated directory of AI tools, resources, and insights to help creators, businesses, and enthusiasts stay ahead in the world of artificial intelligence."
+  };
+
   return (
+    <>
+      <MetaTags
+        title="AITerritory | Discover the Best AI Tools & Resources"
+        description="Explore the best AI tools, resources, and innovations on AITerritory. Find, compare, and review top artificial intelligence solutions for every need."
+        image="https://aiterritory.org/og-default.png"
+        url="https://aiterritory.org"
+      />
     <div className="w-full overflow-x-hidden">
       <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-10">
+        {/* Breadcrumbs */}
+        <PageBreadcrumbs />
+        
         {/* Hero Section */}
         <motion.div
           className="text-center mb-12 px-4"
@@ -107,6 +187,23 @@ export const HomePage: React.FC = () => {
               placeholder="Search AI tools..."
               className="w-full"
             />
+          </div>
+          <div className="flex flex-wrap justify-center gap-4 text-sm">
+            <Link to="/tools/ai-chatbots" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Explore AI chatbots
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link to="/tools/ai-text-generators" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Discover text generators
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link to="/tools/ai-image-generators" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Browse image generators
+            </Link>
+            <span className="text-gray-400">•</span>
+            <Link to="/productivity-tools" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Productivity tools
+            </Link>
           </div>
         </motion.div>
 
@@ -141,6 +238,8 @@ export const HomePage: React.FC = () => {
                     tools={featuredTools || []}
                     loading={featuredLoading}
                     variant="compact"
+                    stats={stats}
+                    itemsToShow={2}
                   />
                 </Suspense>
               </CardContent>
@@ -169,6 +268,8 @@ export const HomePage: React.FC = () => {
                     tools={trendingTools || []}
                     loading={trendingLoading}
                     variant="compact"
+                    stats={stats}
+                    itemsToShow={2}
                   />
                 </Suspense>
               </CardContent>
@@ -266,16 +367,18 @@ export const HomePage: React.FC = () => {
                 tools={tools || []}
                 loading={toolsLoading}
                 variant="default"
-                initialCount={6}
-                incrementCount={6}
+                initialCount={9}
+                incrementCount={9}
                 columns={3}
                 showResultsCount={false}
+                stats={stats} // Pass the stats map
               />
             </main>
           </div>
         </div>
       </div>
     </div>
+    </>
   );
 };
 

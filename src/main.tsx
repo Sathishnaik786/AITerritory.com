@@ -1,8 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import { ClerkProvider } from "@clerk/clerk-react";
 import App from "./App.tsx";
 import "./index.css"; // Ensure this is imported for global styles
+
+// Debug: Log all environment variables
+console.log("🔍 Environment Variables Debug:");
+console.log("VITE_CLERK_PUBLISHABLE_KEY:", import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
+console.log("VITE_SUPABASE_URL:", import.meta.env.VITE_SUPABASE_URL);
+console.log("VITE_SUPABASE_ANON_KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY);
+console.log("All env vars:", import.meta.env);
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -23,11 +31,13 @@ if (PUBLISHABLE_KEY && PUBLISHABLE_KEY.includes('pk_test_') && import.meta.env.P
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ClerkProvider 
-      publishableKey={PUBLISHABLE_KEY || ''} 
-      afterSignOutUrl="/"
-    >
-      <App />
-    </ClerkProvider>
+    <HelmetProvider>
+      <ClerkProvider
+        publishableKey={PUBLISHABLE_KEY || ''}
+        afterSignOutUrl="/"
+      >
+        <App />
+      </ClerkProvider>
+    </HelmetProvider>
   </React.StrictMode>
 );

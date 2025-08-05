@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "https://aiterritory-com.onrender.com";
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3003";
 
 export async function fetchAppleCarouselCards() {
   const res = await fetch(`${API_BASE}/api/apple-carousel`);

@@ -1,37 +1,20 @@
 import React from 'react';
-import { Tool } from '../data/tools';
+import { Tool } from '../types/tool';
 import { Star, Bookmark, ExternalLink, CheckCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 interface FeaturedToolCardProps {
   tool: Tool;
+  bookmarkCount: number; // Add bookmarkCount as a prop
 }
 
-const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
-  // Dummy data for features not present in Tool interface
-  const rating = Math.floor(Math.random() * 5) + 1; // 1-5 stars
-  const reviewsCount = Math.floor(Math.random() * 50) + 1;
-  const bookmarkCount = Math.floor(Math.random() * 5000) + 100;
-  const pricing = tool.status === 'Free' ? 'Free' : (Math.random() > 0.7 ? 'Active deal' : 'Freemium');
-
-  // Use image_url from Supabase, fallback to image for legacy support
-  const imageSrc = tool.image_url || tool.image;
-
+const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, bookmarkCount }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.98 }}
-      whileFocus={{ border: '2px solid #007bff' }}
-      className="bg-card border border-border rounded-2xl shadow-md flex flex-col h-full min-h-[280px] p-2 xs:p-3 sm:p-5 w-full max-w-full"
-    >
+    <Link to={`/tools/${tool.id}`} className="block group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 bg-white dark:bg-gray-800">
       {/* Top Row: Logo, Verified, Name, Rating */}
       <div className="flex items-center gap-2 sm:gap-3 mb-2">
-        {imageSrc ? (
-          <img loading="lazy" src={imageSrc} alt={tool.name} className="w-12 h-12 object-contain rounded-lg flex-shrink-0 transition-opacity duration-500 ease-in-out blur-sm hover:blur-0" />
+        {tool.image_url ? (
+          <img loading="lazy" src={tool.image_url} alt={tool.name} className="w-12 h-12 object-contain rounded-lg flex-shrink-0" />
         ) : (
           <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-xl font-bold">
             {tool.name.charAt(0)}
@@ -44,18 +27,18 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
           </div>
           <div className="flex items-center gap-1 mt-1">
             {[1,2,3,4,5].map(i => (
-              <Star key={i} className={`w-4 h-4 ${rating >= i ? 'text-yellow-400 fill-yellow-400' : 'text-muted'}`} />
+              <Star key={i} className={`w-4 h-4 ${tool.rating >= i ? 'text-yellow-400 fill-yellow-400' : 'text-muted'}`} />
             ))}
-            <span className="text-xs text-muted-foreground ml-1">({reviewsCount})</span>
+            <span className="text-xs text-muted-foreground ml-1">({tool.reviewsCount})</span>
           </div>
         </div>
       </div>
       {/* Pricing and Bookmark Row */}
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center justify-between p-4">
         <span className="font-medium text-card-foreground text-base">
-          {pricing}
+          {tool.pricing}
         </span>
-        <div className="flex items-center gap-1 ml-auto text-muted-foreground">
+        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
           <span className="text-base">{bookmarkCount}</span>
           <Bookmark className="w-4 h-4" />
         </div>
@@ -81,7 +64,7 @@ const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool }) => {
           Visit <ExternalLink className="w-4 h-4 ml-1" />
         </a>
       </div>
-    </motion.div>
+    </Link>
   );
 };
 

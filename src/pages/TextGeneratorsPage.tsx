@@ -8,6 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Search, Filter, ChevronLeft, ChevronRight, Type } from 'lucide-react';
 import { Tool } from '../types/tool';
 
+import SEO from '../components/SEO';
+import FAQ from '../components/FAQ';
+import { ResourcePageSkeleton } from '../components/SkeletonLoader';
 const TextGeneratorsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +38,7 @@ const TextGeneratorsPage = () => {
     params.append('page', String(page));
     params.append('pageSize', String(pageSize));
     
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3004/api';
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003/api';
     fetch(`${apiBaseUrl}/tools/text-generators?${params.toString()}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch tools');
@@ -78,6 +81,10 @@ const TextGeneratorsPage = () => {
     setPage(1);
   };
 
+  if (loading) {
+    return <ResourcePageSkeleton />;
+  }
+
   if (error) return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center text-red-600">
@@ -88,16 +95,40 @@ const TextGeneratorsPage = () => {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center mb-8">
+    <>
+      <SEO
+        title="AI Text Generators - Best AI Writing Tools & Content Generators | AITerritory"
+        description="Discover the top AI text generators and writing tools for creating compelling content. Generate blog posts, marketing copy, social media content, and more with advanced AI writing technology. Compare features, pricing, and reviews."
+        image="/og-default.png"
+        keywords="AI text generators, AI writing tools, content generators, AI writing software, text generation, AI copywriting, content creation tools, AI writing assistants"
+      />
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4 flex items-center justify-center gap-3">
           <Type className="w-8 h-8 text-green-500" />
-          Text Generators
+          AI Text Generators
         </h1>
         <p className="text-lg text-muted-foreground">
           Generate compelling content with AI-powered text generation tools
         </p>
+      </div>
+
+      {/* Enhanced Intro Content */}
+      <div className="mb-8">
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/20 dark:to-blue-950/20 rounded-lg p-6 border border-green-200/50 dark:border-green-800/50">
+          <div className="prose prose-lg max-w-none dark:prose-invert">
+            <p className="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4">
+              Transform your content creation with the latest <strong>AI text generators</strong> and <strong>AI writing tools</strong>. These powerful <strong>content generators</strong> use advanced language models to help you create high-quality blog posts, marketing copy, social media content, and more in minutes instead of hours.
+            </p>
+            <p className="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4">
+              Whether you need <strong>AI writing software</strong> for business content, creative writing assistance, or automated copywriting for your marketing campaigns, our curated selection of <strong>text generation</strong> tools offers something for every content creator. Each tool has been tested and reviewed to ensure it delivers on its promises.
+            </p>
+            <p className="text-base leading-relaxed text-gray-700 dark:text-gray-300">
+              From <strong>AI copywriting</strong> tools that craft compelling marketing messages to <strong>content creation tools</strong> that generate entire articles, these <strong>AI writing assistants</strong> can significantly boost your productivity and creativity. Explore our collection to find the perfect writing companion for your needs.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -289,6 +320,10 @@ const TextGeneratorsPage = () => {
         </div>
       )}
     </div>
+    
+    {/* FAQ Section */}
+    <FAQ category="ai-text-generators" />
+    </>
   );
 };
 

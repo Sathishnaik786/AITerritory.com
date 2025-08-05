@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3004/api';
+import { API_BASE_URL } from '../lib/apiConfig';
 
 export async function fetchAiAgentLearningResources(learningPathId: string) {
   const res = await fetch(`${API_BASE_URL}/ai-agent-learning-resources?learning_path_id=${learningPathId}`);

@@ -1,7 +1,7 @@
 import { supabase } from './supabaseClient';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://aiterritory-backend.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003/api';
 
 export interface LikeResponse {
   success: boolean;

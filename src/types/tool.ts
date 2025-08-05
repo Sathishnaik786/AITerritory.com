@@ -16,12 +16,14 @@ export interface Tool {
   pricing_type: string;
   created_at: string;
   updated_at: string;
+  screenshots?: string[]; // Use array for multiple screenshots
   
   // Related data
   categories?: Category;
   tool_tags?: ToolTag[];
   sub_tools?: SubTool[];
   reviews?: Review[];
+  author?: string;
 }
 
 export interface Category {

@@ -18,11 +18,35 @@ export const BlogCard: React.FC<BlogCardProps> = ({
   className = ''
 }) => {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    try {
+      if (!dateString) return 'Unknown Date';
+      
+      // Handle ISO date strings with timezone offsets
+      let date: Date;
+      
+      // If the date string contains timezone offset (like +00:00), parse it properly
+      if (dateString.includes('+') || dateString.includes('-') && dateString.length > 20) {
+        // Remove the timezone offset for parsing
+        const dateWithoutOffset = dateString.split(/[+-]/)[0];
+        date = new Date(dateWithoutOffset + 'Z'); // Add Z to treat as UTC
+      } else {
+        date = new Date(dateString);
+      }
+      
+      if (isNaN(date.getTime())) {
+        console.error('Invalid date string:', dateString);
+        return 'Invalid Date';
+      }
+      
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error, 'Date string:', dateString);
+      return 'Invalid Date';
+    }
   };
 
   const cardVariants = {
@@ -44,13 +68,11 @@ export const BlogCard: React.FC<BlogCardProps> = ({
   const fallbackImage =
     'https://placehold.co/600x400?text=No+Image';
   const displayImage = post.cover_image_url || fallbackImage;
-  const displayAuthor = post.author_name || 'Unknown Author';
+  const displayAuthor = post.author_name || post.author || 'Unknown Author';
   const displayCategory = post.category || 'Uncategorized';
-  const displaySummary = post.description || 'No summary available.';
-  const displayDate = post.created_at;
-  const displayReadingTime = post.reading_time || '';
-  // readTime is not available; we can omit or show a placeholder
-  // const displayReadTime = post.readTime ? `${post.readTime} min` : '';
+  const displaySummary = post.description || post.summary || 'No summary available.';
+  const displayDate = post.created_at || post.date;
+  const displayReadingTime = post.reading_time ? `${post.reading_time} min` : (post.readTime ? `${post.readTime} min` : '');
 
   if (variant === 'compact') {
     return (
@@ -67,8 +89,8 @@ export const BlogCard: React.FC<BlogCardProps> = ({
               <img
                 src={displayImage}
                 alt={post.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-105 transition-opacity duration-500 ease-in-out blur-sm hover:blur-0"
               />
             </div>
             <CardContent className="p-3 sm:p-4 md:p-5">
@@ -117,7 +139,6 @@ export const BlogCard: React.FC<BlogCardProps> = ({
               <img
                 src={displayImage}
                 alt={post.title}
-                loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -169,8 +190,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
             <img
               src={displayImage}
               alt={post.title}
-              loading="lazy"
-              className="w-full h-full object-cover rounded-xl group-hover:scale-105 group-hover:brightness-110 transition-opacity duration-500 ease-in-out blur-sm hover:blur-0"
+              className="w-full h-full object-cover rounded-xl group-hover:scale-105 group-hover:brightness-110 transition-transform transition-filter duration-300"
             />
           </div>
           <CardContent className="p-4 sm:p-5">
@@ -202,4 +222,4 @@ export const BlogCard: React.FC<BlogCardProps> = ({
       </Link>
     </motion.div>
   );
-}; 
+};

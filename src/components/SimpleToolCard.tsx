@@ -29,10 +29,15 @@ const SimpleToolCard: React.FC<SimpleToolCardProps> = ({ tool }) => {
       <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 line-clamp-3 flex-grow">
         {tool.description}
       </p>
-      <div className="mt-auto">
-        <Link to={tool.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm font-medium">
+      <div className="mt-auto flex gap-2">
+        <Link to={`/tools/${tool.id}`} className="text-blue-600 hover:underline text-sm font-medium">
           Learn More
         </Link>
+        {tool.link && (
+          <a href={tool.link} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-blue-600 text-sm font-medium">
+            Visit Site
+          </a>
+        )}
       </div>
     </motion.div>
   );

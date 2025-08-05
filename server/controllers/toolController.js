@@ -140,12 +140,15 @@ const toolController = {
     try {
       const { id } = req.params;
       const tool = await Tool.findById(id);
-      
       if (!tool) {
         return res.status(404).json({ error: 'Tool not found' });
       }
-      
-      res.json(tool);
+      // Return only meta fields for edge function
+      res.json({
+        name: tool.name,
+        description: tool.description,
+        image_url: tool.image_url
+      });
     } catch (error) {
       next(error);
     }

@@ -23,6 +23,7 @@ import { Tool } from '../types/tool';
 import { LikesService } from '../services/likesService';
 import { SharesService } from '../services/sharesService';
 import { getReviewsForUser } from '../services/reviewsService';
+import { useAuthTracking } from '../hooks/useAuthTracking';
 
 const UserDashboardPage: React.FC = () => {
   const { user, signOut } = useUser();
@@ -32,6 +33,7 @@ const UserDashboardPage: React.FC = () => {
   const [shares, setShares] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { trackSignOut } = useAuthTracking();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,6 +64,9 @@ const UserDashboardPage: React.FC = () => {
   }, [user?.id]);
 
   const handleSignOut = async () => {
+    // Track the sign out event
+    trackSignOut();
+    
     await signOut();
     navigate('/');
   };

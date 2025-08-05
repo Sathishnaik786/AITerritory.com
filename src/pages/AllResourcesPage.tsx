@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Search, Filter, ChevronLeft, ChevronRight, Library } from 'lucide-react';
 import { Tool } from '../types/tool';
+import { ResourcePageSkeleton } from '../components/SkeletonLoader';
+import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 
 const AllResourcesPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
@@ -35,7 +37,7 @@ const AllResourcesPage = () => {
     params.append('page', String(page));
     params.append('pageSize', String(pageSize));
     
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3004/api';
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003/api';
     fetch(`${apiBaseUrl}/tools?${params.toString()}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch tools');
@@ -78,6 +80,10 @@ const AllResourcesPage = () => {
     setPage(1);
   };
 
+  if (loading) {
+    return <ResourcePageSkeleton />;
+  }
+
   if (error) return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center text-red-600">
@@ -89,6 +95,9 @@ const AllResourcesPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Breadcrumbs */}
+      <PageBreadcrumbs />
+      
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4 flex items-center justify-center gap-3">

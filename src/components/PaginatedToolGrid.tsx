@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Tool } from '../types/tool';
-import { ToolCard } from './ToolCard';
+import { ToolCard, ToolCardStats } from './ToolCard';
 import { Button } from './ui/button';
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface PaginatedToolGridProps {
   tools: Tool[];
   loading?: boolean;
+  stats: Record<string, ToolCardStats>;
   variant?: 'default' | 'featured' | 'compact';
   initialCount?: number;
   incrementCount?: number;
@@ -18,6 +19,7 @@ interface PaginatedToolGridProps {
 export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
   tools,
   loading = false,
+  stats,
   variant = 'default',
   initialCount = 6,
   incrementCount = 6,
@@ -82,7 +84,7 @@ export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className={`grid ${getGridCols()} gap-6`}
+          className={`grid ${getGridCols()} gap-8 px-2 sm:px-4 md:px-8`}
         >
           {displayedTools.map((tool, index) => (
             <motion.div
@@ -90,9 +92,13 @@ export const PaginatedToolGrid: React.FC<PaginatedToolGridProps> = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="h-full flex"
+              className="h-full"
             >
-              <ToolCard tool={tool} variant={variant} />
+              <ToolCard
+                tool={tool}
+                variant={variant}
+                stats={stats[tool.id]}
+              />
             </motion.div>
           ))}
         </motion.div>
