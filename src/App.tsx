@@ -11,6 +11,8 @@ import AIAutomation from "./pages/AIAutomation";
 import AIAgents from "./pages/AIAgents";
 import AllResources from "./pages/AllResources";
 import ResourceCategoryPage from "./pages/ResourceCategoryPage";
+import Resources from "./pages/Resources";
+import Company from "./pages/Company";
 import ContactUsPage from "./pages/ContactUsPage";
 import AdvertisePage from "./pages/AdvertisePage";
 import SubmitToolPage from "./pages/SubmitToolPage";
@@ -164,6 +166,7 @@ function ThemedAppContent() {
               <Route path="/signup" element={<CreateAccountPage />} />
               
               {/* Routes for Resources dropdown */}
+              <Route path="/resources" element={<Resources />} />
               <Route path="/resources/ai-agents" element={<AIAgents />} />
               <Route path="/resources/ai-innovation" element={<AIInnovation />} />
               <Route path="/resources/ai-tutorials" element={<AITutorials />} />
@@ -188,6 +191,7 @@ function ThemedAppContent() {
               } />
 
               {/* Company Routes - Some Protected */}
+              <Route path="/company" element={<Company />} />
               <Route path="/company/contact-us" element={<ContactUsPage />} />
               <Route path="/company/advertise" element={
                 <ProtectedRoute>
