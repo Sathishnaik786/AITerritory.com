@@ -38,11 +38,21 @@ export default defineConfig(({ mode }) => ({
     viteCompression({ algorithm: 'brotliCompress' }),
   ].filter(Boolean),
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
+    alias: [
+      {
+        find: '@',
+        replacement: path.resolve(__dirname, "./src"),
+      },
+      {
+        find: '@tanstack/react-query',
+        replacement: path.resolve(__dirname, 'node_modules/@tanstack/react-query')
+      }
+    ],
     // Ensure singletons to avoid multiple React/Router instances in dev
     dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
+  },
+  optimizeDeps: {
+    include: ['@tanstack/react-query'],
   },
   build: {
     outDir: 'dist',

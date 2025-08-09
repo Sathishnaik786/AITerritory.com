@@ -6,6 +6,9 @@
   "engines": {
     "node": ">=18.19.0"
   },
+  "resolutions": {
+    "typescript": "^4.9.5"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -72,7 +75,8 @@
     "@tabler/icons-react": "^3.34.0",
     "@tanstack/react-query": "^5.56.2",
     "@tanstack/react-query-devtools": "^5.56.2",
-    "@tanstack/react-table": "^8.21.3",
+    "@types/react": "^18.3.3",
+    "@types/node": "^22.5.5",
     "axios": "^1.6.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -124,23 +128,32 @@
     "@eslint/js": "^9.9.0",
     "@swc/core": "^1.12.7",
     "@tailwindcss/typography": "^0.5.15",
-    "@types/node": "^22.5.5",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
     "concurrently": "^8.2.2",
-    "eslint": "^9.9.0",
-    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
     "kill-port": "^2.0.1",
     "postcss": "^8.4.47",
+    "prettier": "^3.2.5",
     "tailwindcss": "^3.4.11",
-    "typescript": "^5.5.3",
-    "typescript-eslint": "^8.0.1",
+    "typescript": "^4.9.5",
     "vite": "^7.0.2",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-sitemap": "^0.8.2"
+  },
+  "overrides": {
+    "react-scripts": {
+      "typescript": "^4.9.5"
+    }
   }
 }
