@@ -428,7 +428,13 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({ form, setForm, onSave, i
 
                   {/* Blog Content Preview */}
                   <div className="prose prose-gray dark:prose-invert max-w-none">
-                    <ContentRenderer content={form.content || 'Start writing your blog...'} />
+                    {form.content ? (
+                      <ContentRenderer content={form.content} />
+                    ) : (
+                      <div className="text-gray-500 dark:text-gray-400 italic p-4 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg text-center">
+                        No content yet. Start writing your blog in the editor above.
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

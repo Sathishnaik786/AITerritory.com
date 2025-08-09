@@ -70,7 +70,17 @@ export const BlogCard: React.FC<BlogCardProps> = ({
   const displayImage = post.cover_image_url || fallbackImage;
   const displayAuthor = post.author_name || post.author || 'Unknown Author';
   const displayCategory = post.category || 'Uncategorized';
-  const displaySummary = post.description || post.summary || 'No summary available.';
+
+  // Function to strip HTML tags from description
+  const stripHtml = (html: string): string => {
+    if (!html) return '';
+    return html
+      .replace(/<[^>]*>?/gm, '') // Remove HTML tags
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .trim(); // Trim whitespace
+  };
+
+  const displaySummary = stripHtml(post.description || post.summary || 'No summary available.');
   const displayDate = post.created_at || post.date;
   const displayReadingTime = post.reading_time ? `${post.reading_time} min` : (post.readTime ? `${post.readTime} min` : '');
 
