@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import * as React from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThreadedComments } from '../components/ThreadedComments';
@@ -16,9 +17,8 @@ import NewsletterCTA from '../components/NewsletterCTA';
 import { toast } from '@/components/ui/sonner';
 import { logBlogEvent } from '../services/blogAnalyticsService';
 import { BookOpen, Book, ArrowUp, ArrowLeft, ExternalLink, Info, AlertTriangle, Lightbulb, Clock, MessageCircle, Share2 } from 'lucide-react';
-import type { CodeProps } from 'react-markdown/lib/ast-to-react';
+import type { Components } from 'react-markdown';
 import { supabase } from '../services/supabaseClient';
-import remarkEmoji from 'remark-emoji';
 import { trackShare } from '@/lib/analytics';
 import { sanitizeMarkdownHtml } from '@/lib/sanitizeHtml';
 import { ContentRenderer } from '../components/ContentRenderer';
@@ -31,6 +31,10 @@ import { useEngagementTracker } from '../hooks/useEngagementTracker';
 import { NewsletterService } from '../services/newsletterService';
 import { BlogDetailSkeleton } from '../components/SkeletonLoader';
 import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
+
+// Import remark-emoji with a type assertion
+import emoji from 'remark-emoji';
+const remarkEmoji = emoji as unknown as (options?: any) => void;
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -570,58 +574,41 @@ const BlogDetail: React.FC = () => {
         
         {/* Main Content - Single Vertical Layout */}
         <div className="w-full">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="flex flex-col lg:flex-row gap-8">
-              {/* Table of Contents - Sticky Sidebar */}
-              {headings.length > 0 && (
-                <div className="lg:w-80 xl:w-96 lg:flex-shrink-0">
-                  <div className="sticky top-24">
-                    <TableOfContents 
-                      headings={headings} 
-                      activeHeading={activeHeading}
-                    />
-                  </div>
+          <div className="max-w-4xl mx-auto px-4 py-8">
+            {/* Blog Description - Centered */}
+            {blog.description && (
+              <div className="mb-8 text-center">
+                <div className="text-lg text-gray-600 dark:text-gray-300 prose prose-sm max-w-3xl mx-auto">
+                  <ContentRenderer content={blog.description} />
+                </div>
+              </div>
+            )}
+
+            {/* Content Renderer - Centered */}
+            <div className="max-w-3xl mx-auto">
+              <ContentRenderer
+                content={blog?.content || ''}
+                onHeadingsGenerated={handleHeadingsGenerated}
+              />
+
+              {/* Inline Newsletter CTA - Centered */}
+              {!isUserSubscribed && (
+                <div className="my-12">
+                  <NewsletterCTA onSubscribe={handleNewsletterSubscribe} onToast={toast} />
                 </div>
               )}
-            
-              {/* Content - Flexible Width */}
-              <div className="flex-1 min-w-0 overflow-hidden">
-                {/* Blog Description */}
-                {blog.description && (
-                  <div className="mb-8">
-                    <div className="text-lg text-gray-600 dark:text-gray-300 prose prose-sm max-w-none">
-                      <ContentRenderer content={blog.description} />
-                    </div>
-                  </div>
-                )}
 
-                {/* Content Renderer - Render full content once */}
-                <ContentRenderer
-                  content={blog?.content || ''}
-                  onHeadingsGenerated={handleHeadingsGenerated}
-                />
-
-                {/* Inline Newsletter CTA (only show if user is not subscribed) */}
-                {!isUserSubscribed && (
-                  <div className="my-8">
-                    <NewsletterCTA onSubscribe={handleNewsletterSubscribe} onToast={toast} />
-                  </div>
-                )}
-
-                {/* Comments Section */}
-                <div id="comments-section" className="mt-12">
-                  <ThreadedComments
-                    blogId={blog.slug}
-                  />
-                </div>
+              {/* Comments Section - Centered */}
+              <div id="comments-section" className="mt-12">
+                <ThreadedComments blogId={blog.slug} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* You Might Also Like Section */}
+        {/* You Might Also Like Section - Centered */}
         <div className="w-full bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-          <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="max-w-4xl mx-auto px-4 py-12">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 You Might Also Like
@@ -631,8 +618,9 @@ const BlogDetail: React.FC = () => {
               </p>
             </div>
             <YouMightAlsoLike 
-              currentBlogSlug={blog.slug}
+              currentSlug={blog.slug}
               category={blog.category}
+              tags={blog.tags || []}
             />
           </div>
         </div>

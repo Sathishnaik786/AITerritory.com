@@ -7,16 +7,20 @@
 # Environment configuration
 [context.production.environment]
   NETLIFY_KV_STORE_ID = "your-kv-store-id" # Replace with actual KV store ID
+  NODE_ENV = "production"
 
 # Build configuration
 [build]
-  command = "npm run build"
+  command = "npm install && npm run build"
   publish = "dist"
+  node-version = "18.19.0"
 
 [build.environment]
   # Ensure devDependencies (like Vite, TypeScript, plugins) are installed on Netlify
-  NPM_FLAGS = "--include=dev"
+  NPM_FLAGS = "--include=dev --legacy-peer-deps"
   NPM_CONFIG_PRODUCTION = "false"
+  NODE_VERSION = "18.19.0"
+  NODE_OPTIONS = "--openssl-legacy-provider"
 
 # Functions configuration
 [functions]
@@ -226,3 +230,9 @@ path = "/ai-for-business*"
   from = "/*"
   to = "/index.html"
   status = 200
+
+[dev]
+  command = "npm run dev"
+  port = 3000
+  publish = "dist"
+  targetPort = 3000
