@@ -80,6 +80,7 @@
     "d3": "^7.9.0",
     "d3-cloud": "^1.2.7",
     "date-fns": "^3.6.0",
+    "dompurify": "^3.0.11",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.3.0",
     "framer-motion": "^12.23.12",
@@ -88,12 +89,8 @@
     "lucide-react": "^0.525.0",
     "next-themes": "^0.4.6",
     "node-fetch": "^2.7.0",
-<<<<<<< HEAD
-    "react": "18.2.0",
-    "react-18-image-lightbox": "^5.1.4",
-=======
     "react": "^18.3.1",
->>>>>>> 9772dbaaf29b0ef80c7baffd8d4173da7c7c54ef
+    "react-18-image-lightbox": "^5.1.4",
     "react-3d-cloud": "^1.0.7",
     "react-awesome-reveal": "^4.3.1",
     "react-day-picker": "^8.10.1",
@@ -101,11 +98,7 @@
     "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.53.0",
     "react-icons": "^5.5.0",
-<<<<<<< HEAD
-    "react-markdown": "^8.0.7",
-=======
     "react-markdown": "^10.1.0",
->>>>>>> 9772dbaaf29b0ef80c7baffd8d4173da7c7c54ef
     "react-resizable-panels": "^2.1.3",
     "react-router-dom": "^6.26.2",
     "react-simplemde-editor": "^5.2.0",
@@ -131,17 +124,9 @@
     "@eslint/js": "^9.9.0",
     "@swc/core": "^1.12.7",
     "@tailwindcss/typography": "^0.5.15",
-<<<<<<< HEAD
-    "@types/lowlight": "^0.0.7",
-    "@types/node": "^22.17.1",
-    "@types/react": "^18.3.23",
-    "@types/react-dom": "^18.3.7",
-    "@types/react-syntax-highlighter": "^15.5.13",
-=======
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
->>>>>>> 9772dbaaf29b0ef80c7baffd8d4173da7c7c54ef
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
     "concurrently": "^8.2.2",
