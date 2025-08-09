@@ -112,69 +112,79 @@ const SEO: React.FC<SEOProps> = ({
     return [articleSchema, breadcrumbSchema];
   };
 
-  const blogStructuredData = generateBlogStructuredData();
-
   return (
     <Helmet>
-      {/* Basic Meta Tags */}
-      <title>{title}</title>
+      <title>{title} | AI Territory</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
-      <meta name="robots" content="index, follow" />
-      <link rel="canonical" href={canonicalUrl} />
       
-      {/* Open Graph Meta Tags */}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
+      {/* Open Graph / Facebook */}
       <meta property="og:type" content={article ? 'article' : 'website'} />
       <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:title" content={`${title} | AI Territory`} />
+      <meta property="og:description" content={description} />
       <meta property="og:image" content={image} />
-      <meta property="og:site_name" content="AITerritory" />
-      <meta property="og:locale" content="en_US" />
       
-      {/* Enhanced Open Graph for articles */}
-      {article && blogData && (
-        <>
-          <meta property="article:published_time" content={blogData.publishedAt} />
-          {blogData.modifiedAt && (
-            <meta property="article:modified_time" content={blogData.modifiedAt} />
-          )}
-          <meta property="article:author" content={blogData.author.name} />
-          <meta property="article:section" content={blogData.category} />
-          {blogData.tags?.map((tag, index) => (
-            <meta key={index} property="article:tag" content={tag} />
-          ))}
-        </>
-      )}
-      
-      {/* Twitter Card Meta Tags */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta property="twitter:domain" content="aiterritory.org" />
+      {/* Twitter */}
+      <meta property="twitter:card" content="summary_large_image" />
       <meta property="twitter:url" content={canonicalUrl} />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
-      <meta name="twitter:site" content="@aiterritory" />
+      <meta property="twitter:title" content={`${title} | AI Territory`} />
+      <meta property="twitter:description" content={description} />
+      <meta property="twitter:image" content={image} />
       
-      {/* Preconnect and DNS Prefetch */}
-      <link rel="preconnect" href="https://aiterritory-com.onrender.com" />
-      <link rel="dns-prefetch" href="https://aiterritory-com.onrender.com" />
-      <link rel="preconnect" href="https://api.openai.com" />
-      <link rel="dns-prefetch" href="https://api.openai.com" />
+      {/* Canonical URL */}
+      <link rel="canonical" href={canonicalUrl} />
       
-      {/* JSON-LD Structured Data */}
+      {/* Structured Data */}
       {structuredData && (
         <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            ...structuredData,
+            name: title,
+            description: description,
+            image: image,
+            url: canonicalUrl
+          })}
         </script>
       )}
       
       {/* Blog-specific structured data */}
-      {blogStructuredData?.map((schema, index) => (
-        <script key={index} type="application/ld+json">
-          {JSON.stringify(schema)}
+      {blogData && (
+        <script type="application/ld+json">
+          {JSON.stringify(generateBlogStructuredData())}
         </script>
-      ))}
+      )}
+      
+      {/* Breadcrumb structured data */}
+      {blogData?.category && (
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://aiterritory.org"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Blog",
+                "item": "https://aiterritory.org/blog"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": blogData.category,
+                "item": `https://aiterritory.org/blog/category/${blogData.category.toLowerCase()}`
+              }
+            ]
+          })}
+        </script>
+      )}
     </Helmet>
   );
 };
