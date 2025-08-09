@@ -4,16 +4,9 @@
 #   [plugins.inputs]
 #   exclude = "/*"
 
-# Environment configuration for proper NODE_ENV handling
+# Environment configuration
 [context.production.environment]
-  NODE_ENV = "production"
   NETLIFY_KV_STORE_ID = "your-kv-store-id" # Replace with actual KV store ID
-
-[context.deploy-preview.environment]
-  NODE_ENV = "development"
-
-[context.branch-deploy.environment]
-  NODE_ENV = "development"
 
 # Build configuration
 [build]
@@ -21,7 +14,9 @@
   publish = "dist"
 
 [build.environment]
-  NODE_ENV = "production"
+  # Ensure devDependencies (like Vite, TypeScript, plugins) are installed on Netlify
+  NPM_FLAGS = "--include=dev"
+  NPM_CONFIG_PRODUCTION = "false"
 
 # Functions configuration
 [functions]
