@@ -72,6 +72,10 @@ api.interceptors.response.use(
     if (error.response?.status === 404) {
       console.error('  404 Not Found - check if endpoint exists');
     }
+    if (error.response?.status === 429) {
+      // Back off to avoid spamming during dev
+      console.warn('  429 Too Many Requests - backing off');
+    }
     if (error.response?.status === 401) {
       // Handle unauthorized access
       localStorage.removeItem('auth_token');

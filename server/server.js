@@ -88,11 +88,12 @@ applySecurity(app);
 // --- END: Security Configuration ---
 
 // --- START: Redis-based Rate Limiting ---
-
-// Apply Redis-based rate limiting (replaces express-rate-limit)
-// This provides distributed rate limiting across multiple server instances
-app.use(redisRateLimiter);
-
+// Skip rate limiting in development to avoid 429 during local testing
+if (process.env.NODE_ENV === 'production') {
+  // Apply Redis-based rate limiting (replaces express-rate-limit)
+  // This provides distributed rate limiting across multiple server instances
+  app.use(redisRateLimiter);
+}
 // --- END: Redis-based Rate Limiting ---
 
 // Function to find available port
