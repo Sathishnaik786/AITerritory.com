@@ -63,6 +63,11 @@ const data = {
       url: "#",
       icon: UsersIcon,
     },
+    {
+      title: "Redis Monitor",
+      url: "/admin/redis-dashboard",
+      icon: DatabaseIcon,
+    },
   ],
   navClouds: [
     {

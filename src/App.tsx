@@ -77,6 +77,7 @@ import BlogsAdmin from './admin/BlogsAdmin';
 import NewsletterSubscribersAdmin from './admin/NewsletterSubscribersAdmin';
 import { NavbarNewsletterModal } from './components/NavbarNewsletterModal';
 import { useState } from 'react';
+import RedisDashboard from './pages/admin/redis-dashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -253,6 +254,7 @@ function ThemedAppContent() {
                       <Route path="feedback" element={<FeedbackAdmin />} />
                       <Route path="blogs" element={<BlogsAdmin />} />
                       <Route path="newsletter-subscribers" element={<NewsletterSubscribersAdmin />} />
+                      <Route path="redis-dashboard" element={<RedisDashboard />} />
                     </Routes>
                   </AdminLayout>
                 </ProtectedRoute>

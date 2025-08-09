@@ -38,7 +38,7 @@ const contentNav = [
 ];
 
 const systemNav = [
-  { label: 'Cache Manager', icon: Database, to: '/admin/cache' },
+  { label: 'Redis Dashboard', icon: Database, to: '/admin/redis-dashboard' },
 ];
 
 const AdminSidebarNav = () => {

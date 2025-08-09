@@ -435,3 +435,4 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
 };
 
 export default ToolCard;
+
