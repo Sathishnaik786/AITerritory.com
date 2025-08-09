@@ -7,8 +7,15 @@ import viteCompression from 'vite-plugin-compression';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
+    // Bind explicitly to localhost for Windows/Firefox stability
+    host: "localhost",
     port: 8080,
+    strictPort: true,
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost',
+      clientPort: 8080,
+    },
     proxy: {
       '/api': 'http://localhost:3003',
     },
@@ -34,6 +41,8 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    // Ensure singletons to avoid multiple React/Router instances in dev
+    dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
   },
   build: {
     outDir: 'dist',
