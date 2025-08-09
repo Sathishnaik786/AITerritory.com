@@ -22,8 +22,12 @@ export interface ToolCardStats {
   userHasBookmarked: boolean;
 }
 
+interface ExtendedTool extends Tool {
+  views?: number;
+}
+
 interface ToolCardProps {
-  tool: Tool;
+  tool: ExtendedTool;
   stats?: ToolCardStats;
   variant?: 'default' | 'featured' | 'compact' | 'glass' | 'gradient';
 }
@@ -139,11 +143,11 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
       } else {
         await LikesService.addLike(tool.id, user.id);
         
-        // Track the like event
+        // Track the like event with the first category if available
         trackToolLike(
           tool.id,
           tool.name,
-          tool.category,
+          tool.categories?.name || 'Uncategorized',
           user.id
         );
       }
@@ -168,11 +172,11 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
       } else {
         await bookmarkService.addBookmark(tool.id, user.id);
         
-        // Track the bookmark event
+        // Track the bookmark event with the first category if available
         trackToolBookmark(
           tool.id,
           tool.name,
-          tool.category,
+          tool.categories?.name || 'Uncategorized',
           user.id
         );
       }
@@ -310,7 +314,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
               <img
                 src={tool.image_url || '/placeholder.svg'}
                 alt={tool.name}
-                className="w-11 h-11 rounded-full object-cover ring-2 ring-background shadow-md"
+                className="w-11 h-11 rounded-full object-cover ring-2 ring-background shadow-md bg-white p-1"
               />
               {tool.is_featured && (
                 <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-0.5 border-2 border-background">
@@ -435,4 +439,3 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
 };
 
 export default ToolCard;
-
