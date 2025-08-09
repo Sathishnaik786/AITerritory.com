@@ -1,6 +1,5 @@
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
-import { BreadcrumbsWithIcons } from './components/BreadcrumbsWithIcons';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HomePage } from "./pages/HomePage";
 import NotFound from "./pages/NotFound";
@@ -13,13 +12,13 @@ import AIAgents from "./pages/AIAgents";
 import AllResources from "./pages/AllResources";
 import ResourceCategoryPage from "./pages/ResourceCategoryPage";
 import Resources from "./pages/Resources";
+import Company from "./pages/Company";
 import ContactUsPage from "./pages/ContactUsPage";
 import AdvertisePage from "./pages/AdvertisePage";
 import SubmitToolPage from "./pages/SubmitToolPage";
 import YouTubeChannelPage from "./pages/YouTubeChannelPage";
 import RequestFeaturePage from "./pages/RequestFeaturePage";
-import UpdateToolPage from "./pages/UpdateToolPage";
-import SkillLeapPage from "./pages/SkillLeapPage";
+
 import CreateAccountPage from "./pages/CreateAccountPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
@@ -27,12 +26,10 @@ import ProductivityToolsPage from "./pages/ProductivityToolsPage";
 import ImageGeneratorsPage from "./pages/ImageGeneratorsPage";
 import TextGeneratorsPage from "./pages/TextGeneratorsPage";
 import VideoToolsPage from "./pages/VideoToolsPage";
-import ArtGeneratorsPage from "./pages/ArtGeneratorsPage";
-import AudioGeneratorsPage from "./pages/AudioGeneratorsPage";
+
 import NewsletterPage from "./pages/NewsletterPage";
-import { QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { queryClient } from './lib/queryClient';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from './components/ui/tooltip';
 import { ThemeProvider } from './components/theme-provider';
@@ -69,8 +66,7 @@ import MyBookmarksPage from './pages/MyBookmarksPage';
 import UserDashboardPage from './pages/UserDashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Prompts from './components/Prompts';
-import MetaTags from './components/MetaTags';
-import SEO from './components/SEO';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import React, { Suspense } from 'react';
 import FeedbackAdmin from './admin/FeedbackAdmin';
 import BackgroundAnimation from './components/ui/BackgroundAnimation';
@@ -79,18 +75,18 @@ import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
 import BlogsAdmin from './admin/BlogsAdmin';
 import NewsletterSubscribersAdmin from './admin/NewsletterSubscribersAdmin';
-import CacheManagerAdmin from './admin/CacheManagerAdmin';
 import { NavbarNewsletterModal } from './components/NavbarNewsletterModal';
 import { useState } from 'react';
-import { HelmetProvider, Helmet } from 'react-helmet-async';
-import { useAuthTracking } from './hooks/useAuthTracking';
-import { BackdropLoaderProvider } from './context/BackdropLoaderContext';
-import { BackdropLoaderWrapper } from './components/BackdropLoaderWrapper';
-import { BackdropLoaderTestPage } from './pages/BackdropLoaderTestPage';
-import { useRouteProgress } from './hooks/useRouteProgress';
-import { UIProgressTestAdmin } from './admin/UIProgressTestAdmin';
+import RedisDashboard from './pages/admin/redis-dashboard';
 
-// QueryClient is now imported from lib/queryClient.ts with persistence
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -100,24 +96,64 @@ function ScrollToTop() {
   return null;
 }
 
-// SEO component has been moved to src/components/SEO.tsx
+function SEO() {
+  const location = useLocation();
+  const canonicalUrl = `https://aiterritory.org${location.pathname}`;
+  return (
+    <Helmet>
+      <title>AI Territory</title>
+      <meta name="description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
+      <meta name="robots" content="index, follow" />
+      {/* Open Graph */}
+      <meta property="og:title" content="AI Territory" />
+      <meta property="og:description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:image" content="https://aiterritory.org/og-image.png" />
+      <meta property="og:site_name" content="AITerritory" />
+      {/* Twitter Card */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta property="twitter:domain" content="aiterritory.org" />
+      <meta property="twitter:url" content={canonicalUrl} />
+      <meta name="twitter:title" content="AI Territory" />
+      <meta name="twitter:description" content="AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social." />
+      <meta name="twitter:image" content="https://aiterritory.org/og-image.png" />
+      {/* Canonical */}
+      <link rel="canonical" href={canonicalUrl} />
+      <link rel="preconnect" href="https://aiterritory-com.onrender.com" />
+      <link rel="dns-prefetch" href="https://aiterritory-com.onrender.com" />
+      <link rel="preconnect" href="https://api.openai.com" />
+      <link rel="dns-prefetch" href="https://api.openai.com" />
+      {/* Preconnect and preload Google Fonts */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" media="print" onLoad="this.media='all'" />
+      {/* Defer Analytics or Chat Scripts */}
+      <script async defer src="https://www.googletagmanager.com/gtag/js?id=YOUR_GA_ID" />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'YOUR_GA_ID');
+          `,
+        }}
+      />
+    </Helmet>
+  );
+}
 
 function ThemedAppContent() {
   const location = useLocation();
   const isLandingPro = location.pathname === '/';
   const [newsletterOpen, setNewsletterOpen] = useState(false);
-  const [showNewsletterModal, setShowNewsletterModal] = useState(false);
-  
-  // Initialize auth tracking
-  useAuthTracking();
-  
-  // Initialize route progress tracking
-  useRouteProgress();
-
   return (
     <div className={`min-h-screen antialiased w-full flex flex-col`}>
-        <MetaTags />
+      <HelmetProvider>
+        <SEO />
         <div className="relative min-h-screen flex flex-col items-center w-full">
+<<<<<<< HEAD
           <div className="w-full fixed top-0 z-50">
             <Navbar newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
           </div>
@@ -147,6 +183,32 @@ function ThemedAppContent() {
                 <Route path="/resources/best-ai-text-generators" element={<ResourceCategoryPage title="Best AI Text Generators" filterTag="Language Model" />} />
                 <Route path="/resources/best-ai-3d-generators" element={<ResourceCategoryPage title="Best AI 3D Generators" filterTag="3D" />} />
                 <Route path="/resources/all-resources" element={<AllResources />} />
+=======
+          <Navbar newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
+          <ScrollToTopButton />
+          <main className={`flex-1 w-full min-h-screen`}>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<LandingPro />} />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/ai-for-business" element={<AIBusiness />} />
+              <Route path="/prompts" element={<Prompts />} />
+              
+              {/* Authentication Routes */}
+              <Route path="/signup" element={<CreateAccountPage />} />
+              
+              {/* Routes for Resources dropdown */}
+              <Route path="/resources" element={<Resources />} />
+              <Route path="/resources/ai-agents" element={<AIAgents />} />
+              <Route path="/resources/ai-innovation" element={<AIInnovation />} />
+              <Route path="/resources/ai-tutorials" element={<AITutorials />} />
+              <Route path="/resources/ai-automation" element={<AIAutomation />} />
+              <Route path="/resources/best-ai-art-generators" element={<ResourceCategoryPage title="Best AI Art Generators" filterTag="AI Art" />} />
+              <Route path="/resources/best-ai-image-generators" element={<ResourceCategoryPage title="Best AI Image Generators" filterTag="Image Generation" />} />
+              <Route path="/resources/best-ai-chatbots" element={<ResourceCategoryPage title="Best AI Chatbots" filterTag="Chatbot" />} />
+              <Route path="/resources/best-ai-text-generators" element={<ResourceCategoryPage title="Best AI Text Generators" filterTag="Language Model" />} />
+              <Route path="/resources/all-resources" element={<AllResources />} />
+>>>>>>> 9772dbaaf29b0ef80c7baffd8d4173da7c7c54ef
 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/dashboard" element={
@@ -161,6 +223,7 @@ function ThemedAppContent() {
                   </ProtectedRoute>
                 } />
 
+<<<<<<< HEAD
                 {/* Company Routes - Some Protected */}
                 <Route path="/company/contact-us" element={<ContactUsPage />} />
                 <Route path="/company/advertise" element={
@@ -195,6 +258,35 @@ function ThemedAppContent() {
                 <Route path="/categories/art-generators" element={<ArtGeneratorsPage />} />
                 <Route path="/categories/audio-generators" element={<AudioGeneratorsPage />} />
                 <Route path="/categories/all-ai-tools" element={<AllAIToolsPage />} />
+=======
+              {/* Company Routes - Some Protected */}
+              <Route path="/company" element={<Company />} />
+              <Route path="/company/contact-us" element={<ContactUsPage />} />
+              <Route path="/company/advertise" element={
+                <ProtectedRoute>
+                  <AdvertisePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/company/submit-tool" element={
+                  <SubmitToolPage />
+              } />
+              <Route path="/company/youtube-channel" element={<YouTubeChannelPage />} />
+              <Route path="/company/request-feature" element={
+                <ProtectedRoute>
+                  <RequestFeaturePage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Legacy routes for backward compatibility */}
+              <Route path="/company/create-account" element={<CreateAccountPage />} />
+
+              {/* Routes for Categories */}
+              <Route path="/categories/productivity-tools" element={<ProductivityToolsPage />} />
+              <Route path="/categories/image-generators" element={<ImageGeneratorsPage />} />
+              <Route path="/categories/text-generators" element={<TextGeneratorsPage />} />
+              <Route path="/categories/video-tools" element={<VideoToolsPage />} />
+              <Route path="/categories/all-ai-tools" element={<AllAIToolsPage />} />
+>>>>>>> 9772dbaaf29b0ef80c7baffd8d4173da7c7c54ef
 
                 {/* Direct routes for easier access */}
                 <Route path="/all-ai-tools" element={<AllAIToolsPage />} />
@@ -209,6 +301,7 @@ function ThemedAppContent() {
 
                 <Route path="/newsletter" element={<NewsletterPage />} />
 
+<<<<<<< HEAD
                 {/* Routes for Admin */}
                 <Route path="/admin/*" element={
                   <ProtectedRoute>
@@ -237,6 +330,35 @@ function ThemedAppContent() {
                     </AdminLayout>
                   </ProtectedRoute>
                 } />
+=======
+              {/* Routes for Admin */}
+              <Route path="/admin/*" element={
+                <ProtectedRoute>
+                  <AdminLayout>
+                    <Routes>
+                      <Route path="/" element={
+                        <Suspense fallback={null}>
+                          <AdminDashboard />
+                        </Suspense>
+                      } />
+                      <Route path="business-functions" element={<BusinessFunctionsAdmin />} />
+                      <Route path="ai-agents" element={<AIAgentsAdmin />} />
+                      <Route path="ai-innovations" element={<AIInnovationsAdmin />} />
+                      <Route path="ai-tutorials" element={<AITutorialsAdmin />} />
+                      <Route path="ai-automation" element={<AIAutomationAdmin />} />
+                      <Route path="submissions/contact" element={<ContactSubmissionsAdmin />} />
+                      <Route path="submissions/advertise" element={<AdvertiseSubmissionsAdmin />} />
+                      <Route path="submissions/tools" element={<ToolSubmissionsAdmin />} />
+                      <Route path="submissions/features" element={<FeatureRequestsAdmin />} />
+                      <Route path="feedback" element={<FeedbackAdmin />} />
+                      <Route path="blogs" element={<BlogsAdmin />} />
+                      <Route path="newsletter-subscribers" element={<NewsletterSubscribersAdmin />} />
+                      <Route path="redis-dashboard" element={<RedisDashboard />} />
+                    </Routes>
+                  </AdminLayout>
+                </ProtectedRoute>
+              } />
+>>>>>>> 9772dbaaf29b0ef80c7baffd8d4173da7c7c54ef
 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="/tools/all-resources" element={<AllResourcesPage />} />
@@ -256,9 +378,38 @@ function ThemedAppContent() {
           </div>
         </div>
         <NavbarNewsletterModal isOpen={newsletterOpen} onClose={() => setNewsletterOpen(false)} />
-        <Footer />
+        {/* Only show Footer if not on LandingPro */}
+        {!isLandingPro && <Footer />}
+      </HelmetProvider>
     </div>
   );
+}
+
+// Global Error Boundary
+class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any, errorInfo: any}> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error, errorInfo: null };
+  }
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error('GlobalErrorBoundary caught error:', error, errorInfo);
+    this.setState({ errorInfo });
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ color: 'red', padding: 24 }}>
+          <h1>Global App Error</h1>
+          <pre>{String(this.state.error)}</pre>
+          {this.state.errorInfo && <pre>{this.state.errorInfo.componentStack}</pre>}
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 function App() {
@@ -271,28 +422,25 @@ function App() {
     >
       <BackgroundAnimation />
       <QueryClientProvider client={queryClient}>
-        <BackdropLoaderProvider>
-          <HelmetProvider>
-          <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true
-            }}
-          >
-            <TooltipProvider>
-                <ScrollToTop />
-                <Toaster position="top-right" richColors />
-                <BackdropLoaderWrapper />
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true
+          }}
+        >
+          <TooltipProvider>
+            <HelmetProvider>
+              <ScrollToTop />
+              <Toaster position="top-right" richColors />
+              <GlobalErrorBoundary>
                 <Suspense fallback={<div>Loading...</div>}>
                   <ThemedAppContent />
                 </Suspense>
-                {process.env.NODE_ENV === 'development' && (
-                  <ReactQueryDevtools initialIsOpen={false} />
-                )}
-            </TooltipProvider>
-          </BrowserRouter>
-          </HelmetProvider>
-        </BackdropLoaderProvider>
+              </GlobalErrorBoundary>
+              <ReactQueryDevtools initialIsOpen={false} />
+            </HelmetProvider>
+          </TooltipProvider>
+        </BrowserRouter>
       </QueryClientProvider>
     </ThemeProvider>
   );

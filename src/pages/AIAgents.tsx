@@ -69,7 +69,7 @@ const AIAgents = () => {
   ];
 
   // Replace with your actual AI Agents learning path UUID from Supabase
-  const AI_AGENTS_LEARNING_PATH_ID = 'YOUR_AI_AGENTS_LEARNING_PATH_ID';
+  const AI_AGENTS_LEARNING_PATH_ID = import.meta.env.VITE_AI_AGENTS_LEARNING_PATH_ID || '';
   const [newsletterOpen, setNewsletterOpen] = useState(false);
 
   const socialLinks = [
@@ -187,7 +187,13 @@ const AIAgents = () => {
       {/* Resources Section */}
       <div className="mb-16">
         <h2 className="text-3xl font-bold mb-8">Learning Resources</h2>
-        <AIAgentLearningResources learningPathId={AI_AGENTS_LEARNING_PATH_ID} />
+        {AI_AGENTS_LEARNING_PATH_ID ? (
+          <AIAgentLearningResources learningPathId={AI_AGENTS_LEARNING_PATH_ID} />
+        ) : (
+          <div className="text-sm text-muted-foreground">
+            Learning path not configured.
+          </div>
+        )}
       </div>
 
       {/* Newsletter Section */}

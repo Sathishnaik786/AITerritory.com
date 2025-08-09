@@ -29,15 +29,17 @@ if (PUBLISHABLE_KEY && PUBLISHABLE_KEY.includes('pk_test_') && import.meta.env.P
   console.warn("⚠️ Using Clerk development keys in production! Please update to production keys.");
 }
 
+const AppTree = (
+  <HelmetProvider>
+    <ClerkProvider
+      publishableKey={PUBLISHABLE_KEY || ''}
+      afterSignOutUrl="/"
+    >
+      <App />
+    </ClerkProvider>
+  </HelmetProvider>
+);
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <HelmetProvider>
-      <ClerkProvider
-        publishableKey={PUBLISHABLE_KEY || ''}
-        afterSignOutUrl="/"
-      >
-        <App />
-      </ClerkProvider>
-    </HelmetProvider>
-  </React.StrictMode>
+  import.meta.env.DEV ? AppTree : <React.StrictMode>{AppTree}</React.StrictMode>
 );

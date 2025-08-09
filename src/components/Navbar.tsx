@@ -80,8 +80,8 @@ export function Navbar({ newsletterOpen, setNewsletterOpen }: NavbarProps) {
             <img 
               src="/logo.jpg" 
               alt="AI Territory Logo"
-              className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl object-cover ring-2 ring-blue-200 dark:ring-blue-800 shadow-sm"
               loading="lazy"
+              className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl object-cover ring-2 ring-blue-200 dark:ring-blue-800 shadow-sm"
             />
             <span className="font-bold text-xl sm:text-2xl tracking-tight bg-gradient-to-r from-blue-700 via-purple-700 to-blue-700 bg-clip-text text-transparent">
               AI Territory

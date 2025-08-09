@@ -66,6 +66,11 @@ const adminAuth = require('./middleware/adminAuth');
 const newsletterController = require('./controllers/newsletterController');
 const appleCarouselRoutes = require('./routes/appleCarousel');
 const unifiedInteractionsRoutes = require('./routes/unifiedInteractions');
+const redisMonitorDashboardRoutes = require('./routes/redisMonitorDashboard');
+
+// Enhanced Redis-powered routes
+const enhancedToolRoutes = require('./routes/enhancedTools');
+const enhancedCommentRoutes = require('./routes/enhancedComments');
 
 // Import security middleware
 const { applySecurity } = require('./middleware/security');
@@ -83,11 +88,12 @@ applySecurity(app);
 // --- END: Security Configuration ---
 
 // --- START: Redis-based Rate Limiting ---
-
-// Apply Redis-based rate limiting (replaces express-rate-limit)
-// This provides distributed rate limiting across multiple server instances
-app.use(redisRateLimiter);
-
+// Skip rate limiting in development to avoid 429 during local testing
+if (process.env.NODE_ENV === 'production') {
+  // Apply Redis-based rate limiting (replaces express-rate-limit)
+  // This provides distributed rate limiting across multiple server instances
+  app.use(redisRateLimiter);
+}
 // --- END: Redis-based Rate Limiting ---
 
 // Function to find available port
@@ -131,6 +137,11 @@ app.use('/api/ai-agent-learning-resources', aiAgentLearningResourcesRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/apple-carousel', appleCarouselRoutes);
 app.use('/api/interactions', unifiedInteractionsRoutes);
+app.use('/api/monitor/redis', redisMonitorDashboardRoutes);
+
+// Enhanced Redis-powered routes
+app.use('/api/enhanced/tools', enhancedToolRoutes);
+app.use('/api/enhanced/comments', enhancedCommentRoutes);
 
 // Add /api/paypal webhook route
 app.use('/api/paypal', require('./routes/paypal'));

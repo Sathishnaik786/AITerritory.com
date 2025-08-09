@@ -138,6 +138,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     <img 
                       src="/logo.jpg" 
                       alt="AI Territory Logo" 
+                      loading="lazy"
                       className="h-11 w-11 rounded-xl object-cover ring-2 ring-blue-200 dark:ring-blue-800 shadow-sm" 
                     />
                     <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full p-1 shadow-sm">

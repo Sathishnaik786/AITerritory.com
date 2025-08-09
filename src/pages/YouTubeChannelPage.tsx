@@ -76,6 +76,8 @@ const YouTubeChannelPage: React.FC = () => {
                       <img 
                         src={getThumbnailUrl(video.video_id)} 
                         alt={video.title} 
+                        width={320}
+                        height={180}
                         className="w-full h-48 object-cover rounded-t-xl transition-transform group-hover:scale-105 duration-300"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
@@ -121,6 +123,8 @@ const YouTubeChannelPage: React.FC = () => {
                       <img 
                         src={getThumbnailUrl(short.video_id)} 
                         alt={short.title} 
+                        width={320}
+                        height={180}
                         className="absolute inset-0 w-full h-full object-cover rounded-t-xl transition-transform group-hover:scale-105 duration-300"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
