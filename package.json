@@ -101,7 +101,6 @@
     "react-router-dom": "^6.26.2",
     "react-simplemde-editor": "^5.2.0",
     "react-tagcloud": "^2.3.3",
-    "react-wordcloud": "^1.2.7",
     "recharts": "^3.0.2",
     "rehype-highlight": "^7.0.2",
     "rehype-raw": "^7.0.0",
