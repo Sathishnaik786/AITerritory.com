@@ -127,7 +127,15 @@ function SEO() {
       {/* Preconnect and preload Google Fonts */}
       <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" media="print" onLoad="this.media='all'" />
+      <link 
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" 
+        rel="stylesheet" 
+        media="print" 
+        onLoad={(e) => {
+          const target = e.target as HTMLLinkElement;
+          target.media = 'all';
+        }} 
+      />
       {/* Defer Analytics or Chat Scripts */}
       <script async defer src="https://www.googletagmanager.com/gtag/js?id=YOUR_GA_ID" />
       <script
@@ -153,7 +161,6 @@ function ThemedAppContent() {
       <HelmetProvider>
         <SEO />
         <div className="relative min-h-screen flex flex-col items-center w-full">
-<<<<<<< HEAD
           <div className="w-full fixed top-0 z-50">
             <Navbar newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
           </div>
@@ -166,7 +173,6 @@ function ThemedAppContent() {
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/ai-for-business" element={<AIBusiness />} />
                 <Route path="/prompts" element={<Prompts />} />
-                <Route path="/test-backdrop-loader" element={<BackdropLoaderTestPage />} />
                 
                 {/* Authentication Routes */}
                 <Route path="/signup" element={<CreateAccountPage />} />
@@ -183,32 +189,6 @@ function ThemedAppContent() {
                 <Route path="/resources/best-ai-text-generators" element={<ResourceCategoryPage title="Best AI Text Generators" filterTag="Language Model" />} />
                 <Route path="/resources/best-ai-3d-generators" element={<ResourceCategoryPage title="Best AI 3D Generators" filterTag="3D" />} />
                 <Route path="/resources/all-resources" element={<AllResources />} />
-=======
-          <Navbar newsletterOpen={newsletterOpen} setNewsletterOpen={setNewsletterOpen} />
-          <ScrollToTopButton />
-          <main className={`flex-1 w-full min-h-screen`}>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<LandingPro />} />
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/ai-for-business" element={<AIBusiness />} />
-              <Route path="/prompts" element={<Prompts />} />
-              
-              {/* Authentication Routes */}
-              <Route path="/signup" element={<CreateAccountPage />} />
-              
-              {/* Routes for Resources dropdown */}
-              <Route path="/resources" element={<Resources />} />
-              <Route path="/resources/ai-agents" element={<AIAgents />} />
-              <Route path="/resources/ai-innovation" element={<AIInnovation />} />
-              <Route path="/resources/ai-tutorials" element={<AITutorials />} />
-              <Route path="/resources/ai-automation" element={<AIAutomation />} />
-              <Route path="/resources/best-ai-art-generators" element={<ResourceCategoryPage title="Best AI Art Generators" filterTag="AI Art" />} />
-              <Route path="/resources/best-ai-image-generators" element={<ResourceCategoryPage title="Best AI Image Generators" filterTag="Image Generation" />} />
-              <Route path="/resources/best-ai-chatbots" element={<ResourceCategoryPage title="Best AI Chatbots" filterTag="Chatbot" />} />
-              <Route path="/resources/best-ai-text-generators" element={<ResourceCategoryPage title="Best AI Text Generators" filterTag="Language Model" />} />
-              <Route path="/resources/all-resources" element={<AllResources />} />
->>>>>>> 9772dbaaf29b0ef80c7baffd8d4173da7c7c54ef
 
                 {/* Protected Routes - Require Authentication */}
                 <Route path="/dashboard" element={
@@ -223,7 +203,6 @@ function ThemedAppContent() {
                   </ProtectedRoute>
                 } />
 
-<<<<<<< HEAD
                 {/* Company Routes - Some Protected */}
                 <Route path="/company/contact-us" element={<ContactUsPage />} />
                 <Route path="/company/advertise" element={
@@ -240,12 +219,6 @@ function ThemedAppContent() {
                     <RequestFeaturePage />
                   </ProtectedRoute>
                 } />
-                <Route path="/company/update-tool" element={
-                  <ProtectedRoute>
-                    <UpdateToolPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/company/skill-leap" element={<SkillLeapPage />} />
                 
                 {/* Legacy routes for backward compatibility */}
                 <Route path="/company/create-account" element={<CreateAccountPage />} />
@@ -255,38 +228,7 @@ function ThemedAppContent() {
                 <Route path="/categories/image-generators" element={<ImageGeneratorsPage />} />
                 <Route path="/categories/text-generators" element={<TextGeneratorsPage />} />
                 <Route path="/categories/video-tools" element={<VideoToolsPage />} />
-                <Route path="/categories/art-generators" element={<ArtGeneratorsPage />} />
-                <Route path="/categories/audio-generators" element={<AudioGeneratorsPage />} />
                 <Route path="/categories/all-ai-tools" element={<AllAIToolsPage />} />
-=======
-              {/* Company Routes - Some Protected */}
-              <Route path="/company" element={<Company />} />
-              <Route path="/company/contact-us" element={<ContactUsPage />} />
-              <Route path="/company/advertise" element={
-                <ProtectedRoute>
-                  <AdvertisePage />
-                </ProtectedRoute>
-              } />
-              <Route path="/company/submit-tool" element={
-                  <SubmitToolPage />
-              } />
-              <Route path="/company/youtube-channel" element={<YouTubeChannelPage />} />
-              <Route path="/company/request-feature" element={
-                <ProtectedRoute>
-                  <RequestFeaturePage />
-                </ProtectedRoute>
-              } />
-              
-              {/* Legacy routes for backward compatibility */}
-              <Route path="/company/create-account" element={<CreateAccountPage />} />
-
-              {/* Routes for Categories */}
-              <Route path="/categories/productivity-tools" element={<ProductivityToolsPage />} />
-              <Route path="/categories/image-generators" element={<ImageGeneratorsPage />} />
-              <Route path="/categories/text-generators" element={<TextGeneratorsPage />} />
-              <Route path="/categories/video-tools" element={<VideoToolsPage />} />
-              <Route path="/categories/all-ai-tools" element={<AllAIToolsPage />} />
->>>>>>> 9772dbaaf29b0ef80c7baffd8d4173da7c7c54ef
 
                 {/* Direct routes for easier access */}
                 <Route path="/all-ai-tools" element={<AllAIToolsPage />} />
@@ -301,7 +243,6 @@ function ThemedAppContent() {
 
                 <Route path="/newsletter" element={<NewsletterPage />} />
 
-<<<<<<< HEAD
                 {/* Routes for Admin */}
                 <Route path="/admin/*" element={
                   <ProtectedRoute>
@@ -324,41 +265,11 @@ function ThemedAppContent() {
                         <Route path="feedback" element={<FeedbackAdmin />} />
                         <Route path="blogs" element={<BlogsAdmin />} />
                         <Route path="newsletter-subscribers" element={<NewsletterSubscribersAdmin />} />
-                        <Route path="cache" element={<CacheManagerAdmin />} />
-                        <Route path="ui-test" element={<UIProgressTestAdmin />} />
+                        <Route path="redis-dashboard" element={<RedisDashboard />} />
                       </Routes>
                     </AdminLayout>
                   </ProtectedRoute>
                 } />
-=======
-              {/* Routes for Admin */}
-              <Route path="/admin/*" element={
-                <ProtectedRoute>
-                  <AdminLayout>
-                    <Routes>
-                      <Route path="/" element={
-                        <Suspense fallback={null}>
-                          <AdminDashboard />
-                        </Suspense>
-                      } />
-                      <Route path="business-functions" element={<BusinessFunctionsAdmin />} />
-                      <Route path="ai-agents" element={<AIAgentsAdmin />} />
-                      <Route path="ai-innovations" element={<AIInnovationsAdmin />} />
-                      <Route path="ai-tutorials" element={<AITutorialsAdmin />} />
-                      <Route path="ai-automation" element={<AIAutomationAdmin />} />
-                      <Route path="submissions/contact" element={<ContactSubmissionsAdmin />} />
-                      <Route path="submissions/advertise" element={<AdvertiseSubmissionsAdmin />} />
-                      <Route path="submissions/tools" element={<ToolSubmissionsAdmin />} />
-                      <Route path="submissions/features" element={<FeatureRequestsAdmin />} />
-                      <Route path="feedback" element={<FeedbackAdmin />} />
-                      <Route path="blogs" element={<BlogsAdmin />} />
-                      <Route path="newsletter-subscribers" element={<NewsletterSubscribersAdmin />} />
-                      <Route path="redis-dashboard" element={<RedisDashboard />} />
-                    </Routes>
-                  </AdminLayout>
-                </ProtectedRoute>
-              } />
->>>>>>> 9772dbaaf29b0ef80c7baffd8d4173da7c7c54ef
 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="/tools/all-resources" element={<AllResourcesPage />} />
