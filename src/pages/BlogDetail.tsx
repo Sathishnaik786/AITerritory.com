@@ -202,12 +202,11 @@ const BlogDetail: React.FC = () => {
 
   // Calculate reading time
   const readingTime = useMemo(() => {
-    const content = blog?.content || '';
-    if (!content || typeof content !== 'string') return 3; // Default fallback
+    if (!blog?.content) return '2 min read';
     const wordsPerMinute = 200;
-    const words = content.split(/\s+/);
-    const wordCount = words ? words.length : 0;
-    return Math.ceil(wordCount / wordsPerMinute);
+    const wordCount = blog.content.trim().split(/\s+/).length;
+    const minutes = Math.ceil(wordCount / wordsPerMinute);
+    return `${minutes} min read`;
   }, [blog?.content]);
 
   // Combine content for proper heading extraction
@@ -347,19 +346,28 @@ const BlogDetail: React.FC = () => {
     toast('No problem! You can subscribe anytime.');
   };
 
-  // Show loading state while blog data is being fetched
-  if (loading) {
-    return (
-      <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading blog...</p>
-        </div>
-      </div>
-    );
-  }
+  // SEO data for the blog
+  const seoData = useMemo(() => ({
+    title: blog?.title || 'Blog Post',
+    description: blog?.description || blog?.subtitle || `Read about ${blog?.title || 'this post'}`,
+    image: blog?.cover_image_url,
+    url: typeof window !== 'undefined' ? `${window.location.origin}/blog/${blog?.slug}` : '',
+    type: 'article' as const,
+    publishedTime: blog?.created_at,
+    modifiedTime: blog?.updated_at || blog?.created_at,
+    author: blog?.author_name,
+    section: blog?.category,
+    article: true, // Simplified for now, adjust according to your SEOProps type
+  }), [blog]);
 
-  // Show loading state if blog data is not ready
+  // Handle client-side only content
+  const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Show loading state while blog data is being fetched
   if (loading) {
     return (
       <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717]">
@@ -369,13 +377,15 @@ const BlogDetail: React.FC = () => {
   }
 
   // Show error state if blog failed to load
-  if (error) {
+  if (error || !blog) {
     return (
       <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
         <div className="text-center">
           <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Blog Not Found</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">{error || 'The blog you are looking for does not exist.'}</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            {error || 'The blog you are looking for does not exist.'}
+          </p>
           <button
             onClick={() => navigate('/blog')}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -386,57 +396,26 @@ const BlogDetail: React.FC = () => {
       </div>
     );
   }
-
-  // Show error state if blog is null but not loading
-  if (!blog) {
-    return (
-      <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
-        <div className="text-center">
-          <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Blog Not Found</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">The blog you are looking for does not exist.</p>
-          <button
-            onClick={() => navigate('/blog')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Back to Blogs
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // SEO data for the blog
-  const seoData = {
-    title: blog.title,
-    description: blog.description || blog.subtitle || `Read about ${blog.title}`,
-    image: blog.cover_image_url,
-    url: `${window.location.origin}/blog/${blog.slug}`,
-    type: 'article',
-    publishedTime: blog.created_at,
-    modifiedTime: blog.updated_at,
-    author: blog.author_name,
-    section: blog.category
-  };
 
   return (
     <>
-      {/* SEO Component with structured data */}
+      {/* SEO Component with structured data - This only renders in <head> */}
       <SEO {...seoData} />
       
-      {/* Default Blog Detail Layout */}
       <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] overflow-x-hidden">
-        {/* Enhanced Reading Progress Bar */}
-        <div className="fixed top-0 left-0 w-full h-1 z-50 bg-gray-200 dark:bg-gray-800">
-          <motion.div
-            className="h-full bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500"
-            style={{ width: `${progress}%` }}
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-          />
-        </div>
-          
+        {/* Enhanced Reading Progress Bar - Client-side only to avoid hydration mismatch */}
+        {isClient && (
+          <div className="fixed top-0 left-0 w-full h-1 z-50 bg-gray-200 dark:bg-gray-800">
+            <motion.div
+              className="h-full bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500"
+              style={{ width: `${progress}%` }}
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            />
+          </div>
+        )}
+        
         {/* Hero Section */}
         <motion.div 
           className="w-full bg-white dark:bg-[#171717] border-b border-gray-100 dark:border-gray-800"
@@ -445,10 +424,12 @@ const BlogDetail: React.FC = () => {
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
           <div className="max-w-4xl mx-auto px-4 py-6">
-            {/* Breadcrumbs */}
-            <div className="mb-4">
-              <PageBreadcrumbs />
-            </div>
+            {/* Breadcrumbs - Client-side only */}
+            {isClient && (
+              <div className="mb-4">
+                <PageBreadcrumbs />
+              </div>
+            )}
 
             {/* Category */}
             <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">
@@ -473,15 +454,15 @@ const BlogDetail: React.FC = () => {
             <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
               <div className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />
-                <span>{readingTime} min read</span>
+                <span>{readingTime}</span>
               </div>
               <div>
-                Published {blog.created_at ? new Date(blog.created_at).toLocaleString(undefined, { 
+                {blog.created_at ? new Date(blog.created_at).toLocaleString(undefined, { 
                   year: 'numeric', 
                   month: 'short', 
-                  day: 'numeric', 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
                 }) : '28 Jul 2025, 12:56 pm'}
               </div>
             </div>
@@ -560,13 +541,11 @@ const BlogDetail: React.FC = () => {
               alt={blog.title}
               className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover object-center rounded-lg"
               priority={true}
-        />
+            />
           </motion.div>
         )}
 
-        
-        
-        {/* Main Content - Single Vertical Layout */}
+        {/* Main Content */}
         <div className="w-full">
           <div className="max-w-4xl mx-auto px-4 py-8">
             {/* Blog Description - Centered */}
@@ -600,92 +579,24 @@ const BlogDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* You Might Also Like Section - Centered */}
-        <div className="w-full bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-          <div className="max-w-4xl mx-auto px-4 py-12">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                You Might Also Like
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                Discover more insights and tutorials
-              </p>
-            </div>
-            <YouMightAlsoLike 
-              currentSlug={blog.slug}
-              category={blog.category}
-              tags={blog.tags || []}
-            />
+        {/* You Might Also Like Section */}
+        <div className="bg-gray-50 dark:bg-gray-900 py-12 border-t border-gray-100 dark:border-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">You Might Also Like</h2>
+            <YouMightAlsoLike currentSlug={blog.slug} />
           </div>
         </div>
 
-        {/* Scroll-based Newsletter Modal */}
-        <AnimatePresence>
-          {showNewsletterModal && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-              onClick={handleNewsletterDismiss}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                  Stay Updated!
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Get the latest AI insights and tutorials delivered to your inbox.
-                </p>
-                <NewsletterCTA onSubscribe={handleNewsletterSubscribe} />
-                <button
-                  onClick={handleNewsletterDismiss}
-                  className="w-full mt-3 p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                >
-                  Maybe later
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* "Enjoyed this article?" Popup */}
-        <AnimatePresence>
-          {showEnjoyedArticlePopup && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 z-40"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Enjoyed this article?
-                </span>
-                <ShareBar
-                  url={typeof window !== 'undefined' ? window.location.href : ''}
-                  title={blog.title}
-                  description={blog.description}
-                  image={blog.cover_image_url}
-                  variant="inline"
-                  onShare={handleShare}
-                />
-                <button
-                  onClick={() => setShowEnjoyedArticlePopup(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                  aria-label="Close popup"
-                >
-                  ×
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Back to Top Button - Client-side only */}
+        {isClient && progress > 20 && (
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg transition-all duration-200 transform hover:scale-105 z-40"
+            aria-label="Back to top"
+          >
+            <ArrowUp className="w-5 h-5" />
+          </button>
+        )}
       </div>
     </>
   );

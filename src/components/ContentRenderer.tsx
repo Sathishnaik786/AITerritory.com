@@ -1,7 +1,6 @@
-import React, { useMemo, useEffect, Component, ReactNode } from 'react';
+import React, { useMemo, useEffect, useState, Component, ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import { PromptBox } from './PromptBox';
@@ -30,7 +29,41 @@ class ErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode
   }
 }
 
-// Note: Using default rehype-sanitize configuration for safety
+// Client-side only component to prevent hydration issues
+const ClientOnly: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return mounted ? <>{children}</> : null;
+};
+
+// Custom image component with better error handling and lazy loading
+const CustomImage: React.FC<{
+  src?: string;
+  alt?: string;
+  className?: string;
+  [key: string]: any;
+}> = ({ src, alt = '', className = '', ...props }) => {
+  const [imageError, setImageError] = useState(false);
+  
+  if (!src || imageError) {
+    return null;
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={`${className} max-w-full h-auto`}
+      loading="lazy"
+      onError={() => setImageError(true)}
+      {...props}
+    />
+  );
+};
 
 interface Heading {
   id: string;
@@ -51,25 +84,33 @@ interface CodeProps {
 
 export const ContentRenderer: React.FC<ContentRendererProps> = ({
   content,
-  onHeadingsGenerated
+  onHeadingsGenerated,
 }) => {
+  const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   // Only log in development
-  if (import.meta.env.DEV) {
+  if (import.meta.env.DEV && isClient) {
     console.log('ContentRenderer received content:', { 
       contentLength: content?.length, 
       contentType: typeof content,
-      contentPreview: content?.substring(0, 100)
+      contentPreview: content?.substring(0, 100) 
     });
   }
+
   const headings = useMemo(() => {
     if (!content || typeof content !== 'string') return [];
 
-    // Handle both markdown and HTML headings
     const extractedHeadings: Heading[] = [];
-
-    // First try markdown headings (for backward compatibility)
     const markdownHeadingRegex = /^(#{2,3})\s+(.+)$/gm;
+    const htmlHeadingRegex = /<h([2-3])[^>]*>(.*?)<\/h[2-3]>/gi;
+    
     let match;
+    
+    // Process markdown headings
     while ((match = markdownHeadingRegex.exec(content)) !== null) {
       if (!match[1] || !match[2]) continue;
       
@@ -84,14 +125,13 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
       });
     }
 
-    // If no markdown headings found, try HTML headings
+    // Process HTML headings if no markdown headings found
     if (extractedHeadings.length === 0) {
-      const htmlHeadingRegex = /<h([2-3])[^>]*>(.*?)<\/h[2-3]>/gi;
       while ((match = htmlHeadingRegex.exec(content)) !== null) {
         if (!match[1] || !match[2]) continue;
         
         const level = parseInt(match[1]);
-        const text = match[2].replace(/<[^>]*>/g, '').trim(); // Remove any nested HTML tags
+        const text = match[2].replace(/<[^>]*>/g, '').trim();
         const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
         extractedHeadings.push({
@@ -123,6 +163,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
 
   // Custom components for ReactMarkdown
   const components = {
+    // Headings with proper IDs and anchor links
     h1: ({ children, ...props }: any) => {
       const text = children?.toString() || '';
       const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -132,13 +173,15 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
           className="text-3xl md:text-4xl font-bold mb-6 mt-8 text-gray-900 dark:text-white group relative scroll-mt-20"
           {...props}
         >
-          <a
-            href={`#${id}`}
-            className="absolute -left-6 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400"
-            aria-label={`Link to ${text}`}
-          >
-            #
-          </a>
+          <ClientOnly>
+            <a
+              href={`#${id}`}
+              className="absolute -left-6 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400"
+              aria-label={`Link to ${text}`}
+            >
+              #
+            </a>
+          </ClientOnly>
           {children}
         </h1>
       );
@@ -152,13 +195,15 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
           className="text-2xl md:text-3xl font-semibold mb-4 mt-6 text-gray-900 dark:text-white group relative scroll-mt-20"
           {...props}
         >
-          <a
-            href={`#${id}`}
-            className="absolute -left-6 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400"
-            aria-label={`Link to ${text}`}
-          >
-            #
-          </a>
+          <ClientOnly>
+            <a
+              href={`#${id}`}
+              className="absolute -left-6 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400"
+              aria-label={`Link to ${text}`}
+            >
+              #
+            </a>
+          </ClientOnly>
           {children}
         </h2>
       );
@@ -172,13 +217,15 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
           className="text-xl md:text-2xl font-medium mb-3 mt-5 text-gray-900 dark:text-white group relative scroll-mt-20"
           {...props}
         >
-          <a
-            href={`#${id}`}
-            className="absolute -left-6 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400"
-            aria-label={`Link to ${text}`}
-          >
-            #
-          </a>
+          <ClientOnly>
+            <a
+              href={`#${id}`}
+              className="absolute -left-6 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400"
+              aria-label={`Link to ${text}`}
+            >
+              #
+            </a>
+          </ClientOnly>
           {children}
         </h3>
       );
@@ -226,28 +273,26 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
         {children}
       </blockquote>
     ),
-    img: ({ src, alt, ...props }: any) => (
+    img: (props: any) => (
       <figure className="my-6 text-center">
-        <img
-          src={src}
-          alt={alt || ''}
-          className="mx-auto rounded-lg shadow-md h-auto max-w-full"
-          loading="lazy"
-          {...props}
-        />
-        {(alt || props.title) && (
-          <figcaption className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            {alt || props.title}
-          </figcaption>
-        )}
+        <div className="relative">
+          <CustomImage
+            src={props.src}
+            alt={props.alt || ''}
+            className="mx-auto rounded-lg shadow-md max-w-full h-auto"
+            loading="lazy"
+          />
+          {(props.alt || props.title) && (
+            <figcaption className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              {props.alt || props.title}
+            </figcaption>
+          )}
+        </div>
       </figure>
     ),
     table: ({ children, ...props }: any) => (
       <div className="overflow-x-auto my-6">
-        <table
-          className="w-full border-collapse text-left"
-          {...props}
-        >
+        <table className="w-full border-collapse text-left" {...props}>
           {children}
         </table>
       </div>
@@ -284,6 +329,28 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
         {children}
       </em>
     ),
+    code: function CodeComponent({ inline = false, className, children, ...rest }: CodeProps) {
+      if (inline) {
+        return (
+          <code
+            className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono text-gray-800 dark:text-gray-200"
+            {...rest}
+          >
+            {children}
+          </code>
+        );
+      }
+
+      // Extract language from className (e.g., "language-javascript")
+      const language = className?.replace('language-', '') || '';
+      return (
+        <div className="my-4">
+          <PromptBox language={language}>
+            {children}
+          </PromptBox>
+        </div>
+      );
+    },
     div: ({ className, children, ...props }: any) => {
       // Handle prompt-box div specifically
       if (className && className.includes('prompt-box')) {
@@ -301,62 +368,77 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
         </div>
       );
     },
-    code: function CodeComponent({ inline = false, className, children, ...rest }: CodeProps) {
-      if (inline) {
-        return (
-          <code
-            className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono text-gray-800 dark:text-gray-200"
-            {...rest}
-          >
-            {children}
-          </code>
-        );
-      }
-
-      // Extract language from className (e.g., "language-javascript")
-      const language = className?.replace('language-', '') || '';
-      return (
-        <PromptBox language={language}>
-          {children}
-        </PromptBox>
-      );
-    },
   };
 
-  // Use content directly without additional sanitization
-  const processedContent = useMemo(() => {
-    if (!content || typeof content !== 'string') return '';
-    return content;
-  }, [content]);
-
   return (
-    <article className="content-renderer prose prose-lg max-w-none dark:prose-invert">
-      <div className="blog-content-wrapper">
-        {processedContent ? (
-          <ErrorBoundary fallback={
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <p className="text-lg font-medium">Error rendering content</p>
-              <p className="text-sm">There was an issue rendering this content.</p>
-            </div>
-          }>
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[
-                rehypeRaw, 
-                rehypeHighlight
-              ]}
-              components={components}
-            >
-              {content}
-            </ReactMarkdown>
-          </ErrorBoundary>
-        ) : (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <p className="text-lg font-medium">No content available</p>
-            <p className="text-sm">This blog post doesn't have any content yet.</p>
-          </div>
-        )}
-      </div>
-    </article>
+    <ErrorBoundary 
+      fallback={
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <p className="text-lg font-medium">Error rendering content</p>
+          <p className="text-sm">There was an issue rendering this content.</p>
+        </div>
+      }
+    >
+      <article className="content-renderer prose prose-lg max-w-none dark:prose-invert">
+        <div className="blog-content-wrapper">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[
+              rehypeRaw,
+              rehypeHighlight,
+              // Use a simpler sanitization approach to avoid type conflicts
+              () => (tree) => {
+                // Basic sanitization function
+                const sanitizeNode = (node: any) => {
+                  if (!node || typeof node !== 'object') return;
+                  
+                  // Remove script tags and other potentially dangerous elements
+                  if (node.tagName === 'script' || 
+                      node.tagName === 'iframe' && 
+                      !node.properties?.src?.startsWith('https://www.youtube.com')) {
+                    node.type = 'text';
+                    node.value = '';
+                    return;
+                  }
+
+                  // Process children
+                  if (node.children && Array.isArray(node.children)) {
+                    node.children = node.children.filter((child: any) => {
+                      if (child.type === 'text') return true;
+                      if (child.tagName === 'a' && child.properties?.href?.startsWith('javascript:')) {
+                        return false;
+                      }
+                      sanitizeNode(child);
+                      return true;
+                    });
+                  }
+                };
+
+                if (tree && tree.children) {
+                  tree.children = tree.children.filter((node: any) => {
+                    if (node.type === 'element' && 
+                        (node.tagName === 'script' || 
+                         (node.tagName === 'iframe' && 
+                          !node.properties?.src?.startsWith('https://www.youtube.com')))) {
+                      return false;
+                    }
+                    if (node.type === 'element') {
+                      sanitizeNode(node);
+                    }
+                    return true;
+                  });
+                }
+                
+                return tree;
+              }
+            ]}
+            components={components}
+            skipHtml={false}
+          >
+            {content}
+          </ReactMarkdown>
+        </div>
+      </article>
+    </ErrorBoundary>
   );
-}; 
+};
