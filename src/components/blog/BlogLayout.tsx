@@ -213,26 +213,6 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
           >
             {children || content}
           </motion.div>
-
-          {/* Tags */}
-          {tags.length > 0 && (
-            <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
-              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-                Tags
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <a
-                    key={tag}
-                    href={`/blog/tag/${tag.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    {tag}
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </article>
     </div>

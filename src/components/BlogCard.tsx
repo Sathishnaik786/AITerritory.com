@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, User, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, User, ArrowRight, Share2, Bookmark, Heart } from 'lucide-react';
 import { BlogPost } from '../types/blog';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
@@ -84,6 +84,37 @@ export const BlogCard: React.FC<BlogCardProps> = ({
   const displayDate = post.created_at || post.date;
   const displayReadingTime = post.reading_time ? `${post.reading_time} min` : (post.readTime ? `${post.readTime} min` : '');
 
+  const handleShare = (e: React.MouseEvent, post: BlogPost) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = `${window.location.origin}/blog/${post.slug}`;
+    if (navigator.share) {
+      navigator.share({
+        title: post.title,
+        text: post.description,
+        url: url,
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(url);
+      // Show a toast or notification here
+      alert('Link copied to clipboard!');
+    }
+  };
+
+  const handleBookmark = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Implement bookmark functionality
+    console.log('Bookmark clicked');
+  };
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Implement like functionality
+    console.log('Like clicked');
+  };
+
   if (variant === 'compact') {
     return (
       <motion.div
@@ -145,13 +176,36 @@ export const BlogCard: React.FC<BlogCardProps> = ({
       >
         <Link to={`/blog/${post.slug}`}>
           <Card className="h-full overflow-hidden border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 bg-gradient-to-br from-blue-50/90 via-white/90 to-purple-50/90 dark:from-gray-900/90 dark:via-gray-800/90 dark:to-gray-900/90 backdrop-blur-sm border border-blue-100/50 dark:border-gray-700/50">
-            <div className="aspect-[16/9] overflow-hidden relative rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
+            <div className="aspect-[16/9] overflow-hidden relative">
               <img
                 src={displayImage}
                 alt={post.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                className="w-full h-full object-contain bg-gray-100 dark:bg-gray-800"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute top-4 right-4 flex gap-2">
+                <button 
+                  onClick={(e) => handleLike(e)}
+                  className="p-2 rounded-full bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  aria-label="Like this post"
+                >
+                  <Heart className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={(e) => handleBookmark(e)}
+                  className="p-2 rounded-full bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  aria-label="Bookmark this post"
+                >
+                  <Bookmark className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={(e) => handleShare(e, post)}
+                  className="p-2 rounded-full bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  aria-label="Share this post"
+                >
+                  <Share2 className="w-4 h-4" />
+                </button>
+              </div>
               <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6">
                 <div className="flex items-center gap-2 mb-2">
                   <Badge 
@@ -221,7 +275,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
             <img
               src={displayImage}
               alt={post.title}
-              className="w-full h-full object-cover rounded-xl group-hover:scale-105 group-hover:brightness-110 transition-transform transition-filter duration-300"
+              className="w-full h-full object-contain bg-gray-100 dark:bg-gray-800"
             />
           </div>
           <CardContent className="p-4 sm:p-5">
