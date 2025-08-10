@@ -32,6 +32,9 @@ import { NewsletterService } from '../services/newsletterService';
 import { BlogDetailSkeleton } from '../components/SkeletonLoader';
 import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
 import { Helmet } from 'react-helmet';
+import { BlogLayout } from '@/components/blog/BlogLayout';
+import { BlogCard } from '@/components/BlogCard';
+import { BlogPost } from '@/types/blog';
 
 // Import remark-emoji with a type assertion
 import emoji from 'remark-emoji';
@@ -448,350 +451,60 @@ const BlogDetail: React.FC = () => {
   }
 
   return (
-    <>
-      {/* SEO Component with structured data */}
-      <SEO
-        title={blog.title}
-        description={blog.description || blog.content?.substring(0, 160)}
-        url={`https://aiterritory.org/blog/${blog.slug}`}
-        type="article"
-        publishedTime={blog.created_at}
-        modifiedTime={blog.updated_at}
-        author={blog.author_name || 'AITerritory'}
-        section={blog.category}
-        keywords={blog.tags?.join(', ')}
-        openGraph={{
-          type: 'article',
-          article: {
-            publishedTime: blog.created_at,
-            modifiedTime: blog.updated_at,
-            section: blog.category,
-            authors: blog.author_name ? [blog.author_name] : [],
-            tags: blog.tags || [],
-          },
-          images: [
-            {
-              url: blog.cover_image_url || 'https://aiterritory.org/images/og-default.jpg',
-              width: 1200,
-              height: 630,
-              alt: blog.title,
-            },
-          ],
-          site_name: 'AITerritory',
-        }}
-        twitter={{
-          cardType: 'summary_large_image' as const,
-          site: '@aiterritory',
-          handle: blog.author_twitter || '@aiterritory',
-        }}
-        additionalMetaTags={[
-          {
-            name: 'article:published_time',
-            content: blog.created_at,
-          },
-          {
-            name: 'article:modified_time',
-            content: blog.updated_at || blog.created_at,
-          },
-          {
-            name: 'article:section',
-            content: blog.category || 'Technology',
-          },
-          ...(blog.tags?.map(tag => ({
-            name: 'article:tag',
-            content: tag,
-          })) || []),
-        ]}
-      />
+    <BlogLayout
+      title={blog.title}
+      content={blog.content}
+      description={blog.description}
+      coverImage={blog.cover_image_url}
+      category={blog.category}
+      date={blog.created_at}
+      readingTime={readingTime}
+      tags={blog.tags || []}
+      author={{
+        name: blog.author_name,
+        avatar: blog.author_avatar_url
+      }}
+    >
+      <ContentRenderer content={blog.content} />
       
-      {/* Add critical CSS for social media previews */}
-      <Helmet>
-        <style>
-          {`
-            /* Critical CSS for social media previews */
-            .social-preview {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-              max-width: 100%;
-              line-height: 1.6;
-              color: #1a1a1a;
-              background: #ffffff;
-              padding: 20px;
-            }
-            .social-preview h1, 
-            .social-preview h2, 
-            .social-preview h3 {
-              line-height: 1.2;
-              margin-top: 1.5em;
-              margin-bottom: 0.5em;
-            }
-            .social-preview p {
-              margin-bottom: 1em;
-            }
-            .social-preview a {
-              color: #2563eb;
-              text-decoration: none;
-            }
-            .social-preview a:hover {
-              text-decoration: underline;
-            }
-            .social-preview pre, 
-            .social-preview code {
-              font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-              background-color: #f3f4f6;
-              padding: 0.2em 0.4em;
-              border-radius: 3px;
-              font-size: 85%;
-              overflow-x: auto;
-            }
-            .social-preview pre {
-              padding: 1em;
-            }
-            .social-preview img {
-              max-width: 100%;
-              height: auto;
-              border-radius: 8px;
-            }
-            /* Ensure proper spacing for social preview */
-            @media (max-width: 768px) {
-              .social-preview {
-                padding: 15px;
-              }
-            }
-          `}
-        </style>
-      </Helmet>
-
-      <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] overflow-x-hidden">
-        {/* Enhanced Reading Progress Bar - Client-side only to avoid hydration mismatch */}
-        {isClient && (
-          <div className="fixed top-0 left-0 w-full h-1 z-50 bg-gray-200 dark:bg-gray-800">
-            <motion.div
-              className="h-full bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500"
-              style={{ width: `${progress}%` }}
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-            />
-          </div>
-        )}
-        
-        {/* Hero Section */}
-        <motion.div 
-          className="w-full bg-white dark:bg-[#171717] border-b border-gray-100 dark:border-gray-800"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-        >
-          <div className="max-w-4xl mx-auto px-4 py-6">
-            {/* Breadcrumb Navigation */}
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 text-sm text-gray-600 dark:text-gray-400 overflow-x-auto">
-              <nav className="w-full" aria-label="Breadcrumb">
-                <ol className="flex items-center whitespace-nowrap min-w-max">
-                  <li className="inline-flex items-center">
-                    <a href="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                      <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-                      </svg>
-                      <span className="hidden sm:inline">Home</span>
-                    </a>
-                  </li>
-                  <li className="mx-2 text-gray-500">/</li>
-                  <li>
-                    <a href="/blog" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                      Blog
-                    </a>
-                  </li>
-                  <li className="mx-2 text-gray-500">/</li>
-                  <li className="text-gray-500 truncate max-w-[150px] sm:max-w-xs">
-                    {blog.title}
-                  </li>
-                </ol>
-              </nav>
-            </div>
-
-            {/* Category */}
-            <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">
-              {blog.category || 'ARTIFICIAL INTELLIGENCE'}
-            </div>
-
-            {/* Title */}
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
-              {blog.title}
-            </h1>
-          
-            {/* Author Information */}
-            <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 mb-2">
-              <span className="font-semibold text-blue-600 dark:text-blue-400 cursor-pointer hover:underline">
-                {blog.author_name || 'Sathish Kumar'}
-              </span>
-              <span className="text-gray-500">Senior Contributor.</span>
-              <span className="text-gray-500">&copy; Contributor bio here.</span>
-            </div>
-
-            {/* Reading Time and Publication Date */}
-            <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
-              <div className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                <span>{readingTime}</span>
-              </div>
-              <div>
-                {blog.created_at ? new Date(blog.created_at).toLocaleString(undefined, { 
-                  year: 'numeric', 
-                  month: 'short', 
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                }) : '28 Jul 2025, 12:56 pm'}
-              </div>
-            </div>
-
-            {/* Unified Action Buttons */}
-            <div className="flex items-center gap-3 mb-6">
-              {/* Like Button */}
-              <BlogLikeButton blogId={blog.slug} />
-              
-              {/* Comment Button */}
-              {isSignedIn ? (
-                <button
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  onClick={scrollToComments}
-                >
-                  <MessageCircle className="w-5 h-5" />
-                  <span className="text-sm font-medium">{commentsCount}</span>
-                </button>
-              ) : (
-                <SignInButton mode="modal">
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <MessageCircle className="w-5 h-5" />
-                    <span className="text-sm font-medium">{commentsCount}</span>
-                  </button>
-                </SignInButton>
-              )}
-              
-              {/* Share Button */}
-              <button
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                onClick={() => setShowShareBar((prev) => !prev)}
-              >
-                <Share2 className="w-5 h-5" />
-                <span className="text-sm font-medium">Share</span>
-              </button>
-              
-              {/* Save Button */}
-              <BlogBookmarkButton blogId={blog.slug} />
-            </div>
-
-            {/* Share Dropdown */}
-            {showShareBar && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowShareBar(false)}>
-                <div className="flex gap-2 bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg border border-gray-200 dark:border-gray-700" onClick={e => e.stopPropagation()}>
-                  <button onClick={() => handleShare('twitter')} className="rounded-full border border-gray-300 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
-                    <FaXTwitter className="w-5 h-5 text-blue-600" />
-                  </button>
-                  <button onClick={() => handleShare('linkedin')} className="rounded-full border border-gray-300 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
-                    <FaLinkedin className="w-5 h-5 text-[#0077b5]" />
-                  </button>
-                  <button onClick={() => handleShare('whatsapp')} className="rounded-full border border-gray-300 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 transition">
-                    <FaWhatsapp className="w-5 h-5 text-[#25d366]" />
-                  </button>
-                  <button onClick={() => handleShare('facebook')} className="rounded-full border border-gray-300 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
-                    <FaFacebook className="w-5 h-5 text-[#1877f3]" />
-                  </button>
-                  <button onClick={() => handleShare('copy')} className="rounded-full border border-gray-300 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                    <FaRegCopy className="w-5 h-5 text-gray-700 dark:text-gray-200" />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </motion.div>
-
-        {/* Cover Image */}
-        {blog.cover_image_url && (
-          <div className="w-full h-48 sm:h-64 md:h-80 lg:h-96 relative rounded-xl overflow-hidden mb-8 shadow-lg">
-            <motion.div 
-              className="w-full h-full relative"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10" />
-              <OptimizedImage
-                src={blog.cover_image_url}
-                alt={blog.title}
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                priority={true}
-                width="100%"
-                height="100%"
-                sizes="(max-width: 768px) 100vw, 80vw"
-              />
-            </motion.div>
-          </div>
-        )}
-
-        {/* Main Content */}
-        <div className="w-full">
-          <motion.div 
-            className="max-w-4xl mx-auto px-4 py-6 sm:py-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-          >
-            {/* Blog Description - Centered */}
-            {blog.description && (
-              <motion.div 
-                className="mb-10 text-center"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-              >
-                <div className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto">
-                  <ContentRenderer content={blog.description} />
-                </div>
-              </motion.div>
-            )}
-            {/* Content Renderer - Centered */}
-            <div className="max-w-3xl mx-auto">
-              <ContentRenderer
-                content={blog?.content || ''}
-                onHeadingsGenerated={handleHeadingsGenerated}
-              />
-
-              {/* Inline Newsletter CTA - Centered */}
-              {!isUserSubscribed && (
-                <div className="my-12">
-                  <NewsletterCTA onSubscribe={handleNewsletterSubscribe} onToast={toast} />
-                </div>
-              )}
-
-              {/* Comments Section - Centered */}
-              <div id="comments-section" className="mt-12">
-                <ThreadedComments blogId={blog.slug} />
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* You Might Also Like Section */}
-        <div className="bg-gray-50 dark:bg-gray-900 py-12 border-t border-gray-100 dark:border-gray-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">You Might Also Like</h2>
-            <YouMightAlsoLike currentSlug={blog.slug} />
-          </div>
-        </div>
-
-        {/* Back to Top Button - Client-side only */}
-        {isClient && progress > 20 && (
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg transition-all duration-200 transform hover:scale-105 z-40"
-            aria-label="Back to top"
-          >
-            <ArrowUp className="w-5 h-5" />
-          </button>
-        )}
+      {/* Comments Section */}
+      <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          Discussion ({commentsCount})
+        </h2>
+        <ThreadedComments blogId={blog.slug} />
       </div>
-    </>
+
+      {/* Related Posts */}
+      {relatedBlogs.length > 0 && (
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+            You Might Also Like
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {relatedBlogs.map((post) => {
+              const blogPost: BlogPost = {
+                id: post.id,
+                title: post.title,
+                slug: post.slug,
+                description: post.description || '',
+                content: post.content || '',
+                cover_image_url: post.cover_image_url || '',
+                author_name: post.author_name || 'AITerritory',
+                tags: post.tags || [],
+                created_at: post.created_at,
+                date: post.created_at,
+                category: post.category,
+                reading_time: post.reading_time,
+                author_image_url: post.author_avatar_url,
+                published: true
+              };
+              return <BlogCard key={post.id} post={blogPost} />;
+            })}
+          </div>
+        </div>
+      )}
+    </BlogLayout>
   );
 };
 

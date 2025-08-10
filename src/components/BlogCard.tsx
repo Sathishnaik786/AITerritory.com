@@ -144,40 +144,61 @@ export const BlogCard: React.FC<BlogCardProps> = ({
         className={`group cursor-pointer ${className}`}
       >
         <Link to={`/blog/${post.slug}`}>
-          <Card className="h-full overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-sm">
-            <div className="aspect-[16/9] overflow-hidden relative rounded-md border border-gray-200 dark:border-gray-800 shadow-md">
+          <Card className="h-full overflow-hidden border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 bg-gradient-to-br from-blue-50/90 via-white/90 to-purple-50/90 dark:from-gray-900/90 dark:via-gray-800/90 dark:to-gray-900/90 backdrop-blur-sm border border-blue-100/50 dark:border-gray-700/50">
+            <div className="aspect-[16/9] overflow-hidden relative rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm">
               <img
                 src={displayImage}
                 alt={post.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
-                  <Badge variant="secondary" className="text-xs bg-white/90 dark:bg-gray-800/90 px-1.5 py-0.5">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge 
+                    variant="secondary" 
+                    className="text-xs bg-white/90 text-blue-800 dark:bg-blue-900/80 dark:text-blue-100 px-2 py-1 border border-blue-200/50 dark:border-blue-800/50 backdrop-blur-sm"
+                  >
                     {displayCategory}
                   </Badge>
-                  <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-1.5 py-0.5">
+                  <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs px-2 py-1 border border-blue-400/30 dark:border-blue-600/30">
                     Featured
                   </Badge>
                 </div>
-                <h3 className="font-serif font-bold text-base sm:text-lg md:text-xl text-white line-clamp-2 group-hover:text-blue-200 transition-colors leading-tight group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
+                <h3 className="font-serif font-bold text-lg sm:text-xl md:text-2xl text-white line-clamp-2 group-hover:text-blue-200 transition-colors duration-300 leading-tight drop-shadow-lg">
                   {post.title}
                 </h3>
               </div>
             </div>
-            <CardContent className="p-4 sm:p-5 md:p-6">
-              <p className="text-xs sm:text-sm md:text-base text-gray-200 dark:text-gray-300 line-clamp-3 mb-4 leading-relaxed font-normal">
+            <CardContent className="p-5 sm:p-6 md:p-7">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 line-clamp-3 mb-5 leading-relaxed font-normal">
                 {displaySummary}
               </p>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 text-xs text-gray-200 dark:text-gray-300">
-                <span className="flex items-center gap-1"><User className="w-3 h-3" />{displayAuthor}</span>
-                <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{formatDate(displayDate)}</span>
-                {displayReadingTime && (
-                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{displayReadingTime}</span>
-                )}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800 pt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                    <User className="w-3.5 h-3.5 text-blue-600 dark:text-blue-300" />
+                  </div>
+                  <span>{displayAuthor}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                    {formatDate(displayDate)}
+                  </span>
+                  {displayReadingTime && (
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-purple-500" />
+                      {displayReadingTime}
+                    </span>
+                  )}
+                </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-1 transition-all duration-200 self-end sm:self-auto" />
+              <div className="mt-4 flex justify-end">
+                <span className="inline-flex items-center text-blue-600 dark:text-blue-400 font-medium text-sm group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
+                  Read more
+                  <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform duration-200" />
+                </span>
+              </div>
             </CardContent>
           </Card>
         </Link>

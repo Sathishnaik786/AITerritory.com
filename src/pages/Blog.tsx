@@ -195,76 +195,77 @@ const Blog: React.FC = () => {
         {/* Content */}
         {!isCategoryChanging && (
           <>
-            {/* Featured Blog Card */}
-            {featured && (
-              <motion.section
-                className="w-full max-w-6xl mx-auto mb-12"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                id="featured-post"
-                aria-labelledby="featured-post-heading"
-              >
-                <h2 id="featured-post-heading" className="sr-only">Featured Post</h2>
-                <BlogCard 
-                  post={featured} 
-                  variant="featured"
-                  className="hover:shadow-2xl transition-shadow duration-300"
-                />
-              </motion.section>
-            )}
-
-            {/* Blog Posts Grid */}
-            <section 
-              className="py-4"
-              aria-label="Blog posts"
-              role="region"
+            {/* Mobile: Vertical scroll snap carousel */}
+            <div
+              className="overflow-y-auto scroll-smooth snap-y snap-mandatory flex flex-col gap-8 py-8 hide-scrollbar sm:hidden"
+              style={{ 
+                height: '80vh', 
+                scrollPaddingTop: '2rem', 
+                scrollPaddingBottom: '2rem',
+                scrollSnapType: 'y mandatory'
+              }}
             >
-              {/* Mobile: Vertical scroll snap carousel */}
-              <div
-                className="overflow-y-auto scroll-smooth snap-y snap-mandatory flex flex-col gap-8 py-8 hide-scrollbar sm:hidden"
-                style={{ 
-                  height: '80vh', 
-                  scrollPaddingTop: '2rem', 
-                  scrollPaddingBottom: '2rem',
-                  scrollSnapType: 'y mandatory'
-                }}
-              >
-                {rest.map((post) => (
-                  <article
-                    key={post.id}
-                    className="snap-center mx-auto w-[90vw] max-w-md"
-                    aria-labelledby={`post-${post.id}-title`}
-                  >
-                    <BlogCard post={post} />
-                  </article>
-                ))}
-              </div>
-
-              {/* Desktop/Tablet: Grid */}
-              <div 
-                className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 hidden sm:grid"
-                role="list"
-                aria-label="Blog posts"
-              >
-                {rest.map((post) => (
-                  <article 
-                    key={post.id} 
-                    className="h-full"
-                    aria-labelledby={`post-${post.id}-title`}
-                    role="listitem"
-                  >
-                    <BlogCard post={post} className="h-full" />
-                  </article>
-                ))}
-              </div>
-
-              {rest.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 dark:text-gray-400">No posts found in this category. Check back later!</p>
-                </div>
+              {/* Featured Post (Mobile) */}
+              {featured && (
+                <article
+                  className="snap-center mx-auto w-[90vw] max-w-md"
+                  aria-labelledby={`post-${featured.id}-title`}
+                >
+                  <BlogCard post={featured} variant="featured" />
+                </article>
               )}
-            </section>
+              
+              {/* Regular Posts */}
+              {rest.map((post) => (
+                <article
+                  key={post.id}
+                  className="snap-center mx-auto w-[90vw] max-w-md"
+                  aria-labelledby={`post-${post.id}-title`}
+                >
+                  <BlogCard post={post} />
+                </article>
+              ))}
+            </div>
+
+            {/* Desktop/Tablet: Grid */}
+            <div 
+              className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 hidden sm:grid"
+              role="list"
+              aria-label="Blog posts"
+            >
+              {/* Featured Post (Desktop/Tablet) */}
+              {featured && (
+                <article 
+                  className="sm:col-span-2 lg:col-span-3 h-full"
+                  aria-labelledby={`post-${featured.id}-title`}
+                  role="listitem"
+                >
+                  <BlogCard 
+                    post={featured} 
+                    variant="featured"
+                    className="h-full"
+                  />
+                </article>
+              )}
+              
+              {/* Regular Posts */}
+              {rest.map((post) => (
+                <article 
+                  key={post.id} 
+                  className="h-full"
+                  aria-labelledby={`post-${post.id}-title`}
+                  role="listitem"
+                >
+                  <BlogCard post={post} className="h-full" />
+                </article>
+              ))}
+            </div>
+
+            {rest.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400">No posts found in this category. Check back later!</p>
+              </div>
+            )}
           </>
         )}
       </div>
