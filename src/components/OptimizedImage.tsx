@@ -10,6 +10,8 @@ interface OptimizedImageProps {
   fallbackSrc?: string;
   onLoad?: () => void;
   onError?: () => void;
+  width?: number | string;
+  height?: number | string;
 }
 
 export const OptimizedImage: React.FC<OptimizedImageProps> = ({
@@ -21,6 +23,8 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   fallbackSrc = '/placeholder.svg',
   onLoad,
   onError,
+  width,
+  height,
 }) => {
   const [imageSrc, setImageSrc] = useState<string>(fallbackSrc);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -81,6 +85,8 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         onError={handleError}
         style={{
           minHeight: '120px',
+          width: width,
+          height: height,
         }}
       />
       

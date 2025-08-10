@@ -584,34 +584,26 @@ const BlogDetail: React.FC = () => {
         >
           <div className="max-w-4xl mx-auto px-4 py-6">
             {/* Breadcrumb Navigation */}
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-sm text-gray-600 dark:text-gray-400">
-              <nav className="flex" aria-label="Breadcrumb">
-                <ol className="inline-flex items-center space-x-1 md:space-x-3">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 text-sm text-gray-600 dark:text-gray-400 overflow-x-auto">
+              <nav className="w-full" aria-label="Breadcrumb">
+                <ol className="flex items-center whitespace-nowrap min-w-max">
                   <li className="inline-flex items-center">
                     <a href="/" className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                      <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                       </svg>
-                      Home
+                      <span className="hidden sm:inline">Home</span>
                     </a>
                   </li>
+                  <li className="mx-2 text-gray-500">/</li>
                   <li>
-                    <div className="flex items-center">
-                      <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
-                      </svg>
-                      <a href="/blog" className="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 md:ml-2">Blog</a>
-                    </div>
+                    <a href="/blog" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                      Blog
+                    </a>
                   </li>
-                  <li aria-current="page">
-                    <div className="flex items-center">
-                      <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"></path>
-                      </svg>
-                      <span className="ml-1 text-gray-500 dark:text-gray-400 md:ml-2">
-                        {blog.title.length > 20 ? `${blog.title.substring(0, 20)}...` : blog.title}
-                      </span>
-                    </div>
+                  <li className="mx-2 text-gray-500">/</li>
+                  <li className="text-gray-500 truncate max-w-[150px] sm:max-w-xs">
+                    {blog.title}
                   </li>
                 </ol>
               </nav>
@@ -716,33 +708,48 @@ const BlogDetail: React.FC = () => {
 
         {/* Cover Image */}
         {blog.cover_image_url && (
-          <motion.div 
-            className="relative w-full max-w-4xl mx-auto mb-8"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
-          >
-            <OptimizedImage
-              src={blog.cover_image_url}
-              alt={blog.title}
-              className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover object-center rounded-lg"
-              priority={true}
-            />
-          </motion.div>
+          <div className="w-full h-48 sm:h-64 md:h-80 lg:h-96 relative rounded-xl overflow-hidden mb-8 shadow-lg">
+            <motion.div 
+              className="w-full h-full relative"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10" />
+              <OptimizedImage
+                src={blog.cover_image_url}
+                alt={blog.title}
+                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                priority={true}
+                width="100%"
+                height="100%"
+                sizes="(max-width: 768px) 100vw, 80vw"
+              />
+            </motion.div>
+          </div>
         )}
 
         {/* Main Content */}
         <div className="w-full">
-          <div className="max-w-4xl mx-auto px-4 py-8">
+          <motion.div 
+            className="max-w-4xl mx-auto px-4 py-6 sm:py-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
             {/* Blog Description - Centered */}
             {blog.description && (
-              <div className="mb-8 text-center">
-                <div className="text-lg text-gray-600 dark:text-gray-300 prose prose-sm max-w-3xl mx-auto">
+              <motion.div 
+                className="mb-10 text-center"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+              >
+                <div className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto">
                   <ContentRenderer content={blog.description} />
                 </div>
-              </div>
+              </motion.div>
             )}
-
             {/* Content Renderer - Centered */}
             <div className="max-w-3xl mx-auto">
               <ContentRenderer
@@ -762,7 +769,7 @@ const BlogDetail: React.FC = () => {
                 <ThreadedComments blogId={blog.slug} />
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* You Might Also Like Section */}
