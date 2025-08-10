@@ -1,43 +1,61 @@
+# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow: /auth/
-Disallow: /dashboard/
-Disallow: /settings/
-Disallow: /admin/
 Allow: /
-
-
-# Allow Google bot to crawl everything allowed above without delay
-User-agent: Googlebot
-Disallow: /auth/
-Disallow: /dashboard/
-Disallow: /settings/
 Disallow: /admin/
-Allow: /
+Disallow: /api/
+Disallow: /_next/
+Disallow: /*.json$
+Disallow: /*.xml$
 
-# Allow Bing bot with specific rules
-User-agent: Bingbot
-Disallow: /auth/
-Disallow: /dashboard/
-Disallow: /settings/
-Disallow: /admin/
-Allow: /
-
-# Allow other major search engines
-User-agent: Slurp
-Disallow: /auth/
-Disallow: /dashboard/
-Disallow: /settings/
-Disallow: /admin/
-Allow: /
-
-User-agent: DuckDuckBot
-Disallow: /auth/
-Disallow: /dashboard/
-Disallow: /settings/
-Disallow: /admin/
-Allow: /
-
-# Crawl delay for all bots (1 second)
-Crawl-delay: 1
-
+# Sitemaps
 Sitemap: https://aiterritory.org/sitemap.xml
+
+# Crawl-delay: 10
+
+# Allow all files with these extensions
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+Allow: /*.webp$
+Allow: /*.svg$
+Allow: /*.ico$
+
+# Block access to specific files
+Disallow: /_next/static/
+Disallow: /_next/data/
+Disallow: /_next/image/
+
+# Block access to specific file types
+Disallow: /*.jsx$
+Disallow: /*.ts$
+Disallow: /*.tsx$
+
+# Block access to specific query parameters
+Disallow: /*?*view=
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+
+# Block access to specific paths
+Disallow: /private/
+Disallow: /temp/
+
+# Allow Googlebot to access all pages
+User-agent: Googlebot
+Allow: /
+
+# Block other search engines from specific paths
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+
+# Block all other bots from specific paths
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+
+# Crawl-delay for all other bots
+Crawl-delay: 10

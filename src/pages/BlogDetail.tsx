@@ -31,6 +31,7 @@ import { useEngagementTracker } from '../hooks/useEngagementTracker';
 import { NewsletterService } from '../services/newsletterService';
 import { BlogDetailSkeleton } from '../components/SkeletonLoader';
 import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
+import { Helmet } from 'react-helmet';
 
 // Import remark-emoji with a type assertion
 import emoji from 'remark-emoji';
@@ -346,19 +347,68 @@ const BlogDetail: React.FC = () => {
     toast('No problem! You can subscribe anytime.');
   };
 
-  // SEO data for the blog
-  const seoData = useMemo(() => ({
-    title: blog?.title || 'Blog Post',
-    description: blog?.description || blog?.subtitle || `Read about ${blog?.title || 'this post'}`,
-    image: blog?.cover_image_url,
-    url: typeof window !== 'undefined' ? `${window.location.origin}/blog/${blog?.slug}` : '',
-    type: 'article' as const,
-    publishedTime: blog?.created_at,
-    modifiedTime: blog?.updated_at || blog?.created_at,
-    author: blog?.author_name,
-    section: blog?.category,
-    article: true, // Simplified for now, adjust according to your SEOProps type
-  }), [blog]);
+  // SEO data with enhanced OpenGraph and Twitter card support
+  const seoData = useMemo(() => {
+    if (!blog) return {};
+    
+    const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://aiterritory.org';
+    const blogUrl = `${siteUrl}/blog/${blog.slug}`;
+    const coverImage = blog.cover_image_url || `${siteUrl}/og-image.png`;
+    
+    return {
+      title: blog.title,
+      description: blog.description || blog.content?.substring(0, 160),
+      url: blogUrl,
+      type: 'article',
+      publishedTime: blog.created_at,
+      modifiedTime: blog.updated_at,
+      author: blog.author_name || 'AITerritory',
+      section: blog.category,
+      keywords: blog.tags?.join(', '),
+      openGraph: {
+        type: 'article',
+        article: {
+          publishedTime: blog.created_at,
+          modifiedTime: blog.updated_at,
+          section: blog.category,
+          authors: blog.author_name ? [blog.author_name] : [],
+          tags: blog.tags || [],
+        },
+        images: [
+          {
+            url: blog.cover_image_url || 'https://aiterritory.org/images/og-default.jpg',
+            width: 1200,
+            height: 630,
+            alt: blog.title,
+          },
+        ],
+        site_name: 'AITerritory',
+      },
+      twitter: {
+        cardType: 'summary_large_image' as const,
+        site: '@aiterritory',
+        handle: blog.author_twitter || '@aiterritory',
+      },
+      additionalMetaTags: [
+        {
+          name: 'article:published_time',
+          content: blog.created_at,
+        },
+        {
+          name: 'article:modified_time',
+          content: blog.updated_at || blog.created_at,
+        },
+        {
+          name: 'article:section',
+          content: blog.category || 'Technology',
+        },
+        ...(blog.tags?.map(tag => ({
+          name: 'article:tag',
+          content: tag,
+        })) || []),
+      ],
+    };
+  }, [blog]);
 
   // Handle client-side only content
   const [isClient, setIsClient] = useState(false);
@@ -399,9 +449,118 @@ const BlogDetail: React.FC = () => {
 
   return (
     <>
-      {/* SEO Component with structured data - This only renders in <head> */}
-      <SEO {...seoData} />
+      {/* SEO Component with structured data */}
+      <SEO
+        title={blog.title}
+        description={blog.description || blog.content?.substring(0, 160)}
+        url={`https://aiterritory.org/blog/${blog.slug}`}
+        type="article"
+        publishedTime={blog.created_at}
+        modifiedTime={blog.updated_at}
+        author={blog.author_name || 'AITerritory'}
+        section={blog.category}
+        keywords={blog.tags?.join(', ')}
+        openGraph={{
+          type: 'article',
+          article: {
+            publishedTime: blog.created_at,
+            modifiedTime: blog.updated_at,
+            section: blog.category,
+            authors: blog.author_name ? [blog.author_name] : [],
+            tags: blog.tags || [],
+          },
+          images: [
+            {
+              url: blog.cover_image_url || 'https://aiterritory.org/images/og-default.jpg',
+              width: 1200,
+              height: 630,
+              alt: blog.title,
+            },
+          ],
+          site_name: 'AITerritory',
+        }}
+        twitter={{
+          cardType: 'summary_large_image' as const,
+          site: '@aiterritory',
+          handle: blog.author_twitter || '@aiterritory',
+        }}
+        additionalMetaTags={[
+          {
+            name: 'article:published_time',
+            content: blog.created_at,
+          },
+          {
+            name: 'article:modified_time',
+            content: blog.updated_at || blog.created_at,
+          },
+          {
+            name: 'article:section',
+            content: blog.category || 'Technology',
+          },
+          ...(blog.tags?.map(tag => ({
+            name: 'article:tag',
+            content: tag,
+          })) || []),
+        ]}
+      />
       
+      {/* Add critical CSS for social media previews */}
+      <Helmet>
+        <style>
+          {`
+            /* Critical CSS for social media previews */
+            .social-preview {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+              max-width: 100%;
+              line-height: 1.6;
+              color: #1a1a1a;
+              background: #ffffff;
+              padding: 20px;
+            }
+            .social-preview h1, 
+            .social-preview h2, 
+            .social-preview h3 {
+              line-height: 1.2;
+              margin-top: 1.5em;
+              margin-bottom: 0.5em;
+            }
+            .social-preview p {
+              margin-bottom: 1em;
+            }
+            .social-preview a {
+              color: #2563eb;
+              text-decoration: none;
+            }
+            .social-preview a:hover {
+              text-decoration: underline;
+            }
+            .social-preview pre, 
+            .social-preview code {
+              font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+              background-color: #f3f4f6;
+              padding: 0.2em 0.4em;
+              border-radius: 3px;
+              font-size: 85%;
+              overflow-x: auto;
+            }
+            .social-preview pre {
+              padding: 1em;
+            }
+            .social-preview img {
+              max-width: 100%;
+              height: auto;
+              border-radius: 8px;
+            }
+            /* Ensure proper spacing for social preview */
+            @media (max-width: 768px) {
+              .social-preview {
+                padding: 15px;
+              }
+            }
+          `}
+        </style>
+      </Helmet>
+
       <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] overflow-x-hidden">
         {/* Enhanced Reading Progress Bar - Client-side only to avoid hydration mismatch */}
         {isClient && (
