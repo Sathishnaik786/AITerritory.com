@@ -49,3 +49,19 @@ dist-ssr
 *.sln
 *.sw?
 .env
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+dist/
+.netlify/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

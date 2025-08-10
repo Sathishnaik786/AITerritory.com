@@ -108,13 +108,50 @@ path = "/ai-for-business*"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Content-Security-Policy = """
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.aiterritory.org https://*.clerk.accounts.dev https://js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com;
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      font-src 'self' https://fonts.gstatic.com;
-      img-src 'self' data: https: blob:;
-      connect-src 'self' https://aiterritory-com.onrender.com https://clerk.aiterritory.org https://*.clerk.accounts.dev https://api.stripe.com wss://*.clerk.accounts.dev https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co https://www.google-analytics.com https://www.googletagmanager.com;
-      frame-src https://js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' 
+        https://clerk.aiterritory.org 
+        https://*.clerk.accounts.dev 
+        https://js.stripe.com 
+        https://www.googletagmanager.com 
+        https://www.google-analytics.com
+        https://www.youtube.com
+        https://s.ytimg.com;
+      style-src 'self' 'unsafe-inline' 
+        https://fonts.googleapis.com 
+        https://cdn.jsdelivr.net;
+      font-src 'self' 
+        https://fonts.gstatic.com 
+        https://cdn.jsdelivr.net
+        data:;
+      img-src 'self' 
+        data: 
+        https: 
+        blob: 
+        https://*.supabase.co
+        https://aiterritory-com.onrender.com
+        https://www.google-analytics.com
+        https://www.googletagmanager.com;
+      connect-src 'self' 
+        https://aiterritory-com.onrender.com 
+        https://clerk.aiterritory.org 
+        https://*.clerk.accounts.dev 
+        https://api.stripe.com 
+        wss://*.clerk.accounts.dev 
+        https://ckahkadgnaxzcfhmsdaj.supabase.co 
+        wss://ckahkadgnaxzcfhmsdaj.supabase.co 
+        https://www.google-analytics.com 
+        https://www.googletagmanager.com
+        https://sentry.io;
+      frame-src 
+        https://js.stripe.com 
+        https://www.youtube.com 
+        https://www.youtube-nocookie.com
+        https://clerk.aiterritory.org
+        https://*.clerk.accounts.dev;
       worker-src 'self' blob:;
+      media-src 'self' 
+        https://aiterritory-com.onrender.com
+        https://ckahkadgnaxzcfhmsdaj.supabase.co;
     """
 
 # Cache headers for static assets
@@ -149,90 +186,57 @@ path = "/ai-for-business*"
   to = "/"
   status = 301
 
-[[redirects]]
-  from = "/categories/art-generators"
-  to = "/"
-  status = 301
-
-[[redirects]]
-  from = "/categories/audio-generators"
-  to = "/"
-  status = 301
-
-# API redirects to backend
-[[redirects]]
-  from = "/api/blogs/*"
-  to = "https://aiterritory-com.onrender.com/api/blogs/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/comments/*"
-  to = "https://aiterritory-com.onrender.com/api/comments/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/*"
-  to = "https://aiterritory-com.onrender.com/api/:splat"
-  status = 200
-  force = true
-
-# Blog redirects
-[[redirects]]
-  from = "/blog/*"
-  to = "https://aiterritory-com.onrender.com/blog/:splat"
-  status = 200
-  force = true
-
-# 301 redirects for www and http versions
-[[redirects]]
-  from = "http://aiterritory.org/*"
-  to = "https://aiterritory.org/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "https://www.aiterritory.org/*"
-  to = "https://aiterritory.org/:splat"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "http://www.aiterritory.org/*"
-  to = "https://aiterritory.org/:splat"
-  status = 301
-  force = true
-
-# Remove query parameters from specific pages to prevent duplicate content
-[[redirects]]
-  from = "/tools/ai-text-generators*"
-  to = "/tools/ai-text-generators"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "/company/request-feature*"
-  to = "/company/request-feature"
-  status = 301
-  force = true
-
-# General query parameter cleanup for all pages
-[[redirects]]
-  from = "/*"
-  to = "/:splat"
-  status = 200
-  conditions = {query = {utm_source = ".*", utm_medium = ".*", utm_campaign = ".*", utm_term = ".*", utm_content = ".*", gclid = ".*", fbclid = ".*", _ga = ".*", _gl = ".*"}}
-  force = true
-
-# Catch-all redirect for SPA
+# Add any additional redirects here
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-[dev]
-  command = "npm run dev"
-  port = 3000
-  publish = "dist"
-  targetPort = 3000
+# Handle SPA routing - this should be the last redirect
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Handle 404s
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Handle CORS for API
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+
+# Handle CORS preflight
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
+
+# Handle SPA client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Handle 404s
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404

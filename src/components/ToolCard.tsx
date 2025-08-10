@@ -104,28 +104,59 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
 
     // Fetch and subscribe to views count
     const fetchViews = async () => {
-        const { data } = await supabase
-            .from('tools')
-            .select('views')
-            .eq('id', tool.id)
-            .single();
-        setViewsCount(data?.views ?? 0);
+      try {
+        if (!tool?.id) return;
+        
+        const { data, error } = await supabase
+          .from('tools')
+          .select('views')
+          .eq('id', tool.id)
+          .single();
+          
+        if (error) {
+          console.error('Error fetching views:', error);
+          return;
+        }
+        
+        if (data) {
+          setViewsCount(data.views ?? 0);
+        }
+      } catch (error) {
+        console.error('Unexpected error in fetchViews:', error);
+      }
     };
+    
     fetchViews();
-    const viewsChannel = supabase
+    
+    // Only set up subscription if we have a valid tool ID
+    if (tool?.id) {
+      const viewsChannel = supabase
         .channel(`realtime:tools:views:${tool.id}`)
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'tools', filter: `id=eq.${tool.id}` }, (payload) => {
-            const newViews = payload.new?.views;
-            if (typeof newViews === 'number') {
-                setViewsCount(newViews);
+        .on('postgres_changes', { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'tools', 
+          filter: `id=eq.${tool.id}` 
+        }, (payload) => {
+          if (payload.new && 'views' in payload.new) {
+            const newViews = Number(payload.new.views);
+            if (!isNaN(newViews)) {
+              setViewsCount(newViews);
             }
+          }
         })
         .subscribe();
-      
+        
+      return () => {
+        supabase.removeChannel(viewsChannel);
+        supabase.removeChannel(reviewChannel);
+        supabase.removeChannel(commentsChannel);
+      };
+    }
+    
     return () => {
       supabase.removeChannel(reviewChannel);
       supabase.removeChannel(commentsChannel);
-      supabase.removeChannel(viewsChannel);
     };
   }, [tool.id]);
 
