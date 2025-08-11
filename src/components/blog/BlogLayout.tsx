@@ -1,8 +1,11 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { motion } from 'framer-motion';
 import { OptimizedImage } from '../OptimizedImage';
-import { FaFacebook, FaTwitter, FaLinkedin, FaWhatsapp, FaRegCopy } from 'react-icons/fa';
+import { FaRegComment, FaRegHeart, FaHeart, FaRegBookmark, FaBookmark, FaShare } from 'react-icons/fa';
 import { format } from 'date-fns';
+import { useUser, SignInButton } from '@clerk/clerk-react';
+import { useLikesAndBookmarks } from '../../hooks/useLikesAndBookmarks';
+import { toast } from '../ui/sonner';
 
 type Author = {
   name?: string;
@@ -20,6 +23,8 @@ type BlogLayoutProps = {
   readingTime?: string;
   tags?: string[];
   children?: ReactNode;
+  slug: string;
+  commentsCount?: number;
 };
 
 export const BlogLayout: React.FC<BlogLayoutProps> = ({
@@ -33,10 +38,26 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
   readingTime,
   tags = [],
   children,
+  slug,
+  commentsCount = 0
 }) => {
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const { user, isSignedIn } = useUser();
+  const [copied, setCopied] = useState(false);
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  
+  // Initialize likes and bookmarks
+  const {
+    likeCount,
+    liked,
+    isTogglingLike,
+    toggleLike,
+    bookmarked,
+    toggleBookmark,
+    isTogglingBookmark
+  } = useLikesAndBookmarks(slug);
 
   const handleShare = (platform: string) => {
+    const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
     const shareUrl = encodeURIComponent(currentUrl);
     const shareText = encodeURIComponent(`${title} - AITerritory`);
     
@@ -55,16 +76,26 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
         break;
       case 'copy':
         navigator.clipboard.writeText(currentUrl);
-        // You might want to add a toast notification here
+        setCopied(true);
+        toast.success('Link copied to clipboard!');
+        setTimeout(() => setCopied(false), 2000);
         break;
       default:
         break;
     }
+    setShowShareOptions(false);
+  };
+
+  const scrollToComments = () => {
+    const commentsSection = document.getElementById('comments-section');
+    if (commentsSection) {
+      commentsSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Breadcrumb */}
         <nav className="mb-8 text-sm text-gray-600 dark:text-gray-400">
           <ol className="flex items-center space-x-2">
@@ -87,7 +118,7 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
         </nav>
 
         {/* Header */}
-        <header className="mb-12">
+        <header className="mb-8">
           {category && (
             <span className="inline-block px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-100 dark:bg-blue-900 dark:text-blue-200 rounded-full mb-4">
               {category}
@@ -97,122 +128,156 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
             {title}
           </h1>
           
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-8">
-            <div className="flex items-center">
-              {author?.avatar && (
-                <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                  <OptimizedImage 
-                    src={author.avatar} 
-                    alt={author.name || 'Author'} 
-                    width={40}
-                    height={40}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {author?.name || 'AITerritory'}
-                </p>
-                <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                  <time dateTime={date}>
-                    {format(new Date(date), 'MMMM d, yyyy')}
-                  </time>
-                  {readingTime && (
-                    <>
-                      <span className="mx-2">•</span>
-                      <span>{readingTime} min read</span>
-                    </>
-                  )}
-                </div>
+          {/* Author and Metadata */}
+          <div className="flex items-center mb-8">
+            {author?.avatar && (
+              <img 
+                src={author.avatar} 
+                alt={author.name} 
+                className="w-10 h-10 rounded-full mr-3 object-cover"
+              />
+            )}
+            <div>
+              <p className="font-medium text-gray-900 dark:text-white">{author?.name}</p>
+              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-4">
+                <time dateTime={date}>{format(new Date(date), 'MMMM d, yyyy')}</time>
+                {readingTime && <span>• {readingTime} min read</span>}
               </div>
             </div>
-            
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Share:</span>
+          </div>
+
+          {/* Cover Image */}
+          {coverImage && (
+            <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
+              <OptimizedImage 
+                src={coverImage} 
+                alt={title} 
+                className="w-full h-auto max-h-[500px] object-cover"
+              />
+            </div>
+          )}
+
+          {/* Engagement Bar */}
+          <div className="flex items-center justify-between py-4 border-t border-b border-gray-200 dark:border-gray-800 mb-8">
+            <div className="flex items-center space-x-4">
+              {/* Like Button */}
+              <div className="flex items-center">
+                {isSignedIn ? (
+                  <button
+                    onClick={() => toggleLike()}
+                    disabled={isTogglingLike}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-colors ${
+                      liked 
+                        ? 'text-red-500' 
+                        : 'text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400'
+                    }`}
+                    aria-label={liked ? 'Unlike' : 'Like'}
+                  >
+                    {liked ? (
+                      <FaHeart className="w-5 h-5 fill-current" />
+                    ) : (
+                      <FaRegHeart className="w-5 h-5" />
+                    )}
+                    <span className="text-sm font-medium">{likeCount}</span>
+                  </button>
+                ) : (
+                  <SignInButton mode="modal">
+                    <button 
+                      className="flex items-center space-x-2 px-4 py-2 rounded-full text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                      aria-label="Sign in to like"
+                    >
+                      <FaRegHeart className="w-5 h-5" />
+                      <span className="text-sm font-medium">{likeCount}</span>
+                    </button>
+                  </SignInButton>
+                )}
+              </div>
+
+              {/* Comment Button */}
               <button 
-                onClick={() => handleShare('twitter')} 
-                className="p-2 rounded-full hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors"
-                aria-label="Share on Twitter"
+                onClick={scrollToComments}
+                className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 rounded-full transition-colors"
               >
-                <FaTwitter className="w-5 h-5 text-blue-400" />
+                <FaRegComment className="w-5 h-5" />
+                <span className="text-sm font-medium">{commentsCount}</span>
               </button>
+
+              {/* Bookmark Button */}
               <button 
-                onClick={() => handleShare('facebook')} 
-                className="p-2 rounded-full hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors"
-                aria-label="Share on Facebook"
+                onClick={() => isSignedIn ? toggleBookmark() : null}
+                disabled={!isSignedIn || isTogglingBookmark}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-colors ${
+                  bookmarked 
+                    ? 'text-blue-500' 
+                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400'
+                }`}
+                aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark'}
               >
-                <FaFacebook className="w-5 h-5 text-blue-600" />
+                {bookmarked ? (
+                  <FaBookmark className="w-5 h-5 fill-current" />
+                ) : (
+                  <FaRegBookmark className="w-5 h-5" />
+                )}
               </button>
+            </div>
+
+            {/* Share Button */}
+            <div className="relative">
               <button 
-                onClick={() => handleShare('linkedin')} 
-                className="p-2 rounded-full hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors"
-                aria-label="Share on LinkedIn"
+                onClick={() => setShowShareOptions(!showShareOptions)}
+                className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 rounded-full transition-colors"
+                aria-label="Share"
               >
-                <FaLinkedin className="w-5 h-5 text-blue-700" />
+                <FaShare className="w-5 h-5" />
               </button>
-              <button 
-                onClick={() => handleShare('whatsapp')} 
-                className="p-2 rounded-full hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors"
-                aria-label="Share on WhatsApp"
-              >
-                <FaWhatsapp className="w-5 h-5 text-green-500" />
-              </button>
-              <button 
-                onClick={() => handleShare('copy')} 
-                className="p-2 rounded-full hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors"
-                aria-label="Copy link"
-              >
-                <FaRegCopy className="w-5 h-5 text-gray-500" />
-              </button>
+              
+              {/* Share Dropdown */}
+              {showShareOptions && (
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 z-10 border border-gray-200 dark:border-gray-700">
+                  <button 
+                    onClick={() => handleShare('twitter')}
+                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <span className="mr-2">🐦</span>
+                    Twitter
+                  </button>
+                  <button 
+                    onClick={() => handleShare('facebook')}
+                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <span className="mr-2">👍</span>
+                    Facebook
+                  </button>
+                  <button 
+                    onClick={() => handleShare('linkedin')}
+                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <span className="mr-2">💼</span>
+                    LinkedIn
+                  </button>
+                  <button 
+                    onClick={() => handleShare('whatsapp')}
+                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <span className="mr-2">💬</span>
+                    WhatsApp
+                  </button>
+                  <button 
+                    onClick={() => handleShare('copy')}
+                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <span className="mr-2">🔗</span>
+                    {copied ? 'Copied!' : 'Copy Link'}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>
 
-        {/* Cover Image */}
-        {coverImage && (
-          <motion.div 
-            className="w-full h-64 sm:h-80 md:h-96 lg:h-[500px] rounded-xl overflow-hidden mb-12 shadow-lg"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
-            <div className="w-full h-full relative">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent z-10" />
-              <OptimizedImage
-                src={coverImage}
-                alt={title}
-                className="w-full h-full object-cover"
-                priority={true}
-                width={1200}
-                height={630}
-                sizes="(max-width: 768px) 100vw, 80vw"
-              />
-            </div>
-          </motion.div>
-        )}
-
-        {/* Content */}
-        <div className="max-w-3xl mx-auto">
-          {description && (
-            <motion.div 
-              className="prose prose-lg dark:prose-invert max-w-none mb-12 text-lg text-gray-700 dark:text-gray-300 leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-            >
-              <p className="text-xl font-medium">{description}</p>
-            </motion.div>
-          )}
-
-          <motion.div 
-            className="prose dark:prose-invert max-w-none"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-          >
-            {children || content}
-          </motion.div>
+        {/* Blog Content */}
+        <div className="prose dark:prose-invert max-w-none">
+          {children}
         </div>
       </article>
     </div>

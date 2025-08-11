@@ -24,6 +24,8 @@ export interface BlogPost {
   summary?: string; // For compatibility with mock data
   bannerImage?: string; // For compatibility with mock data
   author?: string; // For compatibility with mock data
+  likeCount?: number; // Number of likes for the post
+  bookmarkCount?: number; // Number of bookmarks for the post
 }
 
 export interface BlogCategory {

@@ -4,6 +4,7 @@ export const blogPosts: BlogPost[] = [
   {
     id: '1',
     title: 'The Future of AI in Content Creation: What to Expect in 2024',
+    description: 'Discover how artificial intelligence is revolutionizing content creation and what trends are shaping the industry this year.',
     summary: 'Discover how artificial intelligence is revolutionizing content creation and what trends are shaping the industry this year.',
     content: `
 # The Future of AI in Content Creation: What to Expect in 2024
@@ -45,97 +46,188 @@ The future of AI in content creation is bright, but it requires careful navigati
 
 As we continue to explore the possibilities of AI, one thing is clear: the content creation landscape will never be the same.
     `,
+    cover_image_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=400&fit=crop',
     bannerImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=400&fit=crop',
+    author_name: 'Sarah Johnson',
     author: 'Sarah Johnson',
+    created_at: '2024-01-15T10:00:00Z',
     date: '2024-01-15',
     readTime: 8,
+    reading_time: '8 min read',
     category: 'AI Trends',
     tags: ['AI', 'Content Creation', 'Technology', 'Future'],
     slug: 'future-ai-content-creation-2024',
     featured: true,
-    published: true
+    published: true,
+    likeCount: 42,
+    bookmarkCount: 15,
+    author_image_url: 'https://randomuser.me/api/portraits/women/44.jpg',
+    author_bio: 'AI Content Strategist and Technology Writer',
+    author_social_links: {
+      twitter: 'https://twitter.com/sarahjohnson',
+      linkedin: 'https://linkedin.com/in/sarahjohnson',
+      github: 'https://github.com/sarahjohnson'
+    }
   },
   {
     id: '2',
     title: '10 Essential AI Tools Every Business Should Consider',
-    summary: 'A comprehensive guide to the most powerful AI tools that can transform your business operations and boost productivity.',
+    description: 'A comprehensive guide to the top AI tools that can help businesses streamline operations and boost productivity.',
+    summary: 'A comprehensive guide to the top AI tools that can help businesses streamline operations and boost productivity.',
     content: `
 # 10 Essential AI Tools Every Business Should Consider
 
-In today's competitive business landscape, leveraging artificial intelligence is no longer optional—it's essential. Here are the top AI tools that can revolutionize your business operations.
+In today's fast-paced business environment, artificial intelligence tools are no longer optional—they're essential for staying competitive. Here are 10 AI tools that can transform your business operations.
 
-## 1. ChatGPT for Customer Service
+## 1. AI-Powered Analytics Platforms
+### What They Do
+- Analyze large datasets to uncover insights
+- Predict future trends and customer behavior
+- Automate reporting and data visualization
 
-ChatGPT and similar conversational AI tools can handle customer inquiries 24/7, providing instant responses and reducing support costs.
+### Benefits
+- Data-driven decision making
+- Identify new business opportunities
+- Optimize marketing and sales strategies
 
-**Key Benefits:**
-- 24/7 availability
-- Consistent responses
-- Scalable support
-- Cost-effective
+## 2. Chatbots and Virtual Assistants
+### Key Features
+- 24/7 customer support
+- Handle routine inquiries
+- Multilingual support
 
-## 2. Grammarly for Content Quality
+### Business Impact
+- Reduce support costs
+- Improve customer satisfaction
+- Scale customer service operations
 
-AI-powered writing assistance ensures your communications are professional, error-free, and engaging.
+## 3. AI-Powered CRM Systems
+### Capabilities
+- Predictive lead scoring
+- Automated data entry
+- Sentiment analysis
 
-## 3. Canva's AI Design Tools
+### Advantages
+- Increase sales productivity
+- Improve customer relationships
+- Better forecast accuracy
 
-Create stunning visuals with AI assistance, from logo design to marketing materials.
+## 4. AI-Enhanced Cybersecurity
+### Protection Features
+- Real-time threat detection
+- Anomaly identification
+- Automated response to security incidents
 
-## 4. Salesforce Einstein for CRM
+### Why It Matters
+- Protect sensitive data
+- Reduce security risks
+- Ensure compliance with regulations
 
-Predictive analytics and automated insights help you understand customer behavior and optimize sales strategies.
+## 5. Intelligent Document Processing
+### Functionality
+- Extract data from documents
+- Automate data entry
+- Process invoices and receipts
 
-## 5. Zapier for Workflow Automation
+### Business Value
+- Reduce manual work
+- Minimize errors
+- Improve efficiency
 
-Connect your apps and automate repetitive tasks, saving hours of manual work.
+## 6. AI-Powered Marketing Automation
+### Features
+- Personalized content delivery
+- Campaign optimization
+- Customer segmentation
 
-## 6. Otter.ai for Meeting Transcription
+### Benefits
+- Higher conversion rates
+- Improved ROI on marketing spend
+- Better customer engagement
 
-Convert meetings into searchable text and extract key insights automatically.
+## 7. Predictive Maintenance Tools
+### Capabilities
+- Monitor equipment health
+- Predict failures before they happen
+- Schedule maintenance proactively
 
-## 7. Loom for Video Communication
+### Impact
+- Reduce downtime
+- Extend equipment life
+- Lower maintenance costs
 
-AI-enhanced video messaging with automatic transcription and translation.
+## 8. AI-Enhanced Recruitment Software
+### Features
+- Resume screening
+- Candidate matching
+- Interview scheduling
 
-## 8. Notion AI for Knowledge Management
+### Advantages
+- Faster hiring process
+- Reduce bias in hiring
+- Better candidate experience
 
-Organize and generate content with AI assistance for better team collaboration.
+## 9. AI-Powered Supply Chain Optimization
+### Benefits
+- Demand forecasting
+- Inventory optimization
+- Route optimization
 
-## 9. Calendly for Scheduling
+### Business Impact
+- Reduce costs
+- Improve efficiency
+- Enhance customer satisfaction
 
-AI-powered scheduling that learns your preferences and optimizes meeting times.
+## 10. AI for Financial Analysis
+### Features
+- Fraud detection
+- Risk assessment
+- Investment recommendations
 
-## 10. HubSpot's AI Marketing Tools
+### Value Proposition
+- Better financial decisions
+- Reduce risks
+- Identify new opportunities
 
-Automate marketing campaigns and personalize customer experiences at scale.
+## Implementation Tips
 
-## Implementation Strategy
-
-When implementing AI tools, consider:
-
-1. **Start Small**: Begin with one tool and master it before adding others
-2. **Train Your Team**: Ensure everyone understands how to use the tools effectively
-3. **Measure Results**: Track the impact on productivity and ROI
-4. **Stay Updated**: AI tools evolve rapidly, so keep up with new features
+1. Start with a clear business objective
+2. Choose tools that integrate with your existing systems
+3. Train your team on how to use AI tools effectively
+4. Measure results and adjust your approach as needed
+5. Stay updated with the latest AI developments
 
 ## Conclusion
 
-The right AI tools can transform your business operations, improve efficiency, and provide a competitive advantage. Start with the tools that address your most pressing needs and gradually expand your AI toolkit.
+AI tools are transforming how businesses operate across all industries. By implementing the right AI solutions, businesses can gain a competitive edge, improve efficiency, and drive growth. The key is to start small, focus on specific business challenges, and scale up as you see results.
     `,
+    cover_image_url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop',
     bannerImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop',
+    author_name: 'Michael Chen',
     author: 'Michael Chen',
-    date: '2024-01-10',
+    created_at: '2024-02-10T10:00:00Z',
+    date: '2024-02-10',
     readTime: 12,
+    reading_time: '12 min read',
     category: 'Business',
     tags: ['AI Tools', 'Business', 'Productivity', 'Automation'],
-    slug: '10-essential-ai-tools-business',
+    slug: 'essential-ai-tools-business',
     featured: true,
-    published: true
+    published: true,
+    likeCount: 35,
+    bookmarkCount: 22,
+    author_image_url: 'https://randomuser.me/api/portraits/men/45.jpg',
+    author_bio: 'AI Business Strategist and Technology Writer',
+    author_social_links: {
+      twitter: 'https://twitter.com/michaelchen',
+      linkedin: 'https://linkedin.com/in/michaelchen',
+      github: 'https://github.com/michaelchen'
+    }
   },
   {
     id: '3',
     title: 'Understanding Machine Learning: A Beginner\'s Guide',
+    description: 'Demystify machine learning with this comprehensive guide for beginners. Learn the basics, applications, and how to get started.',
     summary: 'Demystify machine learning with this comprehensive guide for beginners. Learn the basics, applications, and how to get started.',
     content: `
 # Understanding Machine Learning: A Beginner's Guide
@@ -226,19 +318,33 @@ Machine learning is transforming industries and creating new opportunities. Whil
 
 The key is to start small, practice regularly, and stay curious about new developments in the field.
     `,
+    cover_image_url: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&h=400&fit=crop',
     bannerImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&h=400&fit=crop',
+    author_name: 'Emily Rodriguez',
     author: 'Emily Rodriguez',
+    created_at: '2024-01-05T10:00:00Z',
     date: '2024-01-05',
     readTime: 15,
+    reading_time: '15 min read',
     category: 'Education',
     tags: ['Machine Learning', 'AI', 'Education', 'Technology'],
     slug: 'machine-learning-beginners-guide',
     featured: false,
-    published: true
+    published: true,
+    likeCount: 28,
+    bookmarkCount: 18,
+    author_image_url: 'https://randomuser.me/api/portraits/women/46.jpg',
+    author_bio: 'AI Education Specialist and Technology Writer',
+    author_social_links: {
+      twitter: 'https://twitter.com/emilyrodriguez',
+      linkedin: 'https://linkedin.com/in/emilyrodriguez',
+      github: 'https://github.com/emilyrodriguez'
+    }
   },
   {
     id: '4',
     title: 'The Ethics of AI: Balancing Innovation with Responsibility',
+    description: 'Explore the ethical considerations surrounding artificial intelligence and how we can ensure responsible AI development.',
     summary: 'Explore the ethical considerations surrounding artificial intelligence and how we can ensure responsible AI development.',
     content: `
 # The Ethics of AI: Balancing Innovation with Responsibility
@@ -327,19 +433,33 @@ As AI technology continues to advance, ethical considerations will become even m
 
 The future of AI depends not just on technological innovation, but on our ability to develop and deploy AI systems responsibly and ethically.
     `,
+    cover_image_url: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&h=400&fit=crop',
     bannerImage: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&h=400&fit=crop',
+    author_name: 'David Kim',
     author: 'David Kim',
+    created_at: '2023-12-28T10:00:00Z',
     date: '2023-12-28',
     readTime: 10,
+    reading_time: '10 min read',
     category: 'Ethics',
     tags: ['AI Ethics', 'Responsibility', 'Bias', 'Privacy'],
     slug: 'ethics-ai-innovation-responsibility',
     featured: false,
-    published: true
+    published: true,
+    likeCount: 25,
+    bookmarkCount: 12,
+    author_image_url: 'https://randomuser.me/api/portraits/men/47.jpg',
+    author_bio: 'AI Ethics Specialist and Technology Writer',
+    author_social_links: {
+      twitter: 'https://twitter.com/davidkim',
+      linkedin: 'https://linkedin.com/in/davidkim',
+      github: 'https://github.com/davidkim'
+    }
   },
   {
     id: '5',
     title: 'AI in Healthcare: Revolutionizing Patient Care',
+    description: 'Discover how artificial intelligence is transforming healthcare delivery, from diagnosis to treatment and patient monitoring.',
     summary: 'Discover how artificial intelligence is transforming healthcare delivery, from diagnosis to treatment and patient monitoring.',
     content: `
 # AI in Healthcare: Revolutionizing Patient Care
@@ -441,19 +561,33 @@ AI is revolutionizing healthcare by improving accuracy, efficiency, and accessib
 
 The key is to develop and deploy AI systems responsibly, ensuring they enhance rather than replace human care and benefit all patients equally.
     `,
+    cover_image_url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=400&fit=crop',
     bannerImage: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=800&h=400&fit=crop',
+    author_name: 'Dr. Lisa Wang',
     author: 'Dr. Lisa Wang',
+    created_at: '2023-12-20T10:00:00Z',
     date: '2023-12-20',
     readTime: 14,
+    reading_time: '14 min read',
     category: 'Healthcare',
     tags: ['Healthcare', 'AI', 'Medicine', 'Technology'],
     slug: 'ai-healthcare-revolutionizing-patient-care',
     featured: true,
-    published: true
+    published: true,
+    likeCount: 32,
+    bookmarkCount: 20,
+    author_image_url: 'https://randomuser.me/api/portraits/women/48.jpg',
+    author_bio: 'AI Healthcare Specialist and Technology Writer',
+    author_social_links: {
+      twitter: 'https://twitter.com/drlisawang',
+      linkedin: 'https://linkedin.com/in/drlisawang',
+      github: 'https://github.com/drlisawang'
+    }
   },
   {
     id: '6',
     title: 'Building Your First AI Chatbot: A Step-by-Step Tutorial',
+    description: 'Learn how to create a functional AI chatbot from scratch using modern tools and frameworks. Perfect for beginners!',
     summary: 'Learn how to create a functional AI chatbot from scratch using modern tools and frameworks. Perfect for beginners!',
     content: `
 # Building Your First AI Chatbot: A Step-by-Step Tutorial
@@ -736,15 +870,28 @@ Remember, the key to a successful chatbot is understanding your users' needs and
 
 Happy coding!
     `,
+    cover_image_url: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&h=400&fit=crop',
     bannerImage: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&h=400&fit=crop',
+    author_name: 'Alex Thompson',
     author: 'Alex Thompson',
+    created_at: '2023-12-15T10:00:00Z',
     date: '2023-12-15',
     readTime: 20,
+    reading_time: '20 min read',
     category: 'Tutorial',
     tags: ['Chatbot', 'AI', 'Tutorial', 'Programming'],
     slug: 'building-first-ai-chatbot-tutorial',
     featured: false,
-    published: true
+    published: true,
+    likeCount: 40,
+    bookmarkCount: 25,
+    author_image_url: 'https://randomuser.me/api/portraits/men/49.jpg',
+    author_bio: 'AI Chatbot Specialist and Technology Writer',
+    author_social_links: {
+      twitter: 'https://twitter.com/alexthompson',
+      linkedin: 'https://linkedin.com/in/alexthompson',
+      github: 'https://github.com/alexthompson'
+    }
   }
 ];
 
@@ -791,4 +938,4 @@ export const blogCategories = [
     description: 'Step-by-step guides and tutorials for AI development',
     postCount: 1
   }
-]; 
+];

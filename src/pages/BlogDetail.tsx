@@ -421,7 +421,7 @@ const BlogDetail: React.FC = () => {
   }, []);
 
   // Show loading state while blog data is being fetched
-  if (loading) {
+  if (loading || !blog) {
     return (
       <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717]">
         <BlogDetailSkeleton />
@@ -429,8 +429,22 @@ const BlogDetail: React.FC = () => {
     );
   }
 
+  // Destructure blog data with defaults to prevent undefined errors
+  const {
+    title = 'Blog Post',
+    content = '',
+    description = '',
+    cover_image_url = '',
+    category = 'Technology',
+    created_at = new Date().toISOString(),
+    author_name = 'AITerritory',
+    author_avatar_url = '',
+    tags = [],
+    reading_time = '5 min read'
+  } = blog || {};
+
   // Show error state if blog failed to load
-  if (error || !blog) {
+  if (error) {
     return (
       <div className="min-h-screen w-full bg-gray-50 dark:bg-[#171717] flex items-center justify-center">
         <div className="text-center">
@@ -452,23 +466,25 @@ const BlogDetail: React.FC = () => {
 
   return (
     <BlogLayout
-      title={blog.title}
-      content={blog.content}
-      description={blog.description}
-      coverImage={blog.cover_image_url}
-      category={blog.category}
-      date={blog.created_at}
-      readingTime={readingTime}
-      tags={blog.tags || []}
+      title={title}
+      content={content}
+      description={description}
+      coverImage={cover_image_url}
+      category={category}
+      date={created_at}
+      readingTime={reading_time}
+      tags={tags}
       author={{
-        name: blog.author_name,
-        avatar: blog.author_avatar_url
+        name: author_name,
+        avatar: author_avatar_url
       }}
+      slug={blog.slug}
+      commentsCount={commentsCount}
     >
-      <ContentRenderer content={blog.content} />
+      <ContentRenderer content={content} />
       
       {/* Comments Section */}
-      <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800">
+      <div id="comments-section" className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
           Discussion ({commentsCount})
         </h2>
@@ -483,23 +499,37 @@ const BlogDetail: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedBlogs.map((post) => {
-              const blogPost: BlogPost = {
+              const blogPost = {
                 id: post.id,
                 title: post.title,
                 slug: post.slug,
                 description: post.description || '',
+                excerpt: post.description || '',
                 content: post.content || '',
-                cover_image_url: post.cover_image_url || '',
+                cover_image: post.cover_image_url || '',
+                coverImage: post.cover_image_url || '',
+                cover_image_url: post.cover_image_url || '',  
                 author_name: post.author_name || 'AITerritory',
+                author: post.author_name || 'AITerritory', 
+                author_image_url: post.author_avatar_url,
+                author_avatar_url: post.author_avatar_url, 
                 tags: post.tags || [],
                 created_at: post.created_at,
                 date: post.created_at,
                 category: post.category,
-                reading_time: post.reading_time,
-                author_image_url: post.author_avatar_url,
-                published: true
+                reading_time: post.reading_time || '5 min read',
+                published: true,
+                likeCount: post.likeCount || 0,  
+                bookmarkCount: post.bookmarkCount || 0  
               };
-              return <BlogCard key={post.id} post={blogPost} />;
+              
+              return (
+                <BlogCard 
+                  key={post.id} 
+                  post={blogPost} 
+                  className="h-full"
+                />
+              );
             })}
           </div>
         </div>
