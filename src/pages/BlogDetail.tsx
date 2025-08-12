@@ -481,8 +481,6 @@ const BlogDetail: React.FC = () => {
       slug={blog.slug}
       commentsCount={commentsCount}
     >
-      <ContentRenderer content={content} />
-      
       {/* Comments Section */}
       <div id="comments-section" className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
