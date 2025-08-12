@@ -320,9 +320,13 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
 
         {/* Blog Content */}
         <div className="prose dark:prose-invert max-w-none">
+          {/* Content is rendered through children to avoid duplication */}
           {children}
         </div>
       </article>
     </div>
   );
 };
+
+export default BlogLayout;
+export type { BlogLayoutProps };
