@@ -1,7 +1,9 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { OptimizedImage } from '../OptimizedImage';
 import { FaRegComment, FaRegHeart, FaHeart, FaRegBookmark, FaBookmark, FaShare } from 'react-icons/fa';
+import { FaTwitter as FaXTwitter, FaLinkedin, FaFacebook, FaWhatsapp, FaTelegram } from 'react-icons/fa6';
+import { FiLink } from 'react-icons/fi';
 import { format } from 'date-fns';
 import { useUser, SignInButton } from '@clerk/clerk-react';
 import { useLikesAndBookmarks } from '../../hooks/useLikesAndBookmarks';
@@ -39,12 +41,13 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
   tags = [],
   children,
   slug,
-  commentsCount = 0
+  commentsCount = 0,
 }) => {
   const { user, isSignedIn } = useUser();
   const [copied, setCopied] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
-  
+  const shareRef = useRef<HTMLDivElement>(null);
+
   // Initialize likes and bookmarks
   const {
     likeCount,
@@ -52,15 +55,16 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
     isTogglingLike,
     toggleLike,
     bookmarked,
+    bookmarkCount,
     toggleBookmark,
-    isTogglingBookmark
+    isTogglingBookmark,
   } = useLikesAndBookmarks(slug);
 
   const handleShare = (platform: string) => {
     const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
     const shareUrl = encodeURIComponent(currentUrl);
     const shareText = encodeURIComponent(`${title} - AITerritory`);
-    
+
     switch (platform) {
       case 'twitter':
         window.open(`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}`, '_blank');
@@ -73,6 +77,9 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
         break;
       case 'whatsapp':
         window.open(`https://wa.me/?text=${shareText}%20${shareUrl}`, '_blank');
+        break;
+      case 'telegram':
+        window.open(`https://t.me/share/url?url=${shareUrl}&text=${shareText}`, '_blank');
         break;
       case 'copy':
         navigator.clipboard.writeText(currentUrl);
@@ -127,13 +134,13 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
             {title}
           </h1>
-          
+
           {/* Author and Metadata */}
           <div className="flex items-center mb-8">
             {author?.avatar && (
-              <img 
-                src={author.avatar} 
-                alt={author.name} 
+              <img
+                src={author.avatar}
+                alt={author.name}
                 className="w-10 h-10 rounded-full mr-3 object-cover"
               />
             )}
@@ -149,9 +156,9 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
           {/* Cover Image */}
           {coverImage && (
             <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
-              <OptimizedImage 
-                src={coverImage} 
-                alt={title} 
+              <OptimizedImage
+                src={coverImage}
+                alt={title}
                 className="w-full h-auto max-h-[500px] object-cover"
               />
             </div>
@@ -167,8 +174,8 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
                     onClick={() => toggleLike()}
                     disabled={isTogglingLike}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-colors ${
-                      liked 
-                        ? 'text-red-500' 
+                      liked
+                        ? 'text-red-500'
                         : 'text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400'
                     }`}
                     aria-label={liked ? 'Unlike' : 'Like'}
@@ -182,7 +189,7 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
                   </button>
                 ) : (
                   <SignInButton mode="modal">
-                    <button 
+                    <button
                       className="flex items-center space-x-2 px-4 py-2 rounded-full text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                       aria-label="Sign in to like"
                     >
@@ -194,7 +201,7 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
               </div>
 
               {/* Comment Button */}
-              <button 
+              <button
                 onClick={scrollToComments}
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 rounded-full transition-colors"
               >
@@ -203,71 +210,98 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
               </button>
 
               {/* Bookmark Button */}
-              <button 
-                onClick={() => isSignedIn ? toggleBookmark() : null}
-                disabled={!isSignedIn || isTogglingBookmark}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-colors ${
-                  bookmarked 
-                    ? 'text-blue-500' 
-                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400'
-                }`}
-                aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark'}
-              >
-                {bookmarked ? (
-                  <FaBookmark className="w-5 h-5 fill-current" />
+              <div className="flex items-center">
+                {isSignedIn ? (
+                  <button
+                    onClick={() => toggleBookmark()}
+                    disabled={isTogglingBookmark}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-colors ${
+                      bookmarked
+                        ? 'text-blue-500'
+                        : 'text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400'
+                    }`}
+                    aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark'}
+                  >
+                    {bookmarked ? (
+                      <FaBookmark className="w-5 h-5 fill-current" />
+                    ) : (
+                      <FaRegBookmark className="w-5 h-5" />
+                    )}
+                    <span className="text-sm font-medium">{bookmarkCount || 0}</span>
+                  </button>
                 ) : (
-                  <FaRegBookmark className="w-5 h-5" />
+                  <SignInButton mode="modal">
+                    <button
+                      className="flex items-center space-x-2 px-4 py-2 rounded-full text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                      aria-label="Sign in to bookmark"
+                    >
+                      <FaRegBookmark className="w-5 h-5" />
+                      <span className="text-sm font-medium">{bookmarkCount || 0}</span>
+                    </button>
+                  </SignInButton>
                 )}
-              </button>
+              </div>
             </div>
 
             {/* Share Button */}
-            <div className="relative">
-              <button 
+            <div className="relative" ref={shareRef}>
+              <button
                 onClick={() => setShowShareOptions(!showShareOptions)}
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 rounded-full transition-colors"
                 aria-label="Share"
+                aria-expanded={showShareOptions}
               >
                 <FaShare className="w-5 h-5" />
               </button>
-              
-              {/* Share Dropdown */}
+
+              {/* Share Dropdown with Real Icons */}
               {showShareOptions && (
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 z-10 border border-gray-200 dark:border-gray-700">
-                  <button 
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-10 border border-gray-200 dark:border-gray-700">
+                  <p className="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                    Share this article
+                  </p>
+                  <button
                     onClick={() => handleShare('twitter')}
                     className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    <span className="mr-2">🐦</span>
-                    Twitter
+                    <FaXTwitter className="w-5 h-5 mr-3 text-[#1DA1F2]" />
+                    <span>Twitter</span>
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleShare('facebook')}
                     className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    <span className="mr-2">👍</span>
-                    Facebook
+                    <FaFacebook className="w-5 h-5 mr-3 text-[#1877F2]" />
+                    <span>Facebook</span>
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleShare('linkedin')}
                     className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    <span className="mr-2">💼</span>
-                    LinkedIn
+                    <FaLinkedin className="w-5 h-5 mr-3 text-[#0077B5]" />
+                    <span>LinkedIn</span>
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleShare('whatsapp')}
                     className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    <span className="mr-2">💬</span>
-                    WhatsApp
+                    <FaWhatsapp className="w-5 h-5 mr-3 text-[#25D366]" />
+                    <span>WhatsApp</span>
                   </button>
-                  <button 
+                  <button
+                    onClick={() => handleShare('telegram')}
+                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <FaTelegram className="w-5 h-5 mr-3 text-[#0088CC]" />
+                    <span>Telegram</span>
+                  </button>
+                  <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                  <button
                     onClick={() => handleShare('copy')}
                     className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    <span className="mr-2">🔗</span>
-                    {copied ? 'Copied!' : 'Copy Link'}
+                    <FiLink className="w-5 h-5 mr-3" />
+                    <span>{copied ? 'Link copied!' : 'Copy link'}</span>
                   </button>
                 </div>
               )}
