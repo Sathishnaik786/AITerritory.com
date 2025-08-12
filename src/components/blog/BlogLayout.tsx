@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { useUser, SignInButton } from '@clerk/clerk-react';
 import { useLikesAndBookmarks } from '../../hooks/useLikesAndBookmarks';
 import { toast } from '../ui/sonner';
+import DOMPurify from 'dompurify';
 
 type Author = {
   name?: string;
@@ -131,9 +132,17 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
               {category}
             </span>
           )}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
             {title}
           </h1>
+          
+          {/* Blog Description */}
+          {description && (
+            <div 
+              className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 mb-6"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }} 
+            />
+          )}
 
           {/* Author and Metadata */}
           <div className="flex items-center mb-8">
