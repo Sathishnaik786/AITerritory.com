@@ -73,7 +73,12 @@ export const useLikesAndBookmarks = (blogId: string) => {
 
   // Query for fetching status - allow unlogged users to see counts
   const {
-    data: status = { likeCount: 0, liked: false, bookmarked: false },
+    data: status = { 
+      likeCount: 0, 
+      bookmarkCount: 0, 
+      liked: false, 
+      bookmarked: false 
+    },
     isLoading,
     error,
   } = useQuery({
@@ -107,7 +112,11 @@ export const useLikesAndBookmarks = (blogId: string) => {
       // Silent error handling - no toast
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+      // Invalidate all queries related to this blog post
+      queryClient.invalidateQueries({ 
+        queryKey: ['blog-interactions', blogId],
+        refetchType: 'active',
+      });
     },
   });
 
@@ -133,7 +142,11 @@ export const useLikesAndBookmarks = (blogId: string) => {
       // Silent error handling - no toast
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+      // Invalidate all queries related to this blog post
+      queryClient.invalidateQueries({ 
+        queryKey: ['blog-interactions', blogId],
+        refetchType: 'active',
+      });
     },
   });
 

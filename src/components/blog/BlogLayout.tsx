@@ -9,6 +9,7 @@ import { useUser, SignInButton } from '@clerk/clerk-react';
 import { useLikesAndBookmarks } from '../../hooks/useLikesAndBookmarks';
 import { toast } from '../ui/sonner';
 import DOMPurify from 'dompurify';
+import { trackShare } from '@/lib/analytics';
 
 type Author = {
   name?: string;
@@ -30,6 +31,8 @@ type BlogLayoutProps = {
   commentsCount?: number;
 };
 
+type SharePlatform = 'twitter' | 'facebook' | 'linkedin' | 'whatsapp' | 'copy';
+
 export const BlogLayout: React.FC<BlogLayoutProps> = ({
   title,
   content,
@@ -49,7 +52,7 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
   const [showShareOptions, setShowShareOptions] = useState(false);
   const shareRef = useRef<HTMLDivElement>(null);
 
-  // Initialize likes and bookmarks
+  // Initialize likes and bookmarks with the same hook used in BlogCard
   const {
     likeCount,
     liked,
@@ -61,10 +64,14 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
     isTogglingBookmark,
   } = useLikesAndBookmarks(slug);
 
-  const handleShare = (platform: string) => {
+  // Share functionality with tracking
+  const handleShare = (platform: SharePlatform) => {
     const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
     const shareUrl = encodeURIComponent(currentUrl);
     const shareText = encodeURIComponent(`${title} - AITerritory`);
+
+    // Track the share event with the correct parameter order and types
+    trackShare(platform, 'blog', slug, title, user?.id);
 
     switch (platform) {
       case 'twitter':
@@ -78,9 +85,6 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
         break;
       case 'whatsapp':
         window.open(`https://wa.me/?text=${shareText}%20${shareUrl}`, '_blank');
-        break;
-      case 'telegram':
-        window.open(`https://t.me/share/url?url=${shareUrl}&text=${shareText}`, '_blank');
         break;
       case 'copy':
         navigator.clipboard.writeText(currentUrl);
@@ -164,11 +168,14 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
 
           {/* Cover Image */}
           {coverImage && (
-            <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
+            <div className="mb-8 rounded-xl overflow-hidden shadow-lg aspect-video bg-gray-100 dark:bg-gray-800">
               <OptimizedImage
                 src={coverImage}
                 alt={title}
-                className="w-full h-auto max-h-[500px] object-cover"
+                className="w-full h-full object-cover"
+                width={1200}
+                height={630}
+                priority
               />
             </div>
           )}
@@ -257,62 +264,59 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
               <button
                 onClick={() => setShowShareOptions(!showShareOptions)}
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 rounded-full transition-colors"
-                aria-label="Share"
+                aria-label="Share options"
                 aria-expanded={showShareOptions}
               >
                 <FaShare className="w-5 h-5" />
+                <span className="text-sm font-medium">Share</span>
               </button>
 
-              {/* Share Dropdown with Real Icons */}
+              {/* Share Options Dropdown */}
               {showShareOptions && (
-                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-10 border border-gray-200 dark:border-gray-700">
-                  <p className="px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
-                    Share this article
-                  </p>
-                  <button
-                    onClick={() => handleShare('twitter')}
-                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <FaXTwitter className="w-5 h-5 mr-3 text-[#1DA1F2]" />
-                    <span>Twitter</span>
-                  </button>
-                  <button
-                    onClick={() => handleShare('facebook')}
-                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <FaFacebook className="w-5 h-5 mr-3 text-[#1877F2]" />
-                    <span>Facebook</span>
-                  </button>
-                  <button
-                    onClick={() => handleShare('linkedin')}
-                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <FaLinkedin className="w-5 h-5 mr-3 text-[#0077B5]" />
-                    <span>LinkedIn</span>
-                  </button>
-                  <button
-                    onClick={() => handleShare('whatsapp')}
-                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <FaWhatsapp className="w-5 h-5 mr-3 text-[#25D366]" />
-                    <span>WhatsApp</span>
-                  </button>
-                  <button
-                    onClick={() => handleShare('telegram')}
-                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <FaTelegram className="w-5 h-5 mr-3 text-[#0088CC]" />
-                    <span>Telegram</span>
-                  </button>
-                  <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
-                  <button
-                    onClick={() => handleShare('copy')}
-                    className="flex items-center w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <FiLink className="w-5 h-5 mr-3" />
-                    <span>{copied ? 'Link copied!' : 'Copy link'}</span>
-                  </button>
-                </div>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
+                >
+                  <div className="p-2">
+                    <button
+                      onClick={() => handleShare('twitter')}
+                      className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                    >
+                      <FaXTwitter className="w-5 h-5 mr-3 text-blue-400" />
+                      <span>X (Twitter)</span>
+                    </button>
+                    <button
+                      onClick={() => handleShare('facebook')}
+                      className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                    >
+                      <FaFacebook className="w-5 h-5 mr-3 text-blue-600" />
+                      <span>Facebook</span>
+                    </button>
+                    <button
+                      onClick={() => handleShare('linkedin')}
+                      className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                    >
+                      <FaLinkedin className="w-5 h-5 mr-3 text-blue-700" />
+                      <span>LinkedIn</span>
+                    </button>
+                    <button
+                      onClick={() => handleShare('whatsapp')}
+                      className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                    >
+                      <FaWhatsapp className="w-5 h-5 mr-3 text-green-500" />
+                      <span>WhatsApp</span>
+                    </button>
+                    <button
+                      onClick={() => handleShare('copy')}
+                      className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                    >
+                      <FiLink className="w-5 h-5 mr-3 text-gray-500" />
+                      <span>{copied ? 'Copied!' : 'Copy Link'}</span>
+                    </button>
+                  </div>
+                </motion.div>
               )}
             </div>
           </div>
