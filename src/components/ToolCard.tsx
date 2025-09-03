@@ -258,9 +258,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        whileHover={{ scale: 1.04, boxShadow: '0 10px 40px rgba(0,0,0,0.12)', y: -6 }}
-        whileTap={{ scale: 0.98, rotate: -2 }}
-        className="transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+        className="transition-all duration-300"
       >
         <Card 
           variant={getCardVariant()}
@@ -319,9 +317,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      whileHover={{ y: -8, scale: 1.03, boxShadow: '0 16px 48px rgba(0,0,0,0.13)' }}
-      whileTap={{ scale: 0.98, rotate: 1 }}
-      className="transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+      className="transition-all duration-300"
     >
       <Card 
         variant={getCardVariant()}

@@ -2,16 +2,16 @@ import { BlogPost } from '../types/blog';
 import { blogPosts } from '../data/blogPosts';
 import axios, { AxiosError, CancelTokenSource } from 'axios';
 
-// API configuration
+// API configuration - Use proxy in development, direct URL in production
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 const API_BASE_URL = isProduction 
-  ? 'https://aiterritory-com.onrender.com/api'
-  : 'http://localhost:3003/api';
+  ? 'https://aiterritory-com.onrender.com/api'  // Use direct backend URL in production
+  : '/api';  // Use proxy in development (matches vite.config.ts proxy setup)
 
 // Request configuration
 const DEFAULT_TIMEOUT = 10000; // 10 seconds
 const MAX_RETRIES = 2;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache TTL
+const CACHE_TTL = 1 * 60 * 1000; // 1 minute cache TTL (reduced from 5 minutes)
 
 // In-memory cache
 const cache: Record<string, { data: any; timestamp: number }> = {};
@@ -97,7 +97,15 @@ export const BlogService = {
     // Return cached data if available and valid
     if (isCacheValid(cacheKey)) {
       console.log(`[BlogService] Returning cached blog: ${slug}`);
-      return cache[cacheKey].data;
+      // Verify that the cached data actually matches the requested slug
+      const cachedData = cache[cacheKey].data;
+      if (cachedData && cachedData.slug === slug) {
+        return cachedData;
+      } else {
+        // If slug doesn't match, clear the cache entry
+        delete cache[cacheKey];
+        console.log(`[BlogService] Cache mismatch detected for blog: ${slug}, clearing cache`);
+      }
     }
 
     const url = `${API_BASE_URL}/blogs/${slug}`;
@@ -346,6 +354,23 @@ export const BlogService = {
       source.cancel('All requests cancelled');
     });
     console.log(`[BlogService] Cancelled ${Object.keys(activeRequests).length} active requests`);
+  },
+
+  // Add a method to clear cache for a specific blog
+  clearBlogCache(slug: string) {
+    const cacheKey = `blog_${slug}`;
+    delete cache[cacheKey];
+    console.log(`[BlogService] Cleared cache for blog: ${slug}`);
+  },
+  
+  // Add a method to clear all blog caches
+  clearAllBlogCaches() {
+    Object.keys(cache).forEach(key => {
+      if (key.startsWith('blog_')) {
+        delete cache[key];
+      }
+    });
+    console.log('[BlogService] Cleared all blog caches');
   },
 };
 

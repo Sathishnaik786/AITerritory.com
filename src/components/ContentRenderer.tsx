@@ -92,14 +92,7 @@ export const ContentRenderer: React.FC<ContentRendererProps> = ({
     setIsClient(true);
   }, []);
 
-  // Only log in development
-  if (import.meta.env.DEV && isClient) {
-    console.log('ContentRenderer received content:', { 
-      contentLength: content?.length, 
-      contentType: typeof content,
-      contentPreview: content?.substring(0, 100) 
-    });
-  }
+
 
   const headings = useMemo(() => {
     if (!content || typeof content !== 'string') return [];

@@ -62,6 +62,24 @@ const BlogDetail: React.FC = () => {
       });
     }
   }, [blog?.slug]);
+
+  // Clear cache for previous blog when slug changes
+  useEffect(() => {
+    if (slug) {
+      // Clear cache for the current blog to ensure fresh data
+      BlogService.clearBlogCache(slug);
+    }
+  }, [slug]);
+
+  // Clear cache when component unmounts
+  useEffect(() => {
+    return () => {
+      if (slug) {
+        BlogService.clearBlogCache(slug);
+      }
+    };
+  }, [slug]);
+
   // In BlogDetail component, add state for recentBlogs and relatedBlogs
   const [recentBlogs, setRecentBlogs] = useState<any[]>([]);
   const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
@@ -144,8 +162,11 @@ const BlogDetail: React.FC = () => {
   // Fetch blog data with proper error handling
   useEffect(() => {
     if (slug) {
+      // Reset blog data when slug changes to prevent displaying old data
+      setBlog(null);
       setLoading(true);
       setError(null);
+      
       BlogService.getBySlug(slug)
         .then(data => {
           console.log('Blog loaded:', data);

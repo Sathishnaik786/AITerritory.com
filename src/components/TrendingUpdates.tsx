@@ -113,7 +113,7 @@ export function TrendingUpdates() {
                     src={update.image}
                     alt={update.title}
                     loading="lazy"
-                    className="w-full h-full object-cover transition-opacity duration-500 ease-in-out blur-sm hover:blur-0"
+                    className="w-full h-full object-cover transition-opacity duration-500 ease-in-out"
                   />
                   <div className="absolute top-4 left-4">
                     <span className="px-3 py-1 text-sm font-medium bg-primary/90 text-primary-foreground rounded-full">

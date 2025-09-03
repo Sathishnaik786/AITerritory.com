@@ -10,6 +10,7 @@ import { useLikesAndBookmarks } from '../../hooks/useLikesAndBookmarks';
 import { toast } from '../ui/sonner';
 import DOMPurify from 'dompurify';
 import { trackShare } from '@/lib/analytics';
+import { ContentRenderer } from '../ContentRenderer';
 
 type Author = {
   name?: string;
@@ -47,6 +48,8 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
   slug,
   commentsCount = 0,
 }) => {
+
+
   const { user, isSignedIn } = useUser();
   const [copied, setCopied] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
@@ -145,6 +148,7 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
             <div 
               className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-gray-300 mb-6"
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }} 
+              key={`description-${slug}`}
             />
           )}
 
@@ -324,9 +328,12 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
 
         {/* Blog Content */}
         <div className="prose dark:prose-invert max-w-none">
-          {/* Content is rendered through children to avoid duplication */}
-          {children}
+          {/* Render blog content using ContentRenderer */}
+          <ContentRenderer content={content} />
         </div>
+
+        {/* Render children (comments, related posts, etc.) */}
+        {children}
       </article>
     </div>
   );
