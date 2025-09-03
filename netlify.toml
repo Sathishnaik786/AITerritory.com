@@ -24,18 +24,6 @@
   NODE_VERSION = "18.19.0"
   NODE_OPTIONS = "--openssl-legacy-provider"
 
-# Clear cache before build
-[[plugins]]
-  package = "@netlify/plugin-cache"
-  [plugins.inputs]
-    paths = ["node_modules/.cache"]
-
-# Add build plugin to clear cache between builds
-[[plugins]]
-  package = "netlify-plugin-cache"
-  [plugins.inputs]
-    path = [".netlify/cache", "node_modules/.cache"]
-
 # Functions configuration
 [functions]
   directory = "netlify/functions"
