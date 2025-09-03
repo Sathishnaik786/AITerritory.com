@@ -8,19 +8,33 @@
 [context.production.environment]
   NETLIFY_KV_STORE_ID = "your-kv-store-id" # Replace with actual KV store ID
   NODE_ENV = "production"
+  NPM_FLAGS = "--production=false"
+  NPM_VERBOSE = "true"
 
 # Build configuration
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
   node-version = "18.19.0"
 
 [build.environment]
-  # Ensure devDependencies (like Vite, TypeScript, plugins) are installed on Netlify
   NPM_FLAGS = "--include=dev --legacy-peer-deps"
   NPM_CONFIG_PRODUCTION = "false"
   NODE_VERSION = "18.19.0"
   NODE_OPTIONS = "--openssl-legacy-provider"
+
+# Clear cache before build
+[[plugins]]
+  package = "@netlify/plugin-cache"
+  [plugins.inputs]
+    paths = ["node_modules/.cache"]
+
+# Add build plugin to clear cache between builds
+[[plugins]]
+  package = "netlify-plugin-cache"
+  [plugins.inputs]
+    path = [".netlify/cache", "node_modules/.cache"]
 
 # Functions configuration
 [functions]

@@ -1,18 +1,19 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "ai-tools-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": "18.19.0",
+    "node": ">=18.19.0",
     "npm": ">=8.0.0"
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "rimraf dist && tsc && vite build",
     "build:dev": "vite build --mode development",
+    "preview": "vite preview --host",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
     "server:dev": "cd server && npm run dev",
     "server:install": "cd server && npm install",
     "setup": "npm install && npm run server:install",
@@ -22,7 +23,9 @@
     "post-build-ping": "node scripts/ping-search-engines.js",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "generate:sitemap": "node scripts/generate-sitemap.js",
-    "test:social-previews": "node scripts/test-social-previews.js"
+    "test:social-previews": "node scripts/test-social-previews.js",
+    "analyze": "vite build --mode analyze",
+    "start": "vite preview --host"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.31.9",
@@ -37,6 +40,7 @@
     "@mui/material": "^5.15.10",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-collapsible": "^1.0.3",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-navigation-menu": "^1.1.2",
     "@radix-ui/react-scroll-area": "^1.0.3",
@@ -128,7 +132,9 @@
     "postcss": "^8.4.47",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.10",
+    "rimraf": "^5.0.1",
     "rollup": "^3.29.4",
+    "rollup-plugin-visualizer": "^5.10.0",
     "typescript": "^5.3.3",
     "vite": "^4.5.0",
     "vite-plugin-compression": "^0.5.1",

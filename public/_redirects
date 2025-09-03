@@ -2,5 +2,8 @@
 /blog/*    /blog/:splat    200
 /clear-cache    /blog?deploy=clear-cache    200
 
+# Handle client-side routing, return all requests to index.html
+/*    /index.html   200
+
 # All other routes
 /*         /index.html                                         200 

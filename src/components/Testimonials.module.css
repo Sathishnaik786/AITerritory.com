@@ -1,0 +1,242 @@
+/* Main section */
+.testimonialsSection {
+  --gradient-color-1: #4f46e5;
+  --gradient-color-2: #7c3aed;
+  --gradient-color-3: #a78bfa;
+  --gradient-color-4: #c4b5fd;
+  
+  position: relative;
+  padding: 5rem 0;
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.highlight {
+  background: linear-gradient(90deg, var(--gradient-color-1), var(--gradient-color-3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 1.125rem;
+  max-width: 48rem;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Loading and error states */
+.loading,
+.error {
+  text-align: center;
+  padding: 2rem 0;
+  color: var(--color-text);
+  font-size: 1.125rem;
+}
+
+.error {
+  color: var(--color-error);
+}
+
+/* Testimonials carousel */
+.testimonialsContainer {
+  position: relative;
+  margin: 2rem 0;
+  overflow: hidden;
+}
+
+.testimonialsTrack {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  width: max-content;
+  will-change: transform;
+}
+
+.scrollLeft {
+  animation: scroll-left 40s linear infinite;
+  animation-play-state: running;
+  margin-bottom: 1.5rem;
+}
+
+.scrollRight {
+  animation: scroll-right 45s linear infinite;
+  animation-play-state: running;
+}
+
+.testimonialCard {
+  width: 22rem;
+  flex-shrink: 0;
+  background: var(--color-card);
+  border-radius: 0.75rem;
+  padding: 1.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid var(--color-border);
+}
+
+.testimonialCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.testimonialContent {
+  color: var(--color-text);
+  margin-bottom: 1.25rem;
+  line-height: 1.7;
+  font-size: 0.975rem;
+}
+
+.testimonialFooter {
+  display: flex;
+  align-items: center;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1rem;
+  border: 2px solid var(--color-primary-100);
+}
+
+.defaultAvatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary-50), var(--color-primary-100));
+  color: var(--color-primary-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-right: 1rem;
+  font-size: 0.875rem;
+  border: 2px solid var(--color-primary-100);
+}
+
+.testimonialName {
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.testimonialRole {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Stars */
+.stars {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.star {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.activeStar {
+  color: #f59e0b;
+}
+
+.inactiveStar {
+  color: var(--color-border);
+}
+
+/* Animations */
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-250px * var(--items-count, 1))); }
+}
+
+@keyframes scroll-right {
+  0% { transform: translateX(calc(-250px * var(--items-count, 1))); }
+  100% { transform: translateX(0); }
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .testimonialCard {
+    width: 20rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .testimonialsSection {
+    padding: 3.5rem 0;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .testimonialCard {
+    width: 18rem;
+    padding: 1.5rem;
+  }
+  
+  .testimonialsTrack {
+    gap: 1rem;
+  }
+  
+  .scrollLeft {
+    animation-duration: 30s;
+  }
+  
+  .scrollRight {
+    animation-duration: 35s;
+  }
+}
+
+@media (max-width: 480px) {
+  .testimonialCard {
+    width: 16rem;
+  }
+  
+  .testimonialContent {
+    font-size: 0.9rem;
+  }
+  
+  .testimonialName {
+    font-size: 0.9375rem;
+  }
+  
+  .testimonialRole {
+    font-size: 0.8125rem;
+  }
+}
