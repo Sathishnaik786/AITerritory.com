@@ -328,8 +328,8 @@ const LandingPro: React.FC = () => {
         <Suspense fallback={null}>
           <Testimonials />
         </Suspense>
-        <div className="w-full overflow-hidden">
-          <FAQ />
+        <div className="w-full overflow-hidden mt-12">
+          <FAQ className="rounded-2xl" />
         </div>
       </div>
     </>

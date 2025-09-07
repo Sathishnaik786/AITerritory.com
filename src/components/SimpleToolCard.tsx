@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tool } from '../data/tools';
+import { Tool } from '../types/tool';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -8,7 +8,7 @@ interface SimpleToolCardProps {
 }
 
 const SimpleToolCard: React.FC<SimpleToolCardProps> = ({ tool }) => {
-  const imageSrc = tool.image_url || tool.image;
+  const imageSrc = tool.image_url;
   return (
     <motion.div
       whileHover={{ scale: 1.03 }}
@@ -18,7 +18,7 @@ const SimpleToolCard: React.FC<SimpleToolCardProps> = ({ tool }) => {
     >
       <div className="flex items-center mb-3">
         {imageSrc ? (
-          <img loading="lazy" src={imageSrc} alt={tool.name} className="w-12 h-12 object-contain rounded-full mr-3 transition-opacity duration-500 ease-in-out blur-sm hover:blur-0" />
+          <img loading="lazy" src={imageSrc} alt={tool.name} className="w-12 h-12 object-contain rounded-full mr-3 transition-opacity duration-500 ease-in-out" />
         ) : (
           <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 text-lg font-bold">
             {tool.name.charAt(0)}
@@ -43,4 +43,4 @@ const SimpleToolCard: React.FC<SimpleToolCardProps> = ({ tool }) => {
   );
 };
 
-export default SimpleToolCard; 
+export default SimpleToolCard;

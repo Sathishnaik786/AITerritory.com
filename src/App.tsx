@@ -289,12 +289,11 @@ function ThemedAppContent() {
           </div>
         </div>
         <NavbarNewsletterModal isOpen={newsletterOpen} onClose={() => setNewsletterOpen(false)} />
-        {/* Only show Footer if not on LandingPro */}
-        {!isLandingPro && <Footer />}
+        <Footer />
       </HelmetProvider>
     </div>
   );
-}
+};
 
 // Global Error Boundary
 class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any, errorInfo: any}> {

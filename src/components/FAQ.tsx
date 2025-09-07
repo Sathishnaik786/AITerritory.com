@@ -55,7 +55,7 @@ const FAQ: React.FC<FAQProps> = ({ category, className = "" }) => {
       },
       {
         question: "What types of images can AI generators create?",
-        answer: "AI image generators can create various types of images including photorealistic scenes, artistic paintings, illustrations, concept art, product mockups, social media graphics, and more. The range depends on the specific tool and its training data."
+        answer: "AI image generators can create various types of images including photorealistic scenes, artistic paintings, illustrations, concept art, product mockups, and more. The range depends on the specific tool and its training data."
       }
     ],
     "ai-art-generators": [
@@ -129,7 +129,7 @@ const FAQ: React.FC<FAQProps> = ({ category, className = "" }) => {
   const faqs = category && categoryFAQs[category] ? categoryFAQs[category] : defaultFAQs;
 
   return (
-    <section className={`py-12 bg-gray-50 dark:bg-gray-900 ${className}`}>
+    <section className={`py-16 ${className}`}>
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">
@@ -139,14 +139,14 @@ const FAQ: React.FC<FAQProps> = ({ category, className = "" }) => {
             {faqs.map((faq, index) => (
               <details
                 key={index}
-                className="group bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <summary className="flex items-center justify-between p-5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors rounded-xl">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {faq.question}
                   </h3>
                   <svg
-                    className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform"
+                    className="w-6 h-6 text-blue-500 group-open:rotate-180 transition-transform duration-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -159,7 +159,7 @@ const FAQ: React.FC<FAQProps> = ({ category, className = "" }) => {
                     />
                   </svg>
                 </summary>
-                <div className="px-4 pb-4">
+                <div className="px-5 pb-5">
                   <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                     {faq.answer}
                   </p>
