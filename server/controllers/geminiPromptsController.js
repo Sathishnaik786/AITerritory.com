@@ -25,6 +25,8 @@ exports.getAllGeminiPrompts = async (req, res) => {
     data.slice(0, 5).forEach((prompt, index) => {
       console.log(`${index + 1}. ID: ${prompt.id}, Category: ${prompt.category}, Image URL: ${prompt.image_url}`);
     });
+  } else {
+    console.log('No prompts found in database');
   }
   
   // Send raw data without deepStringify

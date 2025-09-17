@@ -134,7 +134,6 @@ path = "/ai-for-business*"
         https://www.google-analytics.com
         https://www.googletagmanager.com;
       connect-src 'self' 
-        http://localhost:3003
         https://aiterritory-com.onrender.com 
         https://clerk.aiterritory.org 
         https://*.clerk.accounts.dev 
@@ -155,114 +154,6 @@ path = "/ai-for-business*"
       media-src 'self' 
         https://aiterritory-com.onrender.com
         https://ckahkadgnaxzcfhmsdaj.supabase.co;
-    """
-
-# Development environment headers (local development)
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    Content-Security-Policy = """
-      default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' 
-        http://localhost:3003
-        https://clerk.aiterritory.org 
-        https://*.clerk.accounts.dev 
-        https://js.stripe.com 
-        https://www.googletagmanager.com 
-        https://www.google-analytics.com
-        https://www.youtube.com
-        https://s.ytimg.com;
-      style-src 'self' 'unsafe-inline' 
-        https://fonts.googleapis.com 
-        https://cdn.jsdelivr.net;
-      font-src 'self' 
-        https://fonts.gstatic.com 
-        https://cdn.jsdelivr.net
-        data:;
-      img-src 'self' 
-        data: 
-        https: 
-        blob: 
-        https://*.supabase.co
-        https://aiterritory-com.onrender.com
-        https://www.google-analytics.com
-        https://www.googletagmanager.com;
-      connect-src 'self' 
-        http://localhost:3003
-        https://aiterritory-com.onrender.com 
-        https://clerk.aiterritory.org 
-        https://*.clerk.accounts.dev 
-        https://api.stripe.com 
-        wss://*.clerk.accounts.dev 
-        https://ckahkadgnaxzcfhmsdaj.supabase.co 
-        wss://ckahkadgnaxzcfhmsdaj.supabase.co 
-        https://www.google-analytics.com 
-        https://www.googletagmanager.com
-        https://sentry.io;
-      frame-src 
-        https://js.stripe.com 
-        https://www.youtube.com 
-        https://www.youtube-nocookie.com
-        https://clerk.aiterritory.org
-        https://*.clerk.accounts.dev;
-    """
-
-# Production environment headers
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    Content-Security-Policy = """
-      default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' 
-        https://clerk.aiterritory.org 
-        https://*.clerk.accounts.dev 
-        https://js.stripe.com 
-        https://www.googletagmanager.com 
-        https://www.google-analytics.com
-        https://www.youtube.com
-        https://s.ytimg.com;
-      style-src 'self' 'unsafe-inline' 
-        https://fonts.googleapis.com 
-        https://cdn.jsdelivr.net;
-      font-src 'self' 
-        https://fonts.gstatic.com 
-        https://cdn.jsdelivr.net
-        data:;
-      img-src 'self' 
-        data: 
-        https: 
-        blob: 
-        https://*.supabase.co
-        https://aiterritory-com.onrender.com
-        https://www.google-analytics.com
-        https://www.googletagmanager.com;
-      connect-src 'self' 
-        https://aiterritory-com.onrender.com 
-        https://clerk.aiterritory.org 
-        https://*.clerk.accounts.dev 
-        https://api.stripe.com 
-        wss://*.clerk.accounts.dev 
-        https://ckahkadgnaxzcfhmsdaj.supabase.co 
-        wss://ckahkadgnaxzcfhmsdaj.supabase.co 
-        https://www.google-analytics.com 
-        https://www.googletagmanager.com
-        https://sentry.io;
-      frame-src 
-        https://js.stripe.com 
-        https://www.youtube.com 
-        https://www.youtube-nocookie.com
-        https://clerk.aiterritory.org
-        https://*.clerk.accounts.dev;
     """
 
 # Cache headers for static assets
@@ -296,49 +187,6 @@ path = "/ai-for-business*"
   from = "/company/skill-leap"
   to = "/"
   status = 301
-
-# Add any additional redirects here
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-# Handle SPA routing - this should be the last redirect
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-# Handle 404s
-[[redirects]]
-  from = "/*"
-  to = "/404.html"
-  status = 404
-
-# Security headers
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-
-# Handle CORS for API
-[[headers]]
-  for = "/api/*"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type, Authorization"
-
-# Handle CORS preflight
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-  force = true
 
 # Handle SPA client-side routing
 [[redirects]]

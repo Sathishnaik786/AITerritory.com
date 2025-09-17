@@ -87,7 +87,9 @@ const GeminiPromptsPage = () => {
   const fetchPrompts = async () => {
     try {
       setLoading(true);
+      console.log('Fetching prompts...');
       const data = await getGeminiPrompts();
+      console.log('Fetched prompts data:', data);
       
       // Log what we're getting from the API
       console.log('Raw data from API:', data);
@@ -108,6 +110,12 @@ const GeminiPromptsPage = () => {
       setPrompts(data || []);
     } catch (error) {
       console.error('Error fetching prompts:', error);
+      // Add more detailed error logging
+      if (error instanceof Error) {
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
       toast({
         title: 'Error',
         description: 'Failed to fetch prompts. Please try again.',
@@ -309,7 +317,7 @@ const GeminiPromptsPage = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
         <div className="inline-block p-3 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="https://static.vecteezy.com/system/resources/previews/046/861/646/non_2x/gemini-icon-on-a-transparent-background-free-png.png" className="h-10 w-10 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
           </svg>
         </div>

@@ -17,8 +17,8 @@ console.log('  Full URL example:', `${API_BASE_URL}/blogs/test/comments`);
 console.log('  Current URL:', window.location.href);
 
 // Default timeout in milliseconds
-const DEFAULT_TIMEOUT = 10000; // 10 seconds
-const MAX_RETRIES = 2;
+const DEFAULT_TIMEOUT = 15000; // Increased timeout to 15 seconds
+const MAX_RETRIES = 3; // Increased retries
 
 // Create axios instance with default config
 const api = axios.create({
@@ -105,6 +105,7 @@ api.interceptors.response.use(
       console.error('API No Response Error:', {
         url: error.config?.url,
         message: 'No response received from server',
+        error: error.message
       });
     } else {
       // Something happened in setting up the request
