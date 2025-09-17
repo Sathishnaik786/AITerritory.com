@@ -226,6 +226,54 @@ const GeminiPromptsPage = () => {
     }
   };
 
+  const handleSharePrompt = async (promptText: string, promptId: string) => {
+    try {
+      // Copy prompt to clipboard
+      await navigator.clipboard.writeText(promptText);
+      
+      // Create share data
+      const shareData = {
+        title: 'Check out this Gemini Prompt!',
+        text: `Here's an interesting Gemini prompt I found on AITerritory:\n\n${promptText}`,
+        url: window.location.href
+      };
+      
+      // Show visual popup
+      const button = copyButtonRefs.current[promptId];
+      if (button) {
+        const rect = button.getBoundingClientRect();
+        setCopiedPopupPosition({
+          x: rect.left + rect.width / 2,
+          y: rect.top - 10
+        });
+        setShowCopiedPopup(true);
+        setTimeout(() => setShowCopiedPopup(false), 2000); // Hide after 2 seconds
+      }
+      
+      // Try to use Web Share API if available
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast({
+          title: 'Shared!',
+          description: 'Prompt shared successfully!'
+        });
+      } else {
+        // Fallback to clipboard copy with toast notification
+        toast({
+          title: 'Copied!',
+          description: 'Prompt copied to clipboard! You can now share it anywhere.'
+        });
+      }
+    } catch (error) {
+      console.error('Error sharing prompt:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to share prompt. Please try again.',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const handleImageUpload = async () => {
     if (!imageFile) return '';
 
@@ -619,6 +667,17 @@ const GeminiPromptsPage = () => {
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />
                           Try
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          type="button"
+                          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                          onClick={() => handleSharePrompt(prompt.prompt, prompt.id)}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                          </svg>
+                          Share
                         </Button>
                       </div>
                     </CardContent>
