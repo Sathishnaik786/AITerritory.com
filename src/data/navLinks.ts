@@ -15,4 +15,4 @@ export const navLinks = [
       { label: "AI Innovation", to: "/resources/ai-innovation" },
     ],
   }
-]; 
+];

@@ -19,6 +19,7 @@ import SubmitToolPage from "./pages/SubmitToolPage";
 import YouTubeChannelPage from "./pages/YouTubeChannelPage";
 import RequestFeaturePage from "./pages/RequestFeaturePage";
 
+
 import CreateAccountPage from "./pages/CreateAccountPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
@@ -176,6 +177,7 @@ function ThemedAppContent() {
                 <Route path="/ai-for-business" element={<AIBusiness />} />
                 <Route path="/prompts" element={<Prompts />} />
                 <Route path="/gemini-prompts" element={<GeminiPromptsPage />} />
+                
                 
                 {/* Authentication Routes */}
                 <Route path="/signup" element={<CreateAccountPage />} />
