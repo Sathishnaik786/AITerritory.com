@@ -66,6 +66,7 @@ import MyBookmarksPage from './pages/MyBookmarksPage';
 import UserDashboardPage from './pages/UserDashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Prompts from './components/Prompts';
+import GeminiPromptsPage from './pages/GeminiPromptsPage';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import React, { Suspense } from 'react';
 import FeedbackAdmin from './admin/FeedbackAdmin';
@@ -173,6 +174,7 @@ function ThemedAppContent() {
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/ai-for-business" element={<AIBusiness />} />
                 <Route path="/prompts" element={<Prompts />} />
+                <Route path="/gemini-prompts" element={<GeminiPromptsPage />} />
                 
                 {/* Authentication Routes */}
                 <Route path="/signup" element={<CreateAccountPage />} />

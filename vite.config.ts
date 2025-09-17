@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   server: {
-    port: 3000,
+    port: 3003,
     strictPort: true,
     open: true,
     proxy: {
@@ -96,7 +96,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   preview: {
-    port: 3000,
+    port: 3003,
     strictPort: true,
     headers: {
       'Content-Security-Policy': [

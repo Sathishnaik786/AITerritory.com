@@ -4,6 +4,7 @@ export const navLinks = [
   { label: "Blog", to: "/blog" },
   { label: "Newsletter", to: "/newsletter" },
   { label: "Prompts", to: "/prompts" },
+  { label: "Gemini Prompts", to: "/gemini-prompts" },
   {
     label: "Resources",
     dropdown: true,

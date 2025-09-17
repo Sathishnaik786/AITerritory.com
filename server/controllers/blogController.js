@@ -122,8 +122,15 @@ async function getAllBlogs(req, res) {
     if (!data) {
       return res.json([]);
     }
+    
+    // Add published field based on whether content exists
+    const blogsWithPublished = data.map(blog => ({
+      ...blog,
+      published: !!blog.content // Consider published if content exists
+    }));
+    
     // No image processing needed if you don't use signed URLs
-    res.json(data);
+    res.json(blogsWithPublished);
   } catch (error) {
     console.error('Error in getAllBlogs:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -150,7 +157,14 @@ async function getBlogBySlug(req, res) {
     if (!blog) {
       return res.status(404).json({ error: 'Blog not found' });
     }
-    res.json(blog);
+    
+    // Add published field based on whether content exists
+    const blogWithPublished = {
+      ...blog,
+      published: !!blog.content // Consider published if content exists
+    };
+    
+    res.json(blogWithPublished);
   } catch (error) {
     console.error('Error in getBlogBySlug:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -174,7 +188,14 @@ async function getBlogsByCategory(req, res) {
     if (!data) {
       return res.json([]);
     }
-    res.json(data);
+    
+    // Add published field based on whether content exists
+    const blogsWithPublished = data.map(blog => ({
+      ...blog,
+      published: !!blog.content // Consider published if content exists
+    }));
+    
+    res.json(blogsWithPublished);
   } catch (error) {
     console.error('Error in getBlogsByCategory:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -210,7 +231,14 @@ async function getRelatedBlogs(req, res) {
     if (!data) {
       return res.json([]);
     }
-    res.json(data);
+    
+    // Add published field based on whether content exists
+    const blogsWithPublished = data.map(blog => ({
+      ...blog,
+      published: !!blog.content // Consider published if content exists
+    }));
+    
+    res.json(blogsWithPublished);
   } catch (error) {
     console.error('Error in getRelatedBlogs:', error);
     res.status(500).json({ error: 'Internal server error' });
