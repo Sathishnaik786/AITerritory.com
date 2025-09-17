@@ -19,17 +19,18 @@ Live: [https://aiterritory.org](https://aiterritory.org)
 
 ## 🚀 Features
 
-- **Smart Repurposing:** Instantly transform content for different platforms and formats.
-- **SEO Copilot:** AI-driven SEO suggestions, meta tag generation, and performance insights.
-- **Prompt Library:** Curated, searchable prompt collections for OpenAI, Claude, and more.
-- **Blog Generation:** AI-powered blog creation and management.
-- **Tool Discovery:** Explore, filter, and bookmark 500+ AI tools.
-- **Trending & Featured Tools:** Real-time updates on what's hot in AI.
-- **User Dashboard:** Manage bookmarks, submissions, and feedback.
-- **Testimonials & Reviews:** Community-driven insights and ratings.
-- **YouTube AI Content:** Embedded videos and channel integration.
-- **API Access:** RESTful endpoints for tools, prompts, and more.
-- **Responsive UI:** Mobile-first, fast, and accessible.
+- **Smart Repurposing**: Transform content across formats (blog → LinkedIn → Twitter)
+- **SEO Copilot**: AI-driven SEO suggestions and meta tag generation
+- **Prompt Library**: Searchable collection of prompts for OpenAI, Claude, and Google Gemini
+- **Blog Generation**: AI-powered blog creation and management
+- **Tool Discovery**: Filter and bookmark 500+ AI tools
+- **Trending Tools**: Real-time updates on popular AI tools
+- **User Dashboard**: Manage bookmarks, submissions, and feedback
+- **Testimonials & Reviews**: Community-driven ratings
+- **YouTube Integration**: Embedded videos and channel support
+- **RESTful API Access**: Programmatic access to tools and prompts
+- **Google Forms Integration**: Collect prompts via Google Forms
+- **Responsive UI**: Mobile-first, fast-loading interface
 
 ---
 
@@ -308,3 +309,14 @@ This project is licensed under the [MIT License](LICENSE).
 - [GitHub Issues](https://github.com/your-org/aiterritory.org/issues)
 - [GitHub Discussions](https://github.com/your-org/aiterritory.org/discussions)
 - [Docs](docs/)
+
+## Google Forms Integration
+
+You can now collect Gemini prompts via Google Forms with automatic submission and publishing.
+
+### Quick Setup
+1. Create a Google Form with the exact fields specified in [docs/google-forms-setup.md](docs/google-forms-setup.md)
+2. Add the provided Google Apps Script to automatically submit responses to your application
+3. No manual approvals or exports needed - prompts are automatically published
+
+See [docs/google-forms-setup.md](docs/google-forms-setup.md) for detailed setup instructions.

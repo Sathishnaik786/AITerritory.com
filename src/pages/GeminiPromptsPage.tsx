@@ -317,7 +317,7 @@ const GeminiPromptsPage = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
         <div className="inline-block p-3 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900 mb-4">
-          <svg xmlns="https://static.vecteezy.com/system/resources/previews/046/861/646/non_2x/gemini-icon-on-a-transparent-background-free-png.png" className="h-10 w-10 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
           </svg>
         </div>
@@ -379,12 +379,18 @@ const GeminiPromptsPage = () => {
           </TabsList>
         </Tabs>
         
-        <Button 
-          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-          onClick={() => setIsUploadModalOpen(true)}
-        >
-          Upload Your Prompt
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button 
+            type="button"
+            className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSdQvaJryaAZhN9ppwm49w5w4MC1eBALYOH-a_kPqmhT2WcfrQ/viewform?usp=sharing&ouid=117733098512429548107', '_blank')}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            Upload Your Prompt
+          </Button>
+        </div>
         
         <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
           <DialogContent className="sm:max-w-[425px] rounded-lg">
@@ -495,7 +501,7 @@ const GeminiPromptsPage = () => {
                 key={prompt.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
+                transition={{ duration: 0.3, delay: index * 0.1 } as any}
                 whileHover={{ y: -5 }}
                 className="h-full"
               >
@@ -519,6 +525,7 @@ const GeminiPromptsPage = () => {
                       <Button 
                         size="sm" 
                         variant="outline" 
+                        type="button"
                         className="flex-1 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
                         onClick={() => handleCopyPrompt(prompt.prompt, prompt.id)}
                         ref={(el) => (copyButtonRefs.current[prompt.id] = el)}
@@ -528,6 +535,7 @@ const GeminiPromptsPage = () => {
                       </Button>
                       <Button 
                         size="sm" 
+                        type="button"
                         className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                         onClick={() => handleTryPrompt(prompt.prompt)}
                       >
@@ -552,12 +560,18 @@ const GeminiPromptsPage = () => {
           </div>
           <h3 className="text-xl font-semibold mb-2">No prompts found</h3>
           <p className="text-muted-foreground mb-4">Be the first to upload a prompt!</p>
-          <Button 
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            onClick={() => setIsUploadModalOpen(true)}
-          >
-            Upload Your First Prompt
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button 
+              type="button"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSdQvaJryaAZhN9ppwm49w5w4MC1eBALYOH-a_kPqmhT2WcfrQ/viewform?usp=sharing&ouid=117733098512429548107', '_blank')}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Upload Your Prompt
+            </Button>
+          </div>
         </div>
       )}
 

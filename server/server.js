@@ -68,6 +68,7 @@ const appleCarouselRoutes = require('./routes/appleCarousel');
 const unifiedInteractionsRoutes = require('./routes/unifiedInteractions');
 const redisMonitorDashboardRoutes = require('./routes/redisMonitorDashboard');
 const geminiPromptsRoutes = require('./routes/geminiPrompts');
+const googleFormsRoutes = require('./routes/googleForms');
 
 // Enhanced Redis-powered routes
 const enhancedToolRoutes = require('./routes/enhancedTools');
@@ -140,6 +141,7 @@ app.use('/api/apple-carousel', appleCarouselRoutes);
 app.use('/api/interactions', unifiedInteractionsRoutes);
 app.use('/api/monitor/redis', redisMonitorDashboardRoutes);
 app.use('/api/gemini-prompts', geminiPromptsRoutes);
+app.use('/api/google-forms', googleFormsRoutes);
 
 // Enhanced Redis-powered routes
 app.use('/api/enhanced/tools', enhancedToolRoutes);

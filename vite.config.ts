@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   server: {
-    port: 3003,
+    port: 3007,
     strictPort: true,
     open: true,
     proxy: {
@@ -79,7 +79,7 @@ export default defineConfig(({ mode }) => ({
         "img-src 'self' data: blob: http: https:;",
         "font-src 'self' data: http: https:;",
         "connect-src 'self' http://localhost:* https://www.google-analytics.com https://loving-puma-26.clerk.accounts.dev https://aiterritory-com.onrender.com https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co;",
-        "frame-src 'self' http://localhost:* https://loving-puma-26.clerk.accounts.dev;",
+        "frame-src 'self' http://localhost:* https://loving-puma-26.clerk.accounts.dev https://docs.google.com;",
         "worker-src 'self' blob:;",
       ].join(' '),
     } : {
@@ -90,13 +90,13 @@ export default defineConfig(({ mode }) => ({
         "img-src 'self' data: blob: http: https:;",
         "font-src 'self' data: https://fonts.gstatic.com;",
         "connect-src 'self' https://www.google-analytics.com https://loving-puma-26.clerk.accounts.dev https://aiterritory-com.onrender.com https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co;",
-        "frame-src 'self' https://loving-puma-26.clerk.accounts.dev;",
+        "frame-src 'self' https://loving-puma-26.clerk.accounts.dev https://docs.google.com;",
         "worker-src 'self' blob:;",
       ].join(' '),
     },
   },
   preview: {
-    port: 3003,
+    port: 3007,
     strictPort: true,
     headers: {
       'Content-Security-Policy': [

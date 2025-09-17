@@ -4,9 +4,11 @@ const { supabase } = require('../lib/supabase');
 exports.getAllGeminiPrompts = async (req, res) => {
   console.log('Fetching all Gemini prompts from Supabase');
   
+  // Only fetch published prompts
   const { data, error } = await supabase
     .from('gemini_prompts')
     .select('*')
+    .eq('status', 'published') // Only show published prompts
     .order('created_at', { ascending: false });
     
   console.log('Supabase query result:', { 
@@ -35,8 +37,8 @@ exports.getAllGeminiPrompts = async (req, res) => {
 
 // POST /api/gemini-prompts
 exports.createGeminiPrompt = async (req, res) => {
-  const { image_url, prompt, category } = req.body;
-  console.log('Creating new Gemini prompt:', { image_url, prompt, category });
+  const { image_url, prompt, category, submitter_name, submitter_email } = req.body;
+  console.log('Creating new Gemini prompt:', { image_url, prompt, category, submitter_name, submitter_email });
   
   if (!prompt || !category) {
     console.log('Validation failed: prompt or category missing');
@@ -45,7 +47,15 @@ exports.createGeminiPrompt = async (req, res) => {
   
   const { data, error } = await supabase
     .from('gemini_prompts')
-    .insert([{ image_url, prompt, category }])
+    .insert([{
+      image_url,
+      prompt,
+      category,
+      submitted_via: 'web_form',
+      submitter_name: submitter_name || null,
+      submitter_email: submitter_email || null,
+      status: 'published' // Web form submissions are published immediately
+    }])
     .select()
     .single();
     

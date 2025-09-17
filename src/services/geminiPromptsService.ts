@@ -6,6 +6,20 @@ export interface GeminiPrompt {
   prompt: string;
   category: string;
   created_at: string;
+  // New fields for Google Forms submissions
+  submitted_via?: string;
+  submitter_name?: string;
+  submitter_email?: string;
+  status?: string;
+}
+
+// Updated interface for submission
+export interface GeminiPromptSubmission {
+  prompt: string;
+  category: string;
+  image_url?: string | null;
+  submitter_name?: string;
+  submitter_email?: string;
 }
 
 export async function getGeminiPrompts() {
@@ -35,8 +49,15 @@ export async function getGeminiPrompts() {
   }
 }
 
-export async function submitGeminiPrompt(promptData: Omit<GeminiPrompt, 'id' | 'created_at'>) {
+export async function submitGeminiPrompt(promptData: GeminiPromptSubmission) {
   const res = await api.post('/gemini-prompts', promptData);
   if (res.status !== 200 && res.status !== 201) throw new Error('Failed to submit Gemini prompt');
+  return res.data;
+}
+
+// New function to submit via Google Forms webhook
+export async function submitPromptViaGoogleForms(promptData: GeminiPromptSubmission) {
+  const res = await api.post('/google-forms/prompts', promptData);
+  if (res.status !== 200 && res.status !== 201) throw new Error('Failed to submit prompt via Google Forms');
   return res.data;
 }

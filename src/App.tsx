@@ -79,6 +79,7 @@ import NewsletterSubscribersAdmin from './admin/NewsletterSubscribersAdmin';
 import { NavbarNewsletterModal } from './components/NavbarNewsletterModal';
 import { useState } from 'react';
 import RedisDashboard from './pages/admin/redis-dashboard';
+import PromptSubmissionsAdmin from './admin/PromptSubmissionsAdmin';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -264,6 +265,7 @@ function ThemedAppContent() {
                         <Route path="submissions/advertise" element={<AdvertiseSubmissionsAdmin />} />
                         <Route path="submissions/tools" element={<ToolSubmissionsAdmin />} />
                         <Route path="submissions/features" element={<FeatureRequestsAdmin />} />
+                        <Route path="prompt-submissions" element={<PromptSubmissionsAdmin />} />
                         <Route path="feedback" element={<FeedbackAdmin />} />
                         <Route path="blogs" element={<BlogsAdmin />} />
                         <Route path="newsletter-subscribers" element={<NewsletterSubscribersAdmin />} />
