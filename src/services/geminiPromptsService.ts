@@ -61,3 +61,10 @@ export async function submitPromptViaGoogleForms(promptData: GeminiPromptSubmiss
   if (res.status !== 200 && res.status !== 201) throw new Error('Failed to submit prompt via Google Forms');
   return res.data;
 }
+
+// New function to fetch SEO data for a specific prompt
+export async function getSEOGeminiPromptById(id: string) {
+  const res = await api.get(`/seo/gemini-prompts/${id}`);
+  if (res.status !== 200) throw new Error(`Failed to fetch SEO data for prompt. Status: ${res.status}`);
+  return res.data;
+}

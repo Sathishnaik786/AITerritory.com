@@ -9,10 +9,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { motion } from 'framer-motion';
-import { Copy, ExternalLink, Heart, MessageCircle, Share2, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Copy, ExternalLink, Heart, MessageCircle, Share2, Check, Link as LinkIcon } from 'lucide-react';
 import { getGeminiPrompts, submitGeminiPrompt } from '@/services/geminiPromptsService';
 import { slugify } from '@/lib/slugify';
+
+// Add the required icons for social media platforms
+import { FaTwitter as FaXTwitter, FaLinkedin, FaFacebook, FaWhatsapp } from 'react-icons/fa6';
+import { FiLink } from 'react-icons/fi';
 
 import './GeminiPromptsPage.css';
 
@@ -27,6 +31,20 @@ interface GeminiPrompt {
   submitter_name?: string;
   submitter_email?: string;
   status?: string;
+}
+
+// Define the props interface for PromptCard
+interface PromptCardProps {
+  prompt: GeminiPrompt;
+  categoryColor: string;
+  isExpanded: boolean;
+  isLiked: boolean;
+  isCopied: boolean;
+  onToggleReadMore: (id: string) => void;
+  onCopyPrompt: (text: string, id: string) => void;
+  onLikePrompt: (id: string) => void;
+  onSharePrompt: (prompt: GeminiPrompt) => void;
+  toast?: (args: { title: string; description: string; variant?: string }) => void;
 }
 
 // Optimized Prompt Image component with memoization
@@ -76,27 +94,18 @@ const PromptImage = memo(({ imageUrl }: { imageUrl: string | null }) => {
 });
 
 // Memoized Prompt Card Component to prevent unnecessary re-renders
-const PromptCard = memo(({ 
-  prompt, 
-  categoryColor, 
-  isExpanded, 
-  isLiked, 
+const PromptCard = memo(({
+  prompt,
+  categoryColor,
+  isExpanded,
+  isLiked,
   isCopied,
   onToggleReadMore,
   onCopyPrompt,
   onLikePrompt,
-  onSharePrompt
-}: { 
-  prompt: GeminiPrompt;
-  categoryColor: string;
-  isExpanded: boolean;
-  isLiked: boolean;
-  isCopied: boolean;
-  onToggleReadMore: (id: string) => void;
-  onCopyPrompt: (text: string, id: string) => void;
-  onLikePrompt: (id: string) => void;
-  onSharePrompt: (prompt: GeminiPrompt) => void;
-}) => {
+  onSharePrompt,
+  toast
+}: PromptCardProps) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -113,6 +122,114 @@ const PromptCard = memo(({
 
   // Generate slug for the prompt
   const promptSlug = slugify(prompt.prompt.substring(0, 50)) || prompt.id;
+
+  const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
+  const shareDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareDropdownRef.current && !shareDropdownRef.current.contains(event.target as Node)) {
+        console.log('Click outside detected, closing dropdown');
+        setIsShareDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // New function to handle sharing to specific platforms
+  const handlePlatformShare = useCallback(async (platform: string) => {
+    const title = `Gemini ${prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)} Prompt`;
+    const text = prompt.prompt.substring(0, 160);
+    const url = `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`;
+    const imageUrl = prompt.image_url || 'https://aiterritory.org/assets/og-default.png';
+    
+    // Close the dropdown after selecting a platform
+    setIsShareDropdownOpen(false);
+    
+    // Fallback function if toast is not provided
+    const showToast = toast || (() => {});
+    
+    try {
+      switch (platform) {
+        case 'whatsapp':
+          window.open(`https://wa.me/?text=${encodeURIComponent(`${title}
+
+${text}
+
+${url}`)}`, '_blank');
+          break;
+        case 'instagram':
+          // Instagram doesn't allow direct sharing, so we copy the link
+          await navigator.clipboard.writeText(url);
+          showToast({
+            title: "Link Copied",
+            description: "Link copied to clipboard. You can now paste it in Instagram.",
+          });
+          break;
+        case 'linkedin':
+          window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(text)}`, '_blank');
+          break;
+        case 'snapchat':
+          // Snapchat doesn't have a web sharing API, so we copy the link
+          await navigator.clipboard.writeText(url);
+          showToast({
+            title: "Link Copied",
+            description: "Link copied to clipboard. You can now paste it in Snapchat.",
+          });
+          break;
+        case 'facebook':
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(`${title}
+
+${text}`)}`, '_blank');
+          break;
+        case 'twitter':
+          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title}
+
+${text}`)}&url=${encodeURIComponent(url)}`, '_blank');
+          break;
+        case 'copy':
+          await navigator.clipboard.writeText(`${title}
+
+${text}
+
+${url}
+
+Image: ${imageUrl}`);
+          showToast({
+            title: "Copied!",
+            description: "Prompt details copied to clipboard",
+          });
+          break;
+        default:
+          // Fallback to general share
+          if (navigator.share) {
+            await navigator.share({ title, text, url });
+          } else {
+            await navigator.clipboard.writeText(`${title}
+
+${text}
+
+${url}`);
+            showToast({
+              title: "Shared!",
+              description: "Link copied to clipboard",
+            });
+          }
+      }
+    } catch (error) {
+      console.error(`Error sharing to ${platform}:`, error);
+      showToast({
+        title: "Error",
+        description: `Failed to share to ${platform}`,
+        variant: "destructive",
+      });
+    }
+  }, [prompt, toast]);
 
   return (
     <motion.div
@@ -144,74 +261,158 @@ const PromptCard = memo(({
             {isExpanded ? prompt.prompt : truncatePrompt(prompt.prompt, 120)}
           </Link>
           
-          {/* Action buttons */}
-          <div className="flex items-center justify-between mt-2">
-            <div className="flex space-x-2">
+          {/* Action buttons - All in one line */}
+          <div className="flex space-x-2 mt-2">
+            <button
+              type="button"
+              className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault(); // Prevent navigation when clicking action buttons
+                onLikePrompt(prompt.id);
+              }}
+            >
+              <Heart 
+                className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} 
+              />
+            </button>
+            <button
+              type="button"
+              className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault(); // Prevent navigation when clicking action buttons
+                // Comment functionality would go here
+              }}
+            >
+              <MessageCircle className="h-4 w-4 text-gray-500" />
+            </button>
+            
+            {/* Enhanced Share Button with Dropdown - BlogDetail style */}
+            <div className="relative" ref={shareDropdownRef}>
               <button
                 type="button"
-                className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center space-x-2"
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault(); // Prevent navigation when clicking action buttons
-                  onLikePrompt(prompt.id);
-                }}
-              >
-                <Heart 
-                  className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} 
-                />
-              </button>
-              <button
-                type="button"
-                className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault(); // Prevent navigation when clicking action buttons
-                  // Comment functionality would go here
-                }}
-              >
-                <MessageCircle className="h-4 w-4 text-gray-500" />
-              </button>
-              <button
-                type="button"
-                className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault(); // Prevent navigation when clicking action buttons
-                  onSharePrompt(prompt);
+                  setIsShareDropdownOpen(!isShareDropdownOpen);
                 }}
               >
                 <Share2 className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Share</span>
               </button>
+              
+              {/* Social Media Sharing Pop-up - Positioned above and centered */}
+              <AnimatePresence>
+                {isShareDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
+                    style={{ minWidth: '200px', maxWidth: 'calc(100vw - 32px)' }}
+                  >
+                    <div className="p-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePlatformShare('whatsapp');
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                      >
+                        <FaWhatsapp className="w-5 h-5 mr-3 text-green-500" />
+                        <span>WhatsApp</span>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePlatformShare('instagram');
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                      >
+                        <div className="w-5 h-5 mr-3 text-pink-500">
+                          <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.014-3.667.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                          </svg>
+                        </div>
+                        <span>Instagram</span>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePlatformShare('linkedin');
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                      >
+                        <FaLinkedin className="w-5 h-5 mr-3 text-blue-700" />
+                        <span>LinkedIn</span>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePlatformShare('facebook');
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                      >
+                        <FaFacebook className="w-5 h-5 mr-3 text-blue-600" />
+                        <span>Facebook</span>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePlatformShare('twitter');
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                      >
+                        <FaXTwitter className="w-5 h-5 mr-3 text-blue-400" />
+                        <span>Twitter</span>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePlatformShare('copy');
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                      >
+                        <FiLink className="w-5 h-5 mr-3 text-gray-500" />
+                        <span>{isCopied ? 'Copied!' : 'Copy Link'}</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             
-            <div className="flex space-x-2">
-              <button
-                type="button"
-                className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault(); // Prevent navigation when clicking action buttons
-                  onToggleReadMore(prompt.id);
-                }}
-              >
-                {isExpanded ? 'Show Less' : 'Read More'}
-              </button>
-              <button
-                type="button"
-                className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault(); // Prevent navigation when clicking action buttons
-                  onCopyPrompt(prompt.prompt, prompt.id);
-                }}
-              >
-                {isCopied ? (
-                  <Check className="h-4 w-4 text-green-500" />
-                ) : (
-                  <Copy className="h-4 w-4 text-gray-500" />
-                )}
-              </button>
-            </div>
+            {/* Read More button */}
+            <button
+              type="button"
+              className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault(); // Prevent navigation when clicking action buttons
+                onToggleReadMore(prompt.id);
+              }}
+            >
+              {isExpanded ? 'Show Less' : 'Read More'}
+            </button>
+            
+            {/* Copy button */}
+            <button
+              type="button"
+              className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault(); // Prevent navigation when clicking action buttons
+                onCopyPrompt(prompt.prompt, prompt.id);
+              }}
+            >
+              {isCopied ? (
+                <Check className="h-4 w-4 text-green-500" />
+              ) : (
+                <Copy className="h-4 w-4 text-gray-500" />
+              )}
+            </button>
           </div>
         </CardContent>
       </Card>
@@ -247,6 +448,8 @@ const GeminiPromptsPage = () => {
   const [expandedPrompts, setExpandedPrompts] = useState<Record<string, boolean>>({});
   const [copiedPromptId, setCopiedPromptId] = useState<string | null>(null);
   const [likedPrompts, setLikedPrompts] = useState<Record<string, boolean>>({});
+
+  const { toast } = useToast(); // Add this to get the toast function
 
   // Function to scroll to top smoothly
   const scrollToTop = useCallback(() => {
@@ -602,6 +805,7 @@ const GeminiPromptsPage = () => {
                     onCopyPrompt={handleCopyPrompt}
                     onLikePrompt={handleLikePrompt}
                     onSharePrompt={handleSharePrompt}
+                    toast={toast} // Pass the toast function to the PromptCard
                   />
                 );
               })}
@@ -654,6 +858,7 @@ const GeminiPromptsPage = () => {
                       onCopyPrompt={handleCopyPrompt}
                       onLikePrompt={handleLikePrompt}
                       onSharePrompt={handleSharePrompt}
+                      toast={toast} // Pass the toast function to the PromptCard
                     />
                   );
                 })}

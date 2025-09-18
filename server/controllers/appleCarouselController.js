@@ -1,4 +1,4 @@
-const supabase = require('../config/database');
+const { supabase } = require('../lib/supabase');
 
 // Helper to recursively stringify all values in an object/array
 function deepStringify(obj) {
