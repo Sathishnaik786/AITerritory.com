@@ -345,8 +345,18 @@ export default function Prompts() {
                                       <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#3b82f6]/10 transition-colors ${greenIcon}`} title="Chat" onClick={() => setOpenPrompt({...prompt, category: cat})}><FaRegCommentDots size={18} className="sm:w-5 sm:h-5" /></button>
                                       <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#3b82f6]/10 transition-colors ${greenIcon}`} title="Read" onClick={() => setOpenRead(prompt)}><FaRegFileAlt size={18} className="sm:w-5 sm:h-5" /></button>
                                       <button className={`p-1.5 sm:p-2 rounded-full hover:bg-[#3b82f6]/10 transition-colors ${greenIcon}`} title="Copy" onClick={() => {
-                                        navigator.clipboard.writeText(prompt.description || '');
-                                        toast({ title: 'Copied!', description: 'Prompt copied to clipboard.' });
+                                        // Use setTimeout to prevent UI blocking during clipboard operation
+                                        setTimeout(() => {
+                                          navigator.clipboard.writeText(prompt.description || '').then(() => {
+                                            toast({ title: 'Copied!', description: 'Prompt copied to clipboard.' });
+                                          }).catch(() => {
+                                            toast({ 
+                                              title: 'Error', 
+                                              description: 'Failed to copy prompt.', 
+                                              variant: 'destructive' 
+                                            });
+                                          });
+                                        }, 0);
                                       }}><FaRegCopy size={18} className="sm:w-5 sm:h-5" /></button>
                                     </div>
                                   </div>

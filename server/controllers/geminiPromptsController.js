@@ -8,7 +8,6 @@ exports.getAllGeminiPrompts = async (req, res) => {
   const { data, error } = await supabase
     .from('gemini_prompts')
     .select('*')
-    .eq('status', 'published') // Only show published prompts
     .order('created_at', { ascending: false });
     
   console.log('Supabase query result:', { 
@@ -53,8 +52,7 @@ exports.createGeminiPrompt = async (req, res) => {
       category,
       submitted_via: 'web_form',
       submitter_name: submitter_name || null,
-      submitter_email: submitter_email || null,
-      status: 'published' // Web form submissions are published immediately
+      submitter_email: submitter_email || null
     }])
     .select()
     .single();

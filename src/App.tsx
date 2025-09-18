@@ -94,7 +94,22 @@ const queryClient = new QueryClient({
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
+    // Scroll to top of window
     window.scrollTo(0, 0);
+    
+    // Also scroll to top of main content area after a short delay
+    // to ensure all content is loaded
+    const timer = setTimeout(() => {
+      window.scrollTo(0, 0);
+      
+      // Try to scroll main content area if it exists
+      const mainContent = document.querySelector('main');
+      if (mainContent) {
+        mainContent.scrollTop = 0;
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [pathname]);
   return null;
 }
@@ -158,6 +173,7 @@ function SEO() {
 function ThemedAppContent() {
   const location = useLocation();
   const isLandingPro = location.pathname === '/';
+  const isGeminiPromptsPage = location.pathname === '/gemini-prompts';
   const [newsletterOpen, setNewsletterOpen] = useState(false);
   return (
     <div className={`min-h-screen antialiased w-full flex flex-col`}>
@@ -295,7 +311,7 @@ function ThemedAppContent() {
           </div>
         </div>
         <NavbarNewsletterModal isOpen={newsletterOpen} onClose={() => setNewsletterOpen(false)} />
-        <Footer />
+        {!isGeminiPromptsPage && <Footer />}
       </HelmetProvider>
     </div>
   );
