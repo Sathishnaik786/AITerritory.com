@@ -32,11 +32,23 @@ const siteUrl = 'https://aiterritory.org';
 const staticPages = [
   { url: '/', lastmod: new Date().toISOString(), changefreq: 'daily', priority: '1.0' },
   { url: '/blog', lastmod: new Date().toISOString(), changefreq: 'daily', priority: '0.9' },
+  { url: '/gemini-prompts', lastmod: new Date().toISOString(), changefreq: 'daily', priority: '0.8' },
   { url: '/about', lastmod: '2024-01-01', changefreq: 'monthly', priority: '0.8' },
   { url: '/contact', lastmod: '2024-01-01', changefreq: 'monthly', priority: '0.8' },
   { url: '/privacy', lastmod: '2024-01-01', changefreq: 'yearly', priority: '0.5' },
   { url: '/terms', lastmod: '2024-01-01', changefreq: 'yearly', priority: '0.5' },
 ];
+
+// Simple slugify function
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 // Fetch all published blog posts from Supabase
 async function fetchBlogPosts() {
@@ -57,6 +69,32 @@ async function fetchBlogPosts() {
     }));
   } catch (error) {
     console.error('Error fetching blog posts:', error);
+    return [];
+  }
+}
+
+// Fetch all Gemini prompts from Supabase
+async function fetchGeminiPrompts() {
+  try {
+    const { data: prompts, error } = await supabase
+      .from('gemini_prompts')
+      .select('id, prompt, category, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    
+    return prompts.map(prompt => {
+      // Create a slug from the first 50 characters of the prompt
+      const promptSlug = slugify(prompt.prompt.substring(0, 50)) || prompt.id;
+      return {
+        url: `/gemini-prompts/${prompt.category}/${promptSlug}-${prompt.id}`,
+        lastmod: prompt.created_at,
+        changefreq: 'monthly',
+        priority: '0.7',
+      };
+    });
+  } catch (error) {
+    console.error('Error fetching Gemini prompts:', error);
     return [];
   }
 }
@@ -91,9 +129,10 @@ async function generateAndSaveSitemap() {
     
     // Fetch dynamic content
     const blogPosts = await fetchBlogPosts();
+    const geminiPrompts = await fetchGeminiPrompts();
     
     // Combine static and dynamic pages
-    const allPages = [...staticPages, ...blogPosts];
+    const allPages = [...staticPages, ...blogPosts, ...geminiPrompts];
     
     // Generate the sitemap XML
     const sitemap = generateSitemap(allPages);
@@ -112,6 +151,10 @@ async function generateAndSaveSitemap() {
     
     console.log(`✅ Sitemap generated successfully at: ${sitemapPath}`);
     console.log(`📊 Total URLs: ${allPages.length}`);
+    console.log(`📁 Breakdown:
+   - Static pages: ${staticPages.length}
+   - Blog posts: ${blogPosts.length}
+   - Gemini prompts: ${geminiPrompts.length}`);
     
   } catch (error) {
     console.error('❌ Error generating sitemap:', error);

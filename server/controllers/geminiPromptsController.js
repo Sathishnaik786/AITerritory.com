@@ -34,6 +34,90 @@ exports.getAllGeminiPrompts = async (req, res) => {
   res.json(data);
 };
 
+// GET /api/gemini-prompts/:id - get specific prompt by ID for SEO
+exports.getGeminiPromptById = async (req, res) => {
+  const { id } = req.params;
+  console.log(`Fetching Gemini prompt with ID: ${id}`);
+  
+  const { data, error } = await supabase
+    .from('gemini_prompts')
+    .select('*')
+    .eq('id', id)
+    .single();
+    
+  if (error) {
+    console.error('Supabase error:', error);
+    return res.status(404).json({ error: 'Prompt not found' });
+  }
+  
+  // Send prompt data
+  res.json(data);
+};
+
+// GET /api/seo/gemini-prompts/:id - get SEO data for a specific prompt
+exports.getSEOGeminiPromptById = async (req, res) => {
+  const { id } = req.params;
+  console.log(`Fetching SEO data for Gemini prompt with ID: ${id}`);
+  
+  // Fetch the prompt
+  const { data: prompt, error } = await supabase
+    .from('gemini_prompts')
+    .select('*')
+    .eq('id', id)
+    .single();
+    
+  if (error) {
+    console.error('Supabase error:', error);
+    return res.status(404).json({ error: 'Prompt not found' });
+  }
+  
+  // Fetch interaction counts (likes, shares, comments)
+  // For now, we'll return placeholder values as these features aren't fully implemented
+  // In a real implementation, you would query your interactions table
+  const likesCount = 0;
+  const sharesCount = 0;
+  const commentsCount = 0;
+  
+  // Generate SEO title based on category
+  let seoTitle;
+  switch (prompt.category.toLowerCase()) {
+    case 'men':
+      seoTitle = 'Gemini Men\'s Prompt';
+      break;
+    case 'women':
+      seoTitle = 'Gemini Women\'s Prompt';
+      break;
+    case 'couple':
+      seoTitle = 'Gemini Couple\'s Prompt';
+      break;
+    default:
+      seoTitle = 'Gemini Prompt';
+  }
+  
+  // Truncate description for SEO
+  const seoDescription = prompt.prompt.length > 160 
+    ? prompt.prompt.substring(0, 157) + '...' 
+    : prompt.prompt;
+  
+  // Use prompt image or fallback to default
+  const seoImage = prompt.image_url && prompt.image_url.trim() !== '' 
+    ? prompt.image_url 
+    : 'https://aiterritory.org/assets/og-default.png';
+  
+  // Send SEO data
+  res.json({
+    id: prompt.id,
+    title: seoTitle,
+    description: seoDescription,
+    image_url: seoImage,
+    category: prompt.category,
+    created_at: prompt.created_at,
+    likes: likesCount,
+    shares: sharesCount,
+    comments: commentsCount
+  });
+};
+
 // POST /api/gemini-prompts
 exports.createGeminiPrompt = async (req, res) => {
   const { image_url, prompt, category, submitter_name, submitter_email } = req.body;

@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import { Copy, ExternalLink, Heart, MessageCircle, Share2, Check } from 'lucide-react';
 import { getGeminiPrompts, submitGeminiPrompt } from '@/services/geminiPromptsService';
+import { slugify } from '@/lib/slugify';
 
 import './GeminiPromptsPage.css';
 
@@ -110,6 +111,9 @@ const PromptCard = memo(({
     return text.substring(0, maxLength) + '...';
   };
 
+  // Generate slug for the prompt
+  const promptSlug = slugify(prompt.prompt.substring(0, 50)) || prompt.id;
+
   return (
     <motion.div
       key={prompt.id}
@@ -120,7 +124,8 @@ const PromptCard = memo(({
       className="h-full"
     >
       <Card className="h-full flex flex-col overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
-        <div className="aspect-square overflow-hidden relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+        {/* Link wrapper for the image */}
+        <Link to={`/gemini-prompts/${prompt.category}/${promptSlug}-${prompt.id}`} className="aspect-square overflow-hidden relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
           <PromptImage imageUrl={prompt.image_url} />
           <div className="absolute top-2 right-2">
             <span className={`px-2 py-1 text-xs font-semibold rounded-full ${categoryColor}`}>
@@ -132,11 +137,12 @@ const PromptCard = memo(({
               {formatDate(prompt.created_at)}
             </span>
           </div>
-        </div>
+        </Link>
         <CardContent className="flex-1 flex flex-col p-4 bg-white dark:bg-gray-900">
-          <p className="text-sm mb-4 flex-1 text-gray-800 dark:text-gray-200">
+          {/* Link wrapper for the prompt text */}
+          <Link to={`/gemini-prompts/${prompt.category}/${promptSlug}-${prompt.id}`} className="text-sm mb-4 flex-1 text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             {isExpanded ? prompt.prompt : truncatePrompt(prompt.prompt, 120)}
-          </p>
+          </Link>
           
           {/* Action buttons */}
           <div className="flex items-center justify-between mt-2">
@@ -146,6 +152,7 @@ const PromptCard = memo(({
                 className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault(); // Prevent navigation when clicking action buttons
                   onLikePrompt(prompt.id);
                 }}
               >
@@ -158,6 +165,7 @@ const PromptCard = memo(({
                 className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault(); // Prevent navigation when clicking action buttons
                   // Comment functionality would go here
                 }}
               >
@@ -168,6 +176,7 @@ const PromptCard = memo(({
                 className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault(); // Prevent navigation when clicking action buttons
                   onSharePrompt(prompt);
                 }}
               >
@@ -181,6 +190,7 @@ const PromptCard = memo(({
                 className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault(); // Prevent navigation when clicking action buttons
                   onToggleReadMore(prompt.id);
                 }}
               >
@@ -191,6 +201,7 @@ const PromptCard = memo(({
                 className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault(); // Prevent navigation when clicking action buttons
                   onCopyPrompt(prompt.prompt, prompt.id);
                 }}
               >
@@ -422,6 +433,48 @@ const GeminiPromptsPage = () => {
         <meta name="description" content={pageMeta.description} />
         <meta name="keywords" content={pageMeta.keywords} />
         <link rel="canonical" href={`https://aiterritory.org/gemini-prompts`} />
+        
+        {/* OpenGraph */}
+        <meta property="og:title" content={pageMeta.title} />
+        <meta property="og:description" content={pageMeta.description} />
+        <meta property="og:image" content="https://aiterritory.org/assets/og-default.png" />
+        <meta property="og:url" content="https://aiterritory.org/gemini-prompts" />
+        <meta property="og:type" content="website" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageMeta.title} />
+        <meta name="twitter:description" content={pageMeta.description} />
+        <meta name="twitter:image" content="https://aiterritory.org/assets/og-default.png" />
+        
+        {/* JSON-LD */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": pageMeta.title,
+            "description": pageMeta.description,
+            "url": "https://aiterritory.org/gemini-prompts",
+            "publisher": {
+              "@type": "Organization",
+              "name": "AITerritory",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://aiterritory.org/assets/logo.png"
+              }
+            },
+            "mainEntity": {
+              "@type": "ItemList",
+              "itemListElement": filteredPrompts.map((prompt, index) => ({
+                "@type": "CreativeWork",
+                "position": index + 1,
+                "name": `Gemini ${prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)} Prompt`,
+                "description": prompt.prompt.substring(0, 100) + (prompt.prompt.length > 100 ? '...' : ''),
+                "url": `https://aiterritory.org/gemini-prompts/${prompt.category}/${prompt.id}`
+              }))
+            }
+          })}
+        </script>
       </Helmet>
       
       {/* Desktop Sidebar */}
@@ -652,10 +705,14 @@ const GeminiPromptsPage = () => {
                 }}
               >
                 <div className="relative">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={category.icon} />
-                  </svg>
-                  <span className={`absolute -top-1 -right-1 text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center ${
+                  <span className={`text-xs font-medium ${
+                    activeTab === category.id
+                      ? 'text-blue-600 dark:text-blue-400'
+                      : 'text-gray-500 dark:text-gray-400'
+                  }`}>
+                    {category.name}
+                  </span>
+                  <span className={`absolute -top-2 -right-2 text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center ${
                     activeTab === category.id
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
@@ -663,7 +720,6 @@ const GeminiPromptsPage = () => {
                     {category.count > 99 ? '99+' : category.count}
                   </span>
                 </div>
-                <span className="text-[10px] mt-0.5 truncate">{category.name}</span>
               </button>
             ))}
           </div>

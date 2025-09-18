@@ -68,6 +68,7 @@ import UserDashboardPage from './pages/UserDashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Prompts from './components/Prompts';
 import GeminiPromptsPage from './pages/GeminiPromptsPage';
+import PromptDetailsPage from './pages/PromptDetailsPage';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import React, { Suspense } from 'react';
 import FeedbackAdmin from './admin/FeedbackAdmin';
@@ -173,7 +174,7 @@ function SEO() {
 function ThemedAppContent() {
   const location = useLocation();
   const isLandingPro = location.pathname === '/';
-  const isGeminiPromptsPage = location.pathname === '/gemini-prompts';
+  const isGeminiPromptsPage = location.pathname.startsWith('/gemini-prompts');
   const [newsletterOpen, setNewsletterOpen] = useState(false);
   return (
     <div className={`min-h-screen antialiased w-full flex flex-col`}>
@@ -193,6 +194,7 @@ function ThemedAppContent() {
                 <Route path="/ai-for-business" element={<AIBusiness />} />
                 <Route path="/prompts" element={<Prompts />} />
                 <Route path="/gemini-prompts" element={<GeminiPromptsPage />} />
+                <Route path="/gemini-prompts/:category/:id" element={<PromptDetailsPage />} />
                 
                 
                 {/* Authentication Routes */}
