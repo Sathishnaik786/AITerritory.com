@@ -75,6 +75,9 @@ const PromptImage = memo(({ imageUrl }: { imageUrl: string | null }) => {
         src={src}
         alt="Prompt visualization" 
         className={`w-full h-full object-cover transition-all duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+        width="400"
+        height="400"
+        loading="lazy"
         onError={(e) => {
           // If the image fails to load, switch to placeholder
           e.currentTarget.src = '/placeholder.svg';
@@ -84,7 +87,6 @@ const PromptImage = memo(({ imageUrl }: { imageUrl: string | null }) => {
         onLoad={(e) => {
           setIsLoading(false);
         }}
-        loading="lazy"
       />
     </>
   );

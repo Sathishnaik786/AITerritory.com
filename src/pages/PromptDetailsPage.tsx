@@ -462,6 +462,7 @@ ${url}`);
       <Helmet>
         <title>{seoTitle}</title>
         <meta name="description" content={seoDescription} />
+        <meta httpEquiv="last-modified" content={prompt.created_at} />
         <link rel="canonical" href={canonicalUrl} />
 
         {/* OpenGraph */}
@@ -477,7 +478,74 @@ ${url}`);
         <meta name="twitter:description" content={seoDescription} />
         <meta name="twitter:image" content={seoImage} />
 
-        {/* JSON-LD */}
+        {/* JSON-LD - Breadcrumb Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://aiterritory.org/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Prompts",
+                "item": "https://aiterritory.org/gemini-prompts"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1),
+                "item": `https://aiterritory.org/gemini-prompts/${prompt.category}`
+              },
+              {
+                "@type": "ListItem",
+                "position": 4,
+                "name": seoTitle
+              }
+            ]
+          })}
+        </script>
+
+        {/* JSON-LD - FAQ Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "How do I use this AI prompt?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": `To use this ${prompt.category} prompt, simply copy the text and paste it into Google Gemini or other AI tools. You can then customize it with your specific details to get personalized results.`
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Are these prompts free to use?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, all prompts on AITerritory.org are completely free to use for personal and commercial projects. You can copy, modify, and use them as needed."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I share these prompts with others?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Absolutely! We encourage you to share these prompts with friends, colleagues, or on social media. The more people who benefit from AI tools, the better."
+                }
+              }
+            ]
+          })}
+        </script>
+
+        {/* JSON-LD - CreativeWork Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -527,8 +595,11 @@ ${url}`);
             {prompt.image_url ? (
               <img 
                 src={prompt.image_url} 
-                alt="Prompt visualization" 
+                alt={`AI Prompt: ${seoTitle}`} 
                 className="w-full h-full object-cover"
+                width="600"
+                height="600"
+                loading="lazy"
                 onError={(e) => {
                   e.currentTarget.src = '/placeholder.svg';
                 }}
@@ -710,8 +781,11 @@ ${url}`);
                         {relatedPrompt.image_url ? (
                           <img 
                             src={relatedPrompt.image_url} 
-                            alt="Prompt visualization" 
+                            alt={`Related AI Prompt: ${relatedPrompt.prompt.substring(0, 50)}${relatedPrompt.prompt.length > 50 ? '...' : ''}`} 
                             className="w-full h-full object-cover"
+                            width="300"
+                            height="300"
+                            loading="lazy"
                             onError={(e) => {
                               e.currentTarget.src = '/placeholder.svg';
                             }}
@@ -749,6 +823,15 @@ ${url}`);
             </div>
           </div>
         )}
+        
+        {/* Last Updated Display */}
+        <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+          Last updated on {new Date(prompt.created_at).toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+          })}
+        </div>
       </div>
     </div>
   );

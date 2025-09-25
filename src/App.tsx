@@ -155,6 +155,10 @@ function SEO() {
           target.media = 'all';
         }} 
       />
+      {/* Prefetch critical category pages */}
+      <link rel="prefetch" href="/categories/men" />
+      <link rel="prefetch" href="/categories/women" />
+      <link rel="prefetch" href="/categories/couple" />
       {/* Defer Analytics or Chat Scripts */}
       <script async defer src="https://www.googletagmanager.com/gtag/js?id=YOUR_GA_ID" />
       <script

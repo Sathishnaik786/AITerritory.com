@@ -30,9 +30,9 @@ const siteUrl = 'https://aiterritory.org';
 
 // Static pages to include in the sitemap
 const staticPages = [
-  { url: '/', lastmod: new Date().toISOString(), changefreq: 'daily', priority: '1.0' },
-  { url: '/blog', lastmod: new Date().toISOString(), changefreq: 'daily', priority: '0.9' },
-  { url: '/gemini-prompts', lastmod: new Date().toISOString(), changefreq: 'daily', priority: '0.8' },
+  { url: '/', lastmod: '2025-09-18', changefreq: 'daily', priority: '1.0' },
+  { url: '/blog', lastmod: '2025-09-18', changefreq: 'daily', priority: '0.9' },
+  { url: '/gemini-prompts', lastmod: '2025-09-18', changefreq: 'daily', priority: '0.8' },
   { url: '/about', lastmod: '2024-01-01', changefreq: 'monthly', priority: '0.8' },
   { url: '/contact', lastmod: '2024-01-01', changefreq: 'monthly', priority: '0.8' },
   { url: '/privacy', lastmod: '2024-01-01', changefreq: 'yearly', priority: '0.5' },
@@ -55,7 +55,7 @@ async function fetchBlogPosts() {
   try {
     const { data: posts, error } = await supabase
       .from('blogs')
-      .select('slug, created_at, title, featured')
+      .select('slug, created_at, updated_at, title, featured')
       .eq('featured', true)
       .order('created_at', { ascending: false });
 
@@ -63,7 +63,7 @@ async function fetchBlogPosts() {
     
     return posts.map(post => ({
       url: `/blog/${post.slug}`,
-      lastmod: post.created_at,
+      lastmod: post.updated_at || post.created_at,
       changefreq: 'weekly',
       priority: post.featured ? '0.9' : '0.8',
     }));
@@ -78,7 +78,7 @@ async function fetchGeminiPrompts() {
   try {
     const { data: prompts, error } = await supabase
       .from('gemini_prompts')
-      .select('id, prompt, category, created_at')
+      .select('id, prompt, category, created_at, updated_at')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -88,7 +88,7 @@ async function fetchGeminiPrompts() {
       const promptSlug = slugify(prompt.prompt.substring(0, 50)) || prompt.id;
       return {
         url: `/gemini-prompts/${prompt.category}/${promptSlug}-${prompt.id}`,
-        lastmod: prompt.created_at,
+        lastmod: prompt.updated_at || prompt.created_at,
         changefreq: 'monthly',
         priority: '0.7',
       };

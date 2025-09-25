@@ -718,6 +718,16 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
 
   const apiPath = Object.keys(API_MAP).find(route => path.startsWith(route));
 
+  // Determine category-specific OG image
+  let categorySpecificImage = url.origin + "/og-default.png";
+  if (path.startsWith('/categories/men') || path.includes('/men')) {
+    categorySpecificImage = url.origin + "/og/men.png";
+  } else if (path.startsWith('/categories/women') || path.includes('/women')) {
+    categorySpecificImage = url.origin + "/og/women.png";
+  } else if (path.startsWith('/categories/couple') || path.includes('/couple')) {
+    categorySpecificImage = url.origin + "/og/couple.png";
+  }
+
   if (apiPath) {
     id = path.replace(apiPath, "");
     pageName = ROUTE_NAMES[apiPath] || "Page";
@@ -749,6 +759,11 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
         metaDescription = CATEGORY_META_DESCRIPTIONS[id];
       }
     }
+  }
+
+  // Use category-specific image if no specific image is set
+  if (!metaImage || metaImage === url.origin + "/og-default.png") {
+    metaImage = categorySpecificImage;
   }
 
   // Always ensure metaImage is set
@@ -788,7 +803,16 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
   // Add meta tags
   html = html.replace(
     "</head>",
-    `\n    <meta property=\"og:title\" content=\"${metaTitle} | AI Territory\">\n    <meta property=\"og:image\" content=\"${metaImage}\">\n    <meta property=\"og:description\" content=\"${metaDescription}\">\n    <meta property=\"og:url\" content=\"${canonicalUrl}\">\n    <meta name=\"twitter:card\" content=\"summary_large_image\">\n    <meta name=\"twitter:title\" content=\"${metaTitle} | AI Territory\">\n    <meta name=\"twitter:description\" content=\"${metaDescription}\">\n    <meta name=\"twitter:image\" content=\"${metaImage}\">\n    </head>`
+    `
+    <meta property=\"og:title\" content=\"${metaTitle} | AI Territory\">
+    <meta property=\"og:image\" content=\"${metaImage}\">
+    <meta property=\"og:description\" content=\"${metaDescription}\">
+    <meta property=\"og:url\" content=\"${canonicalUrl}\">
+    <meta name=\"twitter:card\" content=\"summary_large_image\">
+    <meta name=\"twitter:title\" content=\"${metaTitle} | AI Territory\">
+    <meta name=\"twitter:description\" content=\"${metaDescription}\">
+    <meta name=\"twitter:image\" content=\"${metaImage}\">
+    </head>`
   );
 
   // Generate comprehensive breadcrumb schema for all eligible pages
@@ -848,6 +872,43 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Yes! We welcome submissions of new AI tools. Visit our submit tool page to share your AI solution with our community."
+          }
+        }
+      ]
+    };
+
+    const faqScript = `<script type="application/ld+json">${JSON.stringify(faqSchema)}</script>`;
+    html = html.replace("</head>", `\n    ${faqScript}\n    </head>`);
+  }
+
+  // Add FAQ Schema for prompt detail pages
+  if (path.startsWith("/gemini-prompts/") && path.includes("-")) {
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I use AI prompts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can copy and paste these AI prompts directly into tools like ChatGPT or Gemini to generate responses."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are the prompts free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, prompts listed on AITerritory.org are free to explore. Premium features may be added later."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I modify these prompts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Absolutely! Feel free to customize any prompt to better suit your specific needs and use cases."
           }
         }
       ]
