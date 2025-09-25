@@ -119,27 +119,36 @@ exports.getSEOGeminiPromptById = async (req, res) => {
   let seoTitle;
   switch (prompt.category.toLowerCase()) {
     case 'men':
-      seoTitle = 'Gemini Men\'s Prompt';
+      seoTitle = `Gemini Men's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
       break;
     case 'women':
-      seoTitle = 'Gemini Women\'s Prompt';
+      seoTitle = `Gemini Women's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
       break;
     case 'couple':
-      seoTitle = 'Gemini Couple\'s Prompt';
+      seoTitle = `Gemini Couple's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
       break;
     default:
-      seoTitle = 'Gemini Prompt';
+      seoTitle = `Gemini Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
   }
   
-  // Truncate description for SEO
-  const seoDescription = prompt.prompt.length > 160 
-    ? prompt.prompt.substring(0, 157) + '...' 
+  // Truncate description for SEO (150 characters as requested)
+  const seoDescription = prompt.prompt.length > 150 
+    ? prompt.prompt.substring(0, 147) + '...' 
     : prompt.prompt;
   
-  // Use prompt image or fallback to default
+  // Use prompt image, fallback to dynamic OG image, or default
   const seoImage = prompt.image_url && prompt.image_url.trim() !== '' 
     ? prompt.image_url 
-    : 'https://aiterritory.org/assets/og-default.png';
+    : `https://aiterritory-com.onrender.com/api/og/prompts/${prompt.id}`;
+  
+  // Generate canonical URL
+  const slug = prompt.prompt.substring(0, 50).toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '') || prompt.id;
+    
+  const canonicalUrl = `https://aiterritory.org/gemini-prompts/${prompt.category}/${slug}-${prompt.id}`;
   
   // Prepare SEO data
   const seoData = {
@@ -151,7 +160,8 @@ exports.getSEOGeminiPromptById = async (req, res) => {
     created_at: prompt.created_at,
     likes: likesCount,
     shares: sharesCount,
-    comments: commentsCount
+    comments: commentsCount,
+    canonical_url: canonicalUrl
   };
   
   console.log('Sending SEO data:', seoData);

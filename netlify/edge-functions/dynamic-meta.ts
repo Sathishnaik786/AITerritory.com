@@ -1,4 +1,6 @@
-import { Context } from "@netlify/edge-functions";
+import type { Context } from "@netlify/edge-functions";
+/// <reference path="./types/netlify.d.ts" />
+/// <reference lib="webworker" />
 
 // Cache utilities for Netlify Edge Functions
 // Implements stale-while-revalidate strategy with 12-hour cache duration
@@ -909,6 +911,43 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Absolutely! Feel free to customize any prompt to better suit your specific needs and use cases."
+          }
+        }
+      ]
+    };
+
+    const faqScript = `<script type="application/ld+json">${JSON.stringify(faqSchema)}</script>`;
+    html = html.replace("</head>", `\n    ${faqScript}\n    </head>`);
+  }
+
+  // Add FAQ Schema for prompt category pages
+  if (path.startsWith("/gemini-prompts/") && !path.includes("-")) {
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What are AI prompts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AI prompts are specific instructions or questions that guide artificial intelligence models like Google Gemini to generate desired responses or content."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I use these prompts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Simply copy any prompt from AITerritory.org and paste it into your preferred AI tool like Google Gemini to get started."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I submit my own prompts?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! We welcome community contributions. Use our Google Form to submit your own creative prompts."
           }
         }
       ]

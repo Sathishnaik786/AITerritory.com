@@ -467,30 +467,43 @@ const GeminiPromptsPage = () => {
     const baseDescription = "Discover and share powerful prompts for Google Gemini AI. Copy, try, and upload your own prompts to enhance your AI experience.";
     const baseKeywords = "Gemini prompts, Google Gemini, AI prompts, artificial intelligence, prompt engineering, AI tools";
 
+    // Category-specific OG image
+    const categoryImage = activeTab !== 'all' 
+      ? `https://aiterritory.org/og/categories/${activeTab}.png`
+      : 'https://aiterritory.org/og-default.png';
+
     switch (activeTab) {
       case 'men':
         return {
           title: `Men's Gemini Prompts - ${baseTitle}`,
           description: `Explore powerful Google Gemini prompts specifically for men. ${baseDescription}`,
-          keywords: `men's prompts, ${baseKeywords}`
+          keywords: `men's prompts, ${baseKeywords}`,
+          image: categoryImage,
+          canonical: 'https://aiterritory.org/gemini-prompts/men'
         };
       case 'women':
         return {
           title: `Women's Gemini Prompts - ${baseTitle}`,
           description: `Discover Google Gemini prompts specifically for women. ${baseDescription}`,
-          keywords: `women's prompts, ${baseKeywords}`
+          keywords: `women's prompts, ${baseKeywords}`,
+          image: categoryImage,
+          canonical: 'https://aiterritory.org/gemini-prompts/women'
         };
       case 'couple':
         return {
           title: `Couple's Gemini Prompts - ${baseTitle}`,
           description: `Find Google Gemini prompts for couples. ${baseDescription}`,
-          keywords: `couple's prompts, ${baseKeywords}`
+          keywords: `couple's prompts, ${baseKeywords}`,
+          image: categoryImage,
+          canonical: 'https://aiterritory.org/gemini-prompts/couple'
         };
       default:
         return {
           title: baseTitle,
           description: baseDescription,
-          keywords: baseKeywords
+          keywords: baseKeywords,
+          image: 'https://aiterritory.org/og-default.png',
+          canonical: 'https://aiterritory.org/gemini-prompts'
         };
     }
   }, [activeTab]);
@@ -637,20 +650,20 @@ const GeminiPromptsPage = () => {
         <title>{pageMeta.title}</title>
         <meta name="description" content={pageMeta.description} />
         <meta name="keywords" content={pageMeta.keywords} />
-        <link rel="canonical" href={`https://aiterritory.org/gemini-prompts`} />
+        <link rel="canonical" href={pageMeta.canonical || 'https://aiterritory.org/gemini-prompts'} />
         
         {/* OpenGraph */}
         <meta property="og:title" content={pageMeta.title} />
         <meta property="og:description" content={pageMeta.description} />
-        <meta property="og:image" content="https://aiterritory.org/assets/og-default.png" />
-        <meta property="og:url" content="https://aiterritory.org/gemini-prompts" />
+        <meta property="og:image" content={pageMeta.image || 'https://aiterritory.org/og-default.png'} />
+        <meta property="og:url" content={pageMeta.canonical || 'https://aiterritory.org/gemini-prompts'} />
         <meta property="og:type" content="website" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageMeta.title} />
         <meta name="twitter:description" content={pageMeta.description} />
-        <meta name="twitter:image" content="https://aiterritory.org/assets/og-default.png" />
+        <meta name="twitter:image" content={pageMeta.image || 'https://aiterritory.org/og-default.png'} />
         
         {/* JSON-LD */}
         <script type="application/ld+json">
@@ -659,7 +672,8 @@ const GeminiPromptsPage = () => {
             "@type": "WebPage",
             "name": pageMeta.title,
             "description": pageMeta.description,
-            "url": "https://aiterritory.org/gemini-prompts",
+            "url": pageMeta.canonical || 'https://aiterritory.org/gemini-prompts',
+            "image": pageMeta.image || 'https://aiterritory.org/og-default.png',
             "publisher": {
               "@type": "Organization",
               "name": "AITerritory",
@@ -675,7 +689,7 @@ const GeminiPromptsPage = () => {
                 "position": index + 1,
                 "name": `Gemini ${prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)} Prompt`,
                 "description": prompt.prompt.substring(0, 100) + (prompt.prompt.length > 100 ? '...' : ''),
-                "url": `https://aiterritory.org/gemini-prompts/${prompt.category}/${prompt.id}`
+                "url": `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`
               }))
             }
           })}

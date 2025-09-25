@@ -34,6 +34,7 @@ interface SEOData {
   likes: number;
   shares: number;
   comments: number;
+  canonical_url?: string;
 }
 
 // Define interaction data interface
@@ -440,22 +441,22 @@ ${url}`);
   // Use SEO data if available, otherwise fallback to client-side generation
   const seoTitle = seoData?.title || (() => {
     switch (prompt.category.toLowerCase()) {
-      case 'men': return 'Gemini Men\'s Prompt';
-      case 'women': return 'Gemini Women\'s Prompt';
-      case 'couple': return 'Gemini Couple\'s Prompt';
-      default: return 'Gemini Prompt';
+      case 'men': return `Gemini Men's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+      case 'women': return `Gemini Women's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+      case 'couple': return `Gemini Couple's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+      default: return `Gemini Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
     }
   })();
 
-  const seoDescription = seoData?.description || (prompt.prompt.length > 160 
-    ? prompt.prompt.substring(0, 157) + '...' 
+  const seoDescription = seoData?.description || (prompt.prompt.length > 150 
+    ? prompt.prompt.substring(0, 147) + '...' 
     : prompt.prompt);
 
-  const canonicalUrl = `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`;
+  const canonicalUrl = seoData?.canonical_url || `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`;
 
   const seoImage = seoData?.image_url || (prompt.image_url && prompt.image_url.trim() !== '' 
     ? prompt.image_url 
-    : 'https://aiterritory.org/assets/og-default.png');
+    : `https://aiterritory-com.onrender.com/api/og/prompts/${prompt.id}`);
 
   return (
     <div className="container mx-auto py-8 px-4">

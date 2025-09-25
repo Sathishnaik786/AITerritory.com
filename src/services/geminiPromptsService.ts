@@ -66,7 +66,7 @@ export async function submitPromptViaGoogleForms(promptData: GeminiPromptSubmiss
 export async function getSEOGeminiPromptById(id: string) {
   console.log('Fetching SEO data for prompt ID:', id);
   try {
-    // Fix the endpoint URL - it should match the route definition
+    // Use the correct SEO endpoint
     const res = await api.get(`/gemini-prompts/seo/${id}`);
     console.log('SEO API response:', res);
     
