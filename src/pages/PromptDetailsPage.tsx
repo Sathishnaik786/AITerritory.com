@@ -4,8 +4,10 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Heart, MessageCircle, Share2, Check, ArrowLeft, Link as LinkIcon } from 'lucide-react';
+import { Copy, Heart, MessageCircle, Share2, Check, ArrowLeft, Link as LinkIcon, ExternalLink } from 'lucide-react';
 import { getGeminiPrompts, getSEOGeminiPromptById } from '../services/geminiPromptsService';
+import { slugify } from '@/lib/slugify';
+import { getPromptLikes, addPromptLike, removePromptLike } from '../services/promptInteractionsService';
 import './GeminiPromptsPage.css';
 
 interface GeminiPrompt {
@@ -34,15 +36,25 @@ interface SEOData {
   comments: number;
 }
 
+// Define interaction data interface
+interface PromptLike {
+  id: string;
+  user_id: string;
+  created_at: string;
+}
+
 const PromptDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [prompt, setPrompt] = useState<GeminiPrompt | null>(null);
   const [seoData, setSeoData] = useState<SEOData | null>(null);
+  const [relatedPrompts, setRelatedPrompts] = useState<GeminiPrompt[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
   const shareDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -50,7 +62,6 @@ const PromptDetailsPage = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (shareDropdownRef.current && !shareDropdownRef.current.contains(event.target as Node)) {
-        console.log('Click outside detected, closing dropdown');
         setIsShareDropdownOpen(false);
       }
     };
@@ -64,12 +75,22 @@ const PromptDetailsPage = () => {
   // Extract actual ID from the param (removing slug part)
   const extractId = (paramId: string | undefined): string | null => {
     if (!paramId) return null;
-    // Check if ID contains a slug (format: slug-actualId)
-    const parts = paramId.split('-');
-    if (parts.length > 1) {
-      // Return the last part which should be the actual ID
-      return parts[parts.length - 1];
+    
+    console.log('Extracting ID from param:', paramId);
+    
+    // The ID is always a UUID, which has a specific format
+    // We'll look for the UUID pattern at the end of the string
+    // UUID pattern: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+    const uuidRegex = /[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const match = paramId.match(uuidRegex);
+    
+    if (match) {
+      console.log('Found UUID:', match[0]);
+      return match[0];
     }
+    
+    // Fallback: if no UUID pattern found, return the original param
+    console.log('No UUID found, returning original param:', paramId);
     return paramId;
   };
 
@@ -77,7 +98,10 @@ const PromptDetailsPage = () => {
   useEffect(() => {
     const fetchSEOData = async () => {
       const actualId = extractId(id);
+      console.log('Fetching SEO data for ID:', actualId);
+      
       if (!actualId) {
+        setError('Invalid prompt ID');
         setLoading(false);
         return;
       }
@@ -85,13 +109,43 @@ const PromptDetailsPage = () => {
       try {
         // Fetch SEO data from backend using the service
         const data: SEOData = await getSEOGeminiPromptById(actualId);
+        console.log('SEO data fetched:', data);
         setSeoData(data);
+        setLikeCount(data.likes || 0);
       } catch (error) {
         console.error('Failed to fetch SEO data:', error);
+        // Don't set error here as we can still show the prompt without SEO data
       }
     };
 
-    fetchSEOData();
+    if (id) {
+      fetchSEOData();
+    }
+  }, [id]);
+
+  // Fetch prompt likes to determine if current user has liked it
+  useEffect(() => {
+    const fetchPromptLikes = async () => {
+      const actualId = extractId(id);
+      console.log('Fetching likes for ID:', actualId);
+      
+      if (!actualId) return;
+
+      try {
+        const likes: PromptLike[] = await getPromptLikes(actualId);
+        console.log('Likes fetched:', likes);
+        setLikeCount(likes.length);
+        // In a real implementation, you would check if the current user has liked the prompt
+        // For now, we'll just set it to false
+        setIsLiked(false);
+      } catch (error) {
+        console.error('Failed to fetch prompt likes:', error);
+      }
+    };
+
+    if (id) {
+      fetchPromptLikes();
+    }
   }, [id]);
 
   // Fetch all prompts and find the one with matching ID
@@ -99,12 +153,40 @@ const PromptDetailsPage = () => {
     const fetchPrompt = async () => {
       try {
         setLoading(true);
+        setError(null);
+        console.log('Fetching all prompts');
         const data = await getGeminiPrompts();
+        console.log('All prompts fetched:', data.length);
+        
         const actualId = extractId(id);
+        console.log('Looking for prompt with ID:', actualId);
+        
+        if (!actualId) {
+          setError('Invalid prompt ID');
+          setLoading(false);
+          return;
+        }
+        
         const foundPrompt = data.find((p: GeminiPrompt) => p.id === actualId);
-        setPrompt(foundPrompt || null);
+        console.log('Found prompt:', foundPrompt);
+        
+        if (!foundPrompt) {
+          setError('Prompt not found');
+          setLoading(false);
+          return;
+        }
+        
+        setPrompt(foundPrompt);
+        
+        // Fetch related prompts (same category)
+        const related = data
+          .filter((p: GeminiPrompt) => p.id !== actualId && p.category === foundPrompt.category)
+          .slice(0, 4); // Limit to 4 related prompts
+        console.log('Related prompts:', related);
+        setRelatedPrompts(related);
       } catch (error) {
         console.error('Error fetching prompt:', error);
+        setError('Failed to load prompt details. Please try again later.');
         toast({
           title: "Error",
           description: "Failed to load prompt details",
@@ -116,7 +198,11 @@ const PromptDetailsPage = () => {
     };
 
     if (id) {
+      console.log('Prompt ID from URL params:', id);
       fetchPrompt();
+    } else {
+      setError('No prompt ID provided');
+      setLoading(false);
     }
   }, [id, toast]);
 
@@ -143,10 +229,39 @@ const PromptDetailsPage = () => {
     }
   }, [prompt, toast]);
 
-  const handleLikePrompt = useCallback(() => {
-    setIsLiked(!isLiked);
-    // In a real implementation, this would call an API to update likes
-  }, [isLiked]);
+  const handleLikePrompt = useCallback(async () => {
+    const actualId = extractId(id);
+    if (!actualId || !prompt) return;
+
+    try {
+      if (isLiked) {
+        // Remove like
+        await removePromptLike(actualId, 'current_user_id'); // Replace with actual user ID
+        setIsLiked(false);
+        setLikeCount(prev => Math.max(0, prev - 1));
+        toast({
+          title: "Unliked",
+          description: "Prompt removed from favorites",
+        });
+      } else {
+        // Add like
+        await addPromptLike(actualId, 'current_user_id'); // Replace with actual user ID
+        setIsLiked(true);
+        setLikeCount(prev => prev + 1);
+        toast({
+          title: "Liked!",
+          description: "Prompt added to favorites",
+        });
+      }
+    } catch (error) {
+      console.error('Error updating like status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update like status",
+        variant: "destructive",
+      });
+    }
+  }, [isLiked, prompt, id, toast]);
 
   const handleSharePrompt = useCallback(async () => {
     if (!prompt) return;
@@ -270,10 +385,38 @@ ${url}`);
     }
   }, [prompt, seoData, toast]);
 
+  // Get category color
+  const getCategoryColor = useCallback((category: string) => {
+    const categoryColors: Record<string, string> = {
+      men: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      women: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
+      couple: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+      all: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+    };
+    
+    return categoryColors[category] || categoryColors['all'];
+  }, []);
+
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4 flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div className="container mx-auto py-8 px-4 flex flex-col items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+        <p className="text-lg">Loading prompt details...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-bold mb-4">Error Loading Prompt</h1>
+          <p className="mb-6 text-red-500">{error}</p>
+          <Button onClick={() => navigate('/gemini-prompts')}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Prompts
+          </Button>
+        </div>
       </div>
     );
   }
@@ -284,6 +427,7 @@ ${url}`);
         <div className="text-center py-12">
           <h1 className="text-2xl font-bold mb-4">Prompt Not Found</h1>
           <p className="mb-6">The prompt you're looking for doesn't exist or has been removed.</p>
+          <p className="mb-6 text-sm text-gray-500">ID: {id}</p>
           <Button onClick={() => navigate('/gemini-prompts')}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Prompts
@@ -307,7 +451,7 @@ ${url}`);
     ? prompt.prompt.substring(0, 157) + '...' 
     : prompt.prompt);
 
-  const canonicalUrl = `https://aiterritory.org/gemini-prompts/${prompt.category}/${id}`;
+  const canonicalUrl = `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`;
 
   const seoImage = seoData?.image_url || (prompt.image_url && prompt.image_url.trim() !== '' 
     ? prompt.image_url 
@@ -351,7 +495,7 @@ ${url}`);
               {
                 "@type": "InteractionCounter",
                 "interactionType": "https://schema.org/LikeAction",
-                "userInteractionCount": seoData?.likes || 0
+                "userInteractionCount": likeCount
               },
               {
                 "@type": "InteractionCounter",
@@ -396,12 +540,7 @@ ${url}`);
               </div>
             )}
             <div className="absolute top-4 right-4">
-              <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                prompt.category === 'men' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                prompt.category === 'women' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' :
-                prompt.category === 'couple' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
-                'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-              }`}>
+              <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getCategoryColor(prompt.category)}`}>
                 {prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)}
               </span>
             </div>
@@ -427,6 +566,7 @@ ${url}`);
                   onClick={handleLikePrompt}
                 >
                   <Heart className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+                  <span className="ml-2">{likeCount}</span>
                 </Button>
                 
                 {/* Enhanced Share Button with Dropdown */}
@@ -436,7 +576,6 @@ ${url}`);
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log('Share button clicked, isShareDropdownOpen:', isShareDropdownOpen); // Debug log
                       setIsShareDropdownOpen(!isShareDropdownOpen);
                     }}
                   >
@@ -469,7 +608,7 @@ ${url}`);
                         }}
                       >
                         <svg className="w-4 h-4 mr-3" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.204-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.689-.07-4.948 0-3.204.014-3.668.072-4.948zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                         </svg>
                         Instagram
                       </button>
@@ -493,7 +632,7 @@ ${url}`);
                         }}
                       >
                         <svg className="w-4 h-4 mr-3" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M12.005 2c-2.166 0-3.938 1.747-3.938 3.914 0 .277.027.547.078.808-.714.216-1.368.577-1.921 1.064-.554.487-.987 1.092-1.263 1.77-.276.677-.391 1.405-.333 2.137.058.732.284 1.44.662 2.066.378.626.89 1.15 1.506 1.536.616.386 1.31.634 2.037.725.727.091 1.476.015 2.177-.22.626-.21 1.196-.555 1.68-.996.484.44.1054.786 1.68.996.701.235 1.45.311 2.177.22.727-.091 1.421-.339 2.037-.725.616-.386 1.128-.91 1.506-1.536.378-.626.604-1.334.662-2.066.058-.732-.057-1.46-.333-2.137-.276-.678-.709-1.283-1.263-1.77-.553-.487-1.207-.848-1.921-1.064.051-.261.078-.531.078-.808 0-2.167-1.772-3.914-3.939-3.914zm-3.938 16.929c-.633 0-1.148-.51-1.148-1.143s.515-1.143 1.148-1.143c.632 0 1.147.51 1.147 1.143s-.515 1.143-1.147 1.143zm7.876 0c-.633 0-1.148-.51-1.148-1.143s.515-1.143 1.148-1.143c.632 0 1.147.51 1.147 1.143s-.515 1.143-1.147 1.143zm-3.938-2.286c-2.537 0-4.595-2.044-4.595-4.565s2.058-4.565 4.595-4.565c2.537 0 4.595 2.044 4.595 4.565s-2.058 4.565-4.595 4.565z"/>
+                          <path d="M12.005 2c-2.166 0-3.938 1.747-3.938 3.914 0 .277.027.547.078.808-.714.216-1.368.577-1.921 1.064-.554.487-.987 1.092-1.263 1.77-.276.677-.391 1.405-.333 2.137.058.732.284 1.44.662 2.066.378.626.89 1.15 1.506 1.536.616.386 1.31.634 2.037.725.727.091 1.476.015 2.177-.22.727-.21 1.196-.555 1.68-.996.484.44.1054.786 1.68.996.701.235 1.45.311 2.177.22.727-.091 1.421-.339 2.037-.725.616-.386 1.128-.91 1.506-1.536.378-.626.604-1.334.662-2.066.058-.732-.057-1.46-.333-2.137-.276-.678-.709-1.283-1.263-1.77-.553-.487-1.207-.848-1.921-1.064.051-.261.078-.531.078-.808 0-2.167-1.772-3.914-3.939-3.914zm-3.938 16.929c-.633 0-1.148-.51-1.148-1.143s.515-1.143 1.148-1.143c.632 0 1.147.51 1.147 1.143s-.515 1.143-1.147 1.143zm7.876 0c-.633 0-1.148-.51-1.148-1.143s.515-1.143 1.148-1.143c.632 0 1.147.51 1.147 1.143s-.515 1.143-1.147 1.143zm-3.938-2.286c-2.537 0-4.595-2.044-4.595-4.565s2.058-4.565 4.595-4.565c2.537 0 4.595 2.044 4.595 4.565s-2.058 4.565-4.595 4.565z"/>
                         </svg>
                         Snapchat
                       </button>
@@ -550,6 +689,66 @@ ${url}`);
             </div>
           </CardContent>
         </Card>
+
+        {/* Related Prompts Section */}
+        {relatedPrompts.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold mb-6">Related Prompts</h2>
+            <div className="gemini-prompts-grid gap-6">
+              {relatedPrompts.map((relatedPrompt) => {
+                const categoryColor = getCategoryColor(relatedPrompt.category);
+                const relatedPromptSlug = slugify(relatedPrompt.prompt.substring(0, 50)) || relatedPrompt.id;
+                
+                return (
+                  <Link 
+                    key={relatedPrompt.id} 
+                    to={`/gemini-prompts/${relatedPrompt.category}/${relatedPromptSlug}-${relatedPrompt.id}`}
+                    className="block h-full"
+                  >
+                    <Card className="h-full flex flex-col overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
+                      <div className="aspect-square overflow-hidden relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+                        {relatedPrompt.image_url ? (
+                          <img 
+                            src={relatedPrompt.image_url} 
+                            alt="Prompt visualization" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = '/placeholder.svg';
+                            }}
+                          />
+                        ) : (
+                          <div className="text-gray-500 dark:text-gray-400">
+                            <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto" />
+                          </div>
+                        )}
+                        <div className="absolute top-2 right-2">
+                          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${categoryColor}`}>
+                            {relatedPrompt.category.charAt(0).toUpperCase() + relatedPrompt.category.slice(1)}
+                          </span>
+                        </div>
+                      </div>
+                      <CardContent className="flex-1 flex flex-col p-4 bg-white dark:bg-gray-900">
+                        <p className="text-sm mb-4 flex-1 text-gray-800 dark:text-gray-200 line-clamp-3">
+                          {relatedPrompt.prompt.substring(0, 120) + (relatedPrompt.prompt.length > 120 ? '...' : '')}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {new Date(relatedPrompt.created_at).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </span>
+                          <ExternalLink className="h-4 w-4 text-gray-500" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

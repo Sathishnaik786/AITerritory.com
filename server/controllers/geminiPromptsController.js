@@ -30,6 +30,8 @@ exports.getAllGeminiPrompts = async (req, res) => {
     console.log('No prompts found in database');
   }
   
+  console.log('Sending response with', data ? data.length : 0, 'prompts');
+  
   // Send raw data without deepStringify
   res.json(data);
 };
@@ -60,23 +62,58 @@ exports.getSEOGeminiPromptById = async (req, res) => {
   console.log(`Fetching SEO data for Gemini prompt with ID: ${id}`);
   
   // Fetch the prompt
-  const { data: prompt, error } = await supabase
+  const { data: prompt, error: promptError } = await supabase
     .from('gemini_prompts')
     .select('*')
     .eq('id', id)
     .single();
     
-  if (error) {
-    console.error('Supabase error:', error);
+  if (promptError) {
+    console.error('Supabase error:', promptError);
     return res.status(404).json({ error: 'Prompt not found' });
   }
+  
+  console.log('Found prompt for SEO:', prompt);
   
   // Fetch interaction counts (likes, shares, comments)
   // For now, we'll return placeholder values as these features aren't fully implemented
   // In a real implementation, you would query your interactions table
-  const likesCount = 0;
-  const sharesCount = 0;
-  const commentsCount = 0;
+  let likesCount = 0;
+  let sharesCount = 0;
+  let commentsCount = 0;
+  
+  try {
+    // Try to fetch actual counts from the database
+    const { count: likes, error: likesError } = await supabase
+      .from('prompt_likes')
+      .select('*', { count: 'exact', head: true })
+      .eq('prompt_id', id);
+    
+    if (!likesError && likes !== null) {
+      likesCount = likes;
+    }
+    
+    const { count: shares, error: sharesError } = await supabase
+      .from('prompt_shares')
+      .select('*', { count: 'exact', head: true })
+      .eq('prompt_id', id);
+    
+    if (!sharesError && shares !== null) {
+      sharesCount = shares;
+    }
+    
+    const { count: comments, error: commentsError } = await supabase
+      .from('prompt_comments')
+      .select('*', { count: 'exact', head: true })
+      .eq('prompt_id', id);
+    
+    if (!commentsError && comments !== null) {
+      commentsCount = comments;
+    }
+  } catch (interactionError) {
+    console.warn('Failed to fetch interaction counts:', interactionError);
+    // Use placeholder values if we can't fetch actual counts
+  }
   
   // Generate SEO title based on category
   let seoTitle;
@@ -104,8 +141,8 @@ exports.getSEOGeminiPromptById = async (req, res) => {
     ? prompt.image_url 
     : 'https://aiterritory.org/assets/og-default.png';
   
-  // Send SEO data
-  res.json({
+  // Prepare SEO data
+  const seoData = {
     id: prompt.id,
     title: seoTitle,
     description: seoDescription,
@@ -115,7 +152,12 @@ exports.getSEOGeminiPromptById = async (req, res) => {
     likes: likesCount,
     shares: sharesCount,
     comments: commentsCount
-  });
+  };
+  
+  console.log('Sending SEO data:', seoData);
+  
+  // Send SEO data
+  res.json(seoData);
 };
 
 // POST /api/gemini-prompts
