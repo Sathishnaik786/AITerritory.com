@@ -24,6 +24,24 @@
       <priority>0.8</priority>
     </url>
     <url>
+      <loc>https://aiterritory.org/gemini-prompts/men</loc>
+      <lastmod>2025-09-18</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women</loc>
+      <lastmod>2025-09-18</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple</loc>
+      <lastmod>2025-09-18</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
       <loc>https://aiterritory.org/about</loc>
       <lastmod>2024-01-01</lastmod>
       <changefreq>monthly</changefreq>

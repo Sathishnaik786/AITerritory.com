@@ -58,7 +58,7 @@ async function fetchBlogPosts() {
   try {
     const { data: posts, error } = await supabase
       .from('blogs')
-      .select('slug, created_at, updated_at, title, featured')
+      .select('slug, created_at, title, featured')
       .eq('featured', true)
       .order('created_at', { ascending: false });
 
@@ -66,7 +66,7 @@ async function fetchBlogPosts() {
     
     return posts.map(post => ({
       url: `/blog/${post.slug}`,
-      lastmod: post.updated_at || post.created_at,
+      lastmod: post.created_at,
       changefreq: 'weekly',
       priority: post.featured ? '0.9' : '0.8',
     }));
@@ -81,7 +81,7 @@ async function fetchGeminiPrompts() {
   try {
     const { data: prompts, error } = await supabase
       .from('gemini_prompts')
-      .select('id, prompt, category, created_at, updated_at')
+      .select('id, prompt, category, created_at')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -91,7 +91,7 @@ async function fetchGeminiPrompts() {
       const promptSlug = slugify(prompt.prompt.substring(0, 50)) || prompt.id;
       return {
         url: `/gemini-prompts/${prompt.category}/${promptSlug}-${prompt.id}`,
-        lastmod: prompt.updated_at || prompt.created_at,
+        lastmod: prompt.created_at,
         changefreq: 'monthly',
         priority: '0.7',
       };

@@ -216,6 +216,10 @@ const CATEGORY_PATHS = [
   '/categories/productivity-tools',
   '/categories/all-ai-tools',
   '/categories/video-tools',
+  '/gemini-prompts/men',
+  '/gemini-prompts/women',
+  '/gemini-prompts/couple',
+  '/gemini-prompts/all',
 ];
 
 const TOOL_PATHS = [
@@ -248,7 +252,7 @@ const DUPLICATE_PATHS = [
 
 // Check if path should be cached
 function shouldCachePath(path: string): boolean {
-  return CATEGORY_PATHS.includes(path) || TOOL_PATHS.includes(path);
+  return CATEGORY_PATHS.includes(path) || TOOL_PATHS.includes(path) || path.startsWith('/gemini-prompts/');
 }
 
 // Check if path is a blog path (should have shorter cache)
@@ -282,6 +286,7 @@ const API_MAP: Record<string, string> = {
   "/resources/": "/api/resources/",   // For resource pages (future)
   "/youtube/": "/api/youtube/",       // For YouTube content
   "/dashboard/": "/api/dashboard/",   // For user dashboard (future)
+  "/gemini-prompts/": "/api/gemini-prompts/seo/", // For Gemini prompts SEO data
   // Add more as needed
 };
 
@@ -296,6 +301,7 @@ const ROUTE_NAMES: Record<string, string> = {
   "/resources/": "Resources",
   "/youtube/": "YouTube",
   "/dashboard/": "Dashboard",
+  "/gemini-prompts/": "Gemini Prompts",
 };
 
 // Category-specific meta descriptions
@@ -691,10 +697,11 @@ function getRobotsMeta(path: string): string {
     return "noindex,follow";
   }
   
-  // For category, blog, tool, and homepage URLs, ensure index,follow
+  // For category, blog, tool, prompt, and homepage URLs, ensure index,follow
   const shouldIndex = path.startsWith('/categories/') || 
                      path.startsWith('/blog/') || 
                      path.startsWith('/tools/') || 
+                     path.startsWith('/gemini-prompts/') || 
                      path === '/' || 
                      path === '/home';
   
@@ -730,6 +737,10 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
     categorySpecificImage = url.origin + "/og/couple.png";
   }
 
+  // Initialize canonical URL
+  let canonicalUrl = generateCanonicalUrl(path, url);
+
+  // Process API data to set meta information
   if (apiPath) {
     id = path.replace(apiPath, "");
     pageName = ROUTE_NAMES[apiPath] || "Page";
@@ -748,6 +759,17 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
         metaDescription = apiData.description || metaDescription;
         metaImage = apiData.thumbnail_url || metaImage;
         itemName = apiData.title || id;
+      } else if (apiPath === "/gemini-prompts/") {
+        // Handle Gemini prompts SEO data
+        metaTitle = apiData.title || metaTitle;
+        metaDescription = apiData.description || metaDescription;
+        metaImage = apiData.image_url || metaImage;
+        itemName = apiData.title || id;
+        
+        // Use canonical URL from SEO data if available
+        if (apiData.canonical_url) {
+          canonicalUrl = apiData.canonical_url;
+        }
       } else {
         metaTitle = apiData.title || apiData.name || metaTitle;
         metaImage = apiData.image_url || apiData.cover_image_url || metaImage;
@@ -773,6 +795,11 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
     metaImage = url.origin + "/og-default.png";
   }
 
+  // Ensure canonical URL is set
+  if (!canonicalUrl) {
+    canonicalUrl = generateCanonicalUrl(path, url);
+  }
+
   // Fetch original HTML template
   const htmlResponse = await fetch(url.origin);
   let html = await htmlResponse.text();
@@ -781,9 +808,6 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
   html = html.replace(/<meta[^>]+(property|name)="og:[^"]+"[^>]*>/gi, '');
   html = html.replace(/<meta[^>]+(property|name)="twitter:[^"]+"[^>]*>/gi, '');
 
-  // Add canonical tag for every page
-  const canonicalUrl = generateCanonicalUrl(path, url);
-  
   // Remove any existing canonical tags to avoid duplicates
   html = html.replace(/<link[^>]+rel=["']canonical["'][^>]*>/gi, '');
   
@@ -1172,6 +1196,92 @@ function generateHtmlWithMeta(meta: { title: string; description: string; canoni
 </html>`;
 }
 
+// Function to detect if the request is from a crawler
+function isCrawlerRequest(req: Request): boolean {
+  const userAgent = req.headers.get('user-agent') || '';
+  
+  // Common crawler user agents
+  const crawlerUserAgents = [
+    'facebookexternalhit',
+    'WhatsApp',
+    'Twitterbot',
+    'LinkedInBot',
+    'Googlebot',
+    'bingbot',
+    'Slurp', // Yahoo
+    'DuckDuckBot',
+    'Baiduspider',
+    'YandexBot',
+    'Pinterestbot',
+    'Discordbot',
+    'TelegramBot',
+    'SkypeUriPreview',
+    'redditbot',
+    'Applebot',
+    'Embedly',
+    'Slackbot',
+    'Facebot',
+    'ia_archiver' // Internet Archive
+  ];
+  
+  return crawlerUserAgents.some(agent => 
+    userAgent.toLowerCase().includes(agent.toLowerCase())
+  );
+}
+
+// Function to inject SEO meta tags for crawlers
+function injectSEOMetaTags(html: string, seoData: any, path: string): string {
+  let modifiedHtml = html;
+  
+  // Remove existing meta tags to avoid duplicates
+  modifiedHtml = modifiedHtml.replace(/<meta[^>]+(property|name)="og:[^"]+"[^>]*>/gi, '');
+  modifiedHtml = modifiedHtml.replace(/<meta[^>]+(property|name)="twitter:[^"]+"[^>]*>/gi, '');
+  modifiedHtml = modifiedHtml.replace(/<link[^>]+rel=["']canonical["'][^>]*>/gi, '');
+  
+  // Extract SEO data
+  const {
+    title: seoTitle = "AITerritory - AI Tools & Insights",
+    description: seoDescription = "Discover the best AI tools and blog posts on AITerritory.",
+    image_url: seoImage = "https://aiterritory.org/og-default.png",
+    canonical_url: canonicalUrl
+  } = seoData;
+  
+  // Generate canonical URL if not provided
+  const finalCanonicalUrl = canonicalUrl || `https://aiterritory.org${path}`;
+  
+  // Add canonical tag
+  modifiedHtml = modifiedHtml.replace(
+    '</head>',
+    `\n    <link rel="canonical" href="${finalCanonicalUrl}" />\n    </head>`
+  );
+  
+  // Add OpenGraph meta tags
+  modifiedHtml = modifiedHtml.replace(
+    '</head>',
+    `
+    <meta property="og:title" content="${seoTitle}" />
+    <meta property="og:description" content="${seoDescription}" />
+    <meta property="og:image" content="${seoImage}" />
+    <meta property="og:url" content="${finalCanonicalUrl}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AI Territory" />
+    </head>`
+  );
+  
+  // Add Twitter meta tags
+  modifiedHtml = modifiedHtml.replace(
+    '</head>',
+    `
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${seoTitle}" />
+    <meta name="twitter:description" content="${seoDescription}" />
+    <meta name="twitter:image" content="${seoImage}" />
+    </head>`
+  );
+  
+  return modifiedHtml;
+}
+
 export default async function handler(req: Request) {
   const url = new URL(req.url);
   const path = url.pathname;
@@ -1190,6 +1300,42 @@ export default async function handler(req: Request) {
   // Log robots meta decision
   const robotsMeta = getRobotsMeta(path);
   console.log(`🤖 Robots meta decision for ${path}: ${robotsMeta}`);
+
+  // Check if this is a crawler request and if it's a Gemini prompts path
+  const isCrawler = isCrawlerRequest(req);
+  console.log(`🕷️ Crawler detection for ${path}: ${isCrawler ? 'YES' : 'NO'}`);
+  
+  // For Gemini prompts paths, handle crawler requests with SEO data
+  if (isCrawler && (path.startsWith('/gemini-prompts/') || path === '/gemini-prompts')) {
+    console.log(`🔍 Processing crawler request for Gemini prompts: ${path}`);
+    
+    try {
+      // Attempt to get API-driven meta data
+      const pageMeta = await getMetaFromAPI(path);
+      
+      if (pageMeta) {
+        console.log(`✅ SEO data fetched for crawler:`, pageMeta);
+        
+        // Generate full HTML page with SEO data
+        const fullHtml = await generateFullHtmlPage(path, pageMeta);
+        
+        // Add cache headers
+        const headers = new Headers({
+          "content-type": "text/html",
+          "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+          "X-Cache": "CRAWLER"
+        });
+        
+        const responseTime = Date.now() - startTime;
+        console.log(`✅ Returning SEO-enhanced HTML for crawler: ${path} (${responseTime}ms)`);
+        return new Response(fullHtml, { headers });
+      } else {
+        console.warn(`⚠️ No SEO data available for crawler request: ${path}`);
+      }
+    } catch (error) {
+      console.error(`❌ Error processing crawler request for ${path}:`, error);
+    }
+  }
 
   // Check if this path should be cached
   if (shouldCachePath(path)) {
