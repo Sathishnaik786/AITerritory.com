@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ToolGrid } from '../components/ToolGrid';
 import { useTags } from '../hooks/useTags';
+import { useDynamicSEO } from '../hooks/useDynamicSEO';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
@@ -24,6 +25,14 @@ const VideoToolsPage = () => {
   const [pageSize] = useState(12);
   const [totalPages, setTotalPages] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Dynamic SEO based on current filters
+  const dynamicSEO = useDynamicSEO({
+    baseTitle: 'AI Video Tools',
+    baseDescription: 'Discover the best AI-powered video tools to create and edit amazing videos, from generation and editing to animation and more.',
+    baseKeywords: 'AI video tools, video generation, video editing, AI animation, video creation',
+    categoryName: 'Video'
+  });
 
   const fetchTools = () => {
     setLoading(true);
@@ -96,8 +105,10 @@ const VideoToolsPage = () => {
   return (
     <>
       <SEO
-        title="AI Video Tools | Create & Edit Amazing Videos"
-        description="Discover the best AI-powered video tools to create and edit amazing videos, from generation and editing to animation and more."
+        title={dynamicSEO.title}
+        description={dynamicSEO.description}
+        keywords={dynamicSEO.keywords}
+        canonical={dynamicSEO.canonical}
       />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}

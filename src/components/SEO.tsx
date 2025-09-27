@@ -7,6 +7,7 @@ interface SEOProps {
   description?: string;
   image?: string;
   url?: string;
+  canonical?: string;
   type?: 'website' | 'article';
   publishedTime?: string;
   modifiedTime?: string;
@@ -73,6 +74,7 @@ const SEO: React.FC<SEOProps> = ({
   description = 'AITerritory is your all-in-one AI-powered content platform. Generate, manage, and optimize content smarter across web, email, and social.',
   image = 'https://aiterritory.org/og-image.png',
   url,
+  canonical,
   type = 'website',
   publishedTime,
   modifiedTime,
@@ -87,7 +89,42 @@ const SEO: React.FC<SEOProps> = ({
   blogData,
 }) => {
   const location = useLocation();
-  const canonicalUrl = url || `https://aiterritory.org${location.pathname}`;
+  
+  // Smart canonical URL generation
+  const generateCanonicalUrl = () => {
+    // If canonical is explicitly provided, use it
+    if (canonical) {
+      return canonical;
+    }
+    
+    // If url is provided, use it
+    if (url) {
+      return url;
+    }
+    
+    // For pages with query parameters, determine if they should be canonical
+    const searchParams = new URLSearchParams(location.search);
+    const hasQueryParams = searchParams.toString().length > 0;
+    
+    if (hasQueryParams) {
+      // Check if this is a meaningful filter that should have its own canonical
+      const meaningfulParams = ['search', 'tag', 'pricing_type', 'min_rating', 'sort', 'launched', 'featured', 'trending'];
+      const hasMeaningfulParams = Array.from(searchParams.keys()).some(key => meaningfulParams.includes(key));
+      
+      if (hasMeaningfulParams) {
+        // This is a meaningful filtered page - it should have its own canonical URL
+        return `https://www.aiterritory.org${location.pathname}?${searchParams.toString()}`;
+      } else {
+        // This is just pagination or non-meaningful params - canonical should point to base page
+        return `https://www.aiterritory.org${location.pathname}`;
+      }
+    }
+    
+    // No query parameters - use pathname only
+    return `https://www.aiterritory.org${location.pathname}`;
+  };
+  
+  const canonicalUrl = generateCanonicalUrl();
   const siteName = 'AI Territory';
   const twitterHandle = twitter?.handle || '@AITerritory';
   

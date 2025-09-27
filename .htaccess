@@ -1,0 +1,40 @@
+# AITerritory.org SEO Redirect Rules
+# Redirect all non-canonical URLs to https://www.aiterritory.org/
+
+# Force HTTPS and www for all requests
+RewriteEngine On
+
+# Redirect HTTP to HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://www.aiterritory.org/$1 [R=301,L]
+
+# Redirect non-www to www (only for HTTPS)
+RewriteCond %{HTTPS} on
+RewriteCond %{HTTP_HOST} ^aiterritory\.org$ [NC]
+RewriteRule ^(.*)$ https://www.aiterritory.org/$1 [R=301,L]
+
+# Redirect www HTTP to www HTTPS
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_HOST} ^www\.aiterritory\.org$ [NC]
+RewriteRule ^(.*)$ https://www.aiterritory.org/$1 [R=301,L]
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Cache static assets
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+</IfModule>

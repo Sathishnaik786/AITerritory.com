@@ -7,6 +7,7 @@ const PrivacyPolicyPage: React.FC = () => {
       <SEO
         title="Privacy Policy | AI Territory"
         description="Read the AI Territory privacy policy to understand how we collect, use, and protect your personal information."
+        canonical="https://www.aiterritory.org/legal/privacy-policy"
       />
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-6 text-center">Privacy Policy</h1>

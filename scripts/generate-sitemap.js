@@ -32,14 +32,35 @@ const siteUrl = 'https://aiterritory.org';
 const staticPages = [
   { url: '/', lastmod: '2025-09-18', changefreq: 'daily', priority: '1.0' },
   { url: '/blog', lastmod: '2025-09-18', changefreq: 'daily', priority: '0.9' },
-  { url: '/gemini-prompts', lastmod: '2025-09-18', changefreq: 'daily', priority: '0.8' },
-  { url: '/gemini-prompts/men', lastmod: '2025-09-18', changefreq: 'daily', priority: '0.7' },
-  { url: '/gemini-prompts/women', lastmod: '2025-09-18', changefreq: 'daily', priority: '0.7' },
-  { url: '/gemini-prompts/couple', lastmod: '2025-09-18', changefreq: 'daily', priority: '0.7' },
+  { url: '/gemini-prompts', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.9' },
+  { url: '/gemini-prompts/men', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
+  { url: '/gemini-prompts/women', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
+  { url: '/gemini-prompts/couple', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
+  { url: '/gemini-prompts/all', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
   { url: '/about', lastmod: '2024-01-01', changefreq: 'monthly', priority: '0.8' },
   { url: '/contact', lastmod: '2024-01-01', changefreq: 'monthly', priority: '0.8' },
   { url: '/privacy', lastmod: '2024-01-01', changefreq: 'yearly', priority: '0.5' },
   { url: '/terms', lastmod: '2024-01-01', changefreq: 'yearly', priority: '0.5' },
+  
+  // Company pages
+  { url: '/company/contact-us', lastmod: '2025-01-15', changefreq: 'monthly', priority: '0.8' },
+  { url: '/company/submit-tool', lastmod: '2025-01-15', changefreq: 'weekly', priority: '0.7' },
+  { url: '/company/advertise', lastmod: '2025-01-15', changefreq: 'monthly', priority: '0.6' },
+  { url: '/company/youtube-channel', lastmod: '2025-01-15', changefreq: 'monthly', priority: '0.6' },
+  
+  // Tool category pages
+  { url: '/all-ai-tools', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.9' },
+  { url: '/video-tools', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
+  { url: '/categories/productivity-tools', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
+  { url: '/categories/image-generators', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
+  { url: '/categories/text-generators', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
+  
+  // Resource pages
+  { url: '/resources', lastmod: '2025-01-15', changefreq: 'weekly', priority: '0.7' },
+  { url: '/resources/ai-automation', lastmod: '2025-01-15', changefreq: 'weekly', priority: '0.7' },
+  { url: '/resources/ai-tutorials', lastmod: '2025-01-15', changefreq: 'weekly', priority: '0.7' },
+  { url: '/resources/ai-innovation', lastmod: '2025-01-15', changefreq: 'weekly', priority: '0.7' },
+  { url: '/resources/ai-agents', lastmod: '2025-01-15', changefreq: 'weekly', priority: '0.7' },
 ];
 
 // Simple slugify function
@@ -76,26 +97,49 @@ async function fetchBlogPosts() {
   }
 }
 
-// Fetch all Gemini prompts from Supabase
+// Fetch high-quality Gemini prompts from Supabase
 async function fetchGeminiPrompts() {
   try {
     const { data: prompts, error } = await supabase
       .from('gemini_prompts')
-      .select('id, prompt, category, created_at')
-      .order('created_at', { ascending: false });
+      .select('id, prompt, category, created_at, status, submitted_via, submitter_name')
+      .eq('status', 'published')
+      .not('prompt', 'is', null)
+      .gte('length(prompt)', 30) // Only prompts with meaningful content
+      .order('created_at', { ascending: false })
+      .limit(100); // Increased limit for better coverage
 
     if (error) throw error;
     
-    return prompts.map(prompt => {
-      // Create a slug from the first 50 characters of the prompt
-      const promptSlug = slugify(prompt.prompt.substring(0, 50)) || prompt.id;
-      return {
-        url: `/gemini-prompts/${prompt.category}/${promptSlug}-${prompt.id}`,
-        lastmod: prompt.created_at,
-        changefreq: 'monthly',
-        priority: '0.7',
-      };
-    });
+    return prompts
+      .filter(prompt => {
+        // Enhanced quality checks
+        const placeholderTexts = ['test', 'example', 'sample', 'placeholder', 'lorem ipsum', 'demo'];
+        const isPlaceholder = placeholderTexts.some(text => 
+          prompt.prompt.toLowerCase().includes(text)
+        );
+        
+        // Check for meaningful content
+        const hasMeaningfulContent = prompt.prompt.length > 30 && 
+                                   !isPlaceholder && 
+                                   prompt.prompt.trim().length > 0;
+        
+        // Check if not test data
+        const isNotTestData = prompt.submitted_via !== 'test' && 
+                             prompt.submitted_via !== 'demo';
+        
+        return hasMeaningfulContent && isNotTestData;
+      })
+      .map(prompt => {
+        // Create a slug from the first 50 characters of the prompt
+        const promptSlug = slugify(prompt.prompt.substring(0, 50)) || prompt.id;
+        return {
+          url: `/gemini-prompts/${prompt.category}/${promptSlug}-${prompt.id}`,
+          lastmod: prompt.created_at,
+          changefreq: 'weekly', // More frequent updates for prompts
+          priority: '0.6', // Higher priority for quality prompts
+        };
+      });
   } catch (error) {
     console.error('Error fetching Gemini prompts:', error);
     return [];

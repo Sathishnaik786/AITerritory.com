@@ -172,6 +172,25 @@ path = "/ai-for-business*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# SEO Redirects - Force canonical domain (https://www.aiterritory.org/)
+[[redirects]]
+  from = "http://aiterritory.org/*"
+  to = "https://www.aiterritory.org/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.aiterritory.org/*"
+  to = "https://www.aiterritory.org/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://aiterritory.org/*"
+  to = "https://www.aiterritory.org/:splat"
+  status = 301
+  force = true
+
 # Redirects for removed fallback pages
 [[redirects]]
   from = "/resources/best-ai-3d-generators"

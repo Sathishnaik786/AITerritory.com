@@ -410,6 +410,11 @@ ${url}`);
   if (error) {
     return (
       <div className="container mx-auto py-8 px-4">
+        <Helmet>
+          <title>Prompt Not Found | AITerritory</title>
+          <meta name="robots" content="noindex, nofollow" />
+          <meta name="description" content="The requested prompt could not be found." />
+        </Helmet>
         <div className="text-center py-12">
           <h1 className="text-2xl font-bold mb-4">Error Loading Prompt</h1>
           <p className="mb-6 text-red-500">{error}</p>
@@ -425,6 +430,11 @@ ${url}`);
   if (!prompt) {
     return (
       <div className="container mx-auto py-8 px-4">
+        <Helmet>
+          <title>Prompt Not Found | AITerritory</title>
+          <meta name="robots" content="noindex, nofollow" />
+          <meta name="description" content="The requested prompt could not be found." />
+        </Helmet>
         <div className="text-center py-12">
           <h1 className="text-2xl font-bold mb-4">Prompt Not Found</h1>
           <p className="mb-6">The prompt you're looking for doesn't exist or has been removed.</p>
@@ -452,11 +462,32 @@ ${url}`);
     ? prompt.prompt.substring(0, 147) + '...' 
     : prompt.prompt);
 
-  const canonicalUrl = seoData?.canonical_url || `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`;
+  const canonicalUrl = seoData?.canonical_url || `https://www.aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`;
 
   const seoImage = seoData?.image_url || (prompt.image_url && prompt.image_url.trim() !== '' 
     ? prompt.image_url 
     : `https://aiterritory-com.onrender.com/api/og/prompts/${prompt.id}`);
+
+  // Determine if this prompt should be indexed based on content quality
+  const shouldIndex = () => {
+    // Check if prompt has meaningful content
+    if (!prompt.prompt || prompt.prompt.length < 20) return false;
+    
+    // Check if prompt is not just placeholder text
+    const placeholderTexts = ['test', 'example', 'sample', 'placeholder', 'lorem ipsum'];
+    const isPlaceholder = placeholderTexts.some(text => 
+      prompt.prompt.toLowerCase().includes(text)
+    );
+    
+    if (isPlaceholder) return false;
+    
+    // Check if prompt has been properly submitted (not just test data)
+    if (prompt.submitted_via === 'test' || prompt.status === 'draft') return false;
+    
+    return true;
+  };
+
+  const shouldBeIndexed = shouldIndex();
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -465,6 +496,19 @@ ${url}`);
         <meta name="description" content={seoDescription} />
         <meta httpEquiv="last-modified" content={prompt.created_at} />
         <link rel="canonical" href={canonicalUrl} />
+        
+        {/* Enhanced SEO metadata */}
+        <meta name="keywords" content={`gemini prompt, ${prompt.category} prompt, AI prompt, artificial intelligence, prompt engineering, ${prompt.category.toLowerCase()} AI prompts`} />
+        <meta name="author" content={prompt.submitter_name || 'AI Territory Community'} />
+        <meta name="article:section" content={`${prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)} Prompts`} />
+        <meta name="article:tag" content={`${prompt.category} prompts`} />
+        <meta name="article:tag" content="AI prompts" />
+        <meta name="article:tag" content="Gemini prompts" />
+        
+        {/* Conditional indexing based on content quality */}
+        {!shouldBeIndexed && (
+          <meta name="robots" content="noindex, nofollow" />
+        )}
 
         {/* OpenGraph */}
         <meta property="og:title" content={seoTitle} />
@@ -590,6 +634,69 @@ ${url}`);
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Prompts
         </Button>
+
+        {/* Enhanced Content Section */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-3">About This Prompt</h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              This {prompt.category.toLowerCase()} AI prompt is designed to help you create engaging and effective content using artificial intelligence. 
+              Whether you're looking for creative inspiration, professional content, or personal projects, this prompt can guide your AI interactions.
+            </p>
+            <div className="grid md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <strong>Category:</strong> {prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)} Prompts
+              </div>
+              <div>
+                <strong>Created:</strong> {new Date(prompt.created_at).toLocaleDateString()}
+              </div>
+              <div>
+                <strong>Author:</strong> {prompt.submitter_name || 'AI Territory Community'}
+              </div>
+              <div>
+                <strong>Type:</strong> Gemini AI Prompt
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Internal Linking Section */}
+        <div className="mb-8">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">Explore More AI Prompts</h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              <Link 
+                to="/gemini-prompts/men" 
+                className="block p-4 bg-white dark:bg-gray-700 rounded-lg hover:shadow-md transition-shadow"
+              >
+                <div className="font-medium text-gray-900 dark:text-gray-100">Men's Prompts</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">AI prompts for men's content and lifestyle</div>
+              </Link>
+              <Link 
+                to="/gemini-prompts/women" 
+                className="block p-4 bg-white dark:bg-gray-700 rounded-lg hover:shadow-md transition-shadow"
+              >
+                <div className="font-medium text-gray-900 dark:text-gray-100">Women's Prompts</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">AI prompts for women's content and lifestyle</div>
+              </Link>
+              <Link 
+                to="/gemini-prompts/couple" 
+                className="block p-4 bg-white dark:bg-gray-700 rounded-lg hover:shadow-md transition-shadow"
+              >
+                <div className="font-medium text-gray-900 dark:text-gray-100">Couple's Prompts</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">AI prompts for couple's content and relationships</div>
+              </Link>
+            </div>
+            <div className="mt-4 text-center">
+              <Link 
+                to="/gemini-prompts" 
+                className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                View All Prompts →
+              </Link>
+            </div>
+          </div>
+        </div>
 
         <Card className="overflow-hidden rounded-xl shadow-lg">
           <div className="aspect-square overflow-hidden relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">

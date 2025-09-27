@@ -3,6 +3,7 @@ import { submitContactForm } from '../services/submissionService';
 import SEO from '../components/SEO';
 import { ContactPageSkeleton } from '../components/SkeletonLoader';
 import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
+import InternalLinking from '../components/InternalLinking';
 
 const ContactUsPage: React.FC = () => {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -43,16 +44,47 @@ const ContactUsPage: React.FC = () => {
     <>
       <SEO
         title="Contact Us | AI Territory"
-        description="Get in touch with the AI Territory team. We'd love to hear from you!"
+        description="Get in touch with the AI Territory team. We'd love to hear from you! Contact us for partnerships, tool submissions, advertising opportunities, or general inquiries."
+        canonical="https://www.aiterritory.org/company/contact-us"
+        keywords="contact AI Territory, get in touch, partnerships, tool submissions, advertising, support"
       />
       {loading ? (
         <ContactPageSkeleton />
       ) : (
-        <div className="max-w-lg mx-auto py-12 px-4">
+        <div className="max-w-4xl mx-auto py-12 px-4">
           {/* Breadcrumbs */}
           <PageBreadcrumbs />
           
-          <h1 className="text-3xl font-bold mb-6 text-center">Contact Us</h1>
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Get in touch with the AI Territory team. We'd love to hear from you! Whether you have questions about our platform, want to submit a tool, or are interested in partnerships, we're here to help.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+              <h2 className="text-xl font-semibold mb-4">Why Contact Us?</h2>
+              <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+                <li>• Submit your AI tool for review</li>
+                <li>• Partnership opportunities</li>
+                <li>• Advertising inquiries</li>
+                <li>• Technical support</li>
+                <li>• Feature requests</li>
+                <li>• General questions</li>
+              </ul>
+            </div>
+            
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+              <h2 className="text-xl font-semibold mb-4">Response Time</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                We typically respond to all inquiries within 24-48 hours during business days.
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                For urgent matters, please mention "URGENT" in your subject line.
+              </p>
+            </div>
+          </div>
         <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-8 flex flex-col gap-4">
           <input
             type="text"
@@ -90,6 +122,14 @@ const ContactUsPage: React.FC = () => {
           {success && <div className="text-green-600 text-center mt-2">{success}</div>}
           {error && <div className="text-red-600 text-center mt-2">{error}</div>}
         </form>
+        
+        {/* Internal Linking for Better Crawling */}
+        <InternalLinking 
+          currentPage="/company/contact-us"
+          showRelatedPages={true}
+          showCategoryPages={true}
+          showResourcePages={false}
+        />
       </div>
       )}
     </>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { PaginatedToolGrid } from '../components/PaginatedToolGrid';
 import { useTags } from '../hooks/useTags';
+import { useDynamicSEO } from '../hooks/useDynamicSEO';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
@@ -16,6 +17,7 @@ import SEO from '../components/SEO';
 import FAQ from '../components/FAQ';
 import { ResourcePageSkeleton } from '../components/SkeletonLoader';
 import { PageBreadcrumbs } from '../components/PageBreadcrumbs';
+import InternalLinking from '../components/InternalLinking';
 import api from '../services/api';
 
 const AllAIToolsPage = () => {
@@ -31,6 +33,13 @@ const AllAIToolsPage = () => {
   const { data: tags, isLoading: tagsLoading } = useTags();
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Dynamic SEO based on current filters
+  const dynamicSEO = useDynamicSEO({
+    baseTitle: 'All AI Tools',
+    baseDescription: 'Discover the most comprehensive collection of AI tools, generators, and artificial intelligence software. Browse 1000+ AI-powered solutions for business, creativity, and productivity.',
+    baseKeywords: 'AI tools, artificial intelligence tools, AI generators, AI software, machine learning tools, AI applications, AI business tools, AI productivity tools, artificial intelligence software'
+  });
 
   const fetchToolsAndStats = async () => {
     setLoading(true);
@@ -109,10 +118,11 @@ const AllAIToolsPage = () => {
   return (
     <>
       <SEO
-        title="All AI Tools - Complete Directory of Artificial Intelligence Tools | AITerritory"
-        description="Discover the most comprehensive collection of AI tools, generators, and artificial intelligence software. Browse 1000+ AI-powered solutions for business, creativity, and productivity. Find the perfect AI tool for your needs with detailed reviews and comparisons."
+        title={dynamicSEO.title}
+        description={dynamicSEO.description}
         image="/og-default.png"
-        keywords="AI tools, artificial intelligence tools, AI generators, AI software, machine learning tools, AI applications, AI business tools, AI productivity tools, artificial intelligence software"
+        keywords={dynamicSEO.keywords}
+        canonical={dynamicSEO.canonical}
       />
       <div className="container mx-auto px-4 py-8 relative">
         {/* Breadcrumbs */}
@@ -331,6 +341,14 @@ const AllAIToolsPage = () => {
       
       {/* FAQ Section */}
       <FAQ category="all-ai-tools" />
+      
+      {/* Internal Linking for Better Crawling */}
+      <InternalLinking 
+        currentPage="/all-ai-tools"
+        showRelatedPages={true}
+        showCategoryPages={true}
+        showResourcePages={true}
+      />
     </>
   );
 };

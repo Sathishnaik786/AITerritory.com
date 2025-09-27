@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, ExternalLink, Heart, MessageCircle, Share2, Check, Link as LinkIcon } from 'lucide-react';
 import { getGeminiPrompts, submitGeminiPrompt } from '@/services/geminiPromptsService';
 import { slugify } from '@/lib/slugify';
+import InternalLinking from '../components/InternalLinking';
 
 // Add the required icons for social media platforms
 import { FaTwitter as FaXTwitter, FaLinkedin, FaFacebook, FaWhatsapp } from 'react-icons/fa6';
@@ -650,13 +651,19 @@ const GeminiPromptsPage = () => {
         <title>{pageMeta.title}</title>
         <meta name="description" content={pageMeta.description} />
         <meta name="keywords" content={pageMeta.keywords} />
-        <link rel="canonical" href={pageMeta.canonical || 'https://aiterritory.org/gemini-prompts'} />
+        <link rel="canonical" href={pageMeta.canonical || 'https://www.aiterritory.org/gemini-prompts'} />
+        
+        {/* Enhanced SEO metadata */}
+        <meta name="author" content="AI Territory" />
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow" />
+        <meta name="bingbot" content="index, follow" />
         
         {/* OpenGraph */}
         <meta property="og:title" content={pageMeta.title} />
         <meta property="og:description" content={pageMeta.description} />
         <meta property="og:image" content={pageMeta.image || 'https://aiterritory.org/og-default.png'} />
-        <meta property="og:url" content={pageMeta.canonical || 'https://aiterritory.org/gemini-prompts'} />
+        <meta property="og:url" content={pageMeta.canonical || 'https://www.aiterritory.org/gemini-prompts'} />
         <meta property="og:type" content="website" />
         
         {/* Twitter Card */}
@@ -948,6 +955,14 @@ const GeminiPromptsPage = () => {
         
         {/* Spacer to prevent content from being hidden behind fixed navbar */}
         <div className="h-16 md:hidden"></div>
+        
+        {/* Internal Linking for Better Crawling */}
+        <InternalLinking 
+          currentPage="/gemini-prompts"
+          showRelatedPages={true}
+          showCategoryPages={true}
+          showResourcePages={true}
+        />
       </div>
     </div>
   );
