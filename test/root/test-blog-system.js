@@ -45,7 +45,7 @@ async function testBlogSystem() {
     
     if (likesError) {
       console.log('❌ Error accessing blog_likes table:', likesError.message);
-      console.log('   Run the migration: supabase/migrations/20250101000000_create_blog_likes.sql');
+      console.log('   Run the migration: database/supabase/migrations/20250101000000_create_blog_likes.sql');
     } else {
       console.log('✅ Blog_likes table accessible');
     }

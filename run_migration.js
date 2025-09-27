@@ -4,7 +4,7 @@ const { supabase } = require('./server/lib/supabase');
 async function runMigration() {
   try {
     console.log('Reading SQL migration file...');
-    const sqlContent = fs.readFileSync('./fix_all_likes_bookmarks_comments.sql', 'utf8');
+    const sqlContent = fs.readFileSync('./database/root/fix_all_likes_bookmarks_comments.sql', 'utf8');
     
     // Split the SQL into individual statements
     const statements = sqlContent

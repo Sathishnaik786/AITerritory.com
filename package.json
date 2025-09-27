@@ -23,7 +23,7 @@
     "post-build-ping": "node scripts/ping-search-engines.js",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "generate:sitemap": "node scripts/generate-sitemap.js",
-    "test:social-previews": "node scripts/test-social-previews.js",
+    "test:social-previews": "node test/scripts/test-social-previews.js",
     "analyze": "vite build --mode analyze",
     "start": "vite preview --host"
   },

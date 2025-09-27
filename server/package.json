@@ -9,7 +9,7 @@
     "seed": "node scripts/seed.js",
     "migrate": "node scripts/migrate.js",
     "kill-port": "npx kill-port 3001 3002",
-    "test-redis": "node scripts/test-redis-integration.js"
+    "test-redis": "node ../test/server/scripts/test-redis-integration.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.2",
