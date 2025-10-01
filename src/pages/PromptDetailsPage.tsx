@@ -660,44 +660,6 @@ ${url}`);
           </div>
         </div>
 
-        {/* Internal Linking Section */}
-        <div className="mb-8">
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4">Explore More AI Prompts</h3>
-            <div className="grid md:grid-cols-3 gap-4">
-              <Link 
-                to="/gemini-prompts/men" 
-                className="block p-4 bg-white dark:bg-gray-700 rounded-lg hover:shadow-md transition-shadow"
-              >
-                <div className="font-medium text-gray-900 dark:text-gray-100">Men's Prompts</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">AI prompts for men's content and lifestyle</div>
-              </Link>
-              <Link 
-                to="/gemini-prompts/women" 
-                className="block p-4 bg-white dark:bg-gray-700 rounded-lg hover:shadow-md transition-shadow"
-              >
-                <div className="font-medium text-gray-900 dark:text-gray-100">Women's Prompts</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">AI prompts for women's content and lifestyle</div>
-              </Link>
-              <Link 
-                to="/gemini-prompts/couple" 
-                className="block p-4 bg-white dark:bg-gray-700 rounded-lg hover:shadow-md transition-shadow"
-              >
-                <div className="font-medium text-gray-900 dark:text-gray-100">Couple's Prompts</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">AI prompts for couple's content and relationships</div>
-              </Link>
-            </div>
-            <div className="mt-4 text-center">
-              <Link 
-                to="/gemini-prompts" 
-                className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                View All Prompts →
-              </Link>
-            </div>
-          </div>
-        </div>
-
         <Card className="overflow-hidden rounded-xl shadow-lg">
           <div className="aspect-square overflow-hidden relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
             {prompt.image_url ? (

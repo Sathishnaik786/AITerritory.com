@@ -13,7 +13,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, ExternalLink, Heart, MessageCircle, Share2, Check, Link as LinkIcon } from 'lucide-react';
 import { getGeminiPrompts, submitGeminiPrompt } from '@/services/geminiPromptsService';
 import { slugify } from '@/lib/slugify';
-import InternalLinking from '../components/InternalLinking';
 
 // Add the required icons for social media platforms
 import { FaTwitter as FaXTwitter, FaLinkedin, FaFacebook, FaWhatsapp } from 'react-icons/fa6';
@@ -955,14 +954,6 @@ const GeminiPromptsPage = () => {
         
         {/* Spacer to prevent content from being hidden behind fixed navbar */}
         <div className="h-16 md:hidden"></div>
-        
-        {/* Internal Linking for Better Crawling */}
-        <InternalLinking 
-          currentPage="/gemini-prompts"
-          showRelatedPages={true}
-          showCategoryPages={true}
-          showResourcePages={true}
-        />
       </div>
     </div>
   );
