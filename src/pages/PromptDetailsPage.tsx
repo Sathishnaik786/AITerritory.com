@@ -637,27 +637,6 @@ ${url}`);
 
         {/* Enhanced Content Section */}
         <div className="mb-8">
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-6 mb-6">
-            <h2 className="text-xl font-semibold mb-3">About This Prompt</h2>
-            <p className="text-gray-700 dark:text-gray-300 mb-4">
-              This {prompt.category.toLowerCase()} AI prompt is designed to help you create engaging and effective content using artificial intelligence. 
-              Whether you're looking for creative inspiration, professional content, or personal projects, this prompt can guide your AI interactions.
-            </p>
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <strong>Category:</strong> {prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)} Prompts
-              </div>
-              <div>
-                <strong>Created:</strong> {new Date(prompt.created_at).toLocaleDateString()}
-              </div>
-              <div>
-                <strong>Author:</strong> {prompt.submitter_name || 'AI Territory Community'}
-              </div>
-              <div>
-                <strong>Type:</strong> Gemini AI Prompt
-              </div>
-            </div>
-          </div>
         </div>
 
         <Card className="overflow-hidden rounded-xl shadow-lg">
