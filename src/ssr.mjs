@@ -20,21 +20,32 @@ const API_PORT = process.env.API_PORT || 3001;
 
 const app = express();
 
-// Serve static files
-app.use(express.static(path.resolve(process.cwd(), 'dist'), { 
+// Aggressive cache control for static assets
+app.use('/assets', express.static(path.resolve(process.cwd(), 'dist/assets'), {
+  maxAge: isProd ? '1y' : '0',
+  etag: true,
+  lastModified: true
+}));
+
+// No cache for HTML files to prevent stale references
+app.use(express.static(path.resolve(process.cwd(), 'dist'), {
   index: false,
-  maxAge: '1y',
-  etag: false,
+  etag: true,
+  lastModified: true,
   setHeaders: (res, path) => {
-    // Disable cache for HTML files
     if (path.endsWith('.html')) {
+      // No cache for HTML files to prevent stale JS/CSS references
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
-    } 
-    // Set cache for other assets
-    else {
-      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (!isProd) {
+      // No cache in development
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } else {
+      // Cache other assets for 1 year in production
+      res.setHeader('Cache-Control', 'public, max-age=31536000');
     }
   }
 }));
@@ -43,14 +54,17 @@ app.use(express.static(path.resolve(process.cwd(), 'dist'), {
 app.use('/api', createProxyMiddleware({
   target: `http://localhost:${API_PORT}`,
   changeOrigin: true,
-  pathRewrite: {
-    '^/api': '/api', // remove /api prefix
-  },
 }));
 
 // Serve the service worker
 app.get('/sw.js', (req, res) => {
-  res.sendFile(path.resolve(process.cwd(), 'dist/sw.js'));
+  res.sendFile(path.resolve(process.cwd(), 'dist/sw.js'), {
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
+  });
 });
 
 // Serve the manifest
@@ -60,7 +74,13 @@ app.get('/manifest.webmanifest', (req, res) => {
 
 // Serve the registerSW.js
 app.get('/registerSW.js', (req, res) => {
-  res.sendFile(path.resolve(process.cwd(), 'dist/registerSW.js'));
+  res.sendFile(path.resolve(process.cwd(), 'dist/registerSW.js'), {
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
+  });
 });
 
 app.get('*', async (req, res) => {

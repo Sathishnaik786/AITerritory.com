@@ -1,45 +1,37 @@
-const https = require('https');
+#!/usr/bin/env node
 
-// Configuration
-const SITE_URL = process.env.SITE_URL || 'https://aiterritory.org';
+// Script to help with cache busting during deployment
 
-// Function to make HTTPS request
-function makeRequest(url, options = {}) {
-  return new Promise((resolve, reject) => {
-    const req = https.request(url, options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => data += chunk);
-      res.on('end', () => resolve({ status: res.statusCode, data }));
+const fs = require('fs');
+const path = require('path');
+
+console.log('🧹 Clearing build cache...');
+
+// Function to delete folder recursively
+function deleteFolderRecursive(folderPath) {
+  if (fs.existsSync(folderPath)) {
+    fs.readdirSync(folderPath).forEach((file) => {
+      const filePath = path.join(folderPath, file);
+      if (fs.lstatSync(filePath).isDirectory()) {
+        deleteFolderRecursive(filePath);
+      } else {
+        fs.unlinkSync(filePath);
+      }
     });
-    
-    req.on('error', reject);
-    req.setTimeout(10000, () => req.destroy());
-    req.end();
-  });
-}
-
-// Function to clear blog cache
-async function clearBlogCache() {
-  try {
-    console.log('🗑️ Clearing blog cache...');
-    const cacheClearUrl = `${SITE_URL}/blog?deploy=clear-cache`;
-    const response = await makeRequest(cacheClearUrl);
-    console.log(`✅ Blog cache cleared: ${response.status}`);
-    console.log(`📝 Response: ${response.data}`);
-  } catch (error) {
-    console.error(`❌ Failed to clear blog cache:`, error.message);
+    fs.rmdirSync(folderPath);
+    console.log(`Deleted folder: ${folderPath}`);
   }
 }
 
-// Main execution
-async function main() {
-  console.log(`🏗️ Cache clearing script started`);
-  console.log(`🌐 Site URL: ${SITE_URL}`);
-  
-  await clearBlogCache();
-  
-  console.log('✅ Cache clearing script completed');
+// Clear dist folder
+const distPath = path.join(__dirname, '..', 'dist');
+deleteFolderRecursive(distPath);
+
+// Clear node_modules/.vite cache
+const viteCachePath = path.join(__dirname, '..', 'node_modules', '.vite');
+if (fs.existsSync(viteCachePath)) {
+  deleteFolderRecursive(viteCachePath);
+  console.log('Cleared Vite cache');
 }
 
-// Run the script
-main().catch(console.error); 
+console.log('✅ Cache clearing complete. Ready for fresh build.');
