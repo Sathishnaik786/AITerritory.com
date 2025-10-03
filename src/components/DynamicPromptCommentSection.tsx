@@ -52,18 +52,34 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
   const [submitting, setSubmitting] = useState(false);
   const [CommentSection, setCommentSection] = useState<any>(null);
 
-  // Dynamically import the CommentSection component
+  // Dynamically import the CommentSection component with error handling
   useEffect(() => {
+    let isMounted = true;
+    
     const loadCommentSection = async () => {
       try {
-        const { CommentSection: ImportedCommentSection } = await import('react-comments-section');
-        setCommentSection(() => ImportedCommentSection);
+        // Use dynamic import with .then() to avoid require issues
+        const module = await import('react-comments-section');
+        if (isMounted) {
+          setCommentSection(() => module.CommentSection);
+        }
       } catch (error) {
         console.error('Failed to load CommentSection:', error);
+        if (isMounted) {
+          toast({
+            title: "Error",
+            description: "Failed to load comment system. Please refresh the page.",
+            variant: "destructive",
+          });
+        }
       }
     };
 
     loadCommentSection();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Fetch comments when component mounts
@@ -279,7 +295,10 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
   if (!CommentSection) {
     return (
       <div className="flex justify-center items-center h-32">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+          <p className="text-gray-500">Loading comment system...</p>
+        </div>
       </div>
     );
   }
