@@ -10,10 +10,12 @@ services:
         value: production
       - key: PORT
         value: "3000"
+      # IMPORTANT: Replace these with your actual production keys from Clerk dashboard
+      # Never commit real production keys to your repository
       - key: VITE_CLERK_PUBLISHABLE_KEY
-        sync: false
+        value: pk_live_YOUR_ACTUAL_PUBLISHABLE_KEY_HERE
       - key: VITE_CLERK_SECRET_KEY
-        sync: false
+        value: sk_live_YOUR_ACTUAL_SECRET_KEY_HERE
       - key: VITE_API_BASE_URL
         value: https://aiterritory-com.onrender.com/api
       - key: VITE_SUPABASE_URL
