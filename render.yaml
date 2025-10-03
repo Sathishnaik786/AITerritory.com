@@ -4,7 +4,7 @@ services:
     plan: free
     runtime: node
     buildCommand: npm run build
-    startCommand: node server.js
+    startCommand: node server/production-ssr.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -13,6 +13,16 @@ services:
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
       - key: PORT
-        value: "3001"
+        value: "3000"
       - key: ENABLE_REDIS
         value: "false"
+      - key: VITE_CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: VITE_CLERK_SECRET_KEY
+        sync: false
+      - key: VITE_API_BASE_URL
+        value: https://aiterritory-com.onrender.com/api
+      - key: VITE_SUPABASE_URL
+        value: https://ckahkadgnaxzcfhmsdaj.supabase.co
+      - key: VITE_SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrYWhrYWRnbmF4emNmaG1zZGFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyNDU4NDMsImV4cCI6MjA2NTgyMTg0M30.SwPOZrN0sFQ86sa_61JfNaJkWGXv5HtmVInwFCi_wRc

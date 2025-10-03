@@ -16,8 +16,27 @@ import App from '../src/App';
 const PORT = process.env.PORT || 3000;
 const app = express();
 
-// Serve static files
-app.use(express.static(path.resolve(__dirname, '../dist'), { index: false }));
+// Serve static files from the dist directory with proper caching
+app.use(express.static(path.resolve(__dirname, '../dist'), { 
+  index: false,
+  maxAge: '1y',
+  etag: false
+}));
+
+// Serve the service worker
+app.get('/sw.js', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../dist/sw.js'));
+});
+
+// Serve the manifest
+app.get('/manifest.webmanifest', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../dist/manifest.webmanifest'));
+});
+
+// Serve the registerSW.js
+app.get('/registerSW.js', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../dist/registerSW.js'));
+});
 
 app.get('*', async (req, res) => {
   try {
@@ -48,7 +67,8 @@ app.get('*', async (req, res) => {
         ${helmet.meta?.toString() || ''}
         ${helmet.link?.toString() || ''}
       `)
-      .replace('<!--app-html-->', appHtml);
+      .replace('<div id="root">', `<div id="root">${appHtml}`)
+      .replace('<!--app-html-->', '');
 
     res.status(200).set({ 
       'Content-Type': 'text/html',
@@ -58,7 +78,8 @@ app.get('*', async (req, res) => {
     }).end(html);
   } catch (error) {
     console.error('SSR Error:', error);
-    res.status(500).send('Server Error');
+    // Fallback to serving the static HTML file
+    res.sendFile(path.resolve(__dirname, '../dist/index.html'));
   }
 });
 
