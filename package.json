@@ -25,7 +25,8 @@
     "generate:sitemap": "node scripts/generate-sitemap.js",
     "test:social-previews": "node test/scripts/test-social-previews.js",
     "analyze": "vite build --mode analyze",
-    "start": "vite preview --host"
+    "start": "vite preview --host",
+    "ssr": "node src/ssr.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.31.9",

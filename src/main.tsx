@@ -74,6 +74,21 @@ const AppTree = (
   </HelmetProvider>
 );
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  import.meta.env.DEV ? AppTree : <React.StrictMode>{AppTree}</React.StrictMode>
-);
+// Improved hydration with error handling
+const rootElement = document.getElementById("root");
+if (rootElement) {
+  const root = ReactDOM.createRoot(rootElement);
+  
+  // Check if we're hydrating or rendering fresh
+  if (rootElement.hasChildNodes()) {
+    // Hydrate existing markup
+    root.render(AppTree);
+  } else {
+    // Render fresh
+    root.render(
+      import.meta.env.DEV ? AppTree : <React.StrictMode>{AppTree}</React.StrictMode>
+    );
+  }
+} else {
+  console.error("Failed to find the root element");
+}

@@ -62,6 +62,9 @@ export default defineConfig(({ mode }) => ({
         assetFileNames: `assets/[name].[hash].[ext]`,
       },
     },
+    // Add CSS optimization to prevent layout flash
+    cssCodeSplit: false,
+    assetsInlineLimit: 4096,
   },
   server: {
     port: 3007,

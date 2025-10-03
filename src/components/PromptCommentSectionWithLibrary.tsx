@@ -9,7 +9,8 @@ import {
   removePromptComment 
 } from '@/services/promptInteractionsService';
 import { CommentSection } from 'react-comments-section';
-import 'react-comments-section/dist/index.css';
+// Import our custom CSS instead of the library's CSS
+import './PromptCommentSection.css';
 
 interface PromptComment {
   id: string;
@@ -104,38 +105,34 @@ const PromptCommentSectionWithLibrary: React.FC<CommentSectionProps> = ({ prompt
     }
   };
 
-  const handleFormSubmit = async (data: { text: string; parentId?: string }) => {
+  const handleFormSubmit = async (formData: { userId: string; comId: string; fullName: string; avatarUrl: string; text: string; parentId?: string | null; }) => {
     if (!isSignedIn) {
       toast({
         title: "Authentication Required",
         description: "Please sign in to post a comment.",
       });
-      return;
+      return false;
     }
-    
-    if (!data.text.trim()) return;
     
     setSubmitting(true);
     try {
       await addPromptComment(
         promptId, 
-        user!.id, 
-        data.text.trim(), 
-        data.parentId || undefined
+        formData.userId, 
+        formData.text, 
+        formData.parentId || undefined
       );
-      
-      fetchComments(); // Refresh comments
+      // Note: Real-time subscription will automatically update the comments list
       toast({
         title: "Success",
-        description: data.parentId ? "Reply posted successfully!" : "Comment posted successfully!",
+        description: "Comment posted successfully!",
       });
-      
       return true; // Indicate success to the library
     } catch (error) {
       console.error('Error posting comment:', error);
       toast({
         title: "Error",
-        description: "Failed to post comment",
+        description: "Failed to post comment. Please try again later.",
         variant: "destructive",
       });
       return false; // Indicate failure to the library
@@ -144,7 +141,7 @@ const PromptCommentSectionWithLibrary: React.FC<CommentSectionProps> = ({ prompt
     }
   };
 
-  const handleEdit = async (comId: string, newText: string) => {
+  const handleEdit = async (comId: string, text: string) => {
     if (!isSignedIn) {
       toast({
         title: "Authentication Required",
@@ -153,12 +150,10 @@ const PromptCommentSectionWithLibrary: React.FC<CommentSectionProps> = ({ prompt
       return false;
     }
     
-    if (!newText.trim()) return false;
-    
     setSubmitting(true);
     try {
-      await updatePromptComment(comId, user!.id, newText.trim());
-      fetchComments(); // Refresh comments
+      await updatePromptComment(comId, user!.id, text);
+      // Note: Real-time subscription will automatically update the comments list
       toast({
         title: "Success",
         description: "Comment updated successfully!",
@@ -168,7 +163,7 @@ const PromptCommentSectionWithLibrary: React.FC<CommentSectionProps> = ({ prompt
       console.error('Error updating comment:', error);
       toast({
         title: "Error",
-        description: "Failed to update comment",
+        description: "Failed to update comment. Please try again later.",
         variant: "destructive",
       });
       return false; // Indicate failure to the library
@@ -189,7 +184,7 @@ const PromptCommentSectionWithLibrary: React.FC<CommentSectionProps> = ({ prompt
     setSubmitting(true);
     try {
       await removePromptComment(comId, user!.id);
-      fetchComments(); // Refresh comments
+      // Note: Real-time subscription will automatically update the comments list
       toast({
         title: "Success",
         description: "Comment deleted successfully!",
@@ -199,7 +194,7 @@ const PromptCommentSectionWithLibrary: React.FC<CommentSectionProps> = ({ prompt
       console.error('Error deleting comment:', error);
       toast({
         title: "Error",
-        description: "Failed to delete comment",
+        description: "Failed to delete comment. Please try again later.",
         variant: "destructive",
       });
       return false; // Indicate failure to the library
@@ -207,16 +202,6 @@ const PromptCommentSectionWithLibrary: React.FC<CommentSectionProps> = ({ prompt
       setSubmitting(false);
     }
   };
-
-  // Custom login component for unauthenticated users
-  const CustomLoginComponent = () => (
-    <div className="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-      <p className="text-gray-500 mb-3">Sign in to join the discussion</p>
-      <SignInButton mode="modal">
-        <Button>Sign In to Comment</Button>
-      </SignInButton>
-    </div>
-  );
 
   if (loading) {
     return (

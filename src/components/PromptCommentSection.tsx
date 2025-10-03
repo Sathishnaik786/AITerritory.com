@@ -2,7 +2,8 @@ import React from 'react';
 import { useUser, SignInButton } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { CommentSection } from 'react-comments-section';
-import 'react-comments-section/dist/index.css';
+// Import our custom CSS instead of the library's CSS
+import './PromptCommentSection.css';
 import { useToast } from '@/hooks/use-toast';
 import { 
   getPromptComments, 
@@ -148,7 +149,7 @@ const PromptCommentSection: React.FC<CommentSectionProps> = ({ promptId }) => {
       console.error('Error fetching comments:', error);
       toast({
         title: "Error",
-        description: "Failed to load comments. Please try again later.",
+        description: "Failed to load comments",
         variant: "destructive",
       });
     } finally {
@@ -156,32 +157,28 @@ const PromptCommentSection: React.FC<CommentSectionProps> = ({ promptId }) => {
     }
   };
 
-  const handleFormSubmit = async (data: { text: string; parentId?: string }) => {
+  const handleFormSubmit = async (formData: { userId: string; comId: string; fullName: string; avatarUrl: string; text: string; parentId?: string | null; }) => {
     if (!isSignedIn) {
       toast({
         title: "Authentication Required",
         description: "Please sign in to post a comment.",
       });
-      return;
+      return false;
     }
-    
-    if (!data.text.trim()) return;
     
     setSubmitting(true);
     try {
       await addPromptComment(
         promptId, 
-        user!.id, 
-        data.text.trim(), 
-        data.parentId || undefined
+        formData.userId, 
+        formData.text, 
+        formData.parentId || undefined
       );
-      
       // Note: Real-time subscription will automatically update the comments list
       toast({
         title: "Success",
-        description: data.parentId ? "Reply posted successfully!" : "Comment posted successfully!",
+        description: "Comment posted successfully!",
       });
-      
       return true; // Indicate success to the library
     } catch (error) {
       console.error('Error posting comment:', error);
@@ -196,7 +193,7 @@ const PromptCommentSection: React.FC<CommentSectionProps> = ({ promptId }) => {
     }
   };
 
-  const handleEdit = async (comId: string, newText: string) => {
+  const handleEdit = async (comId: string, text: string) => {
     if (!isSignedIn) {
       toast({
         title: "Authentication Required",
@@ -205,11 +202,9 @@ const PromptCommentSection: React.FC<CommentSectionProps> = ({ promptId }) => {
       return false;
     }
     
-    if (!newText.trim()) return false;
-    
     setSubmitting(true);
     try {
-      await updatePromptComment(comId, user!.id, newText.trim());
+      await updatePromptComment(comId, user!.id, text);
       // Note: Real-time subscription will automatically update the comments list
       toast({
         title: "Success",
