@@ -5,6 +5,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { HelmetProvider } from 'react-helmet-async';
 import { fileURLToPath } from 'url';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -14,13 +15,35 @@ const __dirname = path.dirname(__filename);
 import App from '../src/App';
 
 const PORT = process.env.PORT || 3000;
+const API_PORT = process.env.API_PORT || 3001;
 const app = express();
 
 // Serve static files from the dist directory with proper caching
 app.use(express.static(path.resolve(__dirname, '../dist'), { 
   index: false,
   maxAge: '1y',
-  etag: false
+  etag: false,
+  setHeaders: (res, path) => {
+    // Disable cache for HTML files
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } 
+    // Set cache for other assets
+    else {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  }
+}));
+
+// Proxy API requests to the backend server
+app.use('/api', createProxyMiddleware({
+  target: `http://localhost:${API_PORT}`,
+  changeOrigin: true,
+  pathRewrite: {
+    '^/api': '/api', // remove /api prefix
+  },
 }));
 
 // Serve the service worker
@@ -85,4 +108,5 @@ app.get('*', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Production SSR server running at http://localhost:${PORT}`);
+  console.log(`API requests will be proxied to http://localhost:${API_PORT}`);
 });

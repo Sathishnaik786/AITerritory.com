@@ -64,6 +64,17 @@ if (PUBLISHABLE_KEY && PUBLISHABLE_KEY.includes('pk_test_') && import.meta.env.P
   console.error("This will cause authentication issues and strict usage limits.");
   console.error("Please update to production keys from your Clerk dashboard.");
   console.error("Learn more: https://clerk.com/docs/deployments/overview");
+  console.error("Current key:", PUBLISHABLE_KEY);
+  
+  // Show a more user-friendly alert
+  if (typeof window !== 'undefined') {
+    // Only show in browser environment
+    setTimeout(() => {
+      if (confirm("CRITICAL SECURITY ISSUE: This site is using development authentication keys. Click OK to learn how to fix this.")) {
+        window.open("https://clerk.com/docs/deployments/overview", "_blank");
+      }
+    }, 5000);
+  }
 }
 
 // Improved error handling for Clerk
