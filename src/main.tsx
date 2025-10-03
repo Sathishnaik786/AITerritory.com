@@ -33,6 +33,42 @@ if (PUBLISHABLE_KEY && PUBLISHABLE_KEY.includes('pk_test_') && import.meta.env.P
   console.error("Please update to production keys from your Clerk dashboard.");
   console.error("Learn more: https://clerk.com/docs/deployments/overview");
   console.error("Current key:", PUBLISHABLE_KEY);
+  
+  // Show a more user-friendly alert in production
+  if (typeof window !== 'undefined') {
+    // Only show this alert once
+    if (!window.sessionStorage.getItem('clerk-dev-key-warning-shown')) {
+      window.sessionStorage.setItem('clerk-dev-key-warning-shown', 'true');
+      // Create a more visible warning for the user
+      const warningDiv = document.createElement('div');
+      warningDiv.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #ff4444;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        z-index: 10000;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+      `;
+      warningDiv.innerHTML = `
+        <strong>⚠️ AUTHENTICATION ISSUE</strong> - 
+        This site is using development authentication keys which will cause login problems. 
+        Please contact the site administrator.
+      `;
+      document.body.appendChild(warningDiv);
+      
+      // Auto-hide after 10 seconds
+      setTimeout(() => {
+        if (warningDiv.parentNode) {
+          warningDiv.parentNode.removeChild(warningDiv);
+        }
+      }, 10000);
+    }
+  }
 }
 
 // Improved error handling for Clerk
