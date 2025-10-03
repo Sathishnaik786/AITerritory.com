@@ -25,7 +25,7 @@
     "generate:sitemap": "node scripts/generate-sitemap.js",
     "test:social-previews": "node test/scripts/test-social-previews.js",
     "analyze": "vite build --mode analyze",
-    "start": "node server.js",
+    "start": "node static-server.js",
     "clear-cache": "node scripts/clear-cache.js"
   },
   "dependencies": {
