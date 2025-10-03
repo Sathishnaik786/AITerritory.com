@@ -69,6 +69,20 @@ export default defineConfig(({ mode }) => ({
     commonjsOptions: {
       include: [/node_modules/],
       extensions: ['.js', '.cjs'],
+    },
+    // Improve CSS handling
+    css: {
+      preprocessorOptions: {
+        css: {
+          charset: false
+        }
+      },
+      // Add postcss config for better CSS processing
+      postcss: {
+        plugins: [
+          // Add any postcss plugins you might be using
+        ]
+      }
     }
   },
   server: {

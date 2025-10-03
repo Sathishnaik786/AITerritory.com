@@ -50,19 +50,23 @@ const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 // Better error handling for missing keys
 if (!PUBLISHABLE_KEY) {
-  console.error("Missing Clerk Publishable Key");
+  console.error("❌ Missing Clerk Publishable Key");
   if (import.meta.env.DEV) {
     throw new Error("Missing Clerk Publishable Key - Check your .env file");
   } else {
-    console.error("Clerk is not properly configured for production");
+    console.error("Clerk is not properly configured for production. Please check your environment variables.");
   }
 }
 
 // Check if we're using development keys in production
 if (PUBLISHABLE_KEY && PUBLISHABLE_KEY.includes('pk_test_') && import.meta.env.PROD) {
-  console.warn("⚠️ Using Clerk development keys in production! Please update to production keys.");
+  console.error("❌ CRITICAL: Using Clerk development keys in production!");
+  console.error("This will cause authentication issues and strict usage limits.");
+  console.error("Please update to production keys from your Clerk dashboard.");
+  console.error("Learn more: https://clerk.com/docs/deployments/overview");
 }
 
+// Improved error handling for Clerk
 const AppTree = (
   <HelmetProvider>
     <ClerkProvider
@@ -82,7 +86,13 @@ if (rootElement) {
   // Check if we're hydrating or rendering fresh
   if (rootElement.hasChildNodes()) {
     // Hydrate existing markup
-    root.render(AppTree);
+    try {
+      root.render(AppTree);
+    } catch (error) {
+      console.error("Hydration failed, falling back to client-side render:", error);
+      rootElement.innerHTML = ''; // Clear server-rendered content
+      root.render(AppTree);
+    }
   } else {
     // Render fresh
     root.render(
@@ -90,5 +100,5 @@ if (rootElement) {
     );
   }
 } else {
-  console.error("Failed to find the root element");
+  console.error("❌ Failed to find the root element");
 }
