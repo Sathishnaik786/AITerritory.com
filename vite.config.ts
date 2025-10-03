@@ -65,6 +65,11 @@ export default defineConfig(({ mode }) => ({
     // Add CSS optimization to prevent layout flash
     cssCodeSplit: false,
     assetsInlineLimit: 4096,
+    // Ensure proper module format
+    commonjsOptions: {
+      include: [/node_modules/],
+      extensions: ['.js', '.cjs'],
+    }
   },
   server: {
     port: 3007,
@@ -124,5 +129,17 @@ export default defineConfig(({ mode }) => ({
   // Add cache-busting for development
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
+    // Ensure ES module compatibility
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+    },
+  },
+  // Ensure proper ES module handling
+  esbuild: {
+    define: {
+      global: 'globalThis',
+    },
   },
 }));

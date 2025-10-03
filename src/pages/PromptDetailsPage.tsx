@@ -9,7 +9,7 @@ import { getGeminiPrompts, getSEOGeminiPromptById } from '../services/geminiProm
 import { slugify } from '@/lib/slugify';
 import { useUser, SignInButton } from '@clerk/clerk-react';
 import { usePromptInteractions } from '../hooks/usePromptInteractions';
-import PromptCommentSection from '@/components/PromptCommentSection';
+import DynamicPromptCommentSection from '@/components/DynamicPromptCommentSection';
 import './GeminiPromptsPage.css';
 
 interface GeminiPrompt {
@@ -804,7 +804,7 @@ ${url}`);
 
         {/* Comment Section */}
         <div className="mt-8">
-          <PromptCommentSection promptId={id || ''} />
+          <DynamicPromptCommentSection promptId={id || ''} />
         </div>
 
         {/* Related Prompts Section */}

@@ -10,21 +10,19 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Import your App (adjust path as needed)
-import App from './App';
+// Import your App using the source file, not the built file
+import App from '../src/App';
 
-const isProd = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT || 3000;
-
 const app = express();
 
 // Serve static files
-app.use(express.static(path.resolve(process.cwd(), 'dist'), { index: false }));
+app.use(express.static(path.resolve(__dirname, '../dist'), { index: false }));
 
 app.get('*', async (req, res) => {
   try {
     // Read the HTML template
-    const templatePath = path.resolve(process.cwd(), 'dist/index.html');
+    const templatePath = path.resolve(__dirname, '../dist/index.html');
     if (!fs.existsSync(templatePath)) {
       console.error('index.html not found at:', templatePath);
       return res.status(500).send('Server Error: HTML template not found');
@@ -64,10 +62,6 @@ app.get('*', async (req, res) => {
   }
 });
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  app.listen(PORT, () => {
-    console.log(`SSR server running at http://localhost:${PORT}`);
-  });
-}
-
-export default app;
+app.listen(PORT, () => {
+  console.log(`Production SSR server running at http://localhost:${PORT}`);
+});

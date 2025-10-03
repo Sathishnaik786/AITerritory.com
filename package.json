@@ -26,7 +26,8 @@
     "test:social-previews": "node test/scripts/test-social-previews.js",
     "analyze": "vite build --mode analyze",
     "start": "vite preview --host",
-    "ssr": "node src/ssr.mjs"
+    "ssr": "node src/ssr.mjs",
+    "ssr:prod": "node server/production-ssr.js"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.31.9",

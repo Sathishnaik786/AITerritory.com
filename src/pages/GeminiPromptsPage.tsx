@@ -15,7 +15,7 @@ import { getGeminiPrompts, getGeminiPromptCategories } from '@/services/geminiPr
 import { slugify } from '@/lib/slugify';
 import { useUser, SignInButton } from '@clerk/clerk-react';
 import { usePromptInteractions } from '../hooks/usePromptInteractions';
-import PromptCommentSection from '@/components/PromptCommentSection';
+import DynamicPromptCommentSection from '@/components/DynamicPromptCommentSection';
 
 // Add the required icons for social media platforms
 import { FaTwitter as FaXTwitter, FaLinkedin, FaFacebook, FaWhatsapp } from 'react-icons/fa6';
@@ -455,7 +455,7 @@ ${url}`);
             <DialogTitle>Comments</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto">
-            <PromptCommentSection promptId={prompt.id} />
+            <DynamicPromptCommentSection promptId={prompt.id} />
           </div>
         </DialogContent>
       </Dialog>
