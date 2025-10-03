@@ -1,35 +1,33 @@
-#!/usr/bin/env node
-
 // Script to help with cache busting during deployment
 
-const fs = require('fs');
-const path = require('path');
+import { existsSync, readdirSync, lstatSync, unlinkSync, rmdirSync } from 'fs';
+import { join } from 'path';
 
 console.log('🧹 Clearing build cache...');
 
 // Function to delete folder recursively
 function deleteFolderRecursive(folderPath) {
-  if (fs.existsSync(folderPath)) {
-    fs.readdirSync(folderPath).forEach((file) => {
-      const filePath = path.join(folderPath, file);
-      if (fs.lstatSync(filePath).isDirectory()) {
+  if (existsSync(folderPath)) {
+    readdirSync(folderPath).forEach((file) => {
+      const filePath = join(folderPath, file);
+      if (lstatSync(filePath).isDirectory()) {
         deleteFolderRecursive(filePath);
       } else {
-        fs.unlinkSync(filePath);
+        unlinkSync(filePath);
       }
     });
-    fs.rmdirSync(folderPath);
+    rmdirSync(folderPath);
     console.log(`Deleted folder: ${folderPath}`);
   }
 }
 
 // Clear dist folder
-const distPath = path.join(__dirname, '..', 'dist');
+const distPath = join(process.cwd(), 'dist');
 deleteFolderRecursive(distPath);
 
 // Clear node_modules/.vite cache
-const viteCachePath = path.join(__dirname, '..', 'node_modules', '.vite');
-if (fs.existsSync(viteCachePath)) {
+const viteCachePath = join(process.cwd(), 'node_modules', '.vite');
+if (existsSync(viteCachePath)) {
   deleteFolderRecursive(viteCachePath);
   console.log('Cleared Vite cache');
 }
