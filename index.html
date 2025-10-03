@@ -33,6 +33,12 @@
         height: 100vh;
         font-size: 1.2rem;
       }
+      
+      /* Ensure smooth transition when showing content */
+      body:not(.no-fouc) {
+        opacity: 1;
+        transition: opacity 0.3s ease-in-out;
+      }
     </style>
     
     <!-- Canonical URL for SEO -->
@@ -59,6 +65,11 @@
       window.addEventListener('load', function() {
         document.body.classList.remove('no-fouc');
       });
+      
+      // Immediate removal if styles are already loaded
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        document.body.classList.remove('no-fouc');
+      }
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

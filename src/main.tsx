@@ -70,10 +70,14 @@ if (PUBLISHABLE_KEY && PUBLISHABLE_KEY.includes('pk_test_') && import.meta.env.P
   if (typeof window !== 'undefined') {
     // Only show in browser environment
     setTimeout(() => {
-      if (confirm("CRITICAL SECURITY ISSUE: This site is using development authentication keys. Click OK to learn how to fix this.")) {
-        window.open("https://clerk.com/docs/deployments/overview", "_blank");
+      const alertShown = sessionStorage.getItem('clerkAlertShown');
+      if (!alertShown) {
+        sessionStorage.setItem('clerkAlertShown', 'true');
+        if (confirm("CRITICAL SECURITY ISSUE: This site is using development authentication keys which have strict usage limits. Click OK to learn how to fix this.")) {
+          window.open("https://clerk.com/docs/deployments/overview", "_blank");
+        }
       }
-    }, 5000);
+    }, 3000);
   }
 }
 

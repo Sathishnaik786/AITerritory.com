@@ -4,7 +4,7 @@ services:
     plan: free
     runtime: node
     buildCommand: npm run build
-    startCommand: node server/production-ssr.js
+    startCommand: node server/start-production.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -14,6 +14,8 @@ services:
         sync: false
       - key: PORT
         value: "3000"
+      - key: API_PORT
+        value: "3001"
       - key: ENABLE_REDIS
         value: "false"
       - key: VITE_CLERK_PUBLISHABLE_KEY

@@ -2,7 +2,7 @@
 
 ## Critical: Replace Development Keys with Production Keys
 
-You're currently seeing the "Using Clerk development keys in production" warning because your [.env.production](file:///C:/Users/sathi/OneDrive/Desktop/AITerritory.com/.env.production) file contains development keys. This must be fixed before deploying to production.
+You're currently seeing the "Using Clerk development keys in production" warning because your environment is using development keys. This must be fixed before deploying to production.
 
 ### Steps to Fix:
 
@@ -12,22 +12,15 @@ You're currently seeing the "Using Clerk development keys in production" warning
    - Navigate to "API Keys" section
    - Copy your production "Publishable Key" and "Secret Key"
 
-2. **Update [.env.production](file:///C:/Users/sathi/OneDrive/Desktop/AITerritory.com/.env.production):**
-   ```
-   # Replace these placeholder values with your actual production keys
-   VITE_CLERK_PUBLISHABLE_KEY=pk_live_your_actual_production_publishable_key
-   VITE_CLERK_SECRET_KEY=sk_live_your_actual_production_secret_key
-   ```
-
-3. **Update Render Environment Variables:**
+2. **Update Render Environment Variables:**
    - Go to your Render dashboard
    - Navigate to your service settings
-   - Add or update the environment variables:
-     - `VITE_CLERK_PUBLISHABLE_KEY`: Your production publishable key
-     - `VITE_CLERK_SECRET_KEY`: Your production secret key
+   - Update the environment variables:
+     - `VITE_CLERK_PUBLISHABLE_KEY`: Your production publishable key (should start with pk_live_)
+     - `VITE_CLERK_SECRET_KEY`: Your production secret key (should start with sk_live_)
 
-4. **Redeploy Your Application:**
-   After updating the keys, rebuild and redeploy your application.
+3. **Redeploy Your Application:**
+   After updating the keys, trigger a new deployment.
 
 ### Why This Matters:
 
@@ -35,30 +28,70 @@ You're currently seeing the "Using Clerk development keys in production" warning
 - Production keys are required for proper authentication functionality
 - Using development keys in production is a security risk
 
-### Additional Notes:
+## API Server Issue
 
-- Never commit actual keys to version control
-- Use environment variables in your deployment platform (Render, Vercel, etc.)
-- Test thoroughly after switching to production keys
+The 404 error for `/api/gemini-prompts/categories` indicates that your API server is not running correctly or not accessible.
 
-## API Endpoint Issue
+### Current Deployment Structure:
 
-The 404 error for `/api/gemini-prompts/categories` suggests there might be an issue with how the API routes are being served. This could be related to:
+Your Render configuration only starts the SSR server (`server/production-ssr.js`) but doesn't start the API server (`server/server.js`).
 
-1. The SSR server not properly proxying API requests
-2. The API server not running correctly
-3. CORS issues between frontend and backend
+### Solution:
 
-### Troubleshooting Steps:
+You need to modify your deployment to start both servers. Here are two approaches:
 
-1. Check the server logs in Render for any errors
-2. Verify that the API server is starting correctly on port 3001
-3. Ensure that the SSR server is properly configured to serve API requests
+### Approach 1: Modify startCommand to run both servers
+
+Update your [render.yaml](file:///C:/Users/sathi/OneDrive/Desktop/AITerritory.com/render.yaml) to use a script that starts both servers:
+
+```yaml
+services:
+  - name: ai-territory
+    type: web
+    plan: free
+    runtime: node
+    buildCommand: npm run build
+    startCommand: node server/start-production.js
+    # ... rest of your configuration
+```
+
+Then create `server/start-production.js`:
+
+### Approach 2: Use concurrently to run both servers
+
+1. Install concurrently in your server directory:
+   ```bash
+   cd server
+   npm install concurrently
+   ```
+
+2. Add a script to your server's package.json:
+   ```json
+   "scripts": {
+     "start:prod": "concurrently \"node server.js\" \"node ../server/production-ssr.js\""
+   }
+   ```
+
+3. Update your [render.yaml](file:///C:/Users/sathi/OneDrive/Desktop/AITerritory.com/render.yaml):
+   ```yaml
+   startCommand: npm run start:prod
+   ```
+
+## Layout Flash Issue
+
+The "Layout was forced before the page was fully loaded" warning is related to CSS loading. This can be improved by:
+
+1. Ensuring critical CSS is inlined in [index.html](file:///C:/Users/sathi/OneDrive/Desktop/AITerritory.com/index.html)
+2. Properly configuring CSS loading order in Vite
+3. Using appropriate loading indicators
 
 ## Cookie Warnings
 
-The cookie warnings are likely related to the Clerk authentication setup. Once you switch to production keys, these warnings should disappear.
+These warnings are related to the Clerk authentication setup and should disappear once you switch to production keys.
 
-## Base64 Preload Issue
+## Next Steps
 
-The base64 encoded preload warning suggests there's still some incorrect preload configuration. This should be resolved with the updated index.html file.
+1. Get production Clerk keys from your Clerk dashboard
+2. Update your Render environment variables
+3. Modify your deployment setup to run both the API server and SSR server
+4. Redeploy your application
