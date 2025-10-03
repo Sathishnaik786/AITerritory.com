@@ -8,14 +8,6 @@ const API_BASE_URL = isProduction
   ? 'https://aiterritory-com.onrender.com/api'  // Use direct backend URL in production
   : '/api';  // Use proxy in development
 
-// Debug logging for API configuration
-console.log('🔧 API Configuration:');
-console.log('  Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
-console.log('  Hostname:', window.location.hostname);
-console.log('  API Base URL:', API_BASE_URL);
-console.log('  Full URL example:', `${API_BASE_URL}/blogs/test/comments`);
-console.log('  Current URL:', window.location.href);
-
 // Default timeout in milliseconds
 const DEFAULT_TIMEOUT = 15000; // Increased timeout to 15 seconds
 const MAX_RETRIES = 3; // Increased retries
@@ -32,8 +24,6 @@ const api = axios.create({
 // Request interceptor for adding auth tokens and retry logic
 api.interceptors.request.use(
   (config) => {
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
-    
     // Add auth token if available
     const token = localStorage.getItem('auth_token');
     if (token) {
@@ -56,14 +46,7 @@ api.interceptors.request.use(
 // Response interceptor for handling errors and retries
 api.interceptors.response.use(
   (response: AxiosResponse) => {
-    // Log successful responses in development
-    if (!isProduction) {
-      console.log(`API Response (${response.status}):`, {
-        url: response.config.url,
-        status: response.status,
-        data: response.data
-      });
-    }
+    // Only log errors in development, not successful responses
     return response;
   },
   async (error: AxiosError) => {
@@ -130,7 +113,6 @@ export const fetchWithRetry = async <T>(
     return response.data;
   } catch (error) {
     if (retries > 0 && axios.isAxiosError(error) && error.code !== 'ECONNABORTED') {
-      console.log(`Retrying ${url}, ${retries} attempts left...`);
       // Wait before retrying (exponential backoff)
       await new Promise(resolve => setTimeout(resolve, 1000 * (MAX_RETRIES - retries + 1)));
       return fetchWithRetry<T>(url, config, retries - 1);

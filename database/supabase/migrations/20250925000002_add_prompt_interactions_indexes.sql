@@ -1,0 +1,3 @@
+-- This migration has been superseded by 20250925000003_create_prompt_interactions_with_indexes.sql
+-- which creates the tables and indexes together for better reliability.
+-- This file is kept for migration history consistency but does nothing.

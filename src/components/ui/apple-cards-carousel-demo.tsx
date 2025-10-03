@@ -31,16 +31,6 @@ export default function AppleCardsCarouselDemo() {
   if (error) return <div className="py-20 text-center text-red-500">{error}</div>;
   if (!cards.length) return <div className="py-20 text-center">No cards found.</div>;
 
-  // Debug: log raw cards
-  console.log('Raw cards from API:', cards);
-
-  // Helper to safely stringify any value
-  function safeString(val: any) {
-    if (val === null || val === undefined) return '';
-    if (typeof val === 'object') return JSON.stringify(val);
-    return String(val);
-  }
-
   // Defensive mapping: ensure all fields are strings, even if object/array
   const safeCards = cards.map((card: any) => ({
     ...card,
@@ -58,7 +48,6 @@ export default function AppleCardsCarouselDemo() {
         </h2>
         <Carousel
           items={safeCards.map((card: any, index: number) => {
-            console.log('Mapping card:', card);
             return (
               <Card
                 key={card.id}
@@ -81,4 +70,11 @@ export default function AppleCardsCarouselDemo() {
       </div>
     </ErrorBoundary>
   );
-} 
+}
+
+// Helper to safely stringify any value
+function safeString(val: any) {
+  if (val === null || val === undefined) return '';
+  if (typeof val === 'object') return JSON.stringify(val);
+  return String(val);
+}

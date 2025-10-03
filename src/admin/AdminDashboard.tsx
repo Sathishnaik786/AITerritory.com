@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getContactSubmissions, getAdvertiseSubmissions, getToolSubmissions, getFeatureRequests } from '@/services/submissionService';
 import { getFeedback } from '@/services/feedbackService';
 import { BlogService } from '../services/blogService';
-import { Mail, Megaphone, PlusSquare, Lightbulb, Users, Bot, Rocket, BookOpen } from 'lucide-react';
+import { Mail, Megaphone, PlusSquare, Lightbulb, Users, Bot, Rocket, BookOpen, Sparkles } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
   const { data: contactSubmissions, isLoading: isLoadingContact } = useQuery({
@@ -127,6 +127,14 @@ const AdminDashboard: React.FC = () => {
             link="/admin/blogs"
             subtext="Total blog posts"
           />
+          <StatCard
+            title="Gemini Prompts"
+            value="Manage"
+            isLoading={false}
+            icon={Sparkles}
+            link="/admin/gemini-prompts"
+            subtext="AI prompts"
+          />
           <Link to="/admin/business-functions">
             <Card className="hover:shadow-lg transition-shadow bg-white dark:bg-gray-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -183,4 +191,4 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;

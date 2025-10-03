@@ -172,32 +172,145 @@ exports.getSEOGeminiPromptById = async (req, res) => {
 
 // POST /api/gemini-prompts
 exports.createGeminiPrompt = async (req, res) => {
-  const { image_url, prompt, category, submitter_name, submitter_email } = req.body;
-  console.log('Creating new Gemini prompt:', { image_url, prompt, category, submitter_name, submitter_email });
+  const { image_url, prompt, category, submitter_name, submitter_email, status } = req.body;
+  console.log('Creating new Gemini prompt:', { image_url, prompt, category, submitter_name, submitter_email, status });
   
   if (!prompt || !category) {
     console.log('Validation failed: prompt or category missing');
     return res.status(400).json({ error: 'Prompt and category are required.' });
   }
   
-  const { data, error } = await supabase
-    .from('gemini_prompts')
-    .insert([{
+  // Validate category - allow any non-empty string
+  if (!category || category.trim() === '') {
+    return res.status(400).json({ error: 'Category cannot be empty.' });
+  }
+  
+  try {
+    // Only insert columns that actually exist in the table
+    const insertData = {
       image_url,
       prompt,
-      category,
-      submitted_via: 'web_form',
-      submitter_name: submitter_name || null,
-      submitter_email: submitter_email || null
-    }])
-    .select()
-    .single();
+      category: category.trim()
+      // Note: serial_no is likely auto-incrementing
+      // Other fields (status, submitter_name, submitter_email, submitted_via) 
+      // don't exist in the current table schema
+    };
+    
+    const { data, error } = await supabase
+      .from('gemini_prompts')
+      .insert([insertData])
+      .select()
+      .single();
+      
+    if (error) {
+      console.error('Supabase insert error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+    
+    console.log('Successfully created prompt:', data);
+    res.status(201).json(data);
+  } catch (err) {
+    console.error('Unexpected error in createGeminiPrompt:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// PUT /api/gemini-prompts/:id - update a gemini prompt
+exports.updateGeminiPrompt = async (req, res) => {
+  const { id } = req.params;
+  const { image_url, prompt, category, status } = req.body;
+  console.log('Updating Gemini prompt with ID:', id, { image_url, prompt, category, status });
+  
+  if (!prompt || !category) {
+    console.log('Validation failed: prompt or category missing');
+    return res.status(400).json({ error: 'Prompt and category are required.' });
+  }
+  
+  // Validate category - allow any non-empty string
+  if (!category || category.trim() === '') {
+    return res.status(400).json({ error: 'Category cannot be empty.' });
+  }
+  
+  try {
+    // Only update columns that actually exist in the table
+    const updateData = {
+      image_url,
+      prompt,
+      category: category.trim()
+      // Note: status column doesn't exist in the current table schema
+    };
+    
+    const { data, error } = await supabase
+      .from('gemini_prompts')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+      
+    if (error) {
+      console.error('Supabase update error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+    
+    if (!data) {
+      console.log('Prompt not found for update');
+      return res.status(404).json({ error: 'Prompt not found' });
+    }
+    
+    console.log('Successfully updated prompt:', data);
+    res.json(data);
+  } catch (err) {
+    console.error('Unexpected error in updateGeminiPrompt:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// DELETE /api/gemini-prompts/:id - delete a gemini prompt
+exports.deleteGeminiPrompt = async (req, res) => {
+  const { id } = req.params;
+  console.log('Deleting Gemini prompt with ID:', id);
+  
+  const { error } = await supabase
+    .from('gemini_prompts')
+    .delete()
+    .eq('id', id);
     
   if (error) {
-    console.error('Supabase insert error:', error);
+    console.error('Supabase delete error:', error);
     return res.status(500).json({ error: error.message });
   }
   
-  console.log('Successfully created prompt:', data);
-  res.status(201).json(data);
+  console.log('Successfully deleted prompt with ID:', id);
+  res.status(204).send();
+};
+
+// GET /api/gemini-prompts/categories - get all unique categories
+exports.getGeminiPromptCategories = async (req, res) => {
+  console.log('=== DEBUG: getGeminiPromptCategories called ===');
+  console.log('Request URL:', req.originalUrl);
+  console.log('Request method:', req.method);
+  
+  try {
+    console.log('Fetching all unique Gemini prompt categories');
+    const { data, error } = await supabase
+      .from('gemini_prompts')
+      .select('category')
+      .order('category');
+      
+    console.log('Supabase query result:', { data: data?.length, error: error?.message });
+    
+    if (error) {
+      console.error('Supabase error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+    
+    // Extract unique categories and filter out any null/undefined values
+    const uniqueCategories = [...new Set(data.map(item => item.category).filter(cat => cat))];
+    
+    console.log('Found categories:', uniqueCategories);
+    res.json(uniqueCategories);
+  } catch (err) {
+    console.error('Unexpected error in getGeminiPromptCategories:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 };

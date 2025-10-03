@@ -287,7 +287,10 @@ export const trackAuthAction = (
  */
 export const initGA4 = (): void => {
   if (typeof window !== 'undefined' && !window.gtag) {
-    console.warn('GA4 not initialized. Make sure the gtag script is loaded.');
+    // Only show warning in development mode
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('GA4 not initialized. Make sure the gtag script is loaded.');
+    }
   }
 };
 

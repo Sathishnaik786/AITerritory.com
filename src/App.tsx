@@ -82,6 +82,8 @@ import { NavbarNewsletterModal } from './components/NavbarNewsletterModal';
 import { useState } from 'react';
 import RedisDashboard from './pages/admin/redis-dashboard';
 import PromptSubmissionsAdmin from './admin/PromptSubmissionsAdmin';
+import CategoriesAdmin from './admin/CategoriesAdmin';
+import GeminiPromptsAdmin from './admin/GeminiPromptsAdmin';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -290,6 +292,8 @@ function ThemedAppContent() {
                         <Route path="submissions/tools" element={<ToolSubmissionsAdmin />} />
                         <Route path="submissions/features" element={<FeatureRequestsAdmin />} />
                         <Route path="prompt-submissions" element={<PromptSubmissionsAdmin />} />
+                        <Route path="categories" element={<CategoriesAdmin />} />
+                        <Route path="gemini-prompts" element={<GeminiPromptsAdmin />} />
                         <Route path="feedback" element={<FeedbackAdmin />} />
                         <Route path="blogs" element={<BlogsAdmin />} />
                         <Route path="newsletter-subscribers" element={<NewsletterSubscribersAdmin />} />

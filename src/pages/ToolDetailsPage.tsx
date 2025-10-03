@@ -1,4 +1,4 @@
-console.log('=== BlogDetail.tsx loaded ===');
+// console.log('=== BlogDetail.tsx loaded ===');
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -208,7 +208,7 @@ const ToolDetailsPage: React.FC = () => {
         trackToolLike(
           toolId,
           tool?.name,
-          tool?.category,
+          tool?.categories?.name,
           user.id
         );
       }
@@ -240,7 +240,7 @@ const ToolDetailsPage: React.FC = () => {
         trackToolBookmark(
           toolId,
           tool?.name,
-          tool?.category,
+          tool?.categories?.name,
           user.id
         );
       }

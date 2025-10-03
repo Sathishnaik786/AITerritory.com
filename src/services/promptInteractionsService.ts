@@ -2,14 +2,11 @@ import api from './api';
 
 // Prompt Likes
 export async function getPromptLikes(promptId: string) {
-  console.log('Fetching likes for prompt ID:', promptId);
   try {
     const res = await api.get(`/prompt-interactions/likes/${promptId}`);
-    console.log('Likes API response:', res);
     
     if (res.status !== 200) throw new Error('Failed to fetch prompt likes');
     
-    console.log('Likes data:', res.data);
     return res.data;
   } catch (error) {
     console.error('Error fetching prompt likes:', error);
@@ -49,9 +46,15 @@ export async function getPromptComments(promptId: string) {
   return res.data;
 }
 
-export async function addPromptComment(promptId: string, userId: string, comment: string) {
-  const res = await api.post('/prompt-interactions/comments', { promptId, userId, comment });
+export async function addPromptComment(promptId: string, userId: string, comment: string, parentId?: string) {
+  const res = await api.post('/prompt-interactions/comments', { promptId, userId, comment, parentId });
   if (res.status !== 200 && res.status !== 201) throw new Error('Failed to add prompt comment');
+  return res.data;
+}
+
+export async function updatePromptComment(commentId: string, userId: string, comment: string) {
+  const res = await api.put(`/prompt-interactions/comments/${commentId}`, { userId, comment });
+  if (res.status !== 200) throw new Error('Failed to update prompt comment');
   return res.data;
 }
 

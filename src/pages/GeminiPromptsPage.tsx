@@ -11,8 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, ExternalLink, Heart, MessageCircle, Share2, Check, Link as LinkIcon } from 'lucide-react';
-import { getGeminiPrompts, submitGeminiPrompt } from '@/services/geminiPromptsService';
+import { getGeminiPrompts, getGeminiPromptCategories } from '@/services/geminiPromptsService';
 import { slugify } from '@/lib/slugify';
+import { useUser, SignInButton } from '@clerk/clerk-react';
+import { usePromptInteractions } from '../hooks/usePromptInteractions';
+import PromptCommentSection from '@/components/PromptCommentSection';
 
 // Add the required icons for social media platforms
 import { FaTwitter as FaXTwitter, FaLinkedin, FaFacebook, FaWhatsapp } from 'react-icons/fa6';
@@ -38,11 +41,9 @@ interface PromptCardProps {
   prompt: GeminiPrompt;
   categoryColor: string;
   isExpanded: boolean;
-  isLiked: boolean;
   isCopied: boolean;
   onToggleReadMore: (id: string) => void;
   onCopyPrompt: (text: string, id: string) => void;
-  onLikePrompt: (id: string) => void;
   onSharePrompt: (prompt: GeminiPrompt) => void;
   toast?: (args: { title: string; description: string; variant?: string }) => void;
 }
@@ -100,14 +101,21 @@ const PromptCard = memo(({
   prompt,
   categoryColor,
   isExpanded,
-  isLiked,
   isCopied,
   onToggleReadMore,
   onCopyPrompt,
-  onLikePrompt,
   onSharePrompt,
   toast
 }: PromptCardProps) => {
+  const { user, isSignedIn } = useUser();
+  const { 
+    likeCount, 
+    liked, 
+    toggleLike,
+    shareCount,
+    commentCount
+  } = usePromptInteractions(prompt.id);
+  const [isCommentSectionOpen, setIsCommentSectionOpen] = useState(false);
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -132,7 +140,10 @@ const PromptCard = memo(({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (shareDropdownRef.current && !shareDropdownRef.current.contains(event.target as Node)) {
-        console.log('Click outside detected, closing dropdown');
+        // Reduced logging - only log in development
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Click outside detected, closing dropdown');
+        }
         setIsShareDropdownOpen(false);
       }
     };
@@ -265,32 +276,50 @@ ${url}`);
           
           {/* Action buttons - All in one line */}
           <div className="flex space-x-2 mt-2">
+            {/* Like Button */}
+            {isSignedIn ? (
+              <button
+                type="button"
+                className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault(); // Prevent navigation when clicking action buttons
+                  // @ts-ignore - toggleLike might be undefined
+                  toggleLike();
+                }}
+              >
+                <Heart 
+                  className={`h-4 w-4 ${liked ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} 
+                />
+                <span className="text-xs ml-1">{likeCount}</span>
+              </button>
+            ) : (
+              <SignInButton mode="modal">
+                <button
+                  type="button"
+                  className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <Heart className="h-4 w-4 text-gray-500" />
+                  <span className="text-xs ml-1">{likeCount}</span>
+                </button>
+              </SignInButton>
+            )}
+            
+            {/* Comment Button */}
             <button
               type="button"
               className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault(); // Prevent navigation when clicking action buttons
-                onLikePrompt(prompt.id);
-              }}
-            >
-              <Heart 
-                className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} 
-              />
-            </button>
-            <button
-              type="button"
-              className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault(); // Prevent navigation when clicking action buttons
-                // Comment functionality would go here
+                setIsCommentSectionOpen(true);
               }}
             >
               <MessageCircle className="h-4 w-4 text-gray-500" />
+              <span className="text-xs ml-1">{commentCount}</span>
             </button>
             
-            {/* Enhanced Share Button with Dropdown - BlogDetail style */}
+            {/* Enhanced Share Button with Dropdown - BlogDetail style - now shows share count */}
             <div className="relative" ref={shareDropdownRef}>
               <button
                 type="button"
@@ -302,7 +331,7 @@ ${url}`);
                 }}
               >
                 <Share2 className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Share</span>
+                <span className="text-xs ml-1">{shareCount}</span>
               </button>
               
               {/* Social Media Sharing Pop-up - Positioned above and centered */}
@@ -335,7 +364,7 @@ ${url}`);
                       >
                         <div className="w-5 h-5 mr-3 text-pink-500">
                           <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.014-3.667.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.689-.07-4.849 0-3.204.014-3.667.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                           </svg>
                         </div>
                         <span>Instagram</span>
@@ -418,6 +447,18 @@ ${url}`);
           </div>
         </CardContent>
       </Card>
+      
+      {/* Comment Section */}
+      <Dialog open={isCommentSectionOpen} onOpenChange={setIsCommentSectionOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Comments</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto">
+            <PromptCommentSection promptId={prompt.id} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }, (prevProps, nextProps) => {
@@ -430,36 +471,45 @@ ${url}`);
     prevProps.prompt.image_url === nextProps.prompt.image_url &&
     prevProps.categoryColor === nextProps.categoryColor &&
     prevProps.isExpanded === nextProps.isExpanded &&
-    prevProps.isLiked === nextProps.isLiked &&
     prevProps.isCopied === nextProps.isCopied
   );
 });
 
-const GeminiPromptsPage = () => {
+const GeminiPromptsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [prompts, setPrompts] = useState<GeminiPrompt[]>([]);
   const [filteredPrompts, setFilteredPrompts] = useState<GeminiPrompt[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [newPrompt, setNewPrompt] = useState({
-    image_url: '',
-    prompt: '',
-    category: 'all'
-  });
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [expandedPrompts, setExpandedPrompts] = useState<Record<string, boolean>>({});
+  // Removed likedPrompts state as it's now handled by the usePromptInteractions hook
   const [copiedPromptId, setCopiedPromptId] = useState<string | null>(null);
-  const [likedPrompts, setLikedPrompts] = useState<Record<string, boolean>>({});
-
-  const { toast } = useToast(); // Add this to get the toast function
-
-  // Function to scroll to top smoothly
-  const scrollToTop = useCallback(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  }, []);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const [categories, setCategories] = useState<Array<{id: string, name: string, icon: string, count: number}>>([
+    { 
+      id: 'all', 
+      name: 'All', 
+      icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
+      count: 0
+    },
+    { 
+      id: 'men', 
+      name: 'Men', 
+      icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+      count: 0
+    },
+    { 
+      id: 'women', 
+      name: 'Women', 
+      icon: 'M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+      count: 0
+    },
+    { 
+      id: 'couple', 
+      name: 'Couple', 
+      icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+      count: 0
+    }
+  ]);
 
   // SEO: Generate dynamic meta tags based on active tab
   const getPageMeta = useCallback(() => {
@@ -510,23 +560,70 @@ const GeminiPromptsPage = () => {
 
   const pageMeta = getPageMeta();
 
-  // Fetch prompts
+  // Fetch prompts and categories
   useEffect(() => {
-    const fetchPrompts = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const data = await getGeminiPrompts();
-        setPrompts(data || []);
+        const [promptsData, categoriesData] = await Promise.all([
+          getGeminiPrompts(),
+          getGeminiPromptCategories()
+        ]);
+      
+        setPrompts(promptsData || []);
+      
+        // Update categories with counts
+        const defaultCategories = [
+          { 
+            id: 'all', 
+            name: 'All', 
+            icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
+            count: promptsData?.length || 0
+          },
+          { 
+            id: 'men', 
+            name: 'Men', 
+            icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+            count: promptsData?.filter(p => p.category === 'men')?.length || 0
+          },
+          { 
+            id: 'women', 
+            name: 'Women', 
+            icon: 'M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+            count: promptsData?.filter(p => p.category === 'women')?.length || 0
+          },
+          { 
+            id: 'couple', 
+            name: 'Couple', 
+            icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+            count: promptsData?.filter(p => p.category === 'couple')?.length || 0
+          }
+        ];
+      
+        // Add dynamic categories
+        const dynamicCategories = categoriesData
+          .filter(cat => !['all', 'men', 'women', 'couple'].includes(cat))
+          .map(cat => ({
+            id: cat,
+            name: cat.charAt(0).toUpperCase() + cat.slice(1),
+            icon: 'M7 20h5v-2a3 3 0 00-5.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+            count: promptsData?.filter(p => p.category === cat)?.length || 0
+          }));
+      
+        setCategories([...defaultCategories, ...dynamicCategories]);
       } catch (error) {
-        console.error('Error fetching prompts:', error);
+        console.error('Error fetching data:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch prompts and categories',
+          variant: 'destructive'
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPrompts();
+    fetchData();
   }, []);
 
   // Filter prompts based on active tab
@@ -558,12 +655,7 @@ const GeminiPromptsPage = () => {
     });
   }, []);
 
-  const handleLikePrompt = useCallback((promptId: string) => {
-    setLikedPrompts(prev => ({
-      ...prev,
-      [promptId]: !prev[promptId]
-    }));
-  }, []);
+  // Removed handleLikePrompt function as it's now handled by the usePromptInteractions hook
 
   const handleSharePrompt = useCallback(async (prompt: GeminiPrompt) => {
     // Create share data
@@ -597,52 +689,34 @@ const GeminiPromptsPage = () => {
       all: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
     };
     
-    return categoryColors[category] || categoryColors['all'];
+    // Generate a color for new categories
+    if (!categoryColors[category]) {
+      const colors = [
+        'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+        'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+        'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200'
+      ];
+      // Use a hash-based approach to consistently assign colors
+      let hash = 0;
+      for (let i = 0; i < category.length; i++) {
+        hash = category.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const index = Math.abs(hash) % colors.length;
+      categoryColors[category] = colors[index];
+    }
+    
+    return categoryColors[category];
   }, []);
 
-  // Calculate prompt counts for each category
-  const getCategoryCounts = useCallback(() => {
-    const counts = {
-      all: prompts.length,
-      men: prompts.filter(p => p.category === 'men').length,
-      women: prompts.filter(p => p.category === 'women').length,
-      couple: prompts.filter(p => p.category === 'couple').length
-    };
-    return counts;
-  }, [prompts]);
-
-  // Category data for sidebar with counts
-  const categories = [
-    { 
-      id: 'all', 
-      name: 'All Prompts', 
-      icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
-      count: getCategoryCounts().all
-    },
-    { 
-      id: 'men', 
-      name: 'Men', 
-      icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-      count: getCategoryCounts().men
-    },
-    { 
-      id: 'women', 
-      name: 'Women', 
-      icon: 'M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-      count: getCategoryCounts().women
-    },
-    { 
-      id: 'couple', 
-      name: 'Couple', 
-      icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-      count: getCategoryCounts().couple
-    }
-  ];
-
-  // Update categories when prompts change
-  useEffect(() => {
-    // This will trigger a re-render when prompts change
-  }, [prompts]);
+  // Function to scroll to top smoothly
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }, []);
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -708,32 +782,7 @@ const GeminiPromptsPage = () => {
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 md:sticky md:top-6">
             <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Categories</h2>
             <nav className="space-y-1">
-              {[
-                { 
-                  id: 'all', 
-                  name: 'All', 
-                  icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
-                  count: prompts.length
-                },
-                { 
-                  id: 'men', 
-                  name: 'Men', 
-                  icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-                  count: prompts.filter(p => p.category === 'men').length
-                },
-                { 
-                  id: 'women', 
-                  name: 'Women', 
-                  icon: 'M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-                  count: prompts.filter(p => p.category === 'women').length
-                },
-                { 
-                  id: 'couple', 
-                  name: 'Couple', 
-                  icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-                  count: prompts.filter(p => p.category === 'couple').length
-                }
-              ].map((category) => (
+              {categories.map((category) => (
                 <button
                   key={category.id}
                   type="button"
@@ -812,7 +861,6 @@ const GeminiPromptsPage = () => {
               {filteredPrompts.map((prompt) => {
                 const categoryColor = getCategoryColor(prompt.category);
                 const isExpanded = expandedPrompts[prompt.id] || false;
-                const isLiked = likedPrompts[prompt.id] || false;
                 const isCopied = copiedPromptId === prompt.id;
                 
                 return (
@@ -821,11 +869,9 @@ const GeminiPromptsPage = () => {
                     prompt={prompt}
                     categoryColor={categoryColor}
                     isExpanded={isExpanded}
-                    isLiked={isLiked}
                     isCopied={isCopied}
                     onToggleReadMore={toggleReadMore}
                     onCopyPrompt={handleCopyPrompt}
-                    onLikePrompt={handleLikePrompt}
                     onSharePrompt={handleSharePrompt}
                     toast={toast} // Pass the toast function to the PromptCard
                   />
@@ -865,7 +911,6 @@ const GeminiPromptsPage = () => {
                 {filteredPrompts.map((prompt) => {
                   const categoryColor = getCategoryColor(prompt.category);
                   const isExpanded = expandedPrompts[prompt.id] || false;
-                  const isLiked = likedPrompts[prompt.id] || false;
                   const isCopied = copiedPromptId === prompt.id;
                   
                   return (
@@ -874,11 +919,9 @@ const GeminiPromptsPage = () => {
                       prompt={prompt}
                       categoryColor={categoryColor}
                       isExpanded={isExpanded}
-                      isLiked={isLiked}
                       isCopied={isCopied}
                       onToggleReadMore={toggleReadMore}
                       onCopyPrompt={handleCopyPrompt}
-                      onLikePrompt={handleLikePrompt}
                       onSharePrompt={handleSharePrompt}
                       toast={toast} // Pass the toast function to the PromptCard
                     />

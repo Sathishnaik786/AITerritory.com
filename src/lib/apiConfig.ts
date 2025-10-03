@@ -3,7 +3,7 @@ export const getApiBaseUrl = () => {
   const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
   return isProduction 
     ? 'https://aiterritory-com.onrender.com/api'
-    : 'http://localhost:3003/api';
+    : '/api';  // Use proxy in development to match vite.config.ts
 };
 
 // Export the base URL for direct use

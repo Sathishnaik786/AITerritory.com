@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Mail, Megaphone, PlusSquare, Lightbulb, Users, Bot, Rocket, BookOpen, Database } from 'lucide-react';
+import { Home, Mail, Megaphone, PlusSquare, Lightbulb, Users, Bot, Rocket, BookOpen, Database, Sparkles, Tag } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -35,6 +35,8 @@ const contentNav = [
   { label: 'AI Tutorials', icon: BookOpen, to: '/admin/ai-tutorials' },
   { label: 'Feedback', icon: Lightbulb, to: '/admin/feedback' },
   { label: 'Blogs', icon: BookOpen, to: '/admin/blogs' },
+  { label: 'Categories', icon: Tag, to: '/admin/categories' },
+  { label: 'Gemini Prompts', icon: Sparkles, to: '/admin/gemini-prompts' },
 ];
 
 const systemNav = [
@@ -147,4 +149,4 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
-export default AdminLayout; 
+export default AdminLayout;

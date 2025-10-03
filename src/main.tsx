@@ -37,12 +37,14 @@ const checkForUpdates = () => {
 // Run cache-busting check
 checkForUpdates();
 
-// Debug: Log all environment variables
-console.log("🔍 Environment Variables Debug:");
-console.log("VITE_CLERK_PUBLISHABLE_KEY:", import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
-console.log("VITE_SUPABASE_URL:", import.meta.env.VITE_SUPABASE_URL);
-console.log("VITE_SUPABASE_ANON_KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY);
-console.log("All env vars:", import.meta.env);
+// Debug: Log all environment variables (only in development)
+if (import.meta.env.DEV) {
+  console.log("🔍 Environment Variables Debug:");
+  console.log("VITE_CLERK_PUBLISHABLE_KEY:", import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
+  console.log("VITE_SUPABASE_URL:", import.meta.env.VITE_SUPABASE_URL);
+  console.log("VITE_SUPABASE_ANON_KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY);
+  console.log("All env vars:", import.meta.env);
+}
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 

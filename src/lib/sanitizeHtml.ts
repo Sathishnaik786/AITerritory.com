@@ -93,7 +93,10 @@ try {
   DOMPurify = require('dompurify');
 } catch {
   // DOMPurify not available, use basic sanitization
-  console.warn('DOMPurify not available, using basic HTML sanitization');
+  // Only show warning in development mode
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('DOMPurify not available, using basic HTML sanitization');
+  }
 }
 
 /**

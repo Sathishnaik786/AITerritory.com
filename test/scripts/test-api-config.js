@@ -8,21 +8,21 @@
 import fetch from 'node-fetch';
 
 const API_ENDPOINTS = [
-  'http://localhost:3003/api/tools',
-  'http://localhost:3003/api/blogs',
-  'http://localhost:3003/api/categories',
-  'http://localhost:3003/api/tags',
-  'http://localhost:3003/api/prompts',
-  'http://localhost:3003/api/testimonials',
+  'http://localhost:3001/api/tools',
+  'http://localhost:3001/api/blogs',
+  'http://localhost:3001/api/categories',
+  'http://localhost:3001/api/tags',
+  'http://localhost:3001/api/prompts',
+  'http://localhost:3001/api/testimonials',
 ];
 
 const PROXY_ENDPOINTS = [
-  'http://localhost:8080/api/tools',
-  'http://localhost:8080/api/blogs',
-  'http://localhost:8080/api/categories',
-  'http://localhost:8080/api/tags',
-  'http://localhost:8080/api/prompts',
-  'http://localhost:8080/api/testimonials',
+  'http://localhost:3007/api/tools',
+  'http://localhost:3007/api/blogs',
+  'http://localhost:3007/api/categories',
+  'http://localhost:3007/api/tags',
+  'http://localhost:3007/api/prompts',
+  'http://localhost:3007/api/testimonials',
 ];
 
 async function testEndpoint(url, description) {
@@ -56,7 +56,7 @@ async function runTests() {
     await testEndpoint(endpoint, 'Direct Backend');
   }
   
-  console.log('\n🌐 Proxy Tests (localhost:8080):');
+  console.log('\n🌐 Proxy Tests (localhost:3007):');
   for (const endpoint of PROXY_ENDPOINTS) {
     await testEndpoint(endpoint, 'Proxy');
   }
@@ -67,8 +67,8 @@ async function runTests() {
   console.log('  Platform:', process.platform);
   
   console.log('\n💡 Recommendations:');
-  console.log('  1. If direct backend tests fail: Check if backend server is running on port 3003');
-  console.log('  2. If proxy tests fail: Check Vite dev server configuration');
+  console.log('  1. If direct backend tests fail: Check if backend server is running on port 3001');
+  console.log('  2. If proxy tests fail: Check Vite dev server configuration on port 3007');
   console.log('  3. If both fail: Check network connectivity and firewall settings');
   console.log('  4. For CORS issues: Ensure backend has proper CORS headers');
 }

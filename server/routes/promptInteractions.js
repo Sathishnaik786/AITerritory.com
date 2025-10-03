@@ -14,6 +14,7 @@ router.post('/shares', promptInteractionsController.addPromptShare);
 // Prompt Comments routes
 router.get('/comments/:promptId', promptInteractionsController.getPromptComments);
 router.post('/comments', promptInteractionsController.addPromptComment);
+router.put('/comments/:commentId', promptInteractionsController.updatePromptComment);
 router.delete('/comments/:commentId', promptInteractionsController.removePromptComment);
 
 module.exports = router;

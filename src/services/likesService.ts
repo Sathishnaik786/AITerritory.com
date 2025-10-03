@@ -1,7 +1,7 @@
 import { supabase } from './supabaseClient';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3003/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export interface LikeResponse {
   success: boolean;
@@ -45,8 +45,6 @@ export class LikesService {
   // Add a like to a tool
   static async addLike(toolId: string, userId?: string): Promise<LikeResponse> {
     try {
-      console.log(`❤️ Adding like for tool: ${toolId}, user: ${userId || 'anonymous'}`);
-      
       const response = await fetch(`${API_BASE_URL}/likes/${toolId}`, {
         method: 'POST',
         headers: {
@@ -55,8 +53,6 @@ export class LikesService {
         body: JSON.stringify({ userId }),
       });
 
-      console.log(`📡 Add like response status: ${response.status}`);
-
       if (!response.ok) {
         const errorData = await response.json();
         console.error('❌ Add like error:', errorData);
@@ -64,7 +60,6 @@ export class LikesService {
       }
 
       const result = await response.json();
-      console.log(`✅ Like added successfully:`, result);
       return result;
     } catch (error) {
       console.error('❌ Error adding like:', error);
@@ -75,8 +70,6 @@ export class LikesService {
   // Remove a like from a tool
   static async removeLike(toolId: string, userId?: string): Promise<LikeResponse> {
     try {
-      console.log(`💔 Removing like for tool: ${toolId}, user: ${userId || 'anonymous'}`);
-      
       const response = await fetch(`${API_BASE_URL}/likes/${toolId}`, {
         method: 'DELETE',
         headers: {
@@ -85,8 +78,6 @@ export class LikesService {
         body: JSON.stringify({ userId }),
       });
 
-      console.log(`📡 Remove like response status: ${response.status}`);
-
       if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ Remove like error:', errorText);
@@ -94,7 +85,6 @@ export class LikesService {
       }
 
       const result = await response.json();
-      console.log(`✅ Like removed successfully:`, result);
       return result;
     } catch (error) {
       console.error('❌ Error removing like:', error);
@@ -107,8 +97,6 @@ export class LikesService {
     if (!userId) return false;
 
     try {
-      console.log(`🔍 Checking if user ${userId} liked tool ${toolId}`);
-      
       const response = await fetch(`${API_BASE_URL}/likes/${toolId}/user/${userId}`);
       console.log(`📡 Check user like response status: ${response.status}`);
       
@@ -129,20 +117,17 @@ export class LikesService {
 
   // Subscribe to real-time like changes for a tool
   static subscribeToLikes(toolId: string, callback: (count: number) => void) {
-    console.log(`📡 Subscribing to real-time likes for tool: ${toolId}`);
-    
     const subscription = supabase
       .channel(`likes-${toolId}`)
       .on(
         'postgres_changes',
         {
-          event: '*',
-          schema: 'public',
-          table: 'likes',
-          filter: `tool_id=eq.${toolId}`,
+          'event': '*',
+          'schema': 'public',
+          'table': 'likes',
+          'filter': `tool_id=eq.${toolId}`,
         },
         async (payload) => {
-          console.log(`🔄 Real-time like update received:`, payload);
           // Refetch the count when likes change
           const count = await this.getLikeCount(toolId);
           callback(count);
@@ -155,20 +140,17 @@ export class LikesService {
 
   // Subscribe to real-time like changes for multiple tools
   static subscribeToMultipleLikes(toolIds: string[], callback: (counts: Record<string, number>) => void) {
-    console.log(`📡 Subscribing to real-time likes for multiple tools:`, toolIds);
-    
     const subscription = supabase
       .channel(`likes-multiple-${toolIds.join('-')}`)
       .on(
         'postgres_changes',
         {
-          event: '*',
-          schema: 'public',
-          table: 'likes',
-          filter: `tool_id=in.(${toolIds.join(',')})`,
+          'event': '*',
+          'schema': 'public',
+          'table': 'likes',
+          'filter': `tool_id=in.(${toolIds.join(',')})`,
         },
         async (payload) => {
-          console.log(`🔄 Real-time multiple likes update received:`, payload);
           // Refetch counts for all tools when any like changes
           const counts: Record<string, number> = {};
           await Promise.all(

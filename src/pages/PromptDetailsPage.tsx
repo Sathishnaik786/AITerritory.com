@@ -7,7 +7,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Copy, Heart, MessageCircle, Share2, Check, ArrowLeft, Link as LinkIcon, ExternalLink } from 'lucide-react';
 import { getGeminiPrompts, getSEOGeminiPromptById } from '../services/geminiPromptsService';
 import { slugify } from '@/lib/slugify';
-import { getPromptLikes, addPromptLike, removePromptLike } from '../services/promptInteractionsService';
+import { useUser, SignInButton } from '@clerk/clerk-react';
+import { usePromptInteractions } from '../hooks/usePromptInteractions';
+import PromptCommentSection from '@/components/PromptCommentSection';
 import './GeminiPromptsPage.css';
 
 interface GeminiPrompt {
@@ -37,28 +39,29 @@ interface SEOData {
   canonical_url?: string;
 }
 
-// Define interaction data interface
-interface PromptLike {
-  id: string;
-  user_id: string;
-  created_at: string;
-}
-
 const PromptDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isSignedIn } = useUser();
+  const { 
+    likeCount, 
+    liked, 
+    toggleLike,
+    shareCount,
+    commentCount
+  } = usePromptInteractions(id || '');
+  
   const [prompt, setPrompt] = useState<GeminiPrompt | null>(null);
   const [seoData, setSeoData] = useState<SEOData | null>(null);
   const [relatedPrompts, setRelatedPrompts] = useState<GeminiPrompt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
   const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
   const shareDropdownRef = useRef<HTMLDivElement>(null);
-
+  const [isCommentSectionOpen, setIsCommentSectionOpen] = useState(false);
+  
   // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -112,7 +115,6 @@ const PromptDetailsPage = () => {
         const data: SEOData = await getSEOGeminiPromptById(actualId);
         console.log('SEO data fetched:', data);
         setSeoData(data);
-        setLikeCount(data.likes || 0);
       } catch (error) {
         console.error('Failed to fetch SEO data:', error);
         // Don't set error here as we can still show the prompt without SEO data
@@ -121,31 +123,6 @@ const PromptDetailsPage = () => {
 
     if (id) {
       fetchSEOData();
-    }
-  }, [id]);
-
-  // Fetch prompt likes to determine if current user has liked it
-  useEffect(() => {
-    const fetchPromptLikes = async () => {
-      const actualId = extractId(id);
-      console.log('Fetching likes for ID:', actualId);
-      
-      if (!actualId) return;
-
-      try {
-        const likes: PromptLike[] = await getPromptLikes(actualId);
-        console.log('Likes fetched:', likes);
-        setLikeCount(likes.length);
-        // In a real implementation, you would check if the current user has liked the prompt
-        // For now, we'll just set it to false
-        setIsLiked(false);
-      } catch (error) {
-        console.error('Failed to fetch prompt likes:', error);
-      }
-    };
-
-    if (id) {
-      fetchPromptLikes();
     }
   }, [id]);
 
@@ -234,26 +211,17 @@ const PromptDetailsPage = () => {
     const actualId = extractId(id);
     if (!actualId || !prompt) return;
 
+    if (!isSignedIn) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to like this prompt.",
+      });
+      return;
+    }
+
     try {
-      if (isLiked) {
-        // Remove like
-        await removePromptLike(actualId, 'current_user_id'); // Replace with actual user ID
-        setIsLiked(false);
-        setLikeCount(prev => Math.max(0, prev - 1));
-        toast({
-          title: "Unliked",
-          description: "Prompt removed from favorites",
-        });
-      } else {
-        // Add like
-        await addPromptLike(actualId, 'current_user_id'); // Replace with actual user ID
-        setIsLiked(true);
-        setLikeCount(prev => prev + 1);
-        toast({
-          title: "Liked!",
-          description: "Prompt added to favorites",
-        });
-      }
+      // @ts-ignore - toggleLike might be undefined
+      toggleLike();
     } catch (error) {
       console.error('Error updating like status:', error);
       toast({
@@ -262,7 +230,7 @@ const PromptDetailsPage = () => {
         variant: "destructive",
       });
     }
-  }, [isLiked, prompt, id, toast]);
+  }, [isSignedIn, prompt, id, toast, toggleLike]);
 
   const handleSharePrompt = useCallback(async () => {
     if (!prompt) return;
@@ -680,16 +648,39 @@ ${url}`);
               </div>
               
               <div className="flex space-x-2">
+                {/* Like Button */}
+                {isSignedIn ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLikePrompt}
+                  >
+                    <Heart className={`h-4 w-4 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
+                    <span className="ml-2">{likeCount}</span>
+                  </Button>
+                ) : (
+                  <SignInButton mode="modal">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Heart className="h-4 w-4" />
+                      <span className="ml-2">{likeCount}</span>
+                    </Button>
+                  </SignInButton>
+                )}
+                
+                {/* Comment Button */}
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleLikePrompt}
+                  onClick={() => setIsCommentSectionOpen(true)}
                 >
-                  <Heart className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-                  <span className="ml-2">{likeCount}</span>
+                  <MessageCircle className="h-4 w-4" />
+                  <span className="ml-2">{commentCount}</span>
                 </Button>
                 
-                {/* Enhanced Share Button with Dropdown */}
+                {/* Enhanced Share Button with Dropdown - now shows share count */}
                 <div className="relative" ref={shareDropdownRef}>
                   <Button
                     variant="outline"
@@ -700,6 +691,7 @@ ${url}`);
                     }}
                   >
                     <Share2 className="h-4 w-4" />
+                    <span className="ml-2">{shareCount}</span>
                   </Button>
                   
                   {/* Social Media Sharing Dropdown */}
@@ -809,6 +801,11 @@ ${url}`);
             </div>
           </CardContent>
         </Card>
+
+        {/* Comment Section */}
+        <div className="mt-8">
+          <PromptCommentSection promptId={id || ''} />
+        </div>
 
         {/* Related Prompts Section */}
         {relatedPrompts.length > 0 && (
