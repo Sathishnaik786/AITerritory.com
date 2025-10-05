@@ -17,8 +17,9 @@ Before deploying, ensure all environment variables are properly set in your Rend
 ```
 NODE_ENV=production
 PORT=3000
-VITE_CLERK_PUBLISHABLE_KEY=your_production_key
-VITE_CLERK_SECRET_KEY=your_production_key
+# Clerk Authentication (replace with your actual production keys from Clerk dashboard)
+VITE_CLERK_PUBLISHABLE_KEY=pk_live_YOUR_ACTUAL_PUBLISHABLE_KEY_HERE
+VITE_CLERK_SECRET_KEY=sk_live_YOUR_ACTUAL_SECRET_KEY_HERE
 VITE_API_BASE_URL=https://your-app.onrender.com/api
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_key

@@ -50,9 +50,10 @@ dist-ssr
 *.sw?
 .env
 # Environment variables
-.env
 .env.*
 !.env.example
+!.env.development
+!.env.production
 
 # Dependencies
 node_modules/

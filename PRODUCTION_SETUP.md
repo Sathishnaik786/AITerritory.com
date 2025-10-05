@@ -17,7 +17,9 @@ You're currently seeing the "Using Clerk development keys in production" warning
    - Navigate to your service settings
    - Update the environment variables:
      - `VITE_CLERK_PUBLISHABLE_KEY`: Your production publishable key (should start with pk_live_)
-     - `VITE_CLERK_SECRET_KEY`: Your production secret key (should start with sk_live_)
+     - `VITE_CLERK_SECRET_KEY`: Your production secret key (should start with sk_live_
+
+   Note: These keys should match the ones in your `.env.production` file and also be set in your deployment platform (Netlify/Render) environment variables.
 
 3. **Redeploy Your Application:**
    After updating the keys, trigger a new deployment.
