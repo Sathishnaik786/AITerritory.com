@@ -156,10 +156,45 @@ const PromptCard = memo(({
 
   // New function to handle sharing to specific platforms
   const handlePlatformShare = useCallback(async (platform: string) => {
-    const title = `Gemini ${prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)} Prompt`;
-    const text = prompt.prompt.substring(0, 160);
-    const url = `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`;
-    const imageUrl = prompt.image_url || 'https://aiterritory.org/assets/og-default.png';
+    // Generate SEO title based on category
+    let seoTitle;
+    switch (prompt.category.toLowerCase()) {
+      case 'men':
+        seoTitle = `Gemini Men's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+        break;
+      case 'women':
+        seoTitle = `Gemini Women's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+        break;
+      case 'couple':
+        seoTitle = `Gemini Couple's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+        break;
+      default:
+        seoTitle = `Gemini Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+    }
+
+    // Truncate description for SEO (150 characters as requested)
+    const seoDescription = prompt.prompt.length > 150 
+      ? prompt.prompt.substring(0, 147) + '...' 
+      : prompt.prompt;
+
+    // Use prompt image, fallback to dynamic OG image, or default
+    const seoImage = prompt.image_url && prompt.image_url.trim() !== '' 
+      ? prompt.image_url 
+      : `https://aiterritory-com.onrender.com/api/og/prompts/${prompt.id}`;
+
+    // Generate canonical URL
+    const slug = prompt.prompt.substring(0, 50).toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '') || prompt.id;
+      
+    const canonicalUrl = `https://aiterritory.org/gemini-prompts/${prompt.category}/${slug}-${prompt.id}`;
+    
+    const title = seoTitle;
+    const text = seoDescription;
+    const url = canonicalUrl;
+    const imageUrl = seoImage;
     
     // Close the dropdown after selecting a platform
     setIsShareDropdownOpen(false);
@@ -203,7 +238,7 @@ ${text}`)}`, '_blank');
         case 'twitter':
           window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title}
 
-${text}`)}&url=${encodeURIComponent(url)}`, '_blank');
+${text}`)}&url=${encodeURIComponent(url)}&image=${encodeURIComponent(imageUrl)}`, '_blank');
           break;
         case 'copy':
           await navigator.clipboard.writeText(`${title}

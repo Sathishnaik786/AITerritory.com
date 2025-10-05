@@ -269,10 +269,30 @@ ${shareData.url}`);
   const handlePlatformShare = useCallback(async (platform: string) => {
     if (!prompt) return;
     
-    const title = seoData?.title || 'Gemini Prompt';
-    const text = seoData?.description || prompt.prompt.substring(0, 160);
-    const url = window.location.href;
-    const imageUrl = seoData?.image_url || prompt.image_url || 'https://aiterritory.org/assets/og-default.png';
+    // Use SEO data if available, otherwise fallback to client-side generation
+    const seoTitle = seoData?.title || (() => {
+      switch (prompt.category.toLowerCase()) {
+        case 'men': return `Gemini Men's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+        case 'women': return `Gemini Women's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+        case 'couple': return `Gemini Couple's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+        default: return `Gemini Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+      }
+    })();
+
+    const seoDescription = seoData?.description || (prompt.prompt.length > 150 
+      ? prompt.prompt.substring(0, 147) + '...' 
+      : prompt.prompt) || `Explore AI prompt: ${seoTitle}. Generate stunning outputs with Gemini prompts. Free & creative AI inspiration.`;
+
+    const seoImage = seoData?.image_url || (prompt.image_url && prompt.image_url.trim() !== '' 
+      ? prompt.image_url 
+      : `https://aiterritory-com.onrender.com/api/og/prompts/${prompt.id}`);
+
+    const canonicalUrl = seoData?.canonical_url || `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`;
+    
+    const title = seoTitle;
+    const text = seoDescription;
+    const url = canonicalUrl;
+    const imageUrl = seoImage;
     
     // Close the dropdown after selecting a platform
     setIsShareDropdownOpen(false);
@@ -313,7 +333,7 @@ ${text}`)}`, '_blank');
         case 'twitter':
           window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title}
 
-${text}`)}&url=${encodeURIComponent(url)}`, '_blank');
+${text}`)}&url=${encodeURIComponent(url)}&image=${encodeURIComponent(imageUrl)}`, '_blank');
           break;
         case 'copy':
           await navigator.clipboard.writeText(`${title}
