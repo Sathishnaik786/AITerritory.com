@@ -20,6 +20,7 @@ import { Review } from '../types/review';
 import { FaXTwitter, FaLinkedin, FaWhatsapp, FaFacebook } from 'react-icons/fa6';
 import { trackToolLike, trackToolBookmark, trackShare, trackCommentPosted } from '@/lib/analytics';
 import { toolInteractions } from '@/services/unifiedInteractionsService';
+import { ShareButton } from '@/components/ShareButton';
 
 const ToolDetailsPage: React.FC = () => {
   // All hooks at the top!
@@ -37,7 +38,6 @@ const ToolDetailsPage: React.FC = () => {
   const [tool, setTool] = useState<Tool | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [recentBlogs, setRecentBlogs] = useState<any[]>([]);
@@ -409,24 +409,31 @@ const ToolDetailsPage: React.FC = () => {
               </div>
               {/* Action Buttons (optional, as before) */}
               <div className="flex items-center gap-6 border-t border-b py-2 mb-2">
-                <button className="flex items-center gap-1 text-blue-700 hover:underline text-sm font-medium" onClick={() => setShareDialogOpen(true)}>
-                  {/* Share icon here */} Share
-                </button>
+                {/* Share button using our new ShareButton component */}
+                <ShareButton
+                  url={window.location.href}
+                  title={tool.name}
+                  description={tool.description}
+                  image={tool.image_url}
+                  variant="inline"
+                  onShare={(platform) => {
+                    // Track the share event
+                    trackShare(
+                      platform as 'twitter' | 'facebook' | 'linkedin' | 'whatsapp' | 'copy',
+                      'tool',
+                      toolId,
+                      tool?.name,
+                      user?.id
+                    );
+                  }}
+                />
                 <button className="flex items-center gap-1 text-blue-700 hover:underline text-sm font-medium" onClick={handleBookmarkToggle}>
                   {/* Save icon here */} Save
                 </button>
                 <button className="flex items-center gap-1 text-blue-700 hover:underline text-sm font-medium">
                   {/* Comment icon here */} Comment {comments.length}
                 </button>
-            </div>
-              <ShareDialog
-                open={shareDialogOpen}
-                onClose={() => setShareDialogOpen(false)}
-                title={tool.name}
-                description={tool.description}
-                image={tool.image_url}
-                url={window.location.href}
-              />
+              </div>
             </div>
           </motion.section>
 

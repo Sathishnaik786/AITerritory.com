@@ -11,6 +11,7 @@ import { toast } from '../ui/sonner';
 import DOMPurify from 'dompurify';
 import { trackShare } from '@/lib/analytics';
 import { ContentRenderer } from '../ContentRenderer';
+import ShareButton from '../ShareButton';
 
 type Author = {
   name?: string;
@@ -48,13 +49,9 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
   slug,
   commentsCount = 0,
 }) => {
-
-
   const { user, isSignedIn } = useUser();
   const [copied, setCopied] = useState(false);
-  const [showShareOptions, setShowShareOptions] = useState(false);
-  const shareRef = useRef<HTMLDivElement>(null);
-
+  
   // Initialize likes and bookmarks with the same hook used in BlogCard
   const {
     likeCount,
@@ -98,7 +95,7 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
       default:
         break;
     }
-    setShowShareOptions(false);
+    // setShowShareOptions(false); // Removed as we're using the new ShareButton component
   };
 
   const scrollToComments = () => {
@@ -264,65 +261,24 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
             </div>
 
             {/* Share Button */}
-            <div className="relative" ref={shareRef}>
-              <button
-                onClick={() => setShowShareOptions(!showShareOptions)}
-                className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 rounded-full transition-colors"
-                aria-label="Share options"
-                aria-expanded={showShareOptions}
-              >
-                <FaShare className="w-5 h-5" />
-                <span className="text-sm font-medium">Share</span>
-              </button>
+            <ShareButton
+              url={typeof window !== 'undefined' ? window.location.href : ''}
+              title={title}
+              description={description || ''}
+              image={coverImage}
+              variant="dropdown"
+              onShare={(platform) => {
+                // Track the share event
+                trackShare(
+                  platform as 'twitter' | 'facebook' | 'linkedin' | 'whatsapp' | 'copy',
+                  'blog',
+                  slug,
+                  title,
+                  user?.id
+                );
+              }}
+            />
 
-              {/* Share Options Dropdown */}
-              {showShareOptions && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
-                >
-                  <div className="p-2">
-                    <button
-                      onClick={() => handleShare('twitter')}
-                      className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                    >
-                      <FaXTwitter className="w-5 h-5 mr-3 text-blue-400" />
-                      <span>X (Twitter)</span>
-                    </button>
-                    <button
-                      onClick={() => handleShare('facebook')}
-                      className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                    >
-                      <FaFacebook className="w-5 h-5 mr-3 text-blue-600" />
-                      <span>Facebook</span>
-                    </button>
-                    <button
-                      onClick={() => handleShare('linkedin')}
-                      className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                    >
-                      <FaLinkedin className="w-5 h-5 mr-3 text-blue-700" />
-                      <span>LinkedIn</span>
-                    </button>
-                    <button
-                      onClick={() => handleShare('whatsapp')}
-                      className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                    >
-                      <FaWhatsapp className="w-5 h-5 mr-3 text-green-500" />
-                      <span>WhatsApp</span>
-                    </button>
-                    <button
-                      onClick={() => handleShare('copy')}
-                      className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                    >
-                      <FiLink className="w-5 h-5 mr-3 text-gray-500" />
-                      <span>{copied ? 'Copied!' : 'Copy Link'}</span>
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </div>
           </div>
         </header>
 
