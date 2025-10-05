@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Heart, MessageCircle, Share2, Check, ArrowLeft, Link as LinkIcon, ExternalLink } from 'lucide-react';
+import { Copy, Heart, MessageCircle, Share2, Check, ArrowLeft, Link as LinkIcon, ExternalLink, Home } from 'lucide-react';
 import { getGeminiPrompts, getSEOGeminiPromptById } from '../services/geminiPromptsService';
 import { slugify } from '@/lib/slugify';
 import { useUser, SignInButton } from '@clerk/clerk-react';
@@ -375,42 +375,113 @@ ${url}`);
     );
   }
 
-  if (error) {
+  // Handle error or missing prompt cases with meaningful content for SEO (avoiding Soft 404)
+  if (error || !prompt) {
+    // Generate fallback SEO data
+    const fallbackTitle = "Prompt Not Found | AI Territory";
+    const fallbackDescription = "The AI prompt you're looking for couldn't be found. Explore our collection of high-quality Gemini prompts for men, women, and couples to enhance your AI experience. Discover creative and effective prompts for various use cases.";
+    const fallbackImage = "https://aiterritory.org/og-default.png";
+    const fallbackCanonical = `https://aiterritory.org/gemini-prompts${id ? `/${id}` : ''}`;
+    
     return (
       <div className="container mx-auto py-8 px-4">
         <Helmet>
-          <title>Prompt Not Found | AITerritory</title>
-          <meta name="robots" content="noindex, nofollow" />
-          <meta name="description" content="The requested prompt could not be found." />
+          <title>{fallbackTitle}</title>
+          <meta name="description" content={fallbackDescription} />
+          <meta name="robots" content="index, follow" />
+          <link rel="canonical" href={fallbackCanonical} />
+          
+          {/* OpenGraph */}
+          <meta property="og:title" content={fallbackTitle} />
+          <meta property="og:description" content={fallbackDescription} />
+          <meta property="og:image" content={fallbackImage} />
+          <meta property="og:url" content={fallbackCanonical} />
+          <meta property="og:type" content="website" />
+          
+          {/* Twitter Card */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={fallbackTitle} />
+          <meta name="twitter:description" content={fallbackDescription} />
+          <meta name="twitter:image" content={fallbackImage} />
+          
+          {/* JSON-LD - WebPage Schema */}
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebPage",
+              "name": fallbackTitle,
+              "description": fallbackDescription,
+              "url": fallbackCanonical,
+              "image": fallbackImage,
+              "publisher": {
+                "@type": "Organization",
+                "name": "AITerritory",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://aiterritory.org/assets/logo.png"
+                }
+              }
+            })}
+          </script>
         </Helmet>
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold mb-4">Error Loading Prompt</h1>
-          <p className="mb-6 text-red-500">{error}</p>
-          <Button onClick={() => navigate('/gemini-prompts')}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Prompts
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!prompt) {
-    return (
-      <div className="container mx-auto py-8 px-4">
-        <Helmet>
-          <title>Prompt Not Found | AITerritory</title>
-          <meta name="robots" content="noindex, nofollow" />
-          <meta name="description" content="The requested prompt could not be found." />
-        </Helmet>
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold mb-4">Prompt Not Found</h1>
-          <p className="mb-6">The prompt you're looking for doesn't exist or has been removed.</p>
-          <p className="mb-6 text-sm text-gray-500">ID: {id}</p>
-          <Button onClick={() => navigate('/gemini-prompts')}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Prompts
-          </Button>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center py-12">
+            <h1 className="text-3xl font-bold mb-6">Prompt Not Found</h1>
+            <p className="mb-6 text-lg text-gray-700 dark:text-gray-300">
+              {error || "The AI prompt you're looking for couldn't be found. Don't worry, we have many other great prompts for you to explore!"}
+            </p>
+            
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-8 max-w-2xl mx-auto">
+              <h2 className="text-xl font-semibold mb-4 text-blue-800 dark:text-blue-200">Explore Our AI Prompts</h2>
+              <p className="mb-4 text-gray-700 dark:text-gray-300">
+                Discover our extensive collection of high-quality Gemini prompts designed to help you get the most out of AI tools. 
+                Whether you're looking for creative inspiration, productivity boosters, or specialized use cases, we have prompts for every need.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <Link to="/gemini-prompts/men" className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">Men's Prompts</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Prompts tailored for men's interests and needs</p>
+                </Link>
+                <Link to="/gemini-prompts/women" className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-semibold text-pink-600 dark:text-pink-400 mb-2">Women's Prompts</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Creative prompts for women's unique perspectives</p>
+                </Link>
+                <Link to="/gemini-prompts/couple" className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700">
+                  <h3 className="font-semibold text-purple-600 dark:text-purple-400 mb-2">Couple's Prompts</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Prompts for couples to explore together</p>
+                </Link>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+              <Button onClick={() => navigate('/gemini-prompts')} className="flex items-center justify-center">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Browse All Prompts
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/')} className="flex items-center justify-center">
+                <Home className="mr-2 h-4 w-4" />
+                Homepage
+              </Button>
+            </div>
+            
+            <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4">Popular Prompt Categories</h3>
+              <div className="flex flex-wrap justify-center gap-2">
+                <Link to="/gemini-prompts/men" className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
+                  Men
+                </Link>
+                <Link to="/gemini-prompts/women" className="px-4 py-2 bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-200 rounded-full hover:bg-pink-200 dark:hover:bg-pink-800 transition-colors">
+                  Women
+                </Link>
+                <Link to="/gemini-prompts/couple" className="px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 rounded-full hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors">
+                  Couple
+                </Link>
+                <Link to="/gemini-prompts" className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                  All Prompts
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -428,13 +499,16 @@ ${url}`);
 
   const seoDescription = seoData?.description || (prompt.prompt.length > 150 
     ? prompt.prompt.substring(0, 147) + '...' 
-    : prompt.prompt);
+    : prompt.prompt) || `Explore AI prompt: ${seoTitle}. Generate stunning outputs with Gemini prompts. Free & creative AI inspiration.`;
 
-  const canonicalUrl = seoData?.canonical_url || `https://www.aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`;
+  const canonicalUrl = seoData?.canonical_url || `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`;
 
   const seoImage = seoData?.image_url || (prompt.image_url && prompt.image_url.trim() !== '' 
     ? prompt.image_url 
     : `https://aiterritory-com.onrender.com/api/og/prompts/${prompt.id}`);
+
+  // Generate keywords for SEO
+  const keywords = `${prompt.category}, ${seoTitle}, AI prompts, AITerritory`;
 
   // Determine if this prompt should be indexed based on content quality
   const shouldIndex = () => {
@@ -460,13 +534,13 @@ ${url}`);
   return (
     <div className="container mx-auto py-8 px-4">
       <Helmet>
-        <title>{seoTitle}</title>
+        <title>{seoTitle} | Gemini Prompts | AITerritory</title>
         <meta name="description" content={seoDescription} />
         <meta httpEquiv="last-modified" content={prompt.created_at} />
         <link rel="canonical" href={canonicalUrl} />
         
         {/* Enhanced SEO metadata */}
-        <meta name="keywords" content={`gemini prompt, ${prompt.category} prompt, AI prompt, artificial intelligence, prompt engineering, ${prompt.category.toLowerCase()} AI prompts`} />
+        <meta name="keywords" content={keywords} />
         <meta name="author" content={prompt.submitter_name || 'AI Territory Community'} />
         <meta name="article:section" content={`${prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)} Prompts`} />
         <meta name="article:tag" content={`${prompt.category} prompts`} />
@@ -479,7 +553,7 @@ ${url}`);
         )}
 
         {/* OpenGraph */}
-        <meta property="og:title" content={seoTitle} />
+        <meta property="og:title" content={`${seoTitle} | Gemini Prompts`} />
         <meta property="og:description" content={seoDescription} />
         <meta property="og:image" content={seoImage} />
         <meta property="og:url" content={canonicalUrl} />
@@ -487,7 +561,7 @@ ${url}`);
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={seoTitle} />
+        <meta name="twitter:title" content={`${seoTitle} | Gemini Prompts`} />
         <meta name="twitter:description" content={seoDescription} />
         <meta name="twitter:image" content={seoImage} />
 
@@ -563,32 +637,16 @@ ${url}`);
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "CreativeWork",
-            "headline": seoTitle,
+            "name": seoTitle,
             "description": seoDescription,
             "image": seoImage,
             "author": {
               "@type": "Organization",
               "name": "AITerritory"
             },
-            "genre": prompt.category,
             "datePublished": prompt.created_at,
-            "interactionStatistic": [
-              {
-                "@type": "InteractionCounter",
-                "interactionType": "https://schema.org/LikeAction",
-                "userInteractionCount": likeCount
-              },
-              {
-                "@type": "InteractionCounter",
-                "interactionType": "https://schema.org/CommentAction",
-                "userInteractionCount": seoData?.comments || 0
-              },
-              {
-                "@type": "InteractionCounter",
-                "interactionType": "https://schema.org/ShareAction",
-                "userInteractionCount": seoData?.shares || 0
-              }
-            ]
+            "dateModified": prompt.created_at,
+            "keywords": keywords
           })}
         </script>
       </Helmet>

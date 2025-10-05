@@ -36,17 +36,7 @@ const staticPages = [
   { url: '/gemini-prompts/men', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
   { url: '/gemini-prompts/women', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
   { url: '/gemini-prompts/couple', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
-  { url: '/gemini-prompts/all', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.8' },
-  { url: '/about', lastmod: '2024-01-01', changefreq: 'monthly', priority: '0.8' },
-  { url: '/contact', lastmod: '2024-01-01', changefreq: 'monthly', priority: '0.8' },
-  { url: '/privacy', lastmod: '2024-01-01', changefreq: 'yearly', priority: '0.5' },
-  { url: '/terms', lastmod: '2024-01-01', changefreq: 'yearly', priority: '0.5' },
-  
-  // Company pages
-  { url: '/company/contact-us', lastmod: '2025-01-15', changefreq: 'monthly', priority: '0.8' },
-  { url: '/company/submit-tool', lastmod: '2025-01-15', changefreq: 'weekly', priority: '0.7' },
-  { url: '/company/advertise', lastmod: '2025-01-15', changefreq: 'monthly', priority: '0.6' },
-  { url: '/company/youtube-channel', lastmod: '2025-01-15', changefreq: 'monthly', priority: '0.6' },
+  // Removed /gemini-prompts/all as it's redundant with /gemini-prompts
   
   // Tool category pages
   { url: '/all-ai-tools', lastmod: '2025-01-15', changefreq: 'daily', priority: '0.9' },
@@ -61,6 +51,22 @@ const staticPages = [
   { url: '/resources/ai-tutorials', lastmod: '2025-01-15', changefreq: 'weekly', priority: '0.7' },
   { url: '/resources/ai-innovation', lastmod: '2025-01-15', changefreq: 'weekly', priority: '0.7' },
   { url: '/resources/ai-agents', lastmod: '2025-01-15', changefreq: 'weekly', priority: '0.7' },
+  
+  // Company pages
+  { url: '/company/contact-us', lastmod: '2025-01-15', changefreq: 'monthly', priority: '0.8' },
+  { url: '/company/submit-tool', lastmod: '2025-01-15', changefreq: 'weekly', priority: '0.7' },
+  { url: '/company/advertise', lastmod: '2025-01-15', changefreq: 'monthly', priority: '0.6' },
+  { url: '/company/youtube-channel', lastmod: '2025-01-15', changefreq: 'monthly', priority: '0.6' },
+  
+  // Removed pages that should be excluded from sitemap:
+  // - /terms
+  // - /privacy
+  // - /contact
+  // - /about
+  // - /search*
+  // - /auth*
+  // - /settings*
+  // - /admin*
 ];
 
 // Simple slugify function
@@ -97,15 +103,40 @@ async function fetchBlogPosts() {
   }
 }
 
+// Fetch unique categories for Gemini prompts
+async function fetchGeminiPromptCategories() {
+  try {
+    const { data: categories, error } = await supabase
+      .from('gemini_prompts')
+      .select('category')
+      .not('prompt', 'is', null)
+      .order('category');
+
+    if (error) throw error;
+    
+    // Extract unique categories
+    const uniqueCategories = [...new Set(categories.map(item => item.category).filter(cat => cat))];
+    
+    // Map to sitemap entries
+    return uniqueCategories.map(category => ({
+      url: `/gemini-prompts/${category}`,
+      lastmod: new Date().toISOString().split('T')[0],
+      changefreq: 'daily',
+      priority: '0.8',
+    }));
+  } catch (error) {
+    console.error('Error fetching Gemini prompt categories:', error);
+    return [];
+  }
+}
+
 // Fetch high-quality Gemini prompts from Supabase
 async function fetchGeminiPrompts() {
   try {
     const { data: prompts, error } = await supabase
       .from('gemini_prompts')
-      .select('id, prompt, category, created_at, status, submitted_via, submitter_name')
-      .eq('status', 'published')
+      .select('id, prompt, category, created_at')
       .not('prompt', 'is', null)
-      .gte('length(prompt)', 30) // Only prompts with meaningful content
       .order('created_at', { ascending: false })
       .limit(100); // Increased limit for better coverage
 
@@ -124,11 +155,7 @@ async function fetchGeminiPrompts() {
                                    !isPlaceholder && 
                                    prompt.prompt.trim().length > 0;
         
-        // Check if not test data
-        const isNotTestData = prompt.submitted_via !== 'test' && 
-                             prompt.submitted_via !== 'demo';
-        
-        return hasMeaningfulContent && isNotTestData;
+        return hasMeaningfulContent;
       })
       .map(prompt => {
         // Create a slug from the first 50 characters of the prompt
@@ -137,7 +164,7 @@ async function fetchGeminiPrompts() {
           url: `/gemini-prompts/${prompt.category}/${promptSlug}-${prompt.id}`,
           lastmod: prompt.created_at,
           changefreq: 'weekly', // More frequent updates for prompts
-          priority: '0.6', // Higher priority for quality prompts
+          priority: '0.7', // Higher priority for quality prompts
         };
       });
   } catch (error) {
@@ -178,8 +205,11 @@ async function generateAndSaveSitemap() {
     const blogPosts = await fetchBlogPosts();
     const geminiPrompts = await fetchGeminiPrompts();
     
+    // Fetch dynamic categories
+    const geminiCategories = await fetchGeminiPromptCategories();
+    
     // Combine static and dynamic pages
-    const allPages = [...staticPages, ...blogPosts, ...geminiPrompts];
+    const allPages = [...staticPages, ...blogPosts, ...geminiCategories, ...geminiPrompts];
     
     // Generate the sitemap XML
     const sitemap = generateSitemap(allPages);

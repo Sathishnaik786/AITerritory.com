@@ -13,16 +13,22 @@ router.get('/prompts/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Fetch the prompt from the database
+    // Fetch the prompt from the database including image_url
     const { data: prompt, error } = await supabase
       .from('gemini_prompts')
-      .select('prompt, category')
+      .select('prompt, category, image_url')
       .eq('id', id)
       .single();
       
     if (error || !prompt) {
       // Fallback to default image if prompt not found
       return res.redirect('/og-default.png');
+    }
+    
+    // If prompt has an image_url, redirect to it
+    if (prompt.image_url && prompt.image_url.trim() !== '') {
+      // Redirect to the prompt's image
+      return res.redirect(prompt.image_url);
     }
     
     const promptTitle = prompt.prompt.substring(0, 100) + (prompt.prompt.length > 100 ? '...' : '');
@@ -51,6 +57,9 @@ router.get('/prompts/:id', async (req, res) => {
         bgColor = '#8b5cf6'; // Purple for couple
         borderColor = '#a78bfa';
         break;
+      default:
+        bgColor = '#1e40af'; // Default blue
+        borderColor = '#3b82f6';
     }
     
     // Draw background

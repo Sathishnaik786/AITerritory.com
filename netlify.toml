@@ -172,22 +172,22 @@ path = "/ai-for-business*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# SEO Redirects - Force canonical domain (https://www.aiterritory.org/)
+# SEO Redirects - Force canonical domain (https://aiterritory.org/)
 [[redirects]]
   from = "http://aiterritory.org/*"
-  to = "https://www.aiterritory.org/:splat"
+  to = "https://aiterritory.org/:splat"
   status = 301
   force = true
 
 [[redirects]]
   from = "http://www.aiterritory.org/*"
-  to = "https://www.aiterritory.org/:splat"
+  to = "https://aiterritory.org/:splat"
   status = 301
   force = true
 
 [[redirects]]
-  from = "https://aiterritory.org/*"
-  to = "https://www.aiterritory.org/:splat"
+  from = "https://www.aiterritory.org/*"
+  to = "https://aiterritory.org/:splat"
   status = 301
   force = true
 
@@ -205,6 +205,12 @@ path = "/ai-for-business*"
 [[redirects]]
   from = "/company/skill-leap"
   to = "/"
+  status = 301
+
+# Redirect /contact to /company/contact-us
+[[redirects]]
+  from = "/contact"
+  to = "/company/contact-us"
   status = 301
 
 # Handle SPA client-side routing

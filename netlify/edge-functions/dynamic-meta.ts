@@ -770,7 +770,7 @@ async function generateFullHtmlPage(path: string, apiData: any): Promise<string>
         if (apiData.canonical_url) {
           canonicalUrl = apiData.canonical_url;
         }
-      } else {
+       } else {
         metaTitle = apiData.title || apiData.name || metaTitle;
         metaImage = apiData.image_url || apiData.cover_image_url || metaImage;
         metaDescription = apiData.description || metaDescription;

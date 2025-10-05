@@ -724,7 +724,7 @@ const GeminiPromptsPage: React.FC = () => {
         <title>{pageMeta.title}</title>
         <meta name="description" content={pageMeta.description} />
         <meta name="keywords" content={pageMeta.keywords} />
-        <link rel="canonical" href={pageMeta.canonical || 'https://www.aiterritory.org/gemini-prompts'} />
+        <link rel="canonical" href={pageMeta.canonical || 'https://aiterritory.org/gemini-prompts'} />
         
         {/* Enhanced SEO metadata */}
         <meta name="author" content="AI Territory" />
@@ -736,7 +736,7 @@ const GeminiPromptsPage: React.FC = () => {
         <meta property="og:title" content={pageMeta.title} />
         <meta property="og:description" content={pageMeta.description} />
         <meta property="og:image" content={pageMeta.image || 'https://aiterritory.org/og-default.png'} />
-        <meta property="og:url" content={pageMeta.canonical || 'https://www.aiterritory.org/gemini-prompts'} />
+        <meta property="og:url" content={pageMeta.canonical || 'https://aiterritory.org/gemini-prompts'} />
         <meta property="og:type" content="website" />
         
         {/* Twitter Card */}
@@ -745,7 +745,7 @@ const GeminiPromptsPage: React.FC = () => {
         <meta name="twitter:description" content={pageMeta.description} />
         <meta name="twitter:image" content={pageMeta.image || 'https://aiterritory.org/og-default.png'} />
         
-        {/* JSON-LD */}
+        {/* JSON-LD - WebPage Schema */}
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -761,17 +761,27 @@ const GeminiPromptsPage: React.FC = () => {
                 "@type": "ImageObject",
                 "url": "https://aiterritory.org/assets/logo.png"
               }
-            },
-            "mainEntity": {
-              "@type": "ItemList",
-              "itemListElement": filteredPrompts.map((prompt, index) => ({
-                "@type": "CreativeWork",
-                "position": index + 1,
-                "name": `Gemini ${prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)} Prompt`,
-                "description": prompt.prompt.substring(0, 100) + (prompt.prompt.length > 100 ? '...' : ''),
-                "url": `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`
-              }))
             }
+          })}
+        </script>
+        
+        {/* JSON-LD - ItemList Schema for category pages */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Gemini Prompts`,
+            "description": pageMeta.description,
+            "url": pageMeta.canonical || 'https://aiterritory.org/gemini-prompts',
+            "numberOfItems": filteredPrompts.length,
+            "itemListElement": filteredPrompts.map((prompt, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "url": `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`,
+              "image": prompt.image_url && prompt.image_url.trim() !== '' 
+                ? prompt.image_url 
+                : `https://aiterritory-com.onrender.com/api/og/prompts/${prompt.id}`
+            }))
           })}
         </script>
       </Helmet>

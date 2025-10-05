@@ -19,51 +19,111 @@
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts</loc>
-      <lastmod>2025-09-18</lastmod>
+      <lastmod>2025-01-15</lastmod>
       <changefreq>daily</changefreq>
-      <priority>0.8</priority>
+      <priority>0.9</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men</loc>
-      <lastmod>2025-09-18</lastmod>
+      <lastmod>2025-01-15</lastmod>
       <changefreq>daily</changefreq>
-      <priority>0.7</priority>
+      <priority>0.8</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/women</loc>
-      <lastmod>2025-09-18</lastmod>
+      <lastmod>2025-01-15</lastmod>
       <changefreq>daily</changefreq>
-      <priority>0.7</priority>
+      <priority>0.8</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/couple</loc>
-      <lastmod>2025-09-18</lastmod>
+      <lastmod>2025-01-15</lastmod>
       <changefreq>daily</changefreq>
+      <priority>0.8</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/all-ai-tools</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.9</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/video-tools</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.8</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/categories/productivity-tools</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.8</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/categories/image-generators</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.8</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/categories/text-generators</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.8</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/resources</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
-      <loc>https://aiterritory.org/about</loc>
-      <lastmod>2024-01-01</lastmod>
+      <loc>https://aiterritory.org/resources/ai-automation</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/resources/ai-tutorials</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/resources/ai-innovation</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/resources/ai-agents</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/company/contact-us</loc>
+      <lastmod>2025-01-15</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
     </url>
     <url>
-      <loc>https://aiterritory.org/contact</loc>
-      <lastmod>2024-01-01</lastmod>
+      <loc>https://aiterritory.org/company/submit-tool</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/company/advertise</loc>
+      <lastmod>2025-01-15</lastmod>
       <changefreq>monthly</changefreq>
-      <priority>0.8</priority>
+      <priority>0.6</priority>
     </url>
     <url>
-      <loc>https://aiterritory.org/privacy</loc>
-      <lastmod>2024-01-01</lastmod>
-      <changefreq>yearly</changefreq>
-      <priority>0.5</priority>
-    </url>
-    <url>
-      <loc>https://aiterritory.org/terms</loc>
-      <lastmod>2024-01-01</lastmod>
-      <changefreq>yearly</changefreq>
-      <priority>0.5</priority>
+      <loc>https://aiterritory.org/company/youtube-channel</loc>
+      <lastmod>2025-01-15</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.6</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/blog/ai-agents-reshaping-2025-workflows</loc>
@@ -78,363 +138,621 @@
       <priority>0.9</priority>
     </url>
     <url>
-      <loc>https://aiterritory.org/gemini-prompts/women/convert-4k-hd-realistic-a-stunning-portrait-of-a-0f2145da-8b62-4f5c-b92d-f12b23b7df46</loc>
-      <lastmod>2025-09-17</lastmod>
-      <changefreq>monthly</changefreq>
+      <loc>https://aiterritory.org/gemini-prompts/all</loc>
+      <lastmod>2025-10-05</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.8</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple</loc>
+      <lastmod>2025-10-05</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.8</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/men</loc>
+      <lastmod>2025-10-05</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.8</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women</loc>
+      <lastmod>2025-10-05</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.8</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-studio-portrait-of-a-young-couple-seated-on-wood-6f136b6f-ff61-466c-a801-857d5868246f</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
-      <loc>https://aiterritory.org/gemini-prompts/all/with-the-person-in-image-casually-leaning-against-4524da54-95d1-45cf-8afb-59f6ac63b028</loc>
-      <lastmod>2025-09-17</lastmod>
-      <changefreq>monthly</changefreq>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-romantic-and-serene-portrait-of-a-couple-sitting-31ee7e14-b5f0-44dd-8fb8-55401d5f2e74</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
-      <loc>https://aiterritory.org/gemini-prompts/men/a-cinematic-low-light-portrait-of-a-south-asian-ma-288719eb-610d-4ac1-8a40-864980b64b95</loc>
-      <lastmod>2025-09-17</lastmod>
-      <changefreq>monthly</changefreq>
+      <loc>https://aiterritory.org/gemini-prompts/couple/create-a-retro-vintage-inspired-image-that-is-gra-7f5ee51d-8ba1-48ba-a3e9-c36269c6524b</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/create-a-romantic-scene-where-a-couple-is-embracin-42c0d22b-ea60-47f2-84a3-5022807858e9</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/create-a-romantic-outdoor-scene-with-a-couple-sitt-3fa94815-0850-4234-b27d-95576d29d509</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/generate-a-wedding-photo-of-a-couple-where-the-ma-31068397-b57b-4536-9210-144bc169f61d</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/create-an-elegant-portrait-of-a-couple-dressed-in-ebb25cca-1842-4327-8c60-72b61bcd7283</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women/a-full-body-portrait-of-a-bride-descending-a-majes-2f24fe46-501c-46d1-98f8-3d4772c5526f</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women/a-glamorous-and-sophisticated-portrait-of-a-woman-03c3d975-2152-4f79-9e23-fb75e0a764c4</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women/a-cool-retro-inspired-portrait-of-a-woman-leaning-b19291b8-338d-4815-a1a4-57a34fb1d67c</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women/a-magical-and-enchanting-portrait-of-a-woman-in-a-4111ad82-9e42-49e0-896e-c068ec95cf9d</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women/create-a-retro-inspired-vintage-image-with-a-grain-9576aee9-83cb-416f-9441-5b4798f5bc18</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women/a-moody-indoor-caf-portrait-of-a-woman-wearing-a-f9ff1f6d-4442-454f-ad0b-21c6f755d59f</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women/a-candid-looking-portrait-of-a-woman-laughing-whil-f84b4ad0-ced3-49fe-ab42-ee620eef266e</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women/a-natural-outdoor-portrait-of-a-woman-standing-in-d240fa0d-6ad9-41ad-9ebf-aa2bc6e98b97</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women/produce-a-striking-and-minimalist-studio-portrait-649e328c-d3b4-4c40-906f-0c99d3651477</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/women/create-a-cinematic-portrait-of-a-woman-on-a-roofto-d51731d3-eaf8-4088-a423-3a2c4a42d416</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/men/draw-the-picture-as-a-precise-ink-sketch-with-clea-07de7722-3f45-418c-a62b-f5d826f6f15a</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/men/turn-the-photo-into-a-classic-film-noir-portrait-i-6b8ee156-f07a-4642-bb6d-3ea8a1b229fe</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/men/paint-the-photo-as-a-loose-watercolor-portrait-wit-e4e49032-3769-4f04-abf0-96a7a1eb7803</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/men/a-person-wading-in-the-shallow-ocean-water-seen-f-2356ede5-979a-4882-9737-2adb17a5f744</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/the-couple-is-photographed-on-a-quiet-indian-stree-2063e868-fabb-4be9-a9d3-0fb5235e7a28</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-couple-stands-side-by-side-during-diwali-celebra-3dfc0de1-cf41-457b-ac40-6f15b14c44ae</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-stunning-and-serene-portrait-of-a-couple-on-the-5f5eb5fb-ed75-4e8a-ba83-7e7d86bc2d33</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-vibrant-and-stylish-portrait-of-a-couple-in-the-92ccd253-c9ff-4ab0-85ef-bfbaa3e13c01</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-vibrant-sun-drenched-portrait-of-a-laughing-cou-d35067d2-95d8-4a6c-abfa-d5c6d2365405</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-couple-walks-barefoot-on-a-kerala-beach-at-sunse-b8b43fc1-99a2-45f4-81d3-712a46706ee3</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-warm-and-candid-portrait-of-a-couple-playfully-c-777145e5-fd79-492b-a92c-36aaef76a73c</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-beautifully-composed-sun-drenched-portrait-of-a-639504e3-9e17-4ffe-b6e9-5f568939cb43</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/an-epic-and-awe-inspiring-portrait-of-an-adventuro-c3fa1375-61da-4bf0-8dfa-aff31e72941b</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-breathtakingly-romantic-photorealistic-portrait-eb2bdc19-c150-46ff-8027-ebe26dcea555</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-cinematic-portrait-of-the-couple-leaning-against-d9b6a616-0f7e-477a-a1e7-3e18ac48c0fa</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-candid-portrait-of-the-couple-at-a-nighttime-fes-04875b4e-5be3-4203-afe1-f1e9fd857f5e</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/the-couple-is-photographed-indoors-in-a-stylish-in-f40a3513-2774-494f-a618-d9dc7f9ec0ad</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-stylish-couple-poses-in-the-middle-of-a-desert-l-eec29273-9a0b-4b1e-93a4-a21a756b3bd5</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-romantic-portrait-of-the-couple-standing-close-u-c00e35c7-90e3-4449-beb2-55f03742d374</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-candid-couple-photo-at-a-european-style-cobblest-8716a015-dfd9-404c-8f8d-83d45f5163de</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-candid-portrait-of-the-couple-at-a-local-street-6a76a8c0-5b64-4d7f-831d-8488cd3fa209</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-stylish-couple-photographed-at-night-against-a-b-c3bab711-091d-4de7-977a-dd7d62a76dcc</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-cozy-outdoor-portrait-of-the-couple-in-a-park-fi-aed6e59f-d516-4f6d-aad1-343c5946f9b2</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/the-couple-is-photographed-against-a-minimalist-cr-4c029309-996e-447d-adff-6e1ed0f0d71d</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/the-couple-poses-in-front-of-a-grand-rajasthani-pa-cba57817-72a7-4d24-afed-37925c47947f</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-couple-stands-barefoot-at-the-edge-of-the-water-b93b02a8-7449-43ca-918e-dd4aed1b6e65</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-candid-portrait-of-a-fashionable-couple-walking-759195a0-4e1b-4416-8bd9-fb78c3fc8b89</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-dramatic-black-and-white-portrait-of-the-couple-e2d67e6b-e901-4f42-9e4f-a5b0f0fedbeb</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-vibrant-portrait-of-the-couple-during-holi-celeb-6e701536-8a79-4a28-a5f0-b99a6040b95c</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/the-couple-sits-at-a-small-rustic-caf-table-by-a-7360f733-0f75-4406-a09b-20d6cd20121f</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-stylish-couple-stands-close-together-on-a-modern-3a6a3913-ed4a-4d09-aa6a-d2528f8f87ee</loc>
+      <lastmod>2025-10-02</lastmod>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/couple/a-dreamy-bohemian-style-portrait-of-a-young-coupl-f8b4cfff-db8a-44e9-b787-1bc789639ea9</loc>
       <lastmod>2025-09-17</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-    </url>
-    <url>
-      <loc>https://aiterritory.org/gemini-prompts/couple/a-beautiful-romantic-couple-photoshoot-in-a-luxury-86d95666-cee2-48b6-a344-7a943facb25e</loc>
-      <lastmod>2025-09-17</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/dreamy-cinematic-portrait-of-a-young-stylish-young-8e8d5126-9654-411a-b8d5-bbe3f5b61301</loc>
       <lastmod>2025-09-17</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/all/a-realistic-cinematic-photo-of-the-uploaded-person-da6fdb76-fdec-4b9c-83c8-1a1a33b7ea4e</loc>
       <lastmod>2025-09-17</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/all/with-the-person-in-image-casually-leaning-against-4524da54-95d1-45cf-8afb-59f6ac63b028</loc>
+      <lastmod>2025-09-17</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/men/a-cinematic-low-light-portrait-of-a-south-asian-ma-288719eb-610d-4ac1-8a40-864980b64b95</loc>
+      <lastmod>2025-09-17</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/couple/a-beautiful-romantic-couple-photoshoot-in-a-luxury-86d95666-cee2-48b6-a344-7a943facb25e</loc>
+      <lastmod>2025-09-17</lastmod>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/women/convert-4k-hd-realistic-a-stunning-portrait-of-a-545bb09b-9860-4d31-966e-1ac59b4d40e9</loc>
       <lastmod>2025-09-17</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/moody-studio-portrait-of-the-upload-person-bethed-a6ff132f-393a-4813-9cbb-01c91b0a74e9</loc>
       <lastmod>2025-09-15</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/a-hyper-realistic-cinematic-editorial-portrait-of-309dce39-6671-409d-b166-ec39fd81ea9d</loc>
       <lastmod>2025-09-13</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/a-man-sitting-in-a-convertible-car-looking-away-f-9166078c-9608-465f-903e-3532dc787c65</loc>
       <lastmod>2025-09-08</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/couple/a-romantic-winter-scene-featuring-a-young-couple-s-ab6d6b07-374b-4317-b577-8e2aaae648a3</loc>
       <lastmod>2025-09-07</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/i-a-raw-cinematic-candid-street-a-photograph-of-a-1da2ad5a-af10-4f62-b43b-7838ececaf8e</loc>
       <lastmod>2025-09-05</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/a-creative-photo-featuring-an-ultra-wide-fisheye-ad62aee2-9f5b-40f0-bec2-5d0d7160d4d3</loc>
       <lastmod>2025-09-02</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/couple/create-a-retro-vintage-grainy-but-bright-mage-of-t-13c1db77-cdc9-417e-9b01-c10673b8a1a6</loc>
       <lastmod>2025-08-25</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/couple/make-this-image-of-two-people-look-like-it-was-tak-0c701802-5735-4568-890b-5a856197185d</loc>
       <lastmod>2025-07-28</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/ultra-realistic-surreal-digital-art-of-a-man-foto-b811e132-4946-4e32-810a-5781c19f01fe</loc>
       <lastmod>2025-07-27</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/create-a-retro-vintage-inspired-image-grainy-ye-f9c73e41-089c-4994-84c7-3a3aa1b5f7eb</loc>
       <lastmod>2025-07-19</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/a-realistic-cinematic-photo-of-the-uploaded-person-d8f73a3e-1d4c-4a08-ae62-65ea87c7d586</loc>
       <lastmod>2025-07-17</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/take-the-face-from-the-uploaded-reference-photo-ex-6c7bfa89-8bd2-4e60-9fd3-789ae71aebe5</loc>
       <lastmod>2025-07-13</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/ultra-hd-8k-photorealistic-full-body-editorial-por-6796b21e-d51d-47e7-807e-38cfe270fb46</loc>
       <lastmod>2025-07-04</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/create-a-black-and-white-portrait-of-a-young-man-s-e0da7dbd-713d-449a-a096-bbf749986e9c</loc>
       <lastmod>2025-06-15</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/generate-a-vertical-916-high-resolution-8k-vintag-e7418749-76d7-4e0b-8c85-c437c7236e31</loc>
       <lastmod>2025-06-14</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/take-the-face-from-the-attached-reference-photo-ex-00288652-4202-401b-a140-07a18b891199</loc>
       <lastmod>2025-05-27</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/create-a-retro-vintage-grainy-but-bright-image-of-ff152c8c-932d-4f0e-8e28-a8dd3af820cd</loc>
       <lastmod>2025-05-23</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/women/this-is-a-photo-of-me-craft-a-moody-studio-portra-9d9bd89c-7f6c-49d1-91e4-6b363cc99f29</loc>
       <lastmod>2025-04-15</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/women/create-a-realistic-vintage-grainy-but-bright-image-23811e62-406c-4033-af24-a5f2e1f8e8d0</loc>
       <lastmod>2025-04-15</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/women/create-a-retro-vintage-rainy-grainy-but-white-ima-fa406f7f-e9e1-4792-8e2a-f302b1915152</loc>
       <lastmod>2025-04-14</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/women/in-a-perfect-navratri-dress-red-color-ghagra-choli-735c7b4b-ce6c-4f14-8cc4-51f8ce4457f5</loc>
       <lastmod>2025-03-31</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/couple/create-a-retro-vintage-grainy-but-bright-image-of-c0c4baf2-54e4-485d-9d66-dbe189b7470e</loc>
       <lastmod>2025-03-29</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/a-surreal-black-and-white-cinematic-portrait-of-a-599c0ac0-24b3-4866-ae04-2d78cf1b5c53</loc>
       <lastmod>2025-03-24</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/a-mysterious-black-and-white-cinematic-portrait-of-113a399f-b663-4980-a2b0-2907e4a8b3e7</loc>
       <lastmod>2025-03-20</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/edit-the-photo-to-be-standing-casually-in-a-modern-4f03edf4-4a98-4c94-898e-e1590671ed93</loc>
       <lastmod>2025-03-19</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/ultra-realistic-cinematic-photo-using-the-exact-sa-e0a58dbd-39f1-4e0d-a53a-b049b8f8b19b</loc>
       <lastmod>2025-03-15</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/couple/a-happy-young-couple-standing-indoors-taking-a-mi-1507c06c-833d-41a1-b4fb-616a11b4e4ce</loc>
       <lastmod>2025-03-11</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/create-a-retro-vintage-inspired-image-grainy-ye-d27baa15-3f8e-4634-a097-2e09ac76f46b</loc>
       <lastmod>2025-03-10</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/with-the-person-in-image-casually-leaning-against-7d6d8af3-980e-4030-a4b1-565fc2283bb8</loc>
       <lastmod>2025-03-03</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/a-full-body-side-angle-portrait-of-a-handsome-25-6fd9396e-eec7-495c-aa3b-dfa32149c592</loc>
       <lastmod>2025-02-23</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/women/create-a-soft-sunlit-portrait-of-my-self-uploade-28f39952-5e17-4902-ba9e-e0a6e1234c18</loc>
       <lastmod>2025-02-17</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/create-a-retro-vintage-grainy-but-bright-image-of-99fee3c8-7b73-4496-8e0d-099091a2dc5d</loc>
       <lastmod>2025-02-11</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/a-stylish-young-man-looking-thoughtful-with-warm-9efdc384-30b1-4a95-9f64-b52db7720ea3</loc>
       <lastmod>2025-02-02</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/take-the-face-from-the-attached-reference-photo-ex-735bf76a-c29f-4f5d-82e0-bd29ee45ed62</loc>
       <lastmod>2025-01-28</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/couple/an-ultra-realistic-8k-portrait-of-a-young-couple-s-eea66432-bc09-42bb-a008-ec9ce7ce8e84</loc>
       <lastmod>2025-01-27</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/fashion-editorial-cinematic-portrait-blurred-silh-4cf69037-f0ed-4e9d-b433-57aa52e59095</loc>
       <lastmod>2025-01-12</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-    </url>
-    <url>
-      <loc>https://aiterritory.org/gemini-prompts/men/cinematic-editorial-photograph-of-person-holding-u-99442791-63b7-4824-9ca2-afd57ca9989e</loc>
-      <lastmod>2025-01-06</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/a-stylish-man-in-a-dark-modern-suit-with-gold-watc-edb8ecc4-3c74-4432-be72-517c16c4137b</loc>
       <lastmod>2025-01-06</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+    <url>
+      <loc>https://aiterritory.org/gemini-prompts/men/cinematic-editorial-photograph-of-person-holding-u-99442791-63b7-4824-9ca2-afd57ca9989e</loc>
+      <lastmod>2025-01-06</lastmod>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/a-stylish-young-man-facial-will-be-100-same-as-t-83024d0b-2e97-4fb5-b668-322a16106b4e</loc>
       <lastmod>2024-12-24</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/women/take-the-face-from-the-attached-reference-photo-ex-397827cc-2f4f-413f-a9a7-fcef871b0918</loc>
       <lastmod>2024-12-12</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/use-my-image-with-the-face-kept-100-accurate-exa-89a810e9-4aef-41e9-b0e0-d3d8ceeb2d99</loc>
       <lastmod>2024-12-09</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/a-young-man-in-a-dark-hoodie-dark-pants-and-ligh-e284b7ba-ac71-4063-be10-c59f162fa631</loc>
       <lastmod>2024-11-26</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-    </url>
-    <url>
-      <loc>https://aiterritory.org/gemini-prompts/men/a-high-resolution-cinematic-and-photorealistic-c-08e7d70d-b9ee-4cb0-a8b5-e882ca9b8603</loc>
-      <lastmod>2024-11-12</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
       <loc>https://aiterritory.org/gemini-prompts/men/create-a-hyper-realistic-cinematic-lifestyle-portr-df8fd784-ec3a-46a6-976a-94f35187bd2c</loc>
       <lastmod>2024-11-12</lastmod>
-      <changefreq>monthly</changefreq>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
     <url>
-      <loc>https://aiterritory.org/gemini-prompts/men/a-full-body-camera-look-angle-portrait-of-a-hands-acc4e13a-48fa-4166-ba0c-c82719b5ed7d</loc>
-      <lastmod>2024-11-09</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-    </url>
-    <url>
-      <loc>https://aiterritory.org/gemini-prompts/men/please-generate-a-top-angle-and-close-up-black-and-e53051b3-6be0-44b2-af19-f8ec6e24d5cd</loc>
-      <lastmod>2024-11-06</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-    </url>
-    <url>
-      <loc>https://aiterritory.org/gemini-prompts/women/a-retro-vintage-and-grainy-photograph-of-a-girl-a1d7a1f2-9551-4115-927a-cfd805e649bd</loc>
-      <lastmod>2024-11-05</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-    </url>
-    <url>
-      <loc>https://aiterritory.org/gemini-prompts/men/extreme-low-angle-cinematic-shot-of-a-man-in-the-i-ad889ec3-51e7-4a83-98dd-49aeef76efd9</loc>
-      <lastmod>2024-10-24</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-    </url>
-    <url>
-      <loc>https://aiterritory.org/gemini-prompts/men/hyper-realistic-cinematic-image-of-a-stylish-youn-d4a5c845-c653-4c95-b3d5-8f3d88e0d9ae</loc>
-      <lastmod>2024-10-05</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-    </url>
-    <url>
-      <loc>https://aiterritory.org/gemini-prompts/couple/keeping-my-face-straight-we-are-romantic-couple-s-a7f0c983-e2cb-40ec-b92b-b543f46f2427</loc>
-      <lastmod>2024-10-03</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-    </url>
-    <url>
-      <loc>https://aiterritory.org/gemini-prompts/men/create-a-retro-vintage-grainy-but-bright-image-of-d916b379-dcd1-4dac-a689-085433647c63</loc>
-      <lastmod>2024-10-01</lastmod>
-      <changefreq>monthly</changefreq>
-      <priority>0.7</priority>
-    </url>
-    <url>
-      <loc>https://aiterritory.org/gemini-prompts/men/create-a-retro-vintage-inspired-image-grainy-ye-9056028b-5990-4e23-9bdf-3d409eb5ed68</loc>
-      <lastmod>2024-09-18</lastmod>
-      <changefreq>monthly</changefreq>
+      <loc>https://aiterritory.org/gemini-prompts/men/a-high-resolution-cinematic-and-photorealistic-c-08e7d70d-b9ee-4cb0-a8b5-e882ca9b8603</loc>
+      <lastmod>2024-11-12</lastmod>
+      <changefreq>weekly</changefreq>
       <priority>0.7</priority>
     </url>
 </urlset>

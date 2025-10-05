@@ -5,5 +5,8 @@
 # Handle client-side routing, return all requests to index.html
 /*    /index.html   200
 
+# Redirect /contact to /company/contact-us
+/contact    /company/contact-us    301
+
 # All other routes
 /*         /index.html                                         200 

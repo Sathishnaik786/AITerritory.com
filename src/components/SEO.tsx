@@ -113,15 +113,15 @@ const SEO: React.FC<SEOProps> = ({
       
       if (hasMeaningfulParams) {
         // This is a meaningful filtered page - it should have its own canonical URL
-        return `https://www.aiterritory.org${location.pathname}?${searchParams.toString()}`;
+        return `https://aiterritory.org${location.pathname}?${searchParams.toString()}`;
       } else {
         // This is just pagination or non-meaningful params - canonical should point to base page
-        return `https://www.aiterritory.org${location.pathname}`;
+        return `https://aiterritory.org${location.pathname}`;
       }
     }
     
     // No query parameters - use pathname only
-    return `https://www.aiterritory.org${location.pathname}`;
+    return `https://aiterritory.org${location.pathname}`;
   };
   
   const canonicalUrl = generateCanonicalUrl();
