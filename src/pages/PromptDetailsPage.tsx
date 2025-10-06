@@ -637,13 +637,12 @@ ${shareData.url}`);
                 {/* Replace the existing share dropdown with our new ShareButton component */}
                 <ShareButton
                   url={window.location.href}
-                  title={prompt?.prompt.substring(0, 100) + (prompt?.prompt.length > 100 ? '...' : '') || 'AI Prompt'}
-                  description={`Check out this AI prompt in the ${prompt?.category} category`}
+                  title={seoTitle}
+                  description={seoDescription}
                   image={prompt?.image_url || undefined}
                   variant="dropdown"
                   onShare={(platform) => {
                     // Track the share event
-                    // You might want to implement a trackShare function for prompts similar to the one for tools
                     console.log(`Shared prompt on ${platform}`);
                   }}
                 />
