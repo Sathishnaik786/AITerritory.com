@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useRef } from 'react';
+import React, { ReactNode, useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { OptimizedImage } from '../OptimizedImage';
 import { FaRegComment, FaRegHeart, FaHeart, FaRegBookmark, FaBookmark, FaShare } from 'react-icons/fa';
@@ -12,6 +12,7 @@ import DOMPurify from 'dompurify';
 import { trackShare } from '@/lib/analytics';
 import { ContentRenderer } from '../ContentRenderer';
 import ShareButton from '../ShareButton';
+import { BlogService, BlogSEOData } from '@/services/blogService';
 
 type Author = {
   name?: string;
@@ -51,6 +52,7 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
 }) => {
   const { user, isSignedIn } = useUser();
   const [copied, setCopied] = useState(false);
+  const [seoData, setSeoData] = useState<BlogSEOData | null>(null);
   
   // Initialize likes and bookmarks with the same hook used in BlogCard
   const {
@@ -64,21 +66,41 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
     isTogglingBookmark,
   } = useLikesAndBookmarks(slug);
 
+  // Fetch SEO data for sharing
+  useEffect(() => {
+    const fetchSEOData = async () => {
+      try {
+        const data = await BlogService.getSEODataBySlug(slug);
+        setSeoData(data);
+      } catch (error) {
+        console.warn('Failed to fetch SEO data for sharing:', error);
+      }
+    };
+    
+    if (slug) {
+      fetchSEOData();
+    }
+  }, [slug]);
+
   // Share functionality with tracking
   const handleShare = (platform: SharePlatform) => {
+    // Use SEO data if available, otherwise fallback to props
+    const shareTitle = seoData?.title || title;
+    const shareDescription = seoData?.description || description || title;
+    const shareImage = seoData?.image_url || coverImage;
     const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
     const shareUrl = encodeURIComponent(currentUrl);
-    const shareText = encodeURIComponent(`${title} - AITerritory`);
+    const shareText = encodeURIComponent(`${shareTitle} - AITerritory`);
 
     // Track the share event with the correct parameter order and types
-    trackShare(platform, 'blog', slug, title, user?.id);
+    trackShare(platform, 'blog', slug, shareTitle, user?.id);
 
     switch (platform) {
       case 'twitter':
-        window.open(`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}`, '_blank');
+        window.open(`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}${shareImage ? `&image=${encodeURIComponent(shareImage)}` : ''}`, '_blank');
         break;
       case 'facebook':
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, '_blank');
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}${shareImage ? `&picture=${encodeURIComponent(shareImage)}` : ''}`, '_blank');
         break;
       case 'linkedin':
         window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`, '_blank');
@@ -95,7 +117,6 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
       default:
         break;
     }
-    // setShowShareOptions(false); // Removed as we're using the new ShareButton component
   };
 
   const scrollToComments = () => {

@@ -53,6 +53,9 @@ router.get('/', cacheMiddlewares.blogs, blogController.getAllBlogs);
 // GET /api/blogs/:slug (CACHED: 5 minutes)
 router.get('/:slug', cacheMiddlewares.blogs, blogController.getBlogBySlug);
 
+// GET /api/blogs/seo/:slug - get SEO data for a specific blog
+router.get('/seo/:slug', blogController.getSEOBlogBySlug);
+
 // GET /api/blogs/category/:category (CACHED: 5 minutes)
 router.get('/category/:category', cacheMiddlewares.blogs, blogController.getBlogsByCategory);
 
@@ -240,4 +243,4 @@ router.post('/:slug/bookmarks', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

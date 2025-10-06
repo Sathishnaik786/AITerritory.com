@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useEffect, useState, useMemo, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThreadedComments } from '../components/ThreadedComments';
 import BlogLikeBookmark from '../components/BlogLikeBookmark';
 import BlogLikeButton from '../components/BlogLikeButton';
 import BlogBookmarkButton from '../components/BlogBookmarkButton';
-import { BlogService } from '../services/blogService';
+import { BlogService, BlogSEOData } from '../services/blogService';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
@@ -42,26 +42,61 @@ const remarkEmoji = emoji as unknown as (options?: any) => void;
 
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [blog, setBlog] = useState<any>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  
+  const [blog, setBlog] = useState<BlogPost | null>(null);
+  const [seoData, setSeoData] = useState<BlogSEOData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const contentRef = useRef<HTMLDivElement>(null);
-  const { user, isSignedIn } = useUser();
-  const [showShareBar, setShowShareBar] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
   const [commentsCount, setCommentsCount] = useState(0);
-
-  // Fetch comments count
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  
+  // Fetch blog data
   useEffect(() => {
-    if (blog?.slug) {
-      import('../services/api').then(({ default: api }) => {
-        api.get(`/blogs/${blog.slug}/comments/count`)
-          .then(res => setCommentsCount(res.data.count || 0))
-          .catch(err => console.error('Error fetching comments count:', err));
-      });
-    }
-  }, [blog?.slug]);
+    const fetchBlogData = async () => {
+      if (!slug) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch both blog data and SEO data in parallel
+        const [blogData, seoData] = await Promise.all([
+          BlogService.getBySlug(slug),
+          BlogService.getSEODataBySlug(slug).catch(() => null) // Don't fail if SEO data is not available
+        ]);
+        
+        setBlog(blogData);
+        setSeoData(seoData);
+        
+        // Fetch related blogs
+        try {
+          const related = await BlogService.getRelatedBlogs(slug);
+          setRelatedBlogs(related.slice(0, 3)); // Limit to 3 related posts
+        } catch (err) {
+          console.warn('Failed to fetch related blogs:', err);
+        }
+        
+        // Fetch comments count
+        try {
+          const count = await BlogService.getCommentsCount(slug);
+          setCommentsCount(count);
+        } catch (err) {
+          console.warn('Failed to fetch comments count:', err);
+        }
+      } catch (err) {
+        console.error('Error fetching blog data:', err);
+        setError('Failed to load blog post. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchBlogData();
+  }, [slug]);
 
   // Clear cache for previous blog when slug changes
   useEffect(() => {
@@ -79,17 +114,6 @@ const BlogDetail: React.FC = () => {
       }
     };
   }, [slug]);
-
-  // In BlogDetail component, add state for recentBlogs and relatedBlogs
-  const [recentBlogs, setRecentBlogs] = useState<any[]>([]);
-  const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
-  // Add state and effect for scroll progress
-  const [progress, setProgress] = useState(0);
-  const [showNewsletterModal, setShowNewsletterModal] = useState(false);
-  const [showShareCTA, setShowShareCTA] = useState(false);
-  const [showEnjoyedArticlePopup, setShowEnjoyedArticlePopup] = useState(false);
-  const [isUserSubscribed, setIsUserSubscribed] = useState(false);
-  const navigate = useNavigate();
 
   // Initialize engagement tracker
   const engagementTracker = useEngagementTracker({
@@ -118,7 +142,7 @@ const BlogDetail: React.FC = () => {
           const isSubscribed = await NewsletterService.isSubscribed(userEmail);
           
           if (isSubscribed) {
-            setIsUserSubscribed(true);
+            setIsSubscribed(true);
             console.log('User already subscribed to newsletter');
             return;
           }
@@ -158,31 +182,6 @@ const BlogDetail: React.FC = () => {
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [showNewsletterModal, showEnjoyedArticlePopup, engagementTracker, isUserSubscribed]);
-
-  // Fetch blog data with proper error handling
-  useEffect(() => {
-    if (slug) {
-      // Reset blog data when slug changes to prevent displaying old data
-      setBlog(null);
-      setLoading(true);
-      setError(null);
-      
-      BlogService.getBySlug(slug)
-        .then(data => {
-          console.log('Blog loaded:', data);
-          console.log('Blog title:', data?.title);
-          console.log('Blog description:', data?.description);
-          console.log('Blog content:', data?.content);
-          setBlog(data);
-        })
-        .catch(error => {
-          console.error('Error loading blog:', error);
-          setError('Failed to load blog. Please try again.');
-          setBlog(null);
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [slug]);
 
   useEffect(() => {
     if (blog && blog.slug) {
@@ -372,7 +371,43 @@ const BlogDetail: React.FC = () => {
   };
 
   // SEO data with enhanced OpenGraph and Twitter card support
-  const seoData = useMemo(() => {
+  const seoDataMemo = useMemo(() => {
+    // Use fetched SEO data if available, otherwise fallback to blog data
+    if (seoData) {
+      const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://aiterritory.org';
+      const blogUrl = `${siteUrl}/blog/${slug}`;
+      
+      return {
+        title: seoData.title,
+        description: seoData.description,
+        url: blogUrl,
+        type: 'article',
+        publishedTime: seoData.created_at,
+        author: seoData.author,
+        openGraph: {
+          type: 'article',
+          article: {
+            publishedTime: seoData.created_at,
+            authors: seoData.author ? [seoData.author] : [],
+          },
+          images: [
+            {
+              url: seoData.image_url,
+              width: 1200,
+              height: 630,
+              alt: seoData.title,
+            },
+          ],
+          site_name: 'AITerritory',
+        },
+        twitter: {
+          cardType: 'summary_large_image' as const,
+          site: '@aiterritory',
+        },
+      };
+    }
+    
+    // Fallback to blog data if no SEO data
     if (!blog) return {};
     
     const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://aiterritory.org';
@@ -432,7 +467,7 @@ const BlogDetail: React.FC = () => {
         })) || []),
       ],
     };
-  }, [blog]);
+  }, [blog, seoData, slug]);
 
   // Handle client-side only content
   const [isClient, setIsClient] = useState(false);

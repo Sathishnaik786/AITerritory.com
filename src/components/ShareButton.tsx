@@ -54,7 +54,7 @@ const SHARE_PLATFORMS = [
     color: 'text-blue-600',
     bgColor: 'bg-blue-50 dark:bg-blue-900/20',
     url: (data: ShareData) => 
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(data.url)}`
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(data.url)}${data.image ? `&picture=${encodeURIComponent(data.image)}` : ''}`
   },
   {
     name: 'whatsapp',

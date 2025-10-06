@@ -101,6 +101,61 @@ const BLOG_FIELDS = [
   'reading_time'
 ];
 
+// GET /api/blogs/seo/:slug - get SEO data for a specific blog
+exports.getSEOBlogBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    
+    // Fetch the blog
+    const { data: blog, error: blogError } = await supabase
+      .from('blogs')
+      .select('*')
+      .eq('slug', slug)
+      .single();
+      
+    if (blogError) {
+      console.error('Supabase error:', blogError);
+      return res.status(404).json({ error: 'Blog not found' });
+    }
+    
+    console.log('Found blog for SEO:', blog);
+    
+    // Generate SEO title
+    const seoTitle = blog.title;
+    
+    // Use description or truncate content for SEO description (150 characters as requested)
+    const seoDescription = blog.description || (blog.content ? blog.content.substring(0, 147) + '...' : '');
+    
+    // Use blog cover image, fallback to dynamic OG image, or default
+    const seoImage = blog.cover_image_url && blog.cover_image_url.trim() !== '' 
+      ? blog.cover_image_url 
+      : `https://aiterritory-com.onrender.com/api/og/blogs/${blog.slug}`;
+    
+    // Generate canonical URL
+    const canonicalUrl = `https://aiterritory.org/blog/${blog.slug}`;
+    
+    // Prepare SEO data
+    const seoData = {
+      id: blog.id,
+      title: seoTitle,
+      description: seoDescription,
+      image_url: seoImage,
+      category: blog.category,
+      created_at: blog.created_at,
+      author: blog.author_name,
+      canonical_url: canonicalUrl
+    };
+    
+    console.log('Sending SEO data:', seoData);
+    
+    // Send SEO data
+    res.json(seoData);
+  } catch (error) {
+    console.error('Error fetching SEO data for blog:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 // Update getAllBlogs to use only these fields and log full errors
 async function getAllBlogs(req, res) {
   try {

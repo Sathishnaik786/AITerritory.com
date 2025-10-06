@@ -38,6 +38,17 @@ const isCacheValid = (key: string) => {
   return Date.now() - cached.timestamp < CACHE_TTL;
 };
 
+export interface BlogSEOData {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  category: string;
+  created_at: string;
+  author: string;
+  canonical_url: string;
+}
+
 export const BlogService = {
   async getAll(params?: any): Promise<BlogPost[]> {
     const cacheKey = `blogs_${JSON.stringify(params || {})}`;
@@ -371,6 +382,55 @@ export const BlogService = {
       }
     });
     console.log('[BlogService] Cleared all blog caches');
+  },
+
+  async getSEODataBySlug(slug: string): Promise<BlogSEOData> {
+    const cacheKey = `blog_seo_${slug}`;
+    
+    // Return cached data if available and valid
+    if (isCacheValid(cacheKey)) {
+      console.log(`[BlogService] Returning cached SEO data for blog: ${slug}`);
+      return cache[cacheKey].data;
+    }
+
+    const url = `${API_BASE_URL}/blogs/seo/${slug}`;
+    const cancelToken = createCancellableRequest(url);
+
+    try {
+      const response = await axios.get<BlogSEOData>(url, {
+        timeout: DEFAULT_TIMEOUT,
+        cancelToken,
+      });
+
+      // Cache the successful response
+      cache[cacheKey] = {
+        data: response.data,
+        timestamp: Date.now(),
+      };
+
+      console.log(`[BlogService] Fetched SEO data for blog: ${slug}`);
+      return response.data;
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log(`[BlogService] Request cancelled for blog SEO: ${slug}`);
+        throw new Error('Request was cancelled');
+      }
+
+      const axiosError = error as AxiosError;
+      console.error('[BlogService] Error fetching blog SEO data:', {
+        status: axiosError.response?.status,
+        message: axiosError.message,
+        url,
+      });
+
+      // Return cached data if available, even if expired
+      if (cache[cacheKey]?.data) {
+        console.warn(`[BlogService] Using expired cache for blog SEO: ${slug}`);
+        return cache[cacheKey].data;
+      }
+
+      throw error;
+    }
   },
 };
 
