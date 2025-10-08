@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useUser, SignInButton } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -30,14 +30,7 @@ interface CommentData {
   avatarUrl: string;
   text: string;
   timestamp: string;
-  replies?: Array<{
-    userId: string;
-    comId: string;
-    fullName: string;
-    avatarUrl: string;
-    text: string;
-    timestamp?: string;
-  }>;
+  replies?: CommentData[]; // Replies should be of the same type
 }
 
 interface DynamicPromptCommentSectionProps {
@@ -51,6 +44,7 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [CommentSection, setCommentSection] = useState<any>(null);
+  const channelRef = useRef<any>(null);
 
   // Dynamically import the CommentSection component with error handling
   useEffect(() => {
@@ -63,13 +57,14 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
         if (isMounted) {
           setCommentSection(() => module.CommentSection);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to load CommentSection:', error);
+        // Fallback to a simple comment display if the library fails to load
         if (isMounted) {
+          setCommentSection(() => null);
           toast({
-            title: "Error",
-            description: "Failed to load comment system. Please refresh the page.",
-            variant: "destructive",
+            title: "Notice",
+            description: "Comment system is temporarily unavailable. Please try again later.",
           });
         }
       }
@@ -82,12 +77,55 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
     };
   }, []);
 
+  // Build nested comment structure
+  const buildCommentTree = (flatComments: PromptComment[]): CommentData[] => {
+    // Create a map of all comments by ID for easy lookup
+    const commentMap: Record<string, CommentData> = {};
+    const rootComments: CommentData[] = [];
+
+    // First pass: Create CommentData objects and store in map
+    flatComments.forEach(comment => {
+      commentMap[comment.id] = {
+        userId: comment.user_id,
+        comId: comment.id,
+        fullName: comment.user_name || 'Anonymous User',
+        avatarUrl: comment.user_avatar || '',
+        text: comment.comment,
+        timestamp: comment.created_at,
+        replies: []
+      };
+    });
+
+    // Second pass: Build the tree structure
+    flatComments.forEach(comment => {
+      const commentData = commentMap[comment.id];
+      if (comment.parent_id) {
+        // This is a reply, add it to its parent's replies
+        const parent = commentMap[comment.parent_id];
+        if (parent) {
+          parent.replies = parent.replies || [];
+          parent.replies.push(commentData);
+        }
+      } else {
+        // This is a root comment
+        rootComments.push(commentData);
+      }
+    });
+
+    return rootComments;
+  };
+
   // Fetch comments when component mounts
   useEffect(() => {
     fetchComments();
     
     // Set up real-time subscription if Supabase client is available
     if (supabase) {
+      // Clean up any existing channel
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
+      
       const channel = supabase
         .channel('prompt-comments-changes')
         .on(
@@ -99,6 +137,7 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
             filter: `prompt_id=eq.${promptId}`
           },
           (payload) => {
+            console.log('New comment inserted:', payload);
             // Add new comment to the list
             fetchComments();
           }
@@ -112,6 +151,7 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
             filter: `prompt_id=eq.${promptId}`
           },
           (payload) => {
+            console.log('Comment updated:', payload);
             // Update existing comment
             fetchComments();
           }
@@ -125,60 +165,46 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
             filter: `prompt_id=eq.${promptId}`
           },
           (payload) => {
+            console.log('Comment deleted:', payload);
             // Remove deleted comment
             fetchComments();
           }
         )
-        .subscribe();
-
-      // Clean up subscription on unmount
-      return () => {
-        supabase.removeChannel(channel);
-      };
+        .subscribe((status) => {
+          console.log('Subscription status:', status);
+          if (status === 'SUBSCRIBED') {
+            console.log('Successfully subscribed to comment changes');
+          } else if (status === 'CHANNEL_ERROR') {
+            console.error('Error subscribing to comment changes');
+          } else if (status === 'CLOSED') {
+            console.log('Subscription closed');
+          }
+        });
+      
+      channelRef.current = channel;
     }
+
+    // Clean up subscription on unmount
+    return () => {
+      if (supabase && channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
+    };
   }, [promptId]);
 
   const fetchComments = async () => {
     setLoading(true);
     try {
       const data = await getPromptComments(promptId);
-      // Convert to the format expected by react-comments-section
-      const formattedComments = data.map((comment: PromptComment) => ({
-        userId: comment.user_id,
-        comId: comment.id,
-        fullName: comment.user_name || 'Anonymous User',
-        avatarUrl: comment.user_avatar || '',
-        text: comment.comment,
-        timestamp: comment.created_at,
-        replies: [] // Will be populated separately
-      }));
-      
-      // Handle replies (nest them under their parent comments)
-      const topLevelComments = formattedComments.filter((comment: CommentData) => 
-        !data.find((c: PromptComment) => c.id === comment.comId)?.parent_id
-      );
-      
-      const commentsWithReplies = topLevelComments.map((comment: CommentData) => {
-        const replies = formattedComments.filter((reply: CommentData) => {
-          const originalComment = data.find((c: PromptComment) => c.id === reply.comId);
-          return originalComment?.parent_id === comment.comId;
-        }).map((reply: CommentData) => ({
-          ...reply,
-          parentId: comment.comId
-        }));
-        
-        return {
-          ...comment,
-          replies: replies
-        };
-      });
-      
-      setComments(commentsWithReplies);
-    } catch (error) {
+      console.log('Fetched comments:', data);
+      // Build nested comment structure
+      const nestedComments = buildCommentTree(data);
+      setComments(nestedComments);
+    } catch (error: any) {
       console.error('Error fetching comments:', error);
       toast({
         title: "Error",
-        description: "Failed to load comments",
+        description: error.message || "Failed to load comments",
         variant: "destructive",
       });
     } finally {
@@ -209,11 +235,11 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
         description: "Comment posted successfully!",
       });
       return true; // Indicate success to the library
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error posting comment:', error);
       toast({
         title: "Error",
-        description: "Failed to post comment. Please try again later.",
+        description: error.message || "Failed to post comment. Please try again later.",
         variant: "destructive",
       });
       return false; // Indicate failure to the library
@@ -240,11 +266,11 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
         description: "Comment updated successfully!",
       });
       return true; // Indicate success to the library
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating comment:', error);
       toast({
         title: "Error",
-        description: "Failed to update comment. Please try again later.",
+        description: error.message || "Failed to update comment. Please try again later.",
         variant: "destructive",
       });
       return false; // Indicate failure to the library
@@ -271,11 +297,11 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
         description: "Comment deleted successfully!",
       });
       return true; // Indicate success to the library
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting comment:', error);
       toast({
         title: "Error",
-        description: "Failed to delete comment. Please try again later.",
+        description: error.message || "Failed to delete comment. Please try again later.",
         variant: "destructive",
       });
       return false; // Indicate failure to the library
@@ -292,12 +318,24 @@ const DynamicPromptCommentSection: React.FC<DynamicPromptCommentSectionProps> = 
     );
   }
 
+  // If CommentSection failed to load, show a fallback UI
   if (!CommentSection) {
     return (
-      <div className="flex justify-center items-center h-32">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-          <p className="text-gray-500">Loading comment system...</p>
+      <div className="mt-8">
+        <div className="flex items-center gap-2 mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clipRule="evenodd" />
+          </svg>
+          <h2 className="text-xl font-bold">Comments</h2>
+          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
+            {comments.length}
+          </span>
+        </div>
+        
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 text-center">
+          <p className="text-gray-500 dark:text-gray-400">
+            The comment system is temporarily unavailable. Please try again later.
+          </p>
         </div>
       </div>
     );
