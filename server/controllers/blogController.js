@@ -102,7 +102,7 @@ const BLOG_FIELDS = [
 ];
 
 // GET /api/blogs/seo/:slug - get SEO data for a specific blog
-exports.getSEOBlogBySlug = async (req, res) => {
+async function getSEOBlogBySlug(req, res) {
   try {
     const { slug } = req.params;
     
@@ -154,7 +154,7 @@ exports.getSEOBlogBySlug = async (req, res) => {
     console.error('Error fetching SEO data for blog:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-};
+}
 
 // Update getAllBlogs to use only these fields and log full errors
 async function getAllBlogs(req, res) {
@@ -426,5 +426,6 @@ module.exports = {
   getRelatedBlogs,
   createBlog,
   updateBlog,
-  deleteBlog
-}; 
+  deleteBlog,
+  getSEOBlogBySlug
+};

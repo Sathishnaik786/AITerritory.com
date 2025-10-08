@@ -1,53 +1,46 @@
-import { BlogPost } from '../types/blog';
-import { blogPosts } from '../data/blogPosts';
-import axios, { AxiosError, CancelTokenSource } from 'axios';
+import { BlogPost } from '@/types/blog';
+import axios, { AxiosError } from 'axios';
 
-// API configuration - Use proxy in development, direct URL in production
-const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-const API_BASE_URL = isProduction 
-  ? 'https://aiterritory-com.onrender.com/api'  // Use direct backend URL in production
-  : '/api';  // Use proxy in development (matches vite.config.ts proxy setup)
-
-// Request configuration
-const DEFAULT_TIMEOUT = 10000; // 10 seconds
-const MAX_RETRIES = 2;
-const CACHE_TTL = 1 * 60 * 1000; // 1 minute cache TTL (reduced from 5 minutes)
-
-// In-memory cache
-const cache: Record<string, { data: any; timestamp: number }> = {};
-
-// Request cancellation tokens
-const activeRequests: Record<string, CancelTokenSource> = {};
-
-// Helper function to create a cancellable request
-const createCancellableRequest = (url: string) => {
-  // Cancel previous request if exists
-  if (activeRequests[url]) {
-    activeRequests[url].cancel('Request cancelled - new request made');
-  }
-
-  const source = axios.CancelToken.source();
-  activeRequests[url] = source;
-  return source.token;
-};
-
-// Helper function to check if cache is still valid
-const isCacheValid = (key: string) => {
-  const cached = cache[key];
-  if (!cached) return false;
-  return Date.now() - cached.timestamp < CACHE_TTL;
-};
-
+// Define BlogSEOData interface
 export interface BlogSEOData {
   id: string;
   title: string;
   description: string;
   image_url: string;
-  category: string;
+  category?: string;
   created_at: string;
-  author: string;
+  author?: string;
   canonical_url: string;
 }
+
+// Cache configuration
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const cache: Record<string, { data: any; timestamp: number }> = {};
+
+// Active requests tracking
+const activeRequests: Record<string, any> = {};
+
+// API configuration
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const DEFAULT_TIMEOUT = 10000;
+
+// Helper function to check if cache is valid
+function isCacheValid(cacheKey: string): boolean {
+  const cached = cache[cacheKey];
+  if (!cached) return false;
+  return Date.now() - cached.timestamp < CACHE_DURATION;
+}
+
+// Helper function to create cancellable requests
+function createCancellableRequest(url: string) {
+  // Create a cancel token source
+  const source = axios.CancelToken.source();
+  activeRequests[url] = source;
+  return source.token;
+}
+
+// Mock blog data for fallback
+const blogPosts: BlogPost[] = [];
 
 export const BlogService = {
   async getAll(params?: any): Promise<BlogPost[]> {
@@ -208,6 +201,108 @@ export const BlogService = {
       // Fallback to static data
       console.warn(`[BlogService] Falling back to static data for category: ${category}`);
       return blogPosts.filter(blog => blog.category === category);
+    }
+  },
+
+  async getRelatedBlogs(slug: string): Promise<BlogPost[]> {
+    const cacheKey = `blogs_related_${slug}`;
+    
+    // Return cached data if available and valid
+    if (isCacheValid(cacheKey)) {
+      console.log(`[BlogService] Returning cached related blogs for: ${slug}`);
+      return cache[cacheKey].data;
+    }
+
+    const url = `${API_BASE_URL}/blogs/related/${encodeURIComponent(slug)}`;
+    const cancelToken = createCancellableRequest(url);
+
+    try {
+      const response = await axios.get<BlogPost[]>(url, {
+        timeout: DEFAULT_TIMEOUT,
+        cancelToken,
+      });
+
+      // Cache the successful response
+      cache[cacheKey] = {
+        data: response.data,
+        timestamp: Date.now(),
+      };
+
+      console.log(`[BlogService] Fetched ${response.data.length} related blogs for: ${slug}`);
+      return response.data;
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log(`[BlogService] Request cancelled for related blogs: ${slug}`);
+        throw new Error('Request was cancelled');
+      }
+
+      const axiosError = error as AxiosError;
+      console.error('[BlogService] Error fetching related blogs:', {
+        status: axiosError.response?.status,
+        message: axiosError.message,
+        url,
+      });
+
+      // Return cached data if available, even if expired
+      if (cache[cacheKey]?.data) {
+        console.warn(`[BlogService] Using expired cache for related blogs: ${slug}`);
+        return cache[cacheKey].data;
+      }
+
+      // Return empty array as fallback
+      return [];
+    }
+  },
+
+  async getCommentsCount(slug: string): Promise<number> {
+    const cacheKey = `blog_comments_count_${slug}`;
+    
+    // Return cached data if available and valid
+    if (isCacheValid(cacheKey)) {
+      console.log(`[BlogService] Returning cached comments count for: ${slug}`);
+      return cache[cacheKey].data;
+    }
+
+    const url = `${API_BASE_URL}/blogs/${encodeURIComponent(slug)}/comments/count`;
+    const cancelToken = createCancellableRequest(url);
+
+    try {
+      const response = await axios.get<{ count: number }>(url, {
+        timeout: DEFAULT_TIMEOUT,
+        cancelToken,
+      });
+
+      const count = response.data.count || 0;
+
+      // Cache the successful response
+      cache[cacheKey] = {
+        data: count,
+        timestamp: Date.now(),
+      };
+
+      console.log(`[BlogService] Fetched comments count ${count} for: ${slug}`);
+      return count;
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log(`[BlogService] Request cancelled for comments count: ${slug}`);
+        throw new Error('Request was cancelled');
+      }
+
+      const axiosError = error as AxiosError;
+      console.error('[BlogService] Error fetching comments count:', {
+        status: axiosError.response?.status,
+        message: axiosError.message,
+        url,
+      });
+
+      // Return cached data if available, even if expired
+      if (cache[cacheKey]?.data) {
+        console.warn(`[BlogService] Using expired cache for comments count: ${slug}`);
+        return cache[cacheKey].data;
+      }
+
+      // Return 0 as fallback
+      return 0;
     }
   },
 
@@ -433,10 +528,3 @@ export const BlogService = {
     }
   },
 };
-
-// Clean up active requests when the page unloads
-if (typeof window !== 'undefined') {
-  window.addEventListener('beforeunload', () => {
-    BlogService.cancelAllRequests();
-  });
-}

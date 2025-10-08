@@ -12,7 +12,20 @@ import DOMPurify from 'dompurify';
 import { trackShare } from '@/lib/analytics';
 import { ContentRenderer } from '../ContentRenderer';
 import ShareButton from '../ShareButton';
-import { BlogService, BlogSEOData } from '@/services/blogService';
+import { BlogService } from '@/services/blogService';
+import { BlogPost } from '@/types/blog';
+
+// Define BlogSEOData interface
+interface BlogSEOData {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  category?: string;
+  created_at: string;
+  author?: string;
+  canonical_url: string;
+}
 
 type Author = {
   name?: string;

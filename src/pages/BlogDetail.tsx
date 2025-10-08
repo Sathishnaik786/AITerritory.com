@@ -6,7 +6,7 @@ import { ThreadedComments } from '../components/ThreadedComments';
 import BlogLikeBookmark from '../components/BlogLikeBookmark';
 import BlogLikeButton from '../components/BlogLikeButton';
 import BlogBookmarkButton from '../components/BlogBookmarkButton';
-import { BlogService, BlogSEOData } from '../services/blogService';
+import { BlogService } from '../services/blogService';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
@@ -14,7 +14,7 @@ import rehypeHighlight from 'rehype-highlight';
 import { useUser, SignInButton } from '@clerk/clerk-react';
 import { FaXTwitter, FaLinkedin, FaWhatsapp, FaFacebook, FaRegCopy } from 'react-icons/fa6';
 import NewsletterCTA from '../components/NewsletterCTA';
-import { toast } from '@/components/ui/sonner';
+import { useToast } from '@/hooks/use-toast';
 import { logBlogEvent } from '../services/blogAnalyticsService';
 import { BookOpen, Book, ArrowUp, ArrowLeft, ExternalLink, Info, AlertTriangle, Lightbulb, Clock, MessageCircle, Share2 } from 'lucide-react';
 import type { Components } from 'react-markdown';
@@ -40,11 +40,24 @@ import { BlogPost } from '@/types/blog';
 import emoji from 'remark-emoji';
 const remarkEmoji = emoji as unknown as (options?: any) => void;
 
+// Define BlogSEOData interface locally since it's not exported
+interface BlogSEOData {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  category: string;
+  created_at: string;
+  author: string;
+  canonical_url: string;
+}
+
 const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const { user, isSignedIn } = useUser();
   
   const [blog, setBlog] = useState<BlogPost | null>(null);
   const [seoData, setSeoData] = useState<BlogSEOData | null>(null);
@@ -53,7 +66,11 @@ const BlogDetail: React.FC = () => {
   const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
   const [commentsCount, setCommentsCount] = useState(0);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  
+  const [progress, setProgress] = useState(0);
+  const [showNewsletterModal, setShowNewsletterModal] = useState(false);
+  const [showEnjoyedArticlePopup, setShowEnjoyedArticlePopup] = useState(false);
+  const [copied, setCopied] = useState(false);
+
   // Fetch blog data
   useEffect(() => {
     const fetchBlogData = async () => {
@@ -168,7 +185,7 @@ const BlogDetail: React.FC = () => {
 
       // Show newsletter modal at 70% scroll depth (only if not dismissed and not subscribed)
       const hasDismissedPopup = localStorage.getItem('newsletter_popup_dismissed');
-      if (percent >= 70 && !showNewsletterModal && !hasDismissedPopup && !isUserSubscribed) {
+      if (percent >= 70 && !showNewsletterModal && !hasDismissedPopup && !isSubscribed) {
         setShowNewsletterModal(true);
         engagementTracker.trackNewsletterSignup({ trigger: 'scroll_depth' });
       }
@@ -181,7 +198,7 @@ const BlogDetail: React.FC = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [showNewsletterModal, showEnjoyedArticlePopup, engagementTracker, isUserSubscribed]);
+  }, [showNewsletterModal, showEnjoyedArticlePopup, engagementTracker, isSubscribed]);
 
   useEffect(() => {
     if (blog && blog.slug) {
@@ -292,7 +309,7 @@ const BlogDetail: React.FC = () => {
   function handleShare(platform: string) {
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
     const shareTitle = blog.title;
-    const shareDescription = blog.description || blog.subtitle || '';
+    const shareDescription = blog.description || '';
     
     let shareUrl_platform = '';
 
@@ -313,7 +330,10 @@ const BlogDetail: React.FC = () => {
         navigator.clipboard.writeText(shareUrl).then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
-          toast('Link copied to clipboard!');
+          toast({
+            title: "Copied!",
+            description: "Link copied to clipboard",
+          });
         });
         return;
       default:
@@ -342,23 +362,33 @@ const BlogDetail: React.FC = () => {
       });
       
       // Mark user as subscribed
-      setIsUserSubscribed(true);
+      setIsSubscribed(true);
       
       console.log('Newsletter subscription successful:', subscription);
-    toast('Subscribed! Check your inbox.');
+      toast({
+        title: "Subscribed!",
+        description: "Check your inbox.",
+      });
       setShowNewsletterModal(false);
     } catch (error) {
       console.error('Error subscribing to newsletter:', error);
       
       // Handle already subscribed case
       if (error instanceof Error && error.message === 'ALREADY_SUBSCRIBED') {
-        setIsUserSubscribed(true);
-        toast('You are already subscribed!');
+        setIsSubscribed(true);
+        toast({
+          title: "Already subscribed!",
+          description: "You are already subscribed!",
+        });
         setShowNewsletterModal(false);
         return;
       }
       
-      toast('Failed to subscribe. Please try again.');
+      toast({
+        title: "Error",
+        description: "Failed to subscribe. Please try again.",
+        variant: "destructive",
+      });
     }
   }
 
@@ -367,7 +397,10 @@ const BlogDetail: React.FC = () => {
     // Store dismissal in localStorage
     localStorage.setItem('newsletter_popup_dismissed', 'true');
     setShowNewsletterModal(false);
-    toast('No problem! You can subscribe anytime.');
+    toast({
+      title: "No problem!",
+      description: "You can subscribe anytime.",
+    });
   };
 
   // SEO data with enhanced OpenGraph and Twitter card support
@@ -420,7 +453,6 @@ const BlogDetail: React.FC = () => {
       url: blogUrl,
       type: 'article',
       publishedTime: blog.created_at,
-      modifiedTime: blog.updated_at,
       author: blog.author_name || 'AITerritory',
       section: blog.category,
       keywords: blog.tags?.join(', '),
@@ -428,7 +460,6 @@ const BlogDetail: React.FC = () => {
         type: 'article',
         article: {
           publishedTime: blog.created_at,
-          modifiedTime: blog.updated_at,
           section: blog.category,
           authors: blog.author_name ? [blog.author_name] : [],
           tags: blog.tags || [],
@@ -446,16 +477,12 @@ const BlogDetail: React.FC = () => {
       twitter: {
         cardType: 'summary_large_image' as const,
         site: '@aiterritory',
-        handle: blog.author_twitter || '@aiterritory',
+        handle: blog.author_social_links?.twitter || '@aiterritory',
       },
       additionalMetaTags: [
         {
           name: 'article:published_time',
           content: blog.created_at,
-        },
-        {
-          name: 'article:modified_time',
-          content: blog.updated_at || blog.created_at,
         },
         {
           name: 'article:section',
@@ -494,7 +521,7 @@ const BlogDetail: React.FC = () => {
     category = 'Technology',
     created_at = new Date().toISOString(),
     author_name = 'AITerritory',
-    author_avatar_url = '',
+    author_image_url = '',
     tags = [],
     reading_time = '5 min read'
   } = blog || {};
@@ -532,7 +559,7 @@ const BlogDetail: React.FC = () => {
       tags={tags}
       author={{
         name: author_name,
-        avatar: author_avatar_url
+        avatar: author_image_url
       }}
       slug={blog.slug}
       commentsCount={commentsCount}
@@ -565,8 +592,8 @@ const BlogDetail: React.FC = () => {
                 cover_image_url: post.cover_image_url || '',  
                 author_name: post.author_name || 'AITerritory',
                 author: post.author_name || 'AITerritory', 
-                author_image_url: post.author_avatar_url,
-                author_avatar_url: post.author_avatar_url, 
+                author_image_url: post.author_image_url || '',
+                author_avatar_url: post.author_image_url || '', 
                 tags: post.tags || [],
                 created_at: post.created_at,
                 date: post.created_at,

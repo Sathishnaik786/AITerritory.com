@@ -182,6 +182,20 @@ function ThemedAppContent() {
   const isLandingPro = location.pathname === '/';
   const isGeminiPromptsPage = location.pathname.startsWith('/gemini-prompts');
   const [newsletterOpen, setNewsletterOpen] = useState(false);
+  
+  // Listen for the custom event to open the newsletter modal
+  useEffect(() => {
+    const handleOpenNewsletterModal = () => {
+      setNewsletterOpen(true);
+    };
+    
+    window.addEventListener('openNewsletterModal', handleOpenNewsletterModal);
+    
+    return () => {
+      window.removeEventListener('openNewsletterModal', handleOpenNewsletterModal);
+    };
+  }, []);
+
   return (
     <div className={`min-h-screen antialiased w-full flex flex-col`}>
       <HelmetProvider>

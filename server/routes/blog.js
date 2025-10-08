@@ -69,15 +69,6 @@ router.put('/:id', blogController.updateBlog);
 // DELETE /api/blogs/:id
 router.delete('/:id', blogController.deleteBlog);
 
-// Mount blog comments router
-router.use('/:slug/comments', (req, res, next) => {
-  console.log('🔍 Server: Blog comments route hit');
-  console.log('  URL:', req.originalUrl);
-  console.log('  Method:', req.method);
-  console.log('  Slug:', req.params.slug);
-  next();
-}, blogCommentsRouter);
-
 // Blog likes endpoints
 router.get('/:slug/likes', async (req, res) => {
   try {
@@ -242,5 +233,8 @@ router.post('/:slug/bookmarks', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Mount blog comments router - moved to the end
+router.use('/:slug/comments', blogCommentsRouter);
 
 module.exports = router;

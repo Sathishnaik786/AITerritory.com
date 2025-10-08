@@ -11,6 +11,7 @@ import { useUser, SignInButton } from '@clerk/clerk-react';
 import { usePromptInteractions } from '../hooks/usePromptInteractions';
 import DynamicPromptCommentSection from '@/components/DynamicPromptCommentSection';
 import { ShareButton } from '@/components/ShareButton';
+import PromptsSidebar from '@/components/PromptsSidebar';
 import './GeminiPromptsPage.css';
 
 interface GeminiPrompt {
@@ -547,7 +548,7 @@ ${shareData.url}`);
         </script>
       </Helmet>
 
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <Button 
           variant="ghost" 
           className="mb-6 flex items-center"
@@ -557,187 +558,157 @@ ${shareData.url}`);
           Back to Prompts
         </Button>
 
-        {/* Enhanced Content Section */}
-        <div className="mb-8">
-        </div>
-
-        <Card className="overflow-hidden rounded-xl shadow-lg">
-          <div className="aspect-square overflow-hidden relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
-            {prompt.image_url ? (
-              <img 
-                src={prompt.image_url} 
-                alt={`AI Prompt: ${seoTitle}`} 
-                className="w-full h-full object-cover"
-                width="600"
-                height="600"
-                loading="lazy"
-                onError={(e) => {
-                  e.currentTarget.src = '/placeholder.svg';
-                }}
-              />
-            ) : (
-              <div className="text-gray-500 dark:text-gray-400">
-                <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto" />
-                <p className="mt-2 text-center">No image available</p>
+        {/* Main content with sidebar */}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Main content - left side on desktop, top on mobile */}
+          <div className="lg:w-2/3">
+            {/* Enhanced Content Section */}
+            <div className="mb-8">
+              {/* Subscribe Button */}
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 mb-6 text-white">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <h3 className="font-bold text-lg">Stay Updated with AI Prompts</h3>
+                    <p className="text-sm opacity-90">Get the latest prompts and AI insights delivered to your inbox</p>
+                  </div>
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    onClick={() => {
+                      // Dispatch a custom event to open the newsletter modal
+                      window.dispatchEvent(new CustomEvent('openNewsletterModal'));
+                    }}
+                    className="whitespace-nowrap"
+                  >
+                    Subscribe
+                  </Button>
+                </div>
               </div>
-            )}
-            <div className="absolute top-4 right-4">
-              <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getCategoryColor(prompt.category)}`}>
-                {prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)}
-              </span>
             </div>
-          </div>
-          
-          <CardContent className="p-6">
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-              <div>
-                <h1 className="text-2xl font-bold mb-2">{seoTitle}</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Created on {new Date(prompt.created_at).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
-                </p>
+
+            <Card className="overflow-hidden rounded-xl shadow-lg">
+              <div className="aspect-square overflow-hidden relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+                {prompt.image_url ? (
+                  <img 
+                    src={prompt.image_url} 
+                    alt={`AI Prompt: ${seoTitle}`} 
+                    className="w-full h-full object-cover"
+                    width="600"
+                    height="600"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.svg';
+                    }}
+                  />
+                ) : (
+                  <div className="text-gray-500 dark:text-gray-400">
+                    <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto" />
+                    <p className="mt-2 text-center">No image available</p>
+                  </div>
+                )}
+                <div className="absolute top-4 right-4">
+                  <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getCategoryColor(prompt.category)}`}>
+                    {prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)}
+                  </span>
+                </div>
               </div>
               
-              <div className="flex space-x-2">
-                {/* Like Button */}
-                {isSignedIn ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleLikePrompt}
-                  >
-                    <Heart className={`h-4 w-4 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
-                    <span className="ml-2">{likeCount}</span>
-                  </Button>
-                ) : (
-                  <SignInButton mode="modal">
+              <CardContent className="p-6">
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                  <div>
+                    <h1 className="text-2xl font-bold mb-2">{seoTitle}</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Created on {new Date(prompt.created_at).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                    {/* Like Button */}
+                    {isSignedIn ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleLikePrompt}
+                      >
+                        <Heart className={`h-4 w-4 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
+                        <span className="ml-2">{likeCount}</span>
+                      </Button>
+                    ) : (
+                      <SignInButton mode="modal">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Heart className="h-4 w-4" />
+                          <span className="ml-2">{likeCount}</span>
+                        </Button>
+                      </SignInButton>
+                    )}
+                    
+                    {/* Comment Button */}
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => setIsCommentSectionOpen(true)}
                     >
-                      <Heart className="h-4 w-4" />
-                      <span className="ml-2">{likeCount}</span>
+                      <MessageCircle className="h-4 w-4" />
+                      <span className="ml-2">{commentCount}</span>
                     </Button>
-                  </SignInButton>
-                )}
+                    
+                    {/* Replace the existing share dropdown with our new ShareButton component */}
+                    <ShareButton
+                      url={window.location.href}
+                      title={seoTitle}
+                      description={seoDescription}
+                      image={prompt?.image_url || undefined}
+                      variant="dropdown"
+                      onShare={(platform) => {
+                        // Track the share event
+                        console.log(`Shared prompt on ${platform}`);
+                      }}
+                    />
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopyPrompt}
+                    >
+                      {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
                 
-                {/* Comment Button */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsCommentSectionOpen(true)}
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  <span className="ml-2">{commentCount}</span>
-                </Button>
-                
-                {/* Replace the existing share dropdown with our new ShareButton component */}
-                <ShareButton
-                  url={window.location.href}
-                  title={seoTitle}
-                  description={seoDescription}
-                  image={prompt?.image_url || undefined}
-                  variant="dropdown"
-                  onShare={(platform) => {
-                    // Track the share event
-                    console.log(`Shared prompt on ${platform}`);
-                  }}
-                />
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopyPrompt}
-                >
-                  {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-            
-            <div className="prose max-w-none dark:prose-invert">
-              <p className="text-lg whitespace-pre-wrap">{prompt.prompt}</p>
-            </div>
-          </CardContent>
-        </Card>
+                <div className="prose max-w-none dark:prose-invert">
+                  <p className="text-lg whitespace-pre-wrap">{prompt.prompt}</p>
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Comment Section */}
-        <div className="mt-8">
-          <DynamicPromptCommentSection promptId={id || ''} />
-        </div>
+            {/* Comment Section */}
+            <div className="mt-8">
+              <DynamicPromptCommentSection promptId={id || ''} />
+            </div>
 
-        {/* Related Prompts Section */}
-        {relatedPrompts.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-2xl font-bold mb-6">Related Prompts</h2>
-            <div className="gemini-prompts-grid gap-6">
-              {relatedPrompts.map((relatedPrompt) => {
-                const categoryColor = getCategoryColor(relatedPrompt.category);
-                const relatedPromptSlug = slugify(relatedPrompt.prompt.substring(0, 50)) || relatedPrompt.id;
-                
-                return (
-                  <Link 
-                    key={relatedPrompt.id} 
-                    to={`/gemini-prompts/${relatedPrompt.category}/${relatedPromptSlug}-${relatedPrompt.id}`}
-                    className="block h-full"
-                  >
-                    <Card className="h-full flex flex-col overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
-                      <div className="aspect-square overflow-hidden relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
-                        {relatedPrompt.image_url ? (
-                          <img 
-                            src={relatedPrompt.image_url} 
-                            alt={`Related AI Prompt: ${relatedPrompt.prompt.substring(0, 50)}${relatedPrompt.prompt.length > 50 ? '...' : ''}`} 
-                            className="w-full h-full object-cover"
-                            width="300"
-                            height="300"
-                            loading="lazy"
-                            onError={(e) => {
-                              e.currentTarget.src = '/placeholder.svg';
-                            }}
-                          />
-                        ) : (
-                          <div className="text-gray-500 dark:text-gray-400">
-                            <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto" />
-                          </div>
-                        )}
-                        <div className="absolute top-2 right-2">
-                          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${categoryColor}`}>
-                            {relatedPrompt.category.charAt(0).toUpperCase() + relatedPrompt.category.slice(1)}
-                          </span>
-                        </div>
-                      </div>
-                      <CardContent className="flex-1 flex flex-col p-4 bg-white dark:bg-gray-900">
-                        <p className="text-sm mb-4 flex-1 text-gray-800 dark:text-gray-200 line-clamp-3">
-                          {relatedPrompt.prompt.substring(0, 120) + (relatedPrompt.prompt.length > 120 ? '...' : '')}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {new Date(relatedPrompt.created_at).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric'
-                            })}
-                          </span>
-                          <ExternalLink className="h-4 w-4 text-gray-500" />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                );
+            {/* Last Updated Display */}
+            <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+              Last updated on {new Date(prompt.created_at).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
               })}
             </div>
           </div>
-        )}
-        
-        {/* Last Updated Display */}
-        <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          Last updated on {new Date(prompt.created_at).toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-          })}
+
+          {/* Sidebar - right side on desktop, bottom on mobile */}
+          <div className="lg:w-1/3">
+            <div className="lg:sticky lg:top-8">
+              <PromptsSidebar currentPromptId={prompt.id} currentCategory={prompt.category} />
+            </div>
+          </div>
         </div>
       </div>
     </div>

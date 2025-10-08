@@ -86,8 +86,8 @@ export default defineConfig(({ mode }) => ({
     }
   },
   server: {
-    port: 3007,
-    strictPort: true,
+    port: 3009,
+    strictPort: false,
     open: true,
     proxy: {
       // Proxy API requests to the backend server
@@ -122,8 +122,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   preview: {
-    port: 3007,
-    strictPort: true,
+    port: 3009,
+    strictPort: false,
     headers: {
       'Content-Security-Policy': [
         "default-src 'self';",
