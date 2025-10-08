@@ -183,16 +183,16 @@ function ThemedAppContent() {
   const isGeminiPromptsPage = location.pathname.startsWith('/gemini-prompts');
   const [newsletterOpen, setNewsletterOpen] = useState(false);
   
-  // Listen for the custom event to open the newsletter modal
+  // Listen for custom event to open newsletter modal
   useEffect(() => {
-    const handleOpenNewsletterModal = () => {
+    const handleOpenNewsletter = () => {
       setNewsletterOpen(true);
     };
     
-    window.addEventListener('openNewsletterModal', handleOpenNewsletterModal);
+    window.addEventListener('openNewsletterModal', handleOpenNewsletter);
     
     return () => {
-      window.removeEventListener('openNewsletterModal', handleOpenNewsletterModal);
+      window.removeEventListener('openNewsletterModal', handleOpenNewsletter);
     };
   }, []);
 

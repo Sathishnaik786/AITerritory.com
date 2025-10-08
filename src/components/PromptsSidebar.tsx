@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { getGeminiPrompts } from '@/services/geminiPromptsService';
 import { Link } from 'react-router-dom';
 import { slugify } from '@/lib/slugify';
@@ -19,12 +18,12 @@ interface GeminiPrompt {
 interface PromptsSidebarProps {
   currentPromptId?: string;
   currentCategory?: string;
+  onOpenNewsletter?: () => void;
 }
 
-const PromptsSidebar: React.FC<PromptsSidebarProps> = ({ currentPromptId, currentCategory }) => {
+const PromptsSidebar: React.FC<PromptsSidebarProps> = ({ currentPromptId, currentCategory, onOpenNewsletter }) => {
   const [relatedPrompts, setRelatedPrompts] = useState<GeminiPrompt[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState(false);
 
   // Fetch related prompts
   useEffect(() => {
@@ -87,25 +86,9 @@ const PromptsSidebar: React.FC<PromptsSidebarProps> = ({ currentPromptId, curren
           <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
             Get access to exclusive prompts, advanced tools, and priority support with a subscription.
           </p>
-          <Dialog open={isSubscribeModalOpen} onOpenChange={setIsSubscribeModalOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full" onClick={() => setIsSubscribeModalOpen(true)}>
-                Subscribe Now
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Premium Subscription</DialogTitle>
-              </DialogHeader>
-              <div className="py-4">
-                <p className="mb-4">Subscription functionality will be connected to Supabase billing in the future.</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  This is a placeholder modal. In the full implementation, this would connect to your Supabase billing system.
-                </p>
-              </div>
-              <Button onClick={() => setIsSubscribeModalOpen(false)}>Close</Button>
-            </DialogContent>
-          </Dialog>
+          <Button className="w-full" onClick={onOpenNewsletter}>
+            Subscribe Now
+          </Button>
         </CardContent>
       </Card>
 

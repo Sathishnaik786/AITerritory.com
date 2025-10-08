@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Copy, Heart, MessageCircle, Share2, Check, ArrowLeft, Link as LinkIcon, ExternalLink, Home } from 'lucide-react';
+import { Copy, Heart, MessageCircle, Share2, Check, ArrowLeft, LinkIcon, ExternalLink, Home } from 'lucide-react';
 import { getGeminiPrompts, getSEOGeminiPromptById } from '../services/geminiPromptsService';
 import { slugify } from '@/lib/slugify';
 import { useUser, SignInButton } from '@clerk/clerk-react';
@@ -564,26 +564,6 @@ ${shareData.url}`);
           <div className="lg:w-2/3">
             {/* Enhanced Content Section */}
             <div className="mb-8">
-              {/* Subscribe Button */}
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 mb-6 text-white">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div>
-                    <h3 className="font-bold text-lg">Stay Updated with AI Prompts</h3>
-                    <p className="text-sm opacity-90">Get the latest prompts and AI insights delivered to your inbox</p>
-                  </div>
-                  <Button 
-                    variant="secondary" 
-                    size="sm" 
-                    onClick={() => {
-                      // Dispatch a custom event to open the newsletter modal
-                      window.dispatchEvent(new CustomEvent('openNewsletterModal'));
-                    }}
-                    className="whitespace-nowrap"
-                  >
-                    Subscribe
-                  </Button>
-                </div>
-              </div>
             </div>
 
             <Card className="overflow-hidden rounded-xl shadow-lg">
@@ -706,7 +686,14 @@ ${shareData.url}`);
           {/* Sidebar - right side on desktop, bottom on mobile */}
           <div className="lg:w-1/3">
             <div className="lg:sticky lg:top-8">
-              <PromptsSidebar currentPromptId={prompt.id} currentCategory={prompt.category} />
+              <PromptsSidebar 
+                currentPromptId={prompt.id} 
+                currentCategory={prompt.category} 
+                onOpenNewsletter={() => {
+                  // Dispatch a custom event to open the newsletter modal
+                  window.dispatchEvent(new CustomEvent('openNewsletterModal'));
+                }} 
+              />
             </div>
           </div>
         </div>
