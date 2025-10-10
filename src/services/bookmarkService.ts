@@ -1,4 +1,6 @@
 import api from './api';
+import { toolService } from './toolService';
+import { Tool } from '../types/tool';
 
 export const bookmarkService = {
   async isBookmarked(toolId: string, user_id: string): Promise<boolean> {
@@ -17,4 +19,16 @@ export const bookmarkService = {
     const res = await api.get('/bookmarks', { params: { user_id } });
     return res.data.bookmarks;
   },
-}; 
+  async getUserBookmarks(user_id: string): Promise<Tool[]> {
+    // First get the bookmarked tool IDs
+    const bookmarkedToolIds = await this.getBookmarksForUser(user_id);
+    
+    // If no bookmarks, return empty array
+    if (!bookmarkedToolIds || bookmarkedToolIds.length === 0) {
+      return [];
+    }
+    
+    // Get the full tool data for all bookmarked tools
+    return await toolService.getToolsByIds(bookmarkedToolIds);
+  }
+};

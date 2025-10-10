@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, easeInOut, easeOut } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { useUser, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
+import { useAuth } from '@/context/AuthContext';
 import { X, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ThemeToggle from '../ThemeToggle';
+import { Button } from '../ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -27,7 +29,8 @@ const resourceLinks = [
 ];
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
-  const { user } = useUser();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const menuVariants = {
@@ -36,7 +39,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       x: 300,
       transition: {
         duration: 0.25,
-        ease: [0.4, 0, 0.2, 1]
+        ease: easeInOut
       }
     },
     open: {
@@ -44,7 +47,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       x: 0,
       transition: {
         duration: 0.35,
-        ease: [0.4, 0, 0.2, 1]
+        ease: easeInOut
       }
     }
   };
@@ -54,14 +57,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       opacity: 0,
       transition: {
         duration: 0.2,
-        ease: "easeInOut"
+        ease: easeInOut
       }
     },
     open: {
       opacity: 1,
       transition: {
         duration: 0.3,
-        ease: "easeOut"
+        ease: easeOut
       }
     }
   };
@@ -72,7 +75,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       x: 20,
       transition: {
         duration: 0.2,
-        ease: "easeInOut"
+        ease: easeInOut
       }
     },
     open: {
@@ -80,7 +83,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       x: 0,
       transition: {
         duration: 0.3,
-        ease: [0.4, 0, 0.2, 1],
+        ease: easeInOut,
         staggerChildren: 0.05,
         delayChildren: 0.1
       }
@@ -223,23 +226,52 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 </motion.div>
                 
                 <motion.div variants={itemVariants} className="space-y-3">
-                  <SignedOut>
-                    <SignUpButton mode="modal">
-                      <button className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl border border-blue-500/30 shadow-sm hover:shadow-md transition-all duration-200">
+                  {!user ? (
+                    <>
+                      <Button 
+                        onClick={() => {
+                          onClose();
+                          navigate('/signup');
+                        }}
+                        className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl border border-blue-500/30 shadow-sm hover:shadow-md transition-all duration-200"
+                      >
                         Sign Up
-                      </button>
-                    </SignUpButton>
-                    <SignInButton mode="modal">
-                      <button className="w-full py-3.5 px-4 border border-border bg-background text-foreground font-medium rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          onClose();
+                          navigate('/login');
+                        }}
+                        variant="outline"
+                        className="w-full py-3.5 px-4 border border-border bg-background text-foreground font-medium rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                      >
                         Login
-                      </button>
-                    </SignInButton>
-                  </SignedOut>
-                  <SignedIn>
-                    <div className="flex items-center justify-center p-4 bg-muted/30 rounded-xl border border-border/30">
-                      <UserButton afterSignOutUrl="/" />
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="flex flex-col gap-3">
+                      <Button 
+                        onClick={() => {
+                          onClose();
+                          navigate('/dashboard');
+                        }}
+                        variant="outline"
+                        className="w-full py-3.5 px-4 border border-border bg-background text-foreground font-medium rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                      >
+                        Dashboard
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          onClose();
+                          navigate('/');
+                        }}
+                        variant="outline"
+                        className="w-full py-3.5 px-4 border border-border bg-background text-foreground font-medium rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                      >
+                        Sign Out
+                      </Button>
                     </div>
-                  </SignedIn>
+                  )}
                 </motion.div>
               </motion.div>
             </div>
@@ -248,4 +280,4 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       )}
     </AnimatePresence>
   );
-} 
+}

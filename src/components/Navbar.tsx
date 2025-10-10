@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { useUser, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
+import { useAuth } from "@/context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
 import {
   NavigationMenu,
@@ -17,6 +17,7 @@ import {
 import { Sparkles } from "lucide-react";
 import MobileMenu from "./MobileMenu";
 import { navLinks } from "../data/navLinks";
+import { Button } from "./ui/button";
 
 interface NavbarProps {
   newsletterOpen: boolean;
@@ -25,8 +26,9 @@ interface NavbarProps {
 
 export function Navbar({ newsletterOpen, setNewsletterOpen }: NavbarProps) {
   const { resolvedTheme } = useTheme();
-  const { user } = useUser();
+  const { user, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [navigationMenuOpen, setNavigationMenuOpen] = useState(false);
   const navigationMenuRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +62,12 @@ export function Navbar({ newsletterOpen, setNewsletterOpen }: NavbarProps) {
       });
       navigationMenuRef.current?.dispatchEvent(escapeEvent);
     }, 10);
+  };
+
+  // Handle logout
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
   };
 
   // Close dropdowns when route changes
@@ -150,21 +158,40 @@ export function Navbar({ newsletterOpen, setNewsletterOpen }: NavbarProps) {
         {/* Desktop Right side: Theme, Auth/User */}
         <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
           <ThemeToggle small />
-          <SignedOut>
-            <SignUpButton mode="modal">
-              <button className="px-5 py-2.5 text-sm font-medium rounded-xl border border-border bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap">
+          {!user ? (
+            <>
+              <Button 
+                onClick={() => navigate('/signup')} 
+                className="px-5 py-2.5 text-sm font-medium rounded-xl border border-border bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap"
+              >
                 Sign Up
-              </button>
-            </SignUpButton>
-            <SignInButton mode="modal">
-              <button className="px-5 py-2.5 text-sm font-medium rounded-xl border border-border bg-background text-foreground shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap">
+              </Button>
+              <Button 
+                onClick={() => navigate('/login')} 
+                variant="outline"
+                className="px-5 py-2.5 text-sm font-medium rounded-xl border border-border bg-background text-foreground shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap"
+              >
                 Login
-              </button>
-            </SignInButton>
-          </SignedOut>
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+              </Button>
+            </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button 
+                onClick={() => navigate('/dashboard')}
+                variant="ghost"
+                className="px-3 py-2 text-sm font-medium rounded-xl"
+              >
+                Dashboard
+              </Button>
+              <Button 
+                onClick={handleLogout}
+                variant="outline"
+                className="px-3 py-2 text-sm font-medium rounded-xl"
+              >
+                Logout
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Mobile Menu: Only show on mobile */}
@@ -195,4 +222,4 @@ function ListItem({ title, children, to, ...props }: React.ComponentPropsWithout
       </NavigationMenuLink>
     </li>
   );
-} 
+}

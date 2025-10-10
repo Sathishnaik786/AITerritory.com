@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { trackAuthAction } from '@/lib/analytics';
 
 /**
@@ -7,31 +7,31 @@ import { trackAuthAction } from '@/lib/analytics';
  * Automatically tracks sign in, sign up, and sign out events
  */
 export const useAuthTracking = () => {
-  const { user, isSignedIn } = useUser();
+  const { user } = useAuth();
 
   useEffect(() => {
     // Track when user signs in
-    if (isSignedIn && user) {
+    if (user) {
       // Determine if this is a new user (sign up) or existing user (sign in)
       // We'll track as sign_in for now, but you could add logic to detect new users
       trackAuthAction(
         'sign_in',
-        'clerk', // auth method
+        'supabase', // auth method
         user.id
       );
     }
-  }, [isSignedIn, user]);
+  }, [user]);
 
   // Function to manually track sign out
   const trackSignOut = () => {
     if (user) {
       trackAuthAction(
         'sign_out',
-        'clerk',
+        'supabase',
         user.id
       );
     }
   };
 
   return { trackSignOut };
-}; 
+};

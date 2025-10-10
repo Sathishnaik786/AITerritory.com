@@ -7,12 +7,12 @@ import { useTheme } from 'next-themes';
 import { FaRegCommentDots, FaRegFileAlt, FaRegCopy, FaBars, FaArrowRight } from 'react-icons/fa';
 import { getPrompts } from '../services/promptsService';
 import { useToast } from './ui/use-toast';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import * as promptActions from '../services/promptActionsService';
 import { motion } from 'framer-motion';
 import { trackPromptLike, trackPromptBookmark, trackCommentPosted } from '@/lib/analytics';
 import { sanitizeText } from '@/lib/sanitizeHtml';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const promptCategories = [
   'Ethereum Developer',
@@ -91,7 +91,8 @@ export default function Prompts() {
   const { toast } = useToast();
   const [openPrompt, setOpenPrompt] = useState<null | Prompt>(null);
   const [openRead, setOpenRead] = useState<null | { title: string; description: string; author?: string }>(null);
-  const { user } = useUser();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   // State for chat dialog actions
   const [chatStatus, setChatStatus] = useState<PromptStatus | null>(null);
   const [chatComments, setChatComments] = useState<PromptComment[]>([]);
@@ -172,7 +173,11 @@ export default function Prompts() {
 
   // Like/unlike
   const handleLike = async () => {
-    if (!user) return;
+    if (!user) {
+      toast({ title: 'Login Required', description: 'Please login to like prompts.' });
+      navigate('/login');
+      return;
+    }
     if (!openPrompt?.id) return;
     setChatLoading(true);
     try {
@@ -198,7 +203,11 @@ export default function Prompts() {
 
   // Bookmark/unbookmark
   const handleBookmark = async () => {
-    if (!user) return;
+    if (!user) {
+      toast({ title: 'Login Required', description: 'Please login to bookmark prompts.' });
+      navigate('/login');
+      return;
+    }
     if (!openPrompt?.id) return;
     setChatLoading(true);
     try {
@@ -224,7 +233,12 @@ export default function Prompts() {
 
   // Add comment
   const handleAddComment = async () => {
-    if (!user || !commentInput.trim() || !openPrompt?.id) return;
+    if (!user) {
+      toast({ title: 'Login Required', description: 'Please login to comment.' });
+      navigate('/login');
+      return;
+    }
+    if (!commentInput.trim() || !openPrompt?.id) return;
     setChatLoading(true);
     try {
       await promptActions.addComment(openPrompt.id, user.id, commentInput.trim());
@@ -449,4 +463,4 @@ export default function Prompts() {
       </div>
     </div>
   );
-} 
+}

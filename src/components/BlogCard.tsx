@@ -6,7 +6,7 @@ import { BlogPost } from '../types/blog';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { useLikesAndBookmarks } from '../hooks/useLikesAndBookmarks';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 
 interface BlogCardProps {
   post: BlogPost;
@@ -19,7 +19,7 @@ export const BlogCard: React.FC<BlogCardProps> = ({
   variant = 'default',
   className = ''
 }) => {
-  const { user, isSignedIn } = useUser();
+  const { user } = useAuth();
   const {
     likeCount: currentLikeCount,
     liked: isLiked,
@@ -35,8 +35,8 @@ export const BlogCard: React.FC<BlogCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
-    if (!isSignedIn) {
-      window.location.href = `/sign-in?redirect=${encodeURIComponent(window.location.pathname)}`;
+    if (!user) {
+      window.location.href = `/login`;
       return;
     }
     
@@ -51,8 +51,8 @@ export const BlogCard: React.FC<BlogCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
-    if (!isSignedIn) {
-      window.location.href = `/sign-in?redirect=${encodeURIComponent(window.location.pathname)}`;
+    if (!user) {
+      window.location.href = `/login`;
       return;
     }
     

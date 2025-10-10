@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ThreadedComments } from '../components/ThreadedComments';
+import ThreadedComments from '../components/ThreadedComments';
 import BlogLikeBookmark from '../components/BlogLikeBookmark';
 import BlogLikeButton from '../components/BlogLikeButton';
 import BlogBookmarkButton from '../components/BlogBookmarkButton';
@@ -11,7 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import rehypeHighlight from 'rehype-highlight';
-import { useUser, SignInButton } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { FaXTwitter, FaLinkedin, FaWhatsapp, FaFacebook, FaRegCopy } from 'react-icons/fa6';
 import NewsletterCTA from '../components/NewsletterCTA';
 import { useToast } from '@/hooks/use-toast';
@@ -57,7 +57,7 @@ const BlogDetail: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { user, isSignedIn } = useUser();
+  const { user } = useAuth();
   
   const [blog, setBlog] = useState<BlogPost | null>(null);
   const [seoData, setSeoData] = useState<BlogSEOData | null>(null);
@@ -153,9 +153,9 @@ const BlogDetail: React.FC = () => {
       }
 
       // If user is signed in, check if they're already subscribed
-      if (isSignedIn && user?.emailAddresses?.[0]?.emailAddress) {
+      if (user?.email) {
         try {
-          const userEmail = user.emailAddresses[0].emailAddress;
+          const userEmail = user.email;
           const isSubscribed = await NewsletterService.isSubscribed(userEmail);
           
           if (isSubscribed) {
@@ -173,7 +173,7 @@ const BlogDetail: React.FC = () => {
     };
 
     checkNewsletterStatus();
-  }, [isSignedIn, user]);
+  }, [user]);
 
   // Enhanced reading progress tracking with engagement CTAs
   useEffect(() => {
@@ -202,7 +202,7 @@ const BlogDetail: React.FC = () => {
 
   useEffect(() => {
     if (blog && blog.slug) {
-      logBlogEvent({ event_type: 'view', blog_id: blog.slug, user_id: isSignedIn ? user?.id : undefined });
+      logBlogEvent({ event_type: 'view', blog_id: blog.slug, user_id: user?.id });
     }
     // eslint-disable-next-line
   }, [blog]);
@@ -569,7 +569,7 @@ const BlogDetail: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
           Discussion ({commentsCount})
         </h2>
-        <ThreadedComments blogId={blog.slug} />
+        <ThreadedComments resourceId={blog.slug} resourceType="blog" />
       </div>
 
       {/* Related Posts */}

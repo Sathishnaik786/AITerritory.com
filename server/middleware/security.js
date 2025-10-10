@@ -93,9 +93,7 @@ const getCSPConfig = () => {
         "'self'",
         "https://api.supabase.co",
         "https://*.supabase.co",
-        "wss://*.supabase.co", // Allow WebSocket connections to Supabase
-        "https://api.clerk.dev",
-        "https://*.clerk.dev"
+        "wss://*.supabase.co" // Allow WebSocket connections to Supabase
       ],
       
       // Allow media from same origin and external sources

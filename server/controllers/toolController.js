@@ -154,6 +154,20 @@ const toolController = {
     }
   },
 
+  // Get multiple tools by IDs
+  async getToolsByIds(req, res, next) {
+    try {
+      const { ids } = req.body;
+      if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ error: 'Invalid or missing IDs array' });
+      }
+      const tools = await Tool.findByIds(ids);
+      res.json(tools);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   // Create new tool
   async createTool(req, res, next) {
     try {

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { navLinks } from "../data/navLinks";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import ThemeToggle from "./ThemeToggle";
 import { NavbarNewsletterModal } from "./NavbarNewsletterModal";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
+import { useAuth } from "@/context/AuthContext";
 
 interface MobileMenuProps {
   newsletterOpen: boolean;
@@ -22,10 +22,18 @@ export default function MobileMenu({ newsletterOpen, setNewsletterOpen, isOpen, 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   
   // Use external control if provided, otherwise use internal state
   const open = isOpen !== undefined ? isOpen : internalOpen;
   const setOpen = onOpenChange || setInternalOpen;
+
+  // Handle logout
+  const handleLogout = async () => {
+    await signOut();
+    setOpen(false);
+    navigate('/');
+  };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -145,25 +153,49 @@ export default function MobileMenu({ newsletterOpen, setNewsletterOpen, isOpen, 
         
         {/* Authentication Buttons */}
         <div className="px-6 py-4 border-t border-border/40">
-          <SignedOut>
+          {!user ? (
             <div className="flex gap-3">
-              <SignUpButton mode="modal">
-                <Button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-200">
-                  Sign Up
-                </Button>
-              </SignUpButton>
-              <SignInButton mode="modal">
-                <Button variant="outline" className="flex-1 font-semibold shadow-sm hover:shadow-md transition-all duration-200">
-                  Login
-                </Button>
-              </SignInButton>
+              <Button 
+                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+                onClick={() => {
+                  setOpen(false);
+                  navigate('/signup');
+                }}
+              >
+                Sign Up
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1 font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+                onClick={() => {
+                  setOpen(false);
+                  navigate('/login');
+                }}
+              >
+                Login
+              </Button>
             </div>
-          </SignedOut>
-          <SignedIn>
-            <div className="flex items-center justify-center">
-              <UserButton afterSignOutUrl="/" />
+          ) : (
+            <div className="flex items-center justify-between">
+              <Button 
+                variant="ghost" 
+                className="flex items-center gap-2"
+                onClick={() => {
+                  setOpen(false);
+                  navigate('/dashboard');
+                }}
+              >
+                <User className="w-4 h-4" />
+                Dashboard
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
             </div>
-          </SignedIn>
+          )}
         </div>
         
         {/* Bottom CTA or contact */}
@@ -188,4 +220,4 @@ export default function MobileMenu({ newsletterOpen, setNewsletterOpen, isOpen, 
       </SheetContent>
     </Sheet>
   );
-} 
+}

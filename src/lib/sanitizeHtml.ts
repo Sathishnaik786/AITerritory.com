@@ -3,7 +3,9 @@
  * Provides XSS protection for user-generated content
  */
 
-// Basic HTML sanitization without external dependencies
+import DOMPurify from 'dompurify';
+
+// Configuration constants
 const ALLOWED_TAGS = [
   'p', 'br', 'strong', 'em', 'b', 'i', 'u', 's', 'mark', 'small', 'del', 'ins',
   'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
@@ -36,16 +38,6 @@ const FORBID_ATTR = [
   'onresize', 'onscroll', 'oncontextmenu', 'oninput', 'oninvalid', 'onsearch'
 ];
 
-// Simple HTML tag and attribute validation
-const isValidTag = (tag: string): boolean => {
-  return ALLOWED_TAGS.includes(tag.toLowerCase());
-};
-
-const isValidAttribute = (attr: string): boolean => {
-  const attrLower = attr.toLowerCase();
-  return ALLOWED_ATTR.includes(attrLower) && !FORBID_ATTR.includes(attrLower);
-};
-
 const isValidUrl = (url: string): boolean => {
   if (!url) return false;
   try {
@@ -56,56 +48,13 @@ const isValidUrl = (url: string): boolean => {
   }
 };
 
-// Basic HTML sanitization function
-const sanitizeHtmlBasic = (html: string): string => {
-  if (!html || typeof html !== 'string') return '';
-  
-  // Remove script tags and their content
-  html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  
-  // Remove style tags and their content
-  html = html.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
-  
-  // Remove forbidden tags
-  FORBID_TAGS.forEach(tag => {
-    const regex = new RegExp(`<\\/?${tag}\\b[^>]*>`, 'gi');
-    html = html.replace(regex, '');
-  });
-  
-  // Remove dangerous attributes
-  FORBID_ATTR.forEach(attr => {
-    const regex = new RegExp(`\\s+${attr}\\s*=\\s*["'][^"']*["']`, 'gi');
-    html = html.replace(regex, '');
-  });
-  
-  // Remove javascript: protocol
-  html = html.replace(/javascript:/gi, '');
-  
-  return html;
-};
-
-// Try to use DOMPurify if available, otherwise fall back to basic sanitization
-let DOMPurify: any = null;
-
-// Try to import DOMPurify dynamically
-try {
-  // This will work if DOMPurify is installed
-  DOMPurify = require('dompurify');
-} catch {
-  // DOMPurify not available, use basic sanitization
-  // Only show warning in development mode
-  if (process.env.NODE_ENV === 'development') {
-    console.warn('DOMPurify not available, using basic HTML sanitization');
-  }
-}
-
 /**
- * Sanitizes HTML content to prevent XSS attacks
+ * Sanitizes HTML content to prevent XSS attacks using DOMPurify
  */
 export const sanitizeHtml = (content: string): string => {
   if (!content || typeof content !== 'string') return '';
   
-  if (DOMPurify && typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && DOMPurify) {
     return DOMPurify.sanitize(content, {
       ALLOWED_TAGS,
       ALLOWED_ATTR,
@@ -117,16 +66,16 @@ export const sanitizeHtml = (content: string): string => {
     });
   }
   
-  return sanitizeHtmlBasic(content);
+  return '';
 };
 
 /**
- * Sanitizes markdown HTML content
+ * Sanitizes markdown HTML content using DOMPurify
  */
 export const sanitizeMarkdownHtml = (content: string): string => {
   if (!content || typeof content !== 'string') return '';
   
-  if (DOMPurify && typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && DOMPurify) {
     return DOMPurify.sanitize(content, {
       ALLOWED_TAGS: [
         ...ALLOWED_TAGS,
@@ -141,7 +90,7 @@ export const sanitizeMarkdownHtml = (content: string): string => {
     });
   }
   
-  return sanitizeHtmlBasic(content);
+  return '';
 };
 
 /**
@@ -177,4 +126,4 @@ export const sanitizeMarkdownForInnerHTML = (content: string) => {
 };
 
 // Export constants for external use
-export { ALLOWED_TAGS, ALLOWED_ATTR, FORBID_TAGS, FORBID_ATTR }; 
+export { ALLOWED_TAGS, ALLOWED_ATTR, FORBID_TAGS, FORBID_ATTR };

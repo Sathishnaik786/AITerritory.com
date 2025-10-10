@@ -117,6 +117,22 @@ class Tool {
     return data;
   }
 
+  static async findByIds(ids) {
+    const { data, error } = await supabase
+      .from('tools')
+      .select(`
+        *,
+        categories(id, name, slug),
+        tool_tags(tags(id, name, slug)),
+        sub_tools(*),
+        reviews(*)
+      `)
+      .in('id', ids);
+
+    if (error) throw error;
+    return data;
+  }
+
   static async create(toolData) {
     const { data, error } = await supabase
       .from('tools')

@@ -2,7 +2,7 @@ import React from 'react';
 import { FaXTwitter, FaLinkedin, FaWhatsapp } from 'react-icons/fa6';
 import { Facebook, Link as LinkIcon } from 'lucide-react';
 import { logBlogEvent } from '../services/blogAnalyticsService';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 
 interface MobileShareBarProps {
   blogUrl: string;
@@ -11,10 +11,10 @@ interface MobileShareBarProps {
 }
 
 const MobileShareBar: React.FC<MobileShareBarProps> = ({ blogUrl, blogTitle, blogId }) => {
-  const { user, isSignedIn } = useUser();
+  const { user } = useAuth();
 
   const handleShare = (platform: string, action: () => void) => {
-    logBlogEvent({ event_type: 'share', blog_id: blogId, user_id: isSignedIn ? user?.id : undefined });
+    logBlogEvent({ event_type: 'share', blog_id: blogId, user_id: user?.id });
     action();
   };
 
@@ -71,4 +71,4 @@ const MobileShareBar: React.FC<MobileShareBarProps> = ({ blogUrl, blogTitle, blo
   );
 };
 
-export default MobileShareBar; 
+export default MobileShareBar;

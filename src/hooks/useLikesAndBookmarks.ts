@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { blogInteractions } from '../services/unifiedInteractionsService';
 
 interface LikeBookmarkStatus {
@@ -67,7 +67,7 @@ const toggleBookmark = async (blogId: string, userId: string): Promise<void> => 
 };
 
 export const useLikesAndBookmarks = (blogId: string) => {
-  const { user, isSignedIn } = useUser();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const queryKey = ['likes-bookmarks', blogId, user?.id];
 
@@ -159,7 +159,7 @@ export const useLikesAndBookmarks = (blogId: string) => {
     error,
     toggleLike: toggleLikeMutation.mutate,
     toggleBookmark: toggleBookmarkMutation.mutate,
-    isTogglingLike: false, // Remove loading state
-    isTogglingBookmark: false, // Remove loading state
+    isTogglingLike: toggleLikeMutation.isPending,
+    isTogglingBookmark: toggleBookmarkMutation.isPending,
   };
-}; 
+};

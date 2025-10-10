@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { PaginatedToolGrid } from '../components/PaginatedToolGrid';
 import { bookmarkService } from '../services/bookmarkService';
@@ -8,10 +8,11 @@ import { Button } from '../components/ui/button';
 import { Bookmark, ArrowLeft } from 'lucide-react';
 
 const MyBookmarksPage: React.FC = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [tools, setTools] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<Record<string, any>>({});
 
   useEffect(() => {
     if (user?.id) {
@@ -27,7 +28,7 @@ const MyBookmarksPage: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Please sign in to view your bookmarks</h2>
-          <Button onClick={() => window.Clerk?.openSignIn?.() || window.location.reload()}>Sign In</Button>
+          <Button onClick={() => navigate('/login')}>Sign In</Button>
         </div>
       </div>
     );
@@ -61,6 +62,7 @@ const MyBookmarksPage: React.FC = () => {
       <PaginatedToolGrid
         tools={tools}
         loading={loading}
+        stats={stats}
         variant="default"
         initialCount={6}
         incrementCount={6}
@@ -85,4 +87,4 @@ const MyBookmarksPage: React.FC = () => {
   );
 };
 
-export default MyBookmarksPage; 
+export default MyBookmarksPage;

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Link, useNavigate } from 'react-router-dom';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { bookmarkService } from '../services/bookmarkService';
 import { LikesService } from '../services/likesService';
 import { motion } from 'framer-motion';
@@ -54,7 +54,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
   const [viewsCount, setViewsCount] = useState<number>(tool.views ?? 0);
 
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user } = useAuth();
 
   useEffect(() => {
     setHasLiked(stats.userHasLiked);
@@ -162,7 +162,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!user) return navigate('/sign-in');
+    if (!user) return navigate('/login');
     
     setIsLikeLoading(true);
     setHasLiked(!hasLiked);
@@ -192,7 +192,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, stats = defaultStats, 
 
   const handleBookmark = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!user) return navigate('/sign-in');
+    if (!user) return navigate('/login');
 
     setIsBookmarkLoading(true);
     setBookmarked(!bookmarked);

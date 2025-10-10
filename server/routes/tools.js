@@ -23,6 +23,9 @@ const { cacheMiddlewares } = require('../middleware/cacheMiddleware');
 // GET /api/tools - Get all tools with optional filters (CACHED: 5 minutes)
 router.get('/', cacheMiddlewares.tools, toolController.getAllTools);
 
+// POST /api/tools/by-ids - Get multiple tools by IDs
+router.post('/by-ids', toolController.getToolsByIds);
+
 // GET /api/tools/featured - Get featured tools (CACHED: 5 minutes)
 router.get('/featured', cacheMiddlewares.tools, toolController.getFeaturedTools);
 

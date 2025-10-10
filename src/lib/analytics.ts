@@ -6,7 +6,16 @@ declare global {
 }
 
 // GA4 Measurement ID
-const GA_MEASUREMENT_ID = 'G-1NJDY2B92X';
+const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-1NJDY2B92X';
+
+// Helper function to check if gtag is available
+const isGtagAvailable = (): boolean => {
+  const available = typeof window !== 'undefined' && !!window.gtag;
+  if (!available && import.meta.env.DEV) {
+    console.warn('gtag not available yet - this is normal during initialization');
+  }
+  return available;
+};
 
 // Event types for tracking
 export type EventType = 
@@ -87,7 +96,7 @@ export type EventParams =
 export const trackEvent = (eventName: EventType, params: EventParams): void => {
   try {
     // Ensure gtag is available
-    if (typeof window !== 'undefined' && window.gtag) {
+    if (isGtagAvailable()) {
       // Add common parameters
       const eventParams = {
         ...params,
@@ -102,7 +111,7 @@ export const trackEvent = (eventName: EventType, params: EventParams): void => {
       
       console.log(`📊 GA4 Event tracked: ${eventName}`, eventParams);
     } else {
-      console.warn('GA4 gtag not available');
+      console.warn('GA4 gtag not available - event not tracked:', eventName);
     }
   } catch (error) {
     console.error('Error tracking GA4 event:', error);
@@ -288,13 +297,39 @@ export const trackAuthAction = (
 export const initGA4 = (): void => {
   if (typeof window !== 'undefined' && !window.gtag) {
     // Only show warning in development mode
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.warn('GA4 not initialized. Make sure the gtag script is loaded.');
     }
+  } else if (import.meta.env.DEV) {
+    console.log('GA4 is available and ready to track events');
   }
 };
 
 // Auto-initialize when the module is imported
 if (typeof window !== 'undefined') {
   initGA4();
-} 
+}
+
+// Pageview tracking
+export const pageview = (url: string) => {
+  if (isGtagAvailable()) {
+    window.gtag('config', GA_MEASUREMENT_ID, {
+      page_path: url,
+    });
+  } else {
+    console.warn('GA4 gtag not available - pageview not tracked:', url);
+  }
+};
+
+// Event tracking
+export const event = ({ action, category, label, value }: any) => {
+  if (isGtagAvailable()) {
+    window.gtag('event', action, {
+      event_category: category,
+      event_label: label,
+      value,
+    });
+  } else {
+    console.warn('GA4 gtag not available - event not tracked:', action);
+  }
+};

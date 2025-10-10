@@ -144,7 +144,6 @@ app.use('/api/interactions', unifiedInteractionsRoutes);
 app.use('/api/monitor/redis', redisMonitorDashboardRoutes);
 app.use('/api/gemini-prompts', geminiPromptsRoutes);
 app.use('/api/google-forms', googleFormsRoutes);
-app.use('/api/prompt-interactions', promptInteractionsRoutes);
 app.use('/api/og', ogImageRoutes);
 
 // Enhanced Redis-powered routes

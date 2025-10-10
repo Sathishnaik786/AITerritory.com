@@ -2,19 +2,18 @@ import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Mail, Lock, User } from 'lucide-react';
+import { ArrowLeft, Mail, Lock } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 
-const CreateAccountPage: React.FC = () => {
+const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,34 +21,20 @@ const CreateAccountPage: React.FC = () => {
     setError('');
     setLoading(true);
 
-    // Basic validation
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      setLoading(false);
-      return;
-    }
-
     try {
-      console.log('CreateAccountPage: Attempting to sign up', { email });
-      const { error } = await signUp(email, password);
-      console.log('CreateAccountPage: Sign up result', { error });
+      console.log('LoginPage: Attempting to sign in', { email });
+      const { error } = await signIn(email, password);
+      console.log('LoginPage: Sign in result', { error });
       
       if (error) {
-        setError(error.message || 'Failed to create account');
-        console.error('CreateAccountPage: Sign up error', error);
+        setError(error.message || 'Failed to sign in');
+        console.error('LoginPage: Sign in error', error);
       } else {
-        // Redirect to dashboard or show email verification message
         navigate('/dashboard');
       }
     } catch (err) {
       setError('An unexpected error occurred');
-      console.error('CreateAccountPage: Unexpected error', err);
+      console.error('LoginPage: Unexpected error', err);
     } finally {
       setLoading(false);
     }
@@ -81,7 +66,7 @@ const CreateAccountPage: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1 sm:mb-2"
           >
-            Join AI Territory
+            Welcome Back
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: -20 }}
@@ -89,11 +74,11 @@ const CreateAccountPage: React.FC = () => {
             transition={{ delay: 0.3 }}
             className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 px-1 sm:px-2"
           >
-            Create your account to access exclusive features, save tools, and stay updated with the latest AI innovations
+            Sign in to your account to continue
           </motion.p>
         </div>
 
-        {/* Signup Form */}
+        {/* Login Form */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -134,22 +119,6 @@ const CreateAccountPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-xs sm:text-sm md:text-base">Confirm Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10 py-2 sm:py-2.5 md:py-3 text-xs sm:text-sm md:text-base"
-                    required
-                  />
-                </div>
-              </div>
-
               {error && (
                 <div className="text-red-500 text-xs sm:text-sm md:text-base p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
                   {error}
@@ -164,10 +133,10 @@ const CreateAccountPage: React.FC = () => {
                 {loading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Creating Account...
+                    Signing In...
                   </>
                 ) : (
-                  'Create Account'
+                  'Sign In'
                 )}
               </Button>
             </div>
@@ -182,9 +151,9 @@ const CreateAccountPage: React.FC = () => {
           className="text-center mt-3 sm:mt-4 md:mt-6"
         >
           <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400">
-            Already have an account?{' '}
-            <Link to="/login" className="text-purple-600 font-medium hover:underline">
-              Sign in here
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-purple-600 font-medium hover:underline">
+              Sign up here
             </Link>
           </p>
         </motion.div>
@@ -193,4 +162,4 @@ const CreateAccountPage: React.FC = () => {
   );
 };
 
-export default CreateAccountPage;
+export default LoginPage;

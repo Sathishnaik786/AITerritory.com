@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { logBlogEvent } from '../services/blogAnalyticsService';
 
 interface EngagementTrackerOptions {
@@ -19,7 +19,7 @@ interface EngagementEvent {
 }
 
 export const useEngagementTracker = (options: EngagementTrackerOptions) => {
-  const { user, isSignedIn } = useUser();
+  const { user } = useAuth();
   const {
     blogId,
     blogTitle,
@@ -80,18 +80,13 @@ export const useEngagementTracker = (options: EngagementTrackerOptions) => {
         logBlogEvent({
           event_type: 'scroll_depth',
           blog_id: blogId,
-          user_id: isSignedIn ? user?.id : undefined,
-          metadata: {
-            depth: threshold,
-            scroll_percent: scrollPercent,
-            session_id: sessionId.current
-          }
+          user_id: user?.id
         });
 
         console.log(`📊 Scroll depth tracked: ${threshold}%`);
       }
     });
-  }, [enableScrollTracking, scrollThresholds, blogId, isSignedIn, user?.id, isSessionActive]);
+  }, [enableScrollTracking, scrollThresholds, blogId, user?.id, isSessionActive]);
 
   // Track user interactions
   const trackInteraction = useCallback((type: EngagementEvent['type'], value?: string | number, metadata?: Record<string, any>) => {
@@ -113,16 +108,12 @@ export const useEngagementTracker = (options: EngagementTrackerOptions) => {
     logBlogEvent({
       event_type: type,
       blog_id: blogId,
-      user_id: isSignedIn ? user?.id : undefined,
-      metadata: {
-        value,
-        ...metadata,
-        session_id: sessionId.current
-      }
+      user_id: user?.id,
+      platform: typeof value === 'string' ? value : undefined
     });
 
     console.log(`🎯 Interaction tracked: ${type}`, { value, metadata });
-  }, [enableInteractionTracking, blogId, isSignedIn, user?.id, isSessionActive]);
+  }, [enableInteractionTracking, blogId, user?.id, isSessionActive]);
 
   // Track comment activity
   const trackComment = useCallback((action: 'post' | 'reply' | 'reaction' | 'report', metadata?: Record<string, any>) => {
@@ -242,10 +233,10 @@ export const useEngagementTracker = (options: EngagementTrackerOptions) => {
     if (enableInteractionTracking) {
       console.log(`🚀 Engagement tracking started for blog: ${blogTitle}`, {
         session_id: sessionId.current,
-        user_id: isSignedIn ? user?.id : 'anonymous'
+        user_id: user?.id || 'anonymous'
       });
     }
-  }, [blogTitle, enableInteractionTracking, isSignedIn, user?.id]);
+  }, [blogTitle, enableInteractionTracking, user?.id]);
 
   return {
     trackInteraction,
@@ -258,4 +249,4 @@ export const useEngagementTracker = (options: EngagementTrackerOptions) => {
     sessionId: sessionId.current,
     isSessionActive: isSessionActive()
   };
-}; 
+};

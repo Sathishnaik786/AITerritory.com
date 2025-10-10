@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { 
   getPromptLikes, 
   addPromptLike, 
@@ -74,7 +74,7 @@ const toggleLike = async (promptId: string, userId: string): Promise<void> => {
 };
 
 export const usePromptInteractions = (promptId: string) => {
-  const { user, isSignedIn } = useUser();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const queryKey = ['prompt-interactions', promptId, user?.id];
 
@@ -136,7 +136,7 @@ export const usePromptInteractions = (promptId: string) => {
     shared: status.shared,
     isLoading: false, // Remove loading state
     error,
-    toggleLike: isSignedIn ? toggleLikeMutation.mutate : undefined,
-    isTogglingLike: false, // Remove loading state
+    toggleLike: user ? toggleLikeMutation.mutate : undefined,
+    isTogglingLike: toggleLikeMutation.isPending,
   };
 };

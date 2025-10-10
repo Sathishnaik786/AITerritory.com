@@ -1,1045 +1,479 @@
-import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Copy, ExternalLink, Heart, MessageCircle, Share2, Check, Link as LinkIcon } from 'lucide-react';
-import { getGeminiPrompts, getGeminiPromptCategories } from '@/services/geminiPromptsService';
-import { slugify } from '@/lib/slugify';
-import { useUser, SignInButton } from '@clerk/clerk-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { motion } from 'framer-motion';
+import { 
+  Search, 
+  Filter, 
+  Star, 
+  ThumbsUp, 
+  MessageCircle, 
+  Clock, 
+  User, 
+  Tag,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  AlertCircle,
+  Copy,
+  Bookmark
+} from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Badge } from '../components/ui/badge';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
+import { Skeleton } from '../components/ui/skeleton';
+import { OptimizedImage } from '../components/OptimizedImage';
 import { usePromptInteractions } from '../hooks/usePromptInteractions';
-import DynamicPromptCommentSection from '@/components/DynamicPromptCommentSection';
+import { trackEvent } from '@/lib/analytics';
+import { toast } from 'sonner';
 
-// Add the required icons for social media platforms
-import { FaTwitter as FaXTwitter, FaLinkedin, FaFacebook, FaWhatsapp } from 'react-icons/fa6';
-import { FiLink } from 'react-icons/fi';
-
-import './GeminiPromptsPage.css';
-
-interface GeminiPrompt {
+// Define the Prompt interface based on what we found
+interface Prompt {
   id: string;
-  image_url: string | null;
-  prompt: string;
+  title: string;
+  description: string;
+  content: string;
   category: string;
-  created_at: string;
-  // New fields for Google Forms submissions
-  submitted_via?: string;
-  submitter_name?: string;
-  submitter_email?: string;
-  status?: string;
+  author?: {
+    name?: string;
+    avatar?: string;
+  };
+  tags?: string[];
+  rating?: number;
+  reviewCount?: number;
+  isFree?: boolean;
+  price?: string;
+  featured?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  usageInstructions?: string;
+  bestPractices?: string;
+  compatibleModels?: string[];
+  image?: string;
 }
 
-// Define the props interface for PromptCard
-interface PromptCardProps {
-  prompt: GeminiPrompt;
-  categoryColor: string;
+// Create a separate component for each prompt item to avoid hook rule violations
+const PromptItem: React.FC<{ 
+  prompt: Prompt; 
+  user: any;
+  onCopy: (prompt: Prompt) => void;
+  onExpand: (promptId: string) => void;
   isExpanded: boolean;
-  isCopied: boolean;
-  onToggleReadMore: (id: string) => void;
-  onCopyPrompt: (text: string, id: string) => void;
-  onSharePrompt: (prompt: GeminiPrompt) => void;
-  toast?: (args: { title: string; description: string; variant?: string }) => void;
-}
-
-// Optimized Prompt Image component with memoization
-const PromptImage = memo(({ imageUrl }: { imageUrl: string | null }) => {
-  const [isLoading, setIsLoading] = useState(false); // Changed default to false
-  const [hasError, setHasError] = useState(false);
-  
-  // Use the database image URL if available, otherwise use placeholder
-  const src = imageUrl && imageUrl.trim() !== '' ? imageUrl : '/placeholder.svg';
-  
-  // Reset loading state when image source changes
-  useEffect(() => {
-    if (src !== '/placeholder.svg') {
-      setIsLoading(true);
-      setHasError(false);
-    }
-  }, [src]);
-  
-  return (
-    <>
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        </div>
-      )}
-      
-      <img 
-        src={src}
-        alt="Prompt visualization" 
-        className={`w-full h-full object-cover transition-all duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-        width="400"
-        height="400"
-        loading="lazy"
-        onError={(e) => {
-          // If the image fails to load, switch to placeholder
-          e.currentTarget.src = '/placeholder.svg';
-          setIsLoading(false);
-          setHasError(true);
-        }}
-        onLoad={(e) => {
-          setIsLoading(false);
-        }}
-      />
-    </>
-  );
-}, (prevProps, nextProps) => {
-  // Only re-render if the image URL actually changes
-  return prevProps.imageUrl === nextProps.imageUrl;
-});
-
-// Memoized Prompt Card Component to prevent unnecessary re-renders
-const PromptCard = memo(({
-  prompt,
-  categoryColor,
-  isExpanded,
-  isCopied,
-  onToggleReadMore,
-  onCopyPrompt,
-  onSharePrompt,
-  toast
-}: PromptCardProps) => {
-  const { user, isSignedIn } = useUser();
-  const { 
-    likeCount, 
-    liked, 
+  navigate: (path: string) => void;
+}> = ({ prompt, user, onCopy, onExpand, isExpanded, navigate }) => {
+  const {
+    likeCount,
+    liked,
+    isLoading: interactionsLoading,
+    error: interactionsError,
     toggleLike,
-    shareCount,
-    commentCount
   } = usePromptInteractions(prompt.id);
-  const [isCommentSectionOpen, setIsCommentSectionOpen] = useState(false);
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
-
-  const truncatePrompt = (text: string, maxLength: number = 120) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-  };
-
-  // Generate slug for the prompt
-  const promptSlug = slugify(prompt.prompt.substring(0, 50)) || prompt.id;
-
-  const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
-  const shareDropdownRef = useRef<HTMLDivElement>(null);
-
-  // Handle click outside to close dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (shareDropdownRef.current && !shareDropdownRef.current.contains(event.target as Node)) {
-        // Reduced logging - only log in development
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Click outside detected, closing dropdown');
-        }
-        setIsShareDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // New function to handle sharing to specific platforms
-  const handlePlatformShare = useCallback(async (platform: string) => {
-    // Generate SEO title based on category
-    let seoTitle;
-    switch (prompt.category.toLowerCase()) {
-      case 'men':
-        seoTitle = `Gemini Men's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
-        break;
-      case 'women':
-        seoTitle = `Gemini Women's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
-        break;
-      case 'couple':
-        seoTitle = `Gemini Couple's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
-        break;
-      default:
-        seoTitle = `Gemini Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
-    }
-
-    // Truncate description for SEO (150 characters as requested)
-    const seoDescription = prompt.prompt.length > 150 
-      ? prompt.prompt.substring(0, 147) + '...' 
-      : prompt.prompt;
-
-    // Use prompt image, fallback to dynamic OG image, or default
-    const seoImage = prompt.image_url && prompt.image_url.trim() !== '' 
-      ? prompt.image_url 
-      : `https://aiterritory-com.onrender.com/api/og/prompts/${prompt.id}`;
-
-    // Generate canonical URL
-    const slug = prompt.prompt.substring(0, 50).toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '') || prompt.id;
-      
-    const canonicalUrl = `https://aiterritory.org/gemini-prompts/${prompt.category}/${slug}-${prompt.id}`;
-    
-    const title = seoTitle;
-    const text = seoDescription;
-    const url = canonicalUrl;
-    const imageUrl = seoImage;
-    
-    // Close the dropdown after selecting a platform
-    setIsShareDropdownOpen(false);
-    
-    // Fallback function if toast is not provided
-    const showToast = toast || (() => {});
-    
-    try {
-      switch (platform) {
-        case 'whatsapp':
-          window.open(`https://wa.me/?text=${encodeURIComponent(`${title}
-
-${text}
-
-${url}`)}`, '_blank');
-          break;
-        case 'instagram':
-          // Instagram doesn't allow direct sharing, so we copy the link
-          await navigator.clipboard.writeText(url);
-          showToast({
-            title: "Link Copied",
-            description: "Link copied to clipboard. You can now paste it in Instagram.",
-          });
-          break;
-        case 'linkedin':
-          window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(text)}`, '_blank');
-          break;
-        case 'snapchat':
-          // Snapchat doesn't have a web sharing API, so we copy the link
-          await navigator.clipboard.writeText(url);
-          showToast({
-            title: "Link Copied",
-            description: "Link copied to clipboard. You can now paste it in Snapchat.",
-          });
-          break;
-        case 'facebook':
-          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(`${title}
-
-${text}`)}`, '_blank');
-          break;
-        case 'twitter':
-          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title}
-
-${text}`)}&url=${encodeURIComponent(url)}`, '_blank');
-          break;
-        case 'copy':
-          await navigator.clipboard.writeText(`${title}
-
-${text}
-
-${url}`);
-          showToast({
-            title: "Copied!",
-            description: "Prompt details copied to clipboard",
-          });
-          break;
-        default:
-          // Fallback to general share
-          if (navigator.share) {
-            await navigator.share({ title, text, url });
-          } else {
-            await navigator.clipboard.writeText(`${title}
-
-${text}
-
-${url}`);
-            showToast({
-              title: "Shared!",
-              description: "Link copied to clipboard",
-            });
-          }
-      }
-    } catch (error) {
-      console.error(`Error sharing to ${platform}:`, error);
-      showToast({
-        title: "Error",
-        description: `Failed to share to ${platform}`,
-        variant: "destructive",
-      });
-    }
-  }, [prompt, toast]);
 
   return (
     <motion.div
       key={prompt.id}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 } as any}
-      whileHover={{ y: -5 }}
-      className="h-full"
+      transition={{ duration: 0.3 }}
     >
-      <Card className="h-full flex flex-col overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
-        {/* Link wrapper for the image */}
-        <Link to={`/gemini-prompts/${prompt.category}/${promptSlug}-${prompt.id}`} className="aspect-square overflow-hidden relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
-          <PromptImage imageUrl={prompt.image_url} />
-          <div className="absolute top-2 right-2">
-            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${categoryColor}`}>
-              {prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)}
-            </span>
-          </div>
-          <div className="absolute bottom-2 left-2">
-            <span className="px-2 py-1 text-xs bg-black bg-opacity-50 text-white rounded-full">
-              {formatDate(prompt.created_at)}
-            </span>
-          </div>
-        </Link>
-        <CardContent className="flex-1 flex flex-col p-4 bg-white dark:bg-gray-900">
-          {/* Link wrapper for the prompt text */}
-          <Link to={`/gemini-prompts/${prompt.category}/${promptSlug}-${prompt.id}`} className="text-sm mb-4 flex-1 text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            {isExpanded ? prompt.prompt : truncatePrompt(prompt.prompt, 120)}
-          </Link>
-          
-          {/* Action buttons - All in one line */}
-          <div className="flex space-x-2 mt-2">
-            {/* Like Button */}
-            {isSignedIn ? (
-              <button
-                type="button"
-                className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault(); // Prevent navigation when clicking action buttons
-                  // @ts-ignore - toggleLike might be undefined
-                  toggleLike();
-                }}
-              >
-                <Heart 
-                  className={`h-4 w-4 ${liked ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} 
-                />
-                <span className="text-xs ml-1">{likeCount}</span>
-              </button>
-            ) : (
-              <SignInButton mode="modal">
-                <button
-                  type="button"
-                  className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                >
-                  <Heart className="h-4 w-4 text-gray-500" />
-                  <span className="text-xs ml-1">{likeCount}</span>
-                </button>
-              </SignInButton>
-            )}
-            
-            {/* Comment Button */}
-            <button
-              type="button"
-              className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault(); // Prevent navigation when clicking action buttons
-                setIsCommentSectionOpen(true);
-              }}
-            >
-              <MessageCircle className="h-4 w-4 text-gray-500" />
-              <span className="text-xs ml-1">{commentCount}</span>
-            </button>
-            
-            {/* Enhanced Share Button with Dropdown - BlogDetail style - now shows share count */}
-            <div className="relative" ref={shareDropdownRef}>
-              <button
-                type="button"
-                className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center space-x-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault(); // Prevent navigation when clicking action buttons
-                  setIsShareDropdownOpen(!isShareDropdownOpen);
-                }}
-              >
-                <Share2 className="h-4 w-4 text-gray-500" />
-                <span className="text-xs ml-1">{shareCount}</span>
-              </button>
-              
-              {/* Social Media Sharing Pop-up - Positioned above and centered */}
-              <AnimatePresence>
-                {isShareDropdownOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
-                    style={{ minWidth: '200px', maxWidth: 'calc(100vw - 32px)' }}
-                  >
-                    <div className="p-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePlatformShare('whatsapp');
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                      >
-                        <FaWhatsapp className="w-5 h-5 mr-3 text-green-500" />
-                        <span>WhatsApp</span>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePlatformShare('instagram');
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                      >
-                        <div className="w-5 h-5 mr-3 text-pink-500">
-                          <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                          </svg>
-                        </div>
-                        <span>Instagram</span>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePlatformShare('linkedin');
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                      >
-                        <FaLinkedin className="w-5 h-5 mr-3 text-blue-700" />
-                        <span>LinkedIn</span>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePlatformShare('facebook');
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                      >
-                        <FaFacebook className="w-5 h-5 mr-3 text-blue-600" />
-                        <span>Facebook</span>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePlatformShare('twitter');
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                      >
-                        <FaXTwitter className="w-5 h-5 mr-3 text-blue-400" />
-                        <span>Twitter</span>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePlatformShare('copy');
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                      >
-                        <FiLink className="w-5 h-5 mr-3 text-gray-500" />
-                        <span>{isCopied ? 'Copied!' : 'Copy Link'}</span>
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+      <Card className="h-full flex flex-col">
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle className="text-lg mb-1">{prompt.title}</CardTitle>
+              <CardDescription className="text-sm">
+                {prompt.description}
+              </CardDescription>
             </div>
-            
-            {/* Read More button */}
-            <button
-              type="button"
-              className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault(); // Prevent navigation when clicking action buttons
-                onToggleReadMore(prompt.id);
-              }}
-            >
-              {isExpanded ? 'Show Less' : 'Read More'}
-            </button>
-            
-            {/* Copy button */}
-            <button
-              type="button"
-              className="p-2 h-auto rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault(); // Prevent navigation when clicking action buttons
-                onCopyPrompt(prompt.prompt, prompt.id);
-              }}
-            >
-              {isCopied ? (
-                <Check className="h-4 w-4 text-green-500" />
-              ) : (
-                <Copy className="h-4 w-4 text-gray-500" />
+            {prompt.featured && (
+              <Badge variant="secondary">Featured</Badge>
+            )}
+          </div>
+          
+          {/* Rating */}
+          <div className="flex items-center mt-2">
+            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 mr-1" />
+            <span className="text-sm font-medium">
+              {prompt.rating?.toFixed(1) || 'N/A'}
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
+              ({prompt.reviewCount || 0})
+            </span>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="flex-1">
+          {/* Preview */}
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 mb-4">
+            <pre className="whitespace-pre-wrap text-xs font-mono text-gray-800 dark:text-gray-200 line-clamp-3">
+              {prompt.content}
+            </pre>
+          </div>
+          
+          {/* Tags */}
+          {prompt.tags && prompt.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-4">
+              {prompt.tags.slice(0, 3).map((tag) => (
+                <Badge key={tag} variant="outline" className="text-xs">
+                  <Tag className="w-3 h-3 mr-1" />
+                  {tag}
+                </Badge>
+              ))}
+              {prompt.tags.length > 3 && (
+                <Badge variant="outline" className="text-xs">
+                  +{prompt.tags.length - 3}
+                </Badge>
               )}
-            </button>
-          </div>
+            </div>
+          )}
+          
+          {/* Expandable Content */}
+          {isExpanded && (
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                {prompt.usageInstructions}
+              </p>
+              {prompt.bestPractices && (
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {prompt.bestPractices}
+                </p>
+              )}
+            </div>
+          )}
         </CardContent>
-      </Card>
-      
-      {/* Comment Section */}
-      <Dialog open={isCommentSectionOpen} onOpenChange={setIsCommentSectionOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Comments</DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto">
-            <DynamicPromptCommentSection promptId={prompt.id} />
+        
+        <CardFooter className="flex flex-col gap-3">
+          <div className="flex justify-between w-full">
+            <Button 
+              size="sm" 
+              onClick={() => onCopy(prompt)}
+              className="flex-1 mr-2"
+            >
+              <Copy className="w-4 h-4 mr-1" />
+              Copy
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => onExpand(prompt.id)}
+            >
+              {isExpanded ? (
+                <>
+                  <ChevronUp className="w-4 h-4 mr-1" />
+                  Less
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="w-4 h-4 mr-1" />
+                  More
+                </>
+              )}
+            </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+          
+          <div className="flex justify-between w-full text-sm">
+            <div className="flex items-center">
+              <ThumbsUp className="w-4 h-4 mr-1 text-gray-500" />
+              <span>{likeCount}</span>
+            </div>
+            <div className="flex items-center">
+              <MessageCircle className="w-4 h-4 mr-1 text-gray-500" />
+              <span>{prompt.reviewCount || 0}</span>
+            </div>
+          </div>
+          
+          {!user && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="w-full"
+              onClick={() => navigate('/login')}
+            >
+              Sign In to Interact
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
     </motion.div>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison function for memo - more precise comparison
-  return (
-    prevProps.prompt.id === nextProps.prompt.id &&
-    prevProps.prompt.prompt === nextProps.prompt.prompt &&
-    prevProps.prompt.category === nextProps.prompt.category &&
-    prevProps.prompt.created_at === nextProps.prompt.created_at &&
-    prevProps.prompt.image_url === nextProps.prompt.image_url &&
-    prevProps.categoryColor === nextProps.categoryColor &&
-    prevProps.isExpanded === nextProps.isExpanded &&
-    prevProps.isCopied === nextProps.isCopied
-  );
-});
+};
 
 const GeminiPromptsPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('all');
-  const [prompts, setPrompts] = useState<GeminiPrompt[]>([]);
-  const [filteredPrompts, setFilteredPrompts] = useState<GeminiPrompt[]>([]);
-  const [expandedPrompts, setExpandedPrompts] = useState<Record<string, boolean>>({});
-  // Removed likedPrompts state as it's now handled by the usePromptInteractions hook
-  const [copiedPromptId, setCopiedPromptId] = useState<string | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [filteredPrompts, setFilteredPrompts] = useState<Prompt[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-  const [categories, setCategories] = useState<Array<{id: string, name: string, icon: string, count: number}>>([
-    { 
-      id: 'all', 
-      name: 'All', 
-      icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
-      count: 0
-    },
-    { 
-      id: 'men', 
-      name: 'Men', 
-      icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-      count: 0
-    },
-    { 
-      id: 'women', 
-      name: 'Women', 
-      icon: 'M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-      count: 0
-    },
-    { 
-      id: 'couple', 
-      name: 'Couple', 
-      icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-      count: 0
-    }
-  ]);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [sortOption, setSortOption] = useState('popular');
+  const [expandedPrompt, setExpandedPrompt] = useState<string | null>(null);
 
-  // SEO: Generate dynamic meta tags based on active tab
-  const getPageMeta = useCallback(() => {
-    const baseTitle = "Gemini Prompts - AI Territory";
-    const baseDescription = "Discover and share powerful prompts for Google Gemini AI. Copy, try, and upload your own prompts to enhance your AI experience.";
-    const baseKeywords = "Gemini prompts, Google Gemini, AI prompts, artificial intelligence, prompt engineering, AI tools";
+  // Mock function to fetch prompts - replace with actual API call
+  const fetchPrompts = async (): Promise<Prompt[]> => {
+    // This is a placeholder - you'll need to implement the actual API call
+    return [
+      {
+        id: '1',
+        title: 'Creative Writing Assistant',
+        description: 'Helps generate creative stories and narratives',
+        content: 'You are a creative writing assistant. Help me write a story about...',
+        category: 'Creative Writing',
+        tags: ['story', 'narrative', 'fiction'],
+        rating: 4.8,
+        reviewCount: 120,
+        featured: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: '2',
+        title: 'Code Explainer',
+        description: 'Explains complex code in simple terms',
+        content: 'You are a code explainer. Explain the following code...',
+        category: 'Programming',
+        tags: ['code', 'explanation', 'learning'],
+        rating: 4.6,
+        reviewCount: 89,
+        featured: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ];
+  };
 
-    // Category-specific OG image
-    const categoryImage = activeTab !== 'all' 
-      ? `https://aiterritory.org/og/categories/${activeTab}.png`
-      : 'https://aiterritory.org/og-default.png';
-
-    switch (activeTab) {
-      case 'men':
-        return {
-          title: `Men's Gemini Prompts - ${baseTitle}`,
-          description: `Explore powerful Google Gemini prompts specifically for men. ${baseDescription}`,
-          keywords: `men's prompts, ${baseKeywords}`,
-          image: categoryImage,
-          canonical: 'https://aiterritory.org/gemini-prompts/men'
-        };
-      case 'women':
-        return {
-          title: `Women's Gemini Prompts - ${baseTitle}`,
-          description: `Discover Google Gemini prompts specifically for women. ${baseDescription}`,
-          keywords: `women's prompts, ${baseKeywords}`,
-          image: categoryImage,
-          canonical: 'https://aiterritory.org/gemini-prompts/women'
-        };
-      case 'couple':
-        return {
-          title: `Couple's Gemini Prompts - ${baseTitle}`,
-          description: `Find Google Gemini prompts for couples. ${baseDescription}`,
-          keywords: `couple's prompts, ${baseKeywords}`,
-          image: categoryImage,
-          canonical: 'https://aiterritory.org/gemini-prompts/couple'
-        };
-      default:
-        return {
-          title: baseTitle,
-          description: baseDescription,
-          keywords: baseKeywords,
-          image: 'https://aiterritory.org/og-default.png',
-          canonical: 'https://aiterritory.org/gemini-prompts'
-        };
-    }
-  }, [activeTab]);
-
-  const pageMeta = getPageMeta();
-
-  // Fetch prompts and categories
+  // Fetch prompts
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchPromptsData = async () => {
       try {
         setLoading(true);
-        const [promptsData, categoriesData] = await Promise.all([
-          getGeminiPrompts(),
-          getGeminiPromptCategories()
-        ]);
-      
-        setPrompts(promptsData || []);
-      
-        // Update categories with counts
-        const defaultCategories = [
-          { 
-            id: 'all', 
-            name: 'All', 
-            icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
-            count: promptsData?.length || 0
-          },
-          { 
-            id: 'men', 
-            name: 'Men', 
-            icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-            count: promptsData?.filter(p => p.category === 'men')?.length || 0
-          },
-          { 
-            id: 'women', 
-            name: 'Women', 
-            icon: 'M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-            count: promptsData?.filter(p => p.category === 'women')?.length || 0
-          },
-          { 
-            id: 'couple', 
-            name: 'Couple', 
-            icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-            count: promptsData?.filter(p => p.category === 'couple')?.length || 0
-          }
-        ];
-      
-        // Add dynamic categories
-        const dynamicCategories = categoriesData
-          .filter(cat => !['all', 'men', 'women', 'couple'].includes(cat))
-          .map(cat => ({
-            id: cat,
-            name: cat.charAt(0).toUpperCase() + cat.slice(1),
-            icon: 'M7 20h5v-2a3 3 0 00-5.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-            count: promptsData?.filter(p => p.category === cat)?.length || 0
-          }));
-      
-        setCategories([...defaultCategories, ...dynamicCategories]);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to fetch prompts and categories',
-          variant: 'destructive'
-        });
+        const promptsData = await fetchPrompts();
+        setPrompts(promptsData);
+        setFilteredPrompts(promptsData);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching prompts:', err);
+        setError('Failed to load prompts. Please try again later.');
+        toast.error('Failed to load prompts');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchPromptsData();
   }, []);
 
-  // Filter prompts based on active tab
+  // Filter and sort prompts
   useEffect(() => {
-    if (activeTab === 'all') {
-      setFilteredPrompts(prompts);
-    } else {
-      const filtered = prompts.filter(prompt => prompt.category === activeTab);
-      setFilteredPrompts(filtered);
+    let result = [...prompts];
+    
+    // Apply search filter
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(prompt => 
+        prompt.title.toLowerCase().includes(term) ||
+        prompt.description.toLowerCase().includes(term) ||
+        prompt.content.toLowerCase().includes(term) ||
+        prompt.tags?.some(tag => tag.toLowerCase().includes(term))
+      );
     }
-  }, [activeTab, prompts]);
+    
+    // Apply category filter
+    if (selectedCategory !== 'All') {
+      result = result.filter(prompt => prompt.category === selectedCategory);
+    }
+    
+    // Apply sorting
+    switch (sortOption) {
+      case 'popular':
+        result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      case 'newest':
+        result.sort((a, b) => 
+          new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
+        );
+        break;
+      case 'rating':
+        result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      default:
+        break;
+    }
+    
+    setFilteredPrompts(result);
+  }, [prompts, searchTerm, selectedCategory, sortOption]);
 
-  const toggleReadMore = useCallback((promptId: string) => {
-    setExpandedPrompts(prev => ({
-      ...prev,
-      [promptId]: !prev[promptId]
-    }));
-  }, []);
-
-  const handleCopyPrompt = useCallback((promptText: string, promptId: string) => {
-    navigator.clipboard.writeText(promptText).then(() => {
-      setCopiedPromptId(promptId);
-      // Reset copied state after 2 seconds
-      setTimeout(() => {
-        setCopiedPromptId(null);
-      }, 2000);
-    }).catch((error) => {
-      console.error('Failed to copy prompt:', error);
+  const handleCopyPrompt = (prompt: Prompt) => {
+    navigator.clipboard.writeText(prompt.content);
+    toast.success('Prompt copied to clipboard!');
+    
+    // Track copy event
+    trackEvent('like_prompt', {
+      prompt_id: prompt.id,
+      prompt_title: prompt.title,
+      prompt_category: prompt.category,
+      page_url: window.location.href,
+      user_id: user?.id,
+      event_type: 'like_prompt'
     });
-  }, []);
+  };
 
-  // Removed handleLikePrompt function as it's now handled by the usePromptInteractions hook
+  const toggleExpand = (promptId: string) => {
+    setExpandedPrompt(expandedPrompt === promptId ? null : promptId);
+  };
 
-  const handleSharePrompt = useCallback(async (prompt: GeminiPrompt) => {
-    // Create share data
-    const shareData = {
-      title: 'Check out this Gemini Prompt!',
-      text: `Here's an interesting Gemini prompt I found on AITerritory:\n\n${prompt.prompt}`,
-      url: window.location.href
-    };
-    
-    // Try to use Web Share API if available
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (shareError) {
-        // User cancelled share or other share error
-        // Fallback to clipboard copy
-        await navigator.clipboard.writeText(`${shareData.text}\n\n${shareData.url}`);
-      }
-    } else {
-      // Fallback: copy to clipboard
-      await navigator.clipboard.writeText(`${shareData.text}\n\n${shareData.url}`);
-    }
-  }, []);
+  // Get unique categories
+  const categories = ['All', ...Array.from(new Set(prompts.map(p => p.category)))];
 
-  // Get category color
-  const getCategoryColor = useCallback((category: string) => {
-    const categoryColors: Record<string, string> = {
-      men: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      women: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
-      couple: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-      all: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-    };
-    
-    // Generate a color for new categories
-    if (!categoryColors[category]) {
-      const colors = [
-        'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
-        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-        'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-        'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200'
-      ];
-      // Use a hash-based approach to consistently assign colors
-      let hash = 0;
-      for (let i = 0; i < category.length; i++) {
-        hash = category.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      const index = Math.abs(hash) % colors.length;
-      categoryColors[category] = colors[index];
-    }
-    
-    return categoryColors[category];
-  }, []);
-
-  // Function to scroll to top smoothly
-  const scrollToTop = useCallback(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  }, []);
-
-  return (
-    <div className="container mx-auto py-8 px-4">
-      <Helmet>
-        <title>{pageMeta.title}</title>
-        <meta name="description" content={pageMeta.description} />
-        <meta name="keywords" content={pageMeta.keywords} />
-        <link rel="canonical" href={pageMeta.canonical || 'https://aiterritory.org/gemini-prompts'} />
-        
-        {/* Enhanced SEO metadata */}
-        <meta name="author" content="AI Territory" />
-        <meta name="robots" content="index, follow" />
-        <meta name="googlebot" content="index, follow" />
-        <meta name="bingbot" content="index, follow" />
-        
-        {/* OpenGraph */}
-        <meta property="og:title" content={pageMeta.title} />
-        <meta property="og:description" content={pageMeta.description} />
-        <meta property="og:image" content={pageMeta.image || 'https://aiterritory.org/og-default.png'} />
-        <meta property="og:url" content={pageMeta.canonical || 'https://aiterritory.org/gemini-prompts'} />
-        <meta property="og:type" content="website" />
-        
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={pageMeta.title} />
-        <meta name="twitter:description" content={pageMeta.description} />
-        <meta name="twitter:image" content={pageMeta.image || 'https://aiterritory.org/og-default.png'} />
-        
-        {/* JSON-LD - WebPage Schema */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": pageMeta.title,
-            "description": pageMeta.description,
-            "url": pageMeta.canonical || 'https://aiterritory.org/gemini-prompts',
-            "image": pageMeta.image || 'https://aiterritory.org/og-default.png',
-            "publisher": {
-              "@type": "Organization",
-              "name": "AITerritory",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://aiterritory.org/assets/logo.png"
-              }
-            }
-          })}
-        </script>
-        
-        {/* JSON-LD - ItemList Schema for category pages */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            "name": `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Gemini Prompts`,
-            "description": pageMeta.description,
-            "url": pageMeta.canonical || 'https://aiterritory.org/gemini-prompts',
-            "numberOfItems": filteredPrompts.length,
-            "itemListElement": filteredPrompts.map((prompt, index) => ({
-              "@type": "ListItem",
-              "position": index + 1,
-              "url": `https://aiterritory.org/gemini-prompts/${prompt.category}/${slugify(prompt.prompt.substring(0, 50)) || prompt.id}-${prompt.id}`,
-              "image": prompt.image_url && prompt.image_url.trim() !== '' 
-                ? prompt.image_url 
-                : `https://aiterritory-com.onrender.com/api/og/prompts/${prompt.id}`
-            }))
-          })}
-        </script>
-      </Helmet>
-      
-      {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:flex-row gap-6">
-        <div className="w-full md:w-64 flex-shrink-0">
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 md:sticky md:top-6">
-            <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Categories</h2>
-            <nav className="space-y-1">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    activeTab === category.id
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 shadow-sm'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                  onClick={() => {
-                    setActiveTab(category.id);
-                    scrollToTop(); // Scroll to top when category is changed
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${
-                      activeTab === category.id
-                        ? 'bg-blue-200 dark:bg-blue-800'
-                        : 'bg-gray-100 dark:bg-gray-700'
-                    }`}>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={category.icon} />
-                      </svg>
-                    </div>
-                    <span className="font-medium">{category.name}</span>
-                  </div>
-                  <span className={`text-sm font-semibold px-2 py-1 rounded-full ${
-                    activeTab === category.id
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                  }`}>
-                    {category.count}
-                  </span>
-                </button>
-              ))}
-            </nav>
-            
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <button 
-                type="button"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2"
-                onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSdQvaJryaAZhN9ppwm49w5w4MC1eBALYOH-a_kPqmhT2WcfrQ/viewform?usp=sharing&ouid=117733098512429548107', '_blank')}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                Upload Prompt
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        {/* Main Content */}
-        <div className="flex-1">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-            <div className="text-center md:text-left">
-              <div className="flex justify-center md:justify-start mb-2">
-                <img 
-                  src="https://logos-world.net/wp-content/uploads/2025/02/Google-Gemini-Logo.png" 
-                  alt="Google Gemini Logo" 
-                  className="h-20 md:h-20 w-auto"
-                />
-              </div>
-              <h1 className="text-3xl font-bold mb-2">Prompts</h1>
-              <p className="text-lg opacity-80">
-                Discover and share powerful prompts for Google Gemini AI
-              </p>
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <Skeleton className="h-12 w-64 mb-4" />
+            <div className="flex flex-wrap gap-4 mb-6">
+              <Skeleton className="h-10 w-64" />
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-10 w-32" />
             </div>
           </div>
           
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            </div>
-          ) : (
-            <div className="gemini-prompts-grid gap-6 mt-6">
-              {filteredPrompts.map((prompt) => {
-                const categoryColor = getCategoryColor(prompt.category);
-                const isExpanded = expandedPrompts[prompt.id] || false;
-                const isCopied = copiedPromptId === prompt.id;
-                
-                return (
-                  <PromptCard
-                    key={prompt.id}
-                    prompt={prompt}
-                    categoryColor={categoryColor}
-                    isExpanded={isExpanded}
-                    isCopied={isCopied}
-                    onToggleReadMore={toggleReadMore}
-                    onCopyPrompt={handleCopyPrompt}
-                    onSharePrompt={handleSharePrompt}
-                    toast={toast} // Pass the toast function to the PromptCard
-                  />
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Mobile View with Bottom Navigation */}
-      <div className="md:hidden">
-        <div className="flex flex-col">
-          <div className="flex-1">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-              <div className="text-center">
-                <div className="flex justify-center mb-2">
-                  <img 
-                    src="https://logos-world.net/wp-content/uploads/2025/02/Google-Gemini-Logo.png" 
-                    alt="Google Gemini Logo" 
-                    className="h-12 w-auto"
-                  />
-                </div>
-                <h1 className="text-3xl font-bold mb-2">Prompts</h1>
-                <p className="text-lg opacity-80">
-                  Discover and share powerful prompts for Google Gemini AI
-                </p>
-              </div>
-            </div>
-            
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-              </div>
-            ) : (
-              <div className="gemini-prompts-grid gap-6 mt-6">
-                {filteredPrompts.map((prompt) => {
-                  const categoryColor = getCategoryColor(prompt.category);
-                  const isExpanded = expandedPrompts[prompt.id] || false;
-                  const isCopied = copiedPromptId === prompt.id;
-                  
-                  return (
-                    <PromptCard
-                      key={prompt.id}
-                      prompt={prompt}
-                      categoryColor={categoryColor}
-                      isExpanded={isExpanded}
-                      isCopied={isCopied}
-                      onToggleReadMore={toggleReadMore}
-                      onCopyPrompt={handleCopyPrompt}
-                      onSharePrompt={handleSharePrompt}
-                      toast={toast} // Pass the toast function to the PromptCard
-                    />
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {/* Fixed Bottom Navigation for Mobile */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg">
-          <div className="grid grid-cols-4 gap-1 p-1">
-            {[
-              { 
-                id: 'all', 
-                name: 'All', 
-                icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z',
-                count: prompts.length
-              },
-              { 
-                id: 'men', 
-                name: 'Men', 
-                icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-                count: prompts.filter(p => p.category === 'men').length
-              },
-              { 
-                id: 'women', 
-                name: 'Women', 
-                icon: 'M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
-                count: prompts.filter(p => p.category === 'women').length
-              },
-              { 
-                id: 'couple', 
-                name: 'Couple', 
-                icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-                count: prompts.filter(p => p.category === 'couple').length
-              }
-            ].map((category) => (
-              <button
-                key={category.id}
-                type="button"
-                className={`flex flex-col items-center justify-center p-1 rounded transition-all duration-200 ${
-                  activeTab === category.id
-                    ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-gray-500 dark:text-gray-400'
-                }`}
-                onClick={() => {
-                  setActiveTab(category.id);
-                  scrollToTop(); // Scroll to top when category is changed
-                }}
-              >
-                <div className="relative">
-                  <span className={`text-xs font-medium ${
-                    activeTab === category.id
-                      ? 'text-blue-600 dark:text-blue-400'
-                      : 'text-gray-500 dark:text-gray-400'
-                  }`}>
-                    {category.name}
-                  </span>
-                  <span className={`absolute -top-2 -right-2 text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center ${
-                    activeTab === category.id
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                  }`}>
-                    {category.count > 99 ? '99+' : category.count}
-                  </span>
-                </div>
-              </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-full" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-20 w-full mb-4" />
+                  <div className="flex justify-between">
+                    <Skeleton className="h-8 w-24" />
+                    <Skeleton className="h-8 w-24" />
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
-        
-        {/* Spacer to prevent content from being hidden behind fixed navbar */}
-        <div className="h-16 md:hidden"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto text-center py-12">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Error Loading Prompts</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            {error}
+          </p>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Gemini Prompts
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Discover and use the best prompts for Google's Gemini AI models to enhance your productivity and creativity.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Search prompts..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            <div className="flex gap-2">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              >
+                {categories.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+              
+              <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              >
+                <option value="popular">Most Popular</option>
+                <option value="newest">Newest</option>
+                <option value="rating">Highest Rated</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Results Count */}
+        <div className="mb-6">
+          <p className="text-gray-600 dark:text-gray-400">
+            Showing {filteredPrompts.length} of {prompts.length} prompts
+          </p>
+        </div>
+
+        {/* Prompts Grid */}
+        {filteredPrompts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              No prompts found matching your criteria.
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('All');
+                setSortOption('popular');
+              }}
+            >
+              Clear Filters
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPrompts.map((prompt) => (
+              <PromptItem
+                key={prompt.id}
+                prompt={prompt}
+                user={user}
+                onCopy={handleCopyPrompt}
+                onExpand={toggleExpand}
+                isExpanded={expandedPrompt === prompt.id}
+                navigate={navigate}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

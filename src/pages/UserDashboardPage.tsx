@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
 import { 
   User, 
@@ -26,9 +26,9 @@ import { getReviewsForUser } from '../services/reviewsService';
 import { useAuthTracking } from '../hooks/useAuthTracking';
 
 const UserDashboardPage: React.FC = () => {
-  const { user, signOut } = useUser();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [bookmarks, setBookmarks] = useState<Tool[]>([]);
+  const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [likes, setLikes] = useState<any[]>([]);
   const [shares, setShares] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
@@ -76,7 +76,7 @@ const UserDashboardPage: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Please sign in to access your dashboard</h2>
-          <Button onClick={() => window.Clerk?.openSignIn?.() || window.location.reload()}>Sign In</Button>
+          <Button onClick={() => navigate('/login')}>Sign In</Button>
         </div>
       </div>
     );
@@ -94,7 +94,7 @@ const UserDashboardPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Welcome back, {user.firstName || user.username || 'User'}!
+                Welcome back, {user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}!
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
                 Manage your account, bookmarks, and preferences
@@ -213,15 +213,15 @@ const UserDashboardPage: React.FC = () => {
                 <CardContent className="space-y-4">
                   <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
-                      {user.firstName?.[0] || user.username?.[0] || 'U'}
+                      {user.user_metadata?.full_name?.[0] || user.email?.[0] || 'U'}
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold">
-                        {user.firstName} {user.lastName}
+                        {user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400">{user.emailAddresses[0]?.emailAddress}</p>
+                      <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
                       <Badge variant="secondary" className="mt-1">
-                        Member since {new Date(user.createdAt).toLocaleDateString()}
+                        Member since {new Date(user.created_at).toLocaleDateString()}
                       </Badge>
                     </div>
                   </div>
@@ -246,29 +246,18 @@ const UserDashboardPage: React.FC = () => {
                     </div>
                   ) : bookmarks.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {bookmarks.map((tool) => (
-                        <Card key={tool.id || tool.link} className="hover:shadow-lg transition-shadow">
+                      {bookmarks.map((toolId) => (
+                        <Card key={toolId} className="hover:shadow-lg transition-shadow">
                           <CardContent className="p-4">
                             <div className="flex items-start space-x-3">
-                              <img
-                                src={tool.image_url || tool.image || '/placeholder.svg'}
-                                alt={tool.name}
-                                className="w-12 h-12 rounded-lg object-cover"
-                              />
+                              <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                <Bookmark className="w-6 h-6 text-gray-500" />
+                              </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-sm truncate">{tool.name}</h4>
+                                <h4 className="font-semibold text-sm truncate">Tool ID: {toolId}</h4>
                                 <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                                  {tool.description}
+                                  Bookmarked tool
                                 </p>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="mt-2"
-                                  onClick={() => window.open(tool.link, '_blank')}
-                                >
-                                  <ExternalLink className="w-3 h-3 mr-1" />
-                                  Visit
-                                </Button>
                               </div>
                             </div>
                           </CardContent>
@@ -473,4 +462,4 @@ const UserDashboardPage: React.FC = () => {
   );
 };
 
-export default UserDashboardPage; 
+export default UserDashboardPage;

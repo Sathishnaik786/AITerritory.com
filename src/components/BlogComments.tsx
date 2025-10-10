@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useUser, SignInButton } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { sanitizeText } from '@/lib/sanitizeHtml';
 import { blogInteractions } from '../services/unifiedInteractionsService';
 import { CommentsSkeleton } from './SkeletonLoader';
+import { Button } from './ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface BlogCommentsProps {
   blogId: string;
@@ -16,7 +18,8 @@ interface BlogComment {
 }
 
 const BlogComments: React.FC<BlogCommentsProps> = ({ blogId }) => {
-  const { user, isSignedIn } = useUser();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [comments, setComments] = useState<BlogComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [input, setInput] = useState('');
@@ -75,7 +78,7 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ blogId }) => {
           </ul>
         </>
       )}
-      {isSignedIn ? (
+      {user ? (
         <form onSubmit={handleSubmit} className="flex flex-col gap-2">
           <textarea
             className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -101,13 +104,16 @@ const BlogComments: React.FC<BlogCommentsProps> = ({ blogId }) => {
       ) : (
         <div className="text-gray-500 flex items-center gap-2">
           <span>You must be signed in to comment.</span>
-          <SignInButton mode="modal">
-            <button className="px-3 py-1.5 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">Sign In</button>
-          </SignInButton>
+          <Button 
+            onClick={() => navigate('/login')}
+            className="px-3 py-1.5 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+          >
+            Sign In
+          </Button>
         </div>
       )}
     </section>
   );
 };
 
-export default BlogComments; 
+export default BlogComments;

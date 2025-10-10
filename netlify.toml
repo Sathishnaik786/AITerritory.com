@@ -111,8 +111,6 @@ path = "/ai-for-business*"
     Content-Security-Policy = """
       default-src 'self';
       script-src 'self' 'unsafe-inline' 'unsafe-eval' 
-        https://clerk.aiterritory.org 
-        https://*.clerk.accounts.dev 
         https://js.stripe.com 
         https://www.googletagmanager.com 
         https://www.google-analytics.com
@@ -135,10 +133,7 @@ path = "/ai-for-business*"
         https://www.googletagmanager.com;
       connect-src 'self' 
         https://aiterritory-com.onrender.com 
-        https://clerk.aiterritory.org 
-        https://*.clerk.accounts.dev 
         https://api.stripe.com 
-        wss://*.clerk.accounts.dev 
         https://ckahkadgnaxzcfhmsdaj.supabase.co 
         wss://ckahkadgnaxzcfhmsdaj.supabase.co 
         https://www.google-analytics.com 
@@ -147,9 +142,7 @@ path = "/ai-for-business*"
       frame-src 
         https://js.stripe.com 
         https://www.youtube.com 
-        https://www.youtube-nocookie.com
-        https://clerk.aiterritory.org
-        https://*.clerk.accounts.dev;
+        https://www.youtube-nocookie.com;
       worker-src 'self' blob:;
       media-src 'self' 
         https://aiterritory-com.onrender.com

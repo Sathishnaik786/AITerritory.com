@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Search, Filter } from 'lucide-react';
 import { Tool } from '../types/tool';
 import MetaTags from '../components/MetaTags';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { supabase } from '../services/supabaseClient'; // Adjust path
 import { ToolCard, ToolCardStats } from '../components/ToolCard'; // Import ToolCardStats
 import SEO from '../components/SEO';
@@ -23,7 +23,7 @@ import api from '../services/api';
 const AllAIToolsPage = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [stats, setStats] = useState<Record<string, ToolCardStats>>({});
-  const { user } = useUser();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');

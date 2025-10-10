@@ -5,7 +5,7 @@ import { FaRegComment, FaRegHeart, FaHeart, FaRegBookmark, FaBookmark, FaShare }
 import { FaTwitter as FaXTwitter, FaLinkedin, FaFacebook, FaWhatsapp, FaTelegram } from 'react-icons/fa6';
 import { FiLink } from 'react-icons/fi';
 import { format } from 'date-fns';
-import { useUser, SignInButton } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { useLikesAndBookmarks } from '../../hooks/useLikesAndBookmarks';
 import { toast } from '../ui/sonner';
 import DOMPurify from 'dompurify';
@@ -14,6 +14,8 @@ import { ContentRenderer } from '../ContentRenderer';
 import ShareButton from '../ShareButton';
 import { BlogService } from '@/services/blogService';
 import { BlogPost } from '@/types/blog';
+import { Button } from '../ui/button';
+import { useNavigate } from 'react-router-dom';
 
 // Define BlogSEOData interface
 interface BlogSEOData {
@@ -63,7 +65,8 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
   slug,
   commentsCount = 0,
 }) => {
-  const { user, isSignedIn } = useUser();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [seoData, setSeoData] = useState<BlogSEOData | null>(null);
   
@@ -220,7 +223,7 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
             <div className="flex items-center space-x-4">
               {/* Like Button */}
               <div className="flex items-center">
-                {isSignedIn ? (
+                {user ? (
                   <button
                     onClick={() => toggleLike()}
                     disabled={isTogglingLike}
@@ -239,15 +242,15 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
                     <span className="text-sm font-medium">{likeCount}</span>
                   </button>
                 ) : (
-                  <SignInButton mode="modal">
-                    <button
-                      className="flex items-center space-x-2 px-4 py-2 rounded-full text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                      aria-label="Sign in to like"
-                    >
-                      <FaRegHeart className="w-5 h-5" />
-                      <span className="text-sm font-medium">{likeCount}</span>
-                    </button>
-                  </SignInButton>
+                  <Button
+                    onClick={() => navigate('/login')}
+                    variant="ghost"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-full text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                    aria-label="Sign in to like"
+                  >
+                    <FaRegHeart className="w-5 h-5" />
+                    <span className="text-sm font-medium">{likeCount}</span>
+                  </Button>
                 )}
               </div>
 
@@ -262,7 +265,7 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
 
               {/* Bookmark Button */}
               <div className="flex items-center">
-                {isSignedIn ? (
+                {user ? (
                   <button
                     onClick={() => toggleBookmark()}
                     disabled={isTogglingBookmark}
@@ -281,15 +284,15 @@ export const BlogLayout: React.FC<BlogLayoutProps> = ({
                     <span className="text-sm font-medium">{bookmarkCount || 0}</span>
                   </button>
                 ) : (
-                  <SignInButton mode="modal">
-                    <button
-                      className="flex items-center space-x-2 px-4 py-2 rounded-full text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
-                      aria-label="Sign in to bookmark"
-                    >
-                      <FaRegBookmark className="w-5 h-5" />
-                      <span className="text-sm font-medium">{bookmarkCount || 0}</span>
-                    </button>
-                  </SignInButton>
+                  <Button
+                    onClick={() => navigate('/login')}
+                    variant="ghost"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-full text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                    aria-label="Sign in to bookmark"
+                  >
+                    <FaRegBookmark className="w-5 h-5" />
+                    <span className="text-sm font-medium">{bookmarkCount || 0}</span>
+                  </Button>
                 )}
               </div>
             </div>

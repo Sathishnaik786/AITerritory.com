@@ -21,6 +21,7 @@ import RequestFeaturePage from "./pages/RequestFeaturePage";
 
 
 import CreateAccountPage from "./pages/CreateAccountPage";
+import LoginPage from "./pages/LoginPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import ProductivityToolsPage from "./pages/ProductivityToolsPage";
@@ -37,14 +38,6 @@ import { ThemeProvider } from './components/theme-provider';
 import ScrollToTopButton from './components/ScrollToTopButton';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-  SignIn,
-} from "@clerk/clerk-react";
 import AdminDashboard from './admin/AdminDashboard';
 import BusinessFunctionsAdmin from './admin/BusinessFunctionsAdmin';
 import AIAgentsAdmin from './admin/AIAgentsAdmin';
@@ -219,6 +212,7 @@ function ThemedAppContent() {
                 
                 {/* Authentication Routes */}
                 <Route path="/signup" element={<CreateAccountPage />} />
+                <Route path="/login" element={<LoginPage />} />
                 
                 {/* Routes for Resources dropdown */}
                 <Route path="/resources" element={<Resources />} />

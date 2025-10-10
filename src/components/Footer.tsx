@@ -2,19 +2,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { Linkedin, Youtube, Instagram, Facebook } from 'lucide-react';
 import { FaTiktok, FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 import { SiDiscord } from 'react-icons/si';
-import {
-  SignedIn,
-  SignedOut,
-  SignUpButton,
-  UserButton,
-  useUser,
-  SignInButton,
-} from "@clerk/clerk-react";
+import { useAuth } from '@/context/AuthContext';
 import { Sun, Moon } from 'lucide-react';
 import TestimonialForm from './TestimonialForm';
 import { useState, useEffect } from 'react';
 import FeedbackModal from './FeedbackModal';
 import ThemeToggle from './ThemeToggle';
+import { Button } from './ui/button';
+import { useNavigate } from 'react-router-dom';
 
 // Add scrollToTop utility
 function scrollToTop() {
@@ -24,7 +19,8 @@ function scrollToTop() {
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const location = useLocation();
-  const { user } = useUser();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [openTestimonial, setOpenTestimonial] = useState(false);
 
   // Scroll to top on every location change
@@ -92,23 +88,37 @@ export function Footer() {
             <div>
               <h4 className="text-sm font-semibold text-foreground mb-4">Account</h4>
               <ul className="space-y-3 text-sm">
-                <SignedOut>
+                {!user ? (
+                  <>
+                    <li>
+                      <Button 
+                        onClick={() => navigate('/signup')}
+                        variant="ghost" 
+                        className="hover:text-blue-500 transition-colors w-full text-left bg-transparent border-none p-0 m-0"
+                      >
+                        Sign Up
+                      </Button>
+                    </li>
+                    <li>
+                      <Button 
+                        onClick={() => navigate('/login')}
+                        variant="ghost" 
+                        className="hover:text-blue-500 transition-colors w-full text-left bg-transparent border-none p-0 m-0"
+                      >
+                        Login
+                      </Button>
+                    </li>
+                  </>
+                ) : (
                   <li>
-                    <SignUpButton mode="modal">
-                      <button className="hover:text-blue-500 transition-colors w-full text-left bg-transparent border-none p-0 m-0">Sign Up</button>
-                    </SignUpButton>
+                    <Button 
+                      onClick={() => navigate('/dashboard')}
+                      variant="ghost"
+                    >
+                      Dashboard
+                    </Button>
                   </li>
-                  <li>
-                    <SignInButton mode="modal">
-                      <button className="hover:text-blue-500 transition-colors w-full text-left bg-transparent border-none p-0 m-0">Login</button>
-                    </SignInButton>
-                  </li>
-                </SignedOut>
-                <SignedIn>
-                  <li>
-                    <UserButton afterSignOutUrl="/" />
-                  </li>
-                </SignedIn>
+                )}
               </ul>
             </div>
           </div>
@@ -130,13 +140,12 @@ export function Footer() {
               <FeedbackModal />
               {/* Submit Testimonial Button: opens sign-in modal if not logged in, else opens testimonial form */}
               {!user ? (
-                <SignInButton mode="modal">
-                  <button
-                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors w-full sm:w-auto"
-                  >
-                    Submit Testimonial
-                  </button>
-                </SignInButton>
+                <Button
+                  onClick={() => navigate('/login')}
+                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors w-full sm:w-auto"
+                >
+                  Submit Testimonial
+                </Button>
               ) : (
                 <button
                   onClick={() => setOpenTestimonial(true)}
@@ -153,8 +162,8 @@ export function Footer() {
       <TestimonialForm
         open={openTestimonial}
         onClose={() => setOpenTestimonial(false)}
-        user={user ? { id: user.id, name: user.fullName || user.username || user.email, avatar: user.imageUrl } : null}
+        user={user ? { id: user.id, name: user.email, avatar: '' } : null}
       />
     </footer>
   );
-} 
+}

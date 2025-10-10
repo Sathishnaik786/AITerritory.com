@@ -7,8 +7,9 @@ import { SiWhatsapp } from 'react-icons/si';
 import { FaTwitter } from 'react-icons/fa';
 import ShareDialog from './ShareDialog';
 import { FaLinkedin, FaFacebook, FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
-import { SignInButton } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { trackToolLike, trackToolBookmark, trackShare, trackCommentPosted } from '@/lib/analytics';
+import { useNavigate } from 'react-router-dom';
 
 interface Comment {
   id: string;
@@ -58,30 +59,40 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleLike = () => {
-    if (!userSession) return toast('Please log in to like this tool.');
+    if (!user) {
+      toast('Please log in to like this tool.');
+      navigate('/login');
+      return;
+    }
     
     // Track the like event
     trackToolLike(
       toolTitle, // Using toolTitle as toolId for now, should be actual toolId
       toolTitle,
       undefined, // toolCategory
-      userSession?.id
+      user.id
     );
     
     onLikeToggle();
   };
 
   const handleBookmark = () => {
-    if (!userSession) return toast('Please log in to bookmark this tool.');
+    if (!user) {
+      toast('Please log in to bookmark this tool.');
+      navigate('/login');
+      return;
+    }
     
     // Track the bookmark event
     trackToolBookmark(
       toolTitle, // Using toolTitle as toolId for now, should be actual toolId
       toolTitle,
       undefined, // toolCategory
-      userSession?.id
+      user.id
     );
     
     onBookmarkToggle();
@@ -89,8 +100,9 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userSession) {
+    if (!user) {
       toast('Please log in to comment.');
+      navigate('/login');
       return;
     }
     if (!newComment.trim()) return;
@@ -103,7 +115,7 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
       toolTitle, // Using toolTitle as toolId for now, should be actual toolId
       toolTitle,
       newComment.length,
-      userSession?.id
+      user.id
     );
     
     await onCommentSubmit(newComment); // Pass the text to the parent
@@ -118,7 +130,7 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
       'tool',
       toolTitle, // Using toolTitle as toolId for now, should be actual toolId
       toolTitle,
-      userSession?.id
+      user?.id
     );
     
     onShare(platform);
@@ -177,18 +189,20 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
           <form onSubmit={handleFormSubmit} className="flex flex-col gap-2">
             <textarea
               className="w-full p-2 border rounded"
-              placeholder={userSession ? 'Write a comment...' : 'Log in to comment'}
+              placeholder={user ? 'Write a comment...' : 'Log in to comment'}
               value={newComment}
               onChange={e => {
-                if (!userSession) {
+                if (!user) {
                   toast('Please log in to comment.');
+                  navigate('/login');
                   return;
                 }
                 setNewComment(e.target.value);
               }}
               onFocus={() => {
-                if (!userSession) {
+                if (!user) {
                   toast('Please log in to comment.');
+                  navigate('/login');
                 }
               }}
               disabled={isSubmitting}
@@ -198,19 +212,23 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
               disabled={isSubmitting}
               onClick={e => {
-                if (!userSession) {
+                if (!user) {
                   e.preventDefault();
                   toast('Please log in to comment.');
+                  navigate('/login');
                 }
               }}
             >
               {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Post Comment'}
             </button>
-            {!userSession && (
+            {!user && (
               <div className="text-center mt-2">
-                <SignInButton mode="modal">
-                  <span className="text-blue-600 underline cursor-pointer">Log in or Sign up to comment</span>
-                </SignInButton>
+                <button 
+                  onClick={() => navigate('/login')}
+                  className="text-blue-600 underline cursor-pointer"
+                >
+                  Log in or Sign up to comment
+                </button>
               </div>
             )}
             </form>
@@ -220,4 +238,4 @@ const ToolInteractionSection: React.FC<ToolInteractionSectionProps> = ({
   );
 };
 
-export default ToolInteractionSection; 
+export default ToolInteractionSection;

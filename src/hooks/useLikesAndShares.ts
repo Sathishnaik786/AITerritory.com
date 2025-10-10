@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { LikesService } from '../services/likesService';
 import { SharesService } from '../services/sharesService';
 import { supabase } from '../services/supabaseClient';
@@ -22,7 +22,7 @@ export const useLikesAndShares = ({ toolId, userId }: UseLikesAndSharesProps): U
   const [shareCount, setShareCount] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useUser();
+  const { user } = useAuth();
 
   // Fetch initial counts and user like status
   useEffect(() => {
@@ -122,6 +122,7 @@ export const useMultipleLikesAndShares = (toolIds: string[], userId?: string) =>
   const [shareCounts, setShareCounts] = useState<Record<string, number>>({});
   const [userLikes, setUserLikes] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
   console.log(`🎣 useMultipleLikesAndShares hook initialized for ${toolIds.length} tools, user: ${userId || 'anonymous'}`);
 
@@ -147,11 +148,11 @@ export const useMultipleLikesAndShares = (toolIds: string[], userId?: string) =>
         setShareCounts(shareCountsData);
 
         // Check user likes for all tools
-        if (userId) {
+        if (user?.id) {
           const userLikesData: Record<string, boolean> = {};
           await Promise.all(
             toolIds.map(async (toolId) => {
-              userLikesData[toolId] = await LikesService.checkUserLike(toolId, userId);
+              userLikesData[toolId] = await LikesService.checkUserLike(toolId, user.id);
             })
           );
           console.log('👤 Multiple user likes:', userLikesData);
@@ -165,7 +166,7 @@ export const useMultipleLikesAndShares = (toolIds: string[], userId?: string) =>
     if (toolIds.length > 0) {
       initializeData();
     }
-  }, [toolIds, userId]);
+  }, [toolIds, user?.id]);
 
   // Subscribe to real-time updates for multiple tools
   useEffect(() => {
@@ -199,4 +200,4 @@ export const useMultipleLikesAndShares = (toolIds: string[], userId?: string) =>
     userLikes,
     isLoading,
   };
-}; 
+};

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useUser, SignIn } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { Navigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, LogIn } from 'lucide-react';
@@ -14,11 +14,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children, 
   redirectTo = '/login' 
 }) => {
-  const { user, isLoaded } = useUser();
+  const { user, loading } = useAuth();
   const location = useLocation();
 
-  // Show loading state while Clerk is initializing
-  if (!isLoaded) {
+  // Show loading state while auth is initializing
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -29,17 +29,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // If user is not authenticated, show Clerk SignIn page
+  // If user is not authenticated, redirect to login
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <SignIn path="/sign-in" routing="path" />
-      </div>
-    );
+    return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
   // If user is authenticated, render the protected content
   return <>{children}</>;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/components/ui/sonner';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import api from '../services/api';
 
 interface Comment {
@@ -41,7 +41,7 @@ const postComment = async ({ blogId, comment }: { blogId: string; comment: Comme
 
 export const useComments = (blogId: string) => {
   const queryClient = useQueryClient();
-  const { user } = useUser();
+  const { user } = useAuth();
   
   // Query for fetching comments - allow unlogged users to see comments
   const {
@@ -116,6 +116,6 @@ export const useComments = (blogId: string) => {
     error,
     refetch,
     postComment: postCommentMutation.mutate,
-    isPosting: false, // Remove loading state
+    isPosting: postCommentMutation.isPending, // Use isPending instead of hardcoded false
   };
-}; 
+};

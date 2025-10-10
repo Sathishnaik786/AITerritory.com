@@ -100,23 +100,23 @@ export default defineConfig(({ mode }) => ({
     headers: mode === 'development' ? {
       'Content-Security-Policy': [
         "default-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:*;",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* https://www.googletagmanager.com https://loving-puma-26.clerk.accounts.dev;",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* https://www.googletagmanager.com;",
         "style-src 'self' 'unsafe-inline' http://localhost:* https://fonts.googleapis.com;",
         "img-src 'self' data: blob: http: https:;",
         "font-src 'self' data: http: https:;",
-        "connect-src 'self' http://localhost:* https://www.google-analytics.com https://loving-puma-26.clerk.accounts.dev https://aiterritory-com.onrender.com https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co;",
-        "frame-src 'self' http://localhost:* https://loving-puma-26.clerk.accounts.dev https://docs.google.com;",
+        "connect-src 'self' http://localhost:* https://www.google-analytics.com https://aiterritory-com.onrender.com https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co;",
+        "frame-src 'self' http://localhost:* https://docs.google.com;",
         "worker-src 'self' blob:;",
       ].join(' '),
     } : {
       'Content-Security-Policy': [
         "default-src 'self';",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://loving-puma-26.clerk.accounts.dev;",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
         "img-src 'self' data: blob: http: https:;",
         "font-src 'self' data: https://fonts.gstatic.com;",
-        "connect-src 'self' https://www.google-analytics.com https://loving-puma-26.clerk.accounts.dev https://aiterritory-com.onrender.com https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co;",
-        "frame-src 'self' https://loving-puma-26.clerk.accounts.dev https://docs.google.com;",
+        "connect-src 'self' https://www.google-analytics.com https://aiterritory-com.onrender.com https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co;",
+        "frame-src 'self' https://docs.google.com;",
         "worker-src 'self' blob:;",
       ].join(' '),
     },
@@ -127,12 +127,12 @@ export default defineConfig(({ mode }) => ({
     headers: {
       'Content-Security-Policy': [
         "default-src 'self';",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://loving-puma-26.clerk.accounts.dev;",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
         "img-src 'self' data: blob: http: https:;",
         "font-src 'self' data: https://fonts.gstatic.com;",
-        "connect-src 'self' https://www.google-analytics.com https://loving-puma-26.clerk.accounts.dev https://aiterritory-com.onrender.com https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co;",
-        "frame-src 'self' https://loving-puma-26.clerk.accounts.dev;",
+        "connect-src 'self' https://www.google-analytics.com https://aiterritory-com.onrender.com https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co;",
+        "frame-src 'self' https://docs.google.com;",
         "worker-src 'self' blob:;",
       ].join(' ')
     },

@@ -24,6 +24,12 @@ export const toolService = {
     return response.data;
   },
 
+  // Get multiple tools by IDs
+  async getToolsByIds(ids: string[]): Promise<Tool[]> {
+    const response = await api.post('/tools/by-ids', { ids });
+    return response.data;
+  },
+
   // Create new tool
   async createTool(toolData: Partial<Tool>): Promise<Tool> {
     const response = await api.post('/tools', toolData);

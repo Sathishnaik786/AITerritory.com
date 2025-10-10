@@ -1,790 +1,344 @@
-// console.log('=== BlogDetail.tsx loaded ===');
-import React, { useEffect, useState, useMemo } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
-import { useUser, SignInButton } from '@clerk/clerk-react';
-import { toast } from '@/components/ui/sonner';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import ToolDescriptionSection from '@/components/ToolDescriptionSection';
-import ToolSidebarInfo from '@/components/ToolSidebarInfo';
-import ShareDialog from '@/components/ShareDialog';
-import MetaTags from '@/components/MetaTags';
-import { supabase } from '@/services/supabaseClient';
+import { 
+  ArrowLeft, 
+  ExternalLink, 
+  Star, 
+  Heart, 
+  Bookmark, 
+  Share2, 
+  Check, 
+  Copy,
+  AlertCircle,
+  Shield,
+  Zap,
+  Globe,
+  Clock,
+  User,
+  ThumbsUp,
+  MessageCircle
+} from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
+import { Skeleton } from '../components/ui/skeleton';
+import ThreadedComments from '../components/ThreadedComments';
+import { OptimizedImage } from '../components/OptimizedImage';
 import { Tool } from '../types/tool';
-import { Review } from '../types/review';
-import { FaXTwitter, FaLinkedin, FaWhatsapp, FaFacebook } from 'react-icons/fa6';
-import { trackToolLike, trackToolBookmark, trackShare, trackCommentPosted } from '@/lib/analytics';
-import { toolInteractions } from '@/services/unifiedInteractionsService';
-import { ShareButton } from '@/components/ShareButton';
+import { toolService } from '../services/toolService';
+import { useLikesAndShares } from '../hooks/useLikesAndShares';
+import { trackEvent } from '@/lib/analytics';
+import { toast } from 'sonner';
 
 const ToolDetailsPage: React.FC = () => {
-  // All hooks at the top!
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   const { toolId } = useParams<{ toolId: string }>();
-  const { user } = useUser();
-  const location = useLocation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [tool, setTool] = useState<Tool | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [reviewsLoading, setReviewsLoading] = useState(true);
-  const [recentBlogs, setRecentBlogs] = useState<any[]>([]);
-  const [blogsLoading, setBlogsLoading] = useState(true);
-  const [relatedTools, setRelatedTools] = useState<{id: string, name: string, description?: string, image_url?: string}[]>([]);
-  const [relatedLoading, setRelatedLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
-  // Likes and bookmarks state
-  const [likesCount, setLikesCount] = useState(0);
-  const [userHasLiked, setUserHasLiked] = useState(false);
-  const [bookmarkCount, setBookmarkCount] = useState(0);
-  const [userHasBookmarked, setUserHasBookmarked] = useState(false);
-  const [likeLoading, setLikeLoading] = useState(false);
-  const [bookmarkLoading, setBookmarkLoading] = useState(false);
-
-  // Comments state
-  const [comments, setComments] = useState<any[]>([]);
-  const [commentsLoading, setCommentsLoading] = useState(true);
-  const [commentText, setCommentText] = useState('');
-  const [commentSubmitting, setCommentSubmitting] = useState(false);
-
-  // Reviews: show only 2 by default, with Show More button
-  const [showAllReviews, setShowAllReviews] = useState(false);
-  const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 2);
+  const {
+    likeCount,
+    shareCount,
+    hasLiked,
+    isLoading: interactionsLoading,
+    handleLike,
+  } = useLikesAndShares({ toolId: toolId || '' });
 
   // Fetch tool details
   useEffect(() => {
-    if (!toolId) return;
-    setLoading(true);
-    setError(null);
-    (async () => {
-      const { data, error } = await supabase
-              .from('tools')
-        .select('*')
-              .eq('id', toolId)
-              .single();
-      if (error) setError(error.message);
-        setTool(data);
-      setLoading(false);
-    })();
-  }, [toolId]);
-
-  // Fetch reviews
-  useEffect(() => {
-    if (!toolId) return;
-    setReviewsLoading(true);
-    (async () => {
-      const { data, error } = await supabase
-        .from('reviews')
-        .select('*')
-        .eq('tool_id', toolId)
-        .order('created_at', { ascending: false });
-      setReviews(data || []);
-      setReviewsLoading(false);
-    })();
-  }, [toolId]);
-
-  // Fetch recent blogs for sidebar
-  useEffect(() => {
-    setBlogsLoading(true);
-    (async () => {
-      const { data, error } = await supabase
-        .from('blogs')
-        .select('id, title, created_at, description, cover_image_url')
-        .order('created_at', { ascending: false })
-        .limit(5);
-      console.log('Supabase blogs fetch:', { data, error });
-      setRecentBlogs(data || []);
-      setBlogsLoading(false);
-    })();
-  }, []);
-
-  // Fetch related tools for sidebar
-  useEffect(() => {
-    if (!tool || !tool.category_id) return;
-    setRelatedLoading(true);
-    (async () => {
-      const { data, error } = await supabase
-        .from('tools')
-        .select('id, name, description, image_url')
-        .eq('category_id', tool.category_id)
-        .neq('id', tool.id)
-        .limit(5);
-      setRelatedTools(data || []);
-      setRelatedLoading(false);
-    })();
-  }, [tool]);
-
-  // Fetch likes count and user like status
-  useEffect(() => {
-    if (!toolId) return;
-    (async () => {
-      try {
-        // Total likes
-        const likeCount = await toolInteractions.getLikeCount(toolId);
-        setLikesCount(likeCount);
-        
-        // User like status
-        if (user?.id) {
-          const hasLiked = await toolInteractions.checkLike(toolId, user.id);
-          setUserHasLiked(hasLiked);
-        } else {
-          setUserHasLiked(false);
-        }
-      } catch (error) {
-        console.error('Error fetching likes:', error);
-      }
-    })();
-  }, [toolId, user?.id]);
-
-  // Fetch bookmarks count and user bookmark status
-  useEffect(() => {
-    if (!toolId) return;
-    (async () => {
-      try {
-        // Total bookmarks
-        const bookmarkCount = await toolInteractions.getBookmarkCount(toolId);
-        setBookmarkCount(bookmarkCount);
-        
-        // User bookmark status
-        if (user?.id) {
-          const hasBookmarked = await toolInteractions.checkBookmark(toolId, user.id);
-          setUserHasBookmarked(hasBookmarked);
-        } else {
-          setUserHasBookmarked(false);
-        }
-      } catch (error) {
-        console.error('Error fetching bookmarks:', error);
-      }
-    })();
-  }, [toolId, user?.id]);
-
-  // Fetch comments
-  useEffect(() => {
-    if (!toolId) return;
-    setCommentsLoading(true);
-    (async () => {
-      try {
-        const data = await toolInteractions.getComments(toolId);
-        setComments(data);
-      } catch (error) {
-        console.error('Error fetching comments:', error);
-      }
-      setCommentsLoading(false);
-    })();
-  }, [toolId]);
-
-
-
-  // Like toggle handler
-  const handleLikeToggle = async () => {
-    if (!user || !user.id) {
-      toast('Please log in to like this tool.');
-      return;
-    }
-    setLikeLoading(true);
-    try {
-      if (userHasLiked) {
-        await toolInteractions.removeLike(toolId, user.id);
-        setLikesCount(c => Math.max(0, c - 1));
-        setUserHasLiked(false);
-      } else {
-        await toolInteractions.addLike(toolId, user.id);
-        setLikesCount(c => c + 1);
-        setUserHasLiked(true);
-        
-        // Track the like event
-        trackToolLike(
-          toolId,
-          tool?.name,
-          tool?.categories?.name,
-          user.id
-        );
-      }
-    } catch (error) {
-      console.error('Error toggling like:', error);
-      toast('Failed to update like');
-    }
-    setLikeLoading(false);
-  };
-
-  // Bookmark toggle handler
-  const handleBookmarkToggle = async () => {
-    if (!user || !user.id) {
-      toast('Please log in to bookmark this tool.');
-      return;
-    }
-    setBookmarkLoading(true);
-    try {
-      if (userHasBookmarked) {
-        await toolInteractions.removeBookmark(toolId, user.id);
-        setBookmarkCount(c => Math.max(0, c - 1));
-        setUserHasBookmarked(false);
-      } else {
-        await toolInteractions.addBookmark(toolId, user.id);
-        setBookmarkCount(c => c + 1);
-        setUserHasBookmarked(true);
-        
-        // Track the bookmark event
-        trackToolBookmark(
-          toolId,
-          tool?.name,
-          tool?.categories?.name,
-          user.id
-        );
-      }
-    } catch (error) {
-      console.error('Error toggling bookmark:', error);
-      toast('Failed to update bookmark');
-    }
-    setBookmarkLoading(false);
-  };
-
-  // Handle comment submit
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !user.id) {
-      toast('Please log in to comment.');
-      return;
-    }
-    if (!commentText.trim()) {
-      toast('Please enter a comment.');
-      return;
-    }
-    setCommentSubmitting(true);
-    try {
-      const data = await toolInteractions.addComment(toolId, user.id, commentText.trim());
+    const fetchToolDetails = async () => {
+      if (!toolId) return;
       
-      // Track the comment posted event
-      trackCommentPosted(
-        'tool',
-        toolId,
-        tool?.name,
-        commentText.length,
-        user.id
-      );
-      
-      setCommentText('');
-      setComments(prev => [data, ...prev]);
-      toast('Comment posted successfully!');
-    } catch (error) {
-      console.error('Error posting comment:', error);
-      toast('Failed to post comment');
-    } finally {
-      setCommentSubmitting(false);
+      try {
+        setLoading(true);
+        const toolData = await toolService.getToolById(toolId);
+        setTool(toolData);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching tool details:', err);
+        setError('Failed to load tool details. Please try again later.');
+        toast.error('Failed to load tool details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchToolDetails();
+  }, [toolId]);
+
+  const handleVisitTool = () => {
+    if (tool?.link) {
+      // Track tool visit
+      trackEvent('share_item', {
+        platform: 'copy', // Using copy as a placeholder since we don't have a specific platform
+        content_type: 'tool',
+        content_id: tool.id,
+        content_title: tool.name,
+        page_url: window.location.href,
+        user_id: user?.id,
+        event_type: 'share_item'
+      });
+      window.open(tool.link, '_blank');
     }
   };
 
-  // Calculate average rating
-  const avgRating = useMemo(() => {
-    if (!reviews.length) return 0;
-    return reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length;
-  }, [reviews]);
+  const handleCopyLink = () => {
+    if (tool) {
+      navigator.clipboard.writeText(`${window.location.origin}/tools/${tool.id}`);
+      setCopied(true);
+      toast.success('Link copied to clipboard!');
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
-  // Loading skeletons
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <Skeleton className="h-10 w-2/3 mb-4" />
-        <Skeleton className="h-6 w-1/3 mb-2" />
-        <Skeleton className="h-8 w-1/2 mb-6" />
-        <div className="flex gap-2 mb-8">
-          <Skeleton className="h-10 w-10 rounded-xl" />
-          <Skeleton className="h-10 w-32" />
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <Skeleton className="h-12 w-32 mb-8" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <Skeleton className="h-96 w-full rounded-xl mb-6" />
+              <Skeleton className="h-8 w-64 mb-4" />
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-3/4 mb-6" />
+              <Skeleton className="h-64 w-full" />
+            </div>
+            <div>
+              <Skeleton className="h-64 w-full rounded-xl" />
+            </div>
+          </div>
         </div>
-        <Skeleton className="h-64 w-full rounded-2xl mb-8" />
-        <Skeleton className="h-8 w-1/4 mb-2" />
-        <Skeleton className="h-40 w-full rounded-xl" />
       </div>
     );
   }
+
   if (error || !tool) {
-    return <div className="max-w-2xl mx-auto px-4 py-16 text-center text-red-500">{error || 'Tool not found.'}</div>;
-  }
-
-  // SEO
-  const canonicalUrl = `https://aiterritory.org/tools/${tool.id}`;
-  const metaDescription = tool.description ? tool.description.slice(0, 160) : 'Discover this AI tool on AITerritory.';
-  const metaImage = tool.image_url ? tool.image_url : 'https://aiterritory.org/og-default.png';
-
-  // Social share logic
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const shareTitle = tool?.name || 'Check out this AI tool!';
-  const shareDescription = tool?.description || '';
-  const shareImage = tool?.image_url || '';
-
-  function handleShare(platform: string) {
-    const url = encodeURIComponent(shareUrl);
-    const title = encodeURIComponent(shareTitle);
-    const description = encodeURIComponent(tool?.description || 'Check out this amazing AI tool!');
-    
-    // Track the share event
-    trackShare(
-      platform as 'twitter' | 'facebook' | 'linkedin' | 'whatsapp' | 'copy',
-      'tool',
-      toolId,
-      tool?.name,
-      user?.id
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto text-center py-12">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Tool Not Found</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            {error || 'The tool you are looking for does not exist or has been removed.'}
+          </p>
+          <Button onClick={() => navigate('/resources/all-resources')}>
+            Browse All Tools
+          </Button>
+        </div>
+      </div>
     );
-    
-    let shareLink = '';
-    switch (platform) {
-      case 'x':
-      case 'twitter':
-        shareLink = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
-        break;
-      case 'facebook':
-        shareLink = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-        break;
-      case 'linkedin':
-        shareLink = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
-        break;
-      case 'whatsapp':
-        shareLink = `https://wa.me/?text=${title}%20${url}`;
-        break;
-      default:
-        // Copy to clipboard
-        navigator.clipboard.writeText(shareUrl);
-        toast('Link copied to clipboard!');
-        return;
-    }
-    
-    if (shareLink) {
-      window.open(shareLink, '_blank', 'width=600,height=400');
-    }
   }
 
   return (
-    <div className="relative bg-white dark:bg-[#171717] min-h-screen pt-4 md:pt-8 pb-8 md:pb-12">
-      <MetaTags
-        title={`${tool.name} | AITerritory`}
-        description={metaDescription}
-        image={metaImage}
-        url={canonicalUrl}
-        type="website"
-      />
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-8 flex flex-col md:flex-row gap-8">
-        {/* Main Content */}
-          <div className="flex-1 min-w-0">
-          {/* Hero Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="w-full border-b border-muted/40 pb-6 md:pb-8 mb-6 md:mb-8 px-2 sm:px-4 flex flex-col md:flex-row md:items-center gap-4 md:gap-6"
-          >
-            {/* Logo on the left */}
-            <div className="flex-shrink-0">
-              <img
-                src={tool.image_url || '/public/placeholder.svg'}
-                alt={tool.name}
-                className="w-16 h-16 md:w-20 md:h-20 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 bg-white"
-              />
-            </div>
-            {/* Main info */}
-            <div className="flex-1 flex flex-col gap-2 min-w-0">
-              {/* Tool Name */}
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 break-words">
-                {tool.name}
-              </h1>
-              {/* Byline */}
-              <div className="text-sm text-muted-foreground mb-1">
-                By <span className="font-semibold text-blue-700 dark:text-blue-400">{tool.author || 'Unknown Author'}</span>
-              </div>
-              {/* Dates */}
-              <div className="text-xs text-muted-foreground mb-2">
-                Published {tool.created_at ? new Date(tool.created_at).toLocaleString() : ''}
-                {tool.updated_at ? `, Updated ${new Date(tool.updated_at).toLocaleString()}` : ''}
-              </div>
-              {/* Action Buttons (optional, as before) */}
-              <div className="flex items-center gap-6 border-t border-b py-2 mb-2">
-                {/* Share button using our new ShareButton component */}
-                <ShareButton
-                  url={window.location.href}
-                  title={tool.name}
-                  description={tool.description}
-                  image={tool.image_url}
-                  variant="inline"
-                  onShare={(platform) => {
-                    // Track the share event
-                    trackShare(
-                      platform as 'twitter' | 'facebook' | 'linkedin' | 'whatsapp' | 'copy',
-                      'tool',
-                      toolId,
-                      tool?.name,
-                      user?.id
-                    );
-                  }}
-                />
-                <button className="flex items-center gap-1 text-blue-700 hover:underline text-sm font-medium" onClick={handleBookmarkToggle}>
-                  {/* Save icon here */} Save
-                </button>
-                <button className="flex items-center gap-1 text-blue-700 hover:underline text-sm font-medium">
-                  {/* Comment icon here */} Comment {comments.length}
-                </button>
-              </div>
-            </div>
-          </motion.section>
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Back Button */}
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate(-1)}
+          className="mb-6"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
 
-          {/* Blog-Style Overview Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-          >
-            <ToolDescriptionSection longDescription={tool.description || ''} />
-          </motion.section>
-
-          {/* Reviews Section */}
-          <motion.section
-            id="reviews"
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className="max-w-2xl mx-auto my-12"
-          >
-            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-              <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
-              User Reviews
-            </h2>
-            {/* Average rating and count */}
-            <div className="flex items-center gap-2 mb-6">
-              <div className="flex items-center gap-1">
-                {[1,2,3,4,5].map(star => (
-                  <Star key={star} className={`w-5 h-5 ${avgRating >= star ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 dark:text-gray-600'}`} />
-                ))}
-              </div>
-              <span className="text-sm text-muted-foreground ml-2">{avgRating.toFixed(1)} / 5 ({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})</span>
-            </div>
-            
-            {/* Review Submission Form */}
-            <ReviewForm
-              toolId={tool.id}
-              user={user}
-              onReviewAdded={async () => {
-                setReviewsLoading(true);
-                const { data } = await supabase
-                  .from('reviews')
-                  .select('*')
-                  .eq('tool_id', tool.id)
-                  .order('created_at', { ascending: false });
-                setReviews(data || []);
-                setReviewsLoading(false);
-              }}
-            />
-
-            {/* Reviews List */}
-            {reviewsLoading ? (
-              <div className="space-y-4 mt-6">
-                {[...Array(2)].map((_, i) => (
-                  <Skeleton key={i} className="h-24 w-full rounded-xl" />
-                ))}
-              </div>
-            ) : reviews.length === 0 ? (
-              <div className="text-muted-foreground text-center mt-8">No reviews yet. Be the first to review!</div>
-            ) : (
-              <div className="space-y-6 mt-6">
-                {visibleReviews.map((review) => (
-                  <div key={review.id} className="bg-white dark:bg-gray-900 border border-muted rounded-xl p-4 flex gap-4 items-start">
-                    <Avatar>
-                      <AvatarImage src={review.user_id ? `https://images.clerk.dev/v1/user/${review.user_id}/profile_image?width=48` : undefined} />
-                      <AvatarFallback>{typeof review.user_name === 'string' && review.user_name.length > 0 ? review.user_name.charAt(0) : '?'}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-gray-900 dark:text-white">{review.user_name || 'Anonymous'}</span>
-                        <span className="text-xs text-muted-foreground">{new Date(review.created_at).toLocaleDateString()}</span>
-              </div>
-                      <div className="flex items-center gap-1 mb-1">
-                        {[1,2,3,4,5].map(star => (
-                          <Star key={star} className={`w-4 h-4 ${review.rating >= star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300 dark:text-gray-600'}`} />
-              ))}
-            </div>
-                      <div className="text-base text-gray-700 dark:text-gray-200">{review.comment}</div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            {/* Header */}
+            <div className="mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-start gap-6 mb-6">
+                {tool.image_url && (
+                  <div className="flex-shrink-0">
+                    <OptimizedImage
+                      src={tool.image_url}
+                      alt={tool.name}
+                      className="w-24 h-24 rounded-xl object-cover shadow-lg"
+                      width={96}
+                      height={96}
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <Badge variant="secondary">{tool.categories?.name}</Badge>
+                    {tool.pricing_type === 'free' && <Badge variant="outline">Free</Badge>}
+                    {tool.is_featured && <Badge>Featured</Badge>}
+                  </div>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{tool.name}</h1>
+                  <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">{tool.description}</p>
+                  
+                  {/* Rating */}
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center">
+                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                      <span className="ml-1 font-semibold">{tool.rating?.toFixed(1) || 'N/A'}</span>
+                      <span className="text-gray-500 dark:text-gray-400 ml-1">
+                        ({tool.review_count || 0} reviews)
+                      </span>
                     </div>
-          </div>
-                ))}
-            {reviews.length > 2 && (
-              <div className="flex justify-center mt-4">
-                <Button variant="outline" size="sm" onClick={() => setShowAllReviews(v => !v)}>
-                  {showAllReviews ? 'Show Less' : `Show More (${reviews.length - 2} more)`}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3 mb-8">
+                <Button 
+                  onClick={handleVisitTool}
+                  className="flex-1 min-w-[120px] bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Visit Tool
+                </Button>
+                
+                <Button 
+                  variant={hasLiked ? "default" : "outline"}
+                  onClick={handleLike}
+                  disabled={interactionsLoading}
+                >
+                  <Heart className={`w-4 h-4 mr-2 ${hasLiked ? 'fill-current' : ''}`} />
+                  {hasLiked ? 'Liked' : 'Like'}
+                </Button>
+                
+                <Button variant="outline" onClick={handleCopyLink}>
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4 mr-2" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copy Link
+                    </>
+                  )}
                 </Button>
               </div>
-            )}
-          </div>
-            )}
-          </motion.section>
-
-          {/* Comments Section */}
-          <section className="max-w-2xl mx-auto my-12">
-            <h2 className="text-xl font-bold mb-4">Comments</h2>
-            {/* Comment Box */}
-            <form onSubmit={handleCommentSubmit} className="mb-6 flex flex-col gap-2">
-              <textarea
-                className="w-full p-2 border rounded min-h-[60px]"
-                placeholder={user ? 'Write a comment...' : 'Log in to comment'}
-                value={commentText}
-                onChange={e => setCommentText(e.target.value)}
-                disabled={commentSubmitting}
-                onFocus={() => { if (!user) toast('Please log in to comment.'); }}
-              />
-              <div className="flex items-center gap-2">
-                <Button type="submit" loading={commentSubmitting}>Post Comment</Button>
-                {!user && (
-                  <SignInButton mode="modal">
-                    <span className="text-blue-600 underline cursor-pointer">Log in or Sign up to comment</span>
-                  </SignInButton>
-                )}
-              </div>
-            </form>
-            {/* Comments List */}
-            {commentsLoading ? (
-              <div className="space-y-3">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <Skeleton className="h-8 w-8 rounded-full" />
-                    <div className="flex-1 space-y-2">
-                      <Skeleton className="h-4 w-3/4" />
-                      <Skeleton className="h-3 w-2/3" />
             </div>
+
+            {/* Tool Details */}
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Tool Details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Category</h3>
+                    <p className="text-gray-600 dark:text-gray-400">{tool.categories?.name}</p>
                   </div>
-                ))}
-              </div>
-            ) : comments.length === 0 ? (
-              <div className="text-muted-foreground text-sm">No comments yet. Be the first to comment!</div>
-            ) : (
-              <ul className="space-y-4">
-                {comments.map(comment => (
-                  <li key={comment.id} className="flex items-start gap-3">
-                    <Avatar>
-                      <AvatarImage src={comment.user_id ? `https://images.clerk.dev/v1/user/${comment.user_id}/profile_image?width=48` : undefined} />
-                      <AvatarFallback>{typeof comment.user_name === 'string' && comment.user_name.length > 0 ? comment.user_name.charAt(0) : '?'}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-gray-900 dark:text-white">{comment.user_name || 'Anonymous'}</span>
-                        <span className="text-xs text-muted-foreground">{new Date(comment.created_at).toLocaleDateString()}</span>
-                      </div>
-                      <div className="text-base text-gray-700 dark:text-gray-200 break-words">{comment.comment}</div>
-                    </div>
-                </li>
-              ))}
-            </ul>
-          )}
-          </section>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Pricing</h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {tool.pricing_type === 'free' ? 'Free' : 'Paid'}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Launch Date</h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {tool.created_at ? new Date(tool.created_at).toLocaleDateString() : 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Last Updated</h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {tool.updated_at ? new Date(tool.updated_at).toLocaleDateString() : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Likes/Bookmarks UI */}
-          {/* This section is now moved to the hero section */}
+            {/* Description */}
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Description</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="prose dark:prose-invert max-w-none">
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {tool.description || 'No detailed description available.'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Comments, Related Tools, and Sidebar will be implemented in the next steps */}
-          {/* ... */}
-        </div>
-        {/* Sidebar: now visible on all screens, sticky on desktop */}
-        <aside className="w-full md:w-80 lg:w-96 flex-shrink-0 mb-8 md:mb-0">
-          <div className="md:sticky md:top-8 space-y-8">
-            {/* Recent Blogs */}
-            <section>
-              <h3 className="text-lg font-semibold mb-3">Recent Blogs</h3>
-              {blogsLoading ? (
-                <div className="space-y-3">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <Skeleton className="h-10 w-10 rounded-xl" />
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-3/4" />
-                        <Skeleton className="h-3 w-2/3" />
-                      </div>
-                    </div>
-                  ))}
-      </div>
-              ) : recentBlogs.length === 0 ? (
-                <div className="text-muted-foreground text-sm">No blogs found.</div>
-              ) : (
-                <ul className="space-y-3">
-                  {(isMobile ? recentBlogs.slice(0, 3) : recentBlogs).map(blog => (
-                    <li key={blog.id} className="flex items-center gap-3">
-                      <img
-                        src={blog.cover_image_url || '/public/placeholder.svg'}
-                        alt={blog.title}
-                        className="w-10 h-10 rounded-xl object-cover border border-gray-200 dark:border-gray-700 bg-white"
-                        loading="lazy"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <Link to={`/blog/${blog.id}`} className="block font-medium text-blue-700 dark:text-blue-400 truncate hover:underline">
-                          {blog.title}
-                        </Link>
-                        <div className="text-xs text-muted-foreground truncate">
-                          {blog.description?.slice(0, 60)}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {blog.created_at ? new Date(blog.created_at).toLocaleDateString() : ''}
-        </div>
-      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-            {/* Related Tools */}
-            <section>
-              <h3 className="text-lg font-semibold mb-3">Related Tools</h3>
-              {relatedLoading ? (
-                <div className="space-y-3">
-                  {[...Array(2)].map((_, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <Skeleton className="h-10 w-10 rounded-xl" />
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-3/4" />
-                        <Skeleton className="h-3 w-2/3" />
-                      </div>
-                    </div>
-          ))}
-        </div>
-              ) : relatedTools.length === 0 ? (
-                <div className="text-muted-foreground text-sm">No related tools found.</div>
-              ) : (
-                <ul className="space-y-3">
-                  {(isMobile ? relatedTools.slice(0, 3) : relatedTools).map(t => (
-                    <li key={t.id} className="flex items-center gap-3">
-                        <img
-                          src={t.image_url || '/public/placeholder.svg'}
-                          alt={t.name}
-                        className="w-10 h-10 rounded-xl object-cover border border-gray-200 dark:border-gray-700 bg-white"
-                loading="lazy"
-              />
-                      <div className="flex-1 min-w-0">
-                        <Link to={`/tools/${t.id}`} className="block font-medium text-blue-700 dark:text-blue-400 truncate hover:underline">
-                          {t.name}
-                      </Link>
-                        <div className="text-xs text-muted-foreground truncate">
-                          {t.description?.slice(0, 60)}
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-        )}
-      </section>
-            {/* Social Share Block */}
-            <section>
-              <h3 className="text-lg font-semibold mb-3">Share</h3>
-              <div className="flex gap-3">
-                <button
-                  aria-label="Share on X"
-                  className="rounded-full bg-gray-100 dark:bg-gray-800 p-2 hover:bg-blue-100 dark:hover:bg-gray-700 transition"
-                  onClick={() => handleShare('x')}
-                >
-                  <FaXTwitter className="w-5 h-5 text-black dark:text-white" />
-                </button>
-                <button
-                  aria-label="Share on LinkedIn"
-                  className="rounded-full bg-gray-100 dark:bg-gray-800 p-2 hover:bg-blue-100 dark:hover:bg-gray-700 transition"
-                  onClick={() => handleShare('linkedin')}
-                >
-                  <FaLinkedin className="w-5 h-5 text-[#0077b5]" />
-                </button>
-                  <button
-                  aria-label="Share on WhatsApp"
-                  className="rounded-full bg-gray-100 dark:bg-gray-800 p-2 hover:bg-green-100 dark:hover:bg-gray-700 transition"
-                  onClick={() => handleShare('whatsapp')}
-                >
-                  <FaWhatsapp className="w-5 h-5 text-[#25d366]" />
-                </button>
-                <button
-                  aria-label="Share on Facebook"
-                  className="rounded-full bg-gray-100 dark:bg-gray-800 p-2 hover:bg-blue-100 dark:hover:bg-gray-700 transition"
-                  onClick={() => handleShare('facebook')}
-                >
-                  <FaFacebook className="w-5 h-5 text-[#1877f3]" />
-                </button>
-                    </div>
-            </section>
-          </div>
-        </aside>
+            {/* Reviews Section */}
+            <div id="reviews-section">
+              <ThreadedComments resourceId={tool.id} resourceType="tool" />
             </div>
+          </div>
+
+          {/* Sidebar */}
+          <div>
+            {/* Interaction Stats */}
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>Engagement</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Heart className="w-5 h-5 text-red-500 mr-2" />
+                      <span className="text-gray-600 dark:text-gray-400">Likes</span>
+                    </div>
+                    <span className="font-semibold">{likeCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Share2 className="w-5 h-5 text-blue-500 mr-2" />
+                      <span className="text-gray-600 dark:text-gray-400">Shares</span>
+                    </div>
+                    <span className="font-semibold">{shareCount}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tool Info */}
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>Tool Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <Shield className="w-5 h-5 text-gray-500 mr-3" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">Verified</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">AITerritory Verified</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Zap className="w-5 h-5 text-gray-500 mr-3" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">Performance</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Fast & Reliable</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Globe className="w-5 h-5 text-gray-500 mr-3" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">Availability</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Global Access</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
+      </div>
+    </div>
   );
 };
 
-export default ToolDetailsPage; 
-
-// ReviewForm component (inline for now)
-function ReviewForm({ toolId, user, onReviewAdded }: { toolId: string, user: any, onReviewAdded: () => void }) {
-  const [rating, setRating] = useState(5);
-  const [text, setText] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-      toast('Please log in to review.');
-      return;
-    }
-    if (!text.trim()) {
-      toast('Please enter your review.');
-      return;
-    }
-    setLoading(true);
-    const { data, error } = await supabase.from('reviews').insert({
-      tool_id: toolId,
-      user_id: user.id,
-      user_name: user.fullName,
-      rating,
-      comment: text,
-      created_at: new Date().toISOString(),
-    });
-    console.log('Supabase review insert result:', { data, error });
-    setLoading(false);
-    if (error) {
-      toast.error('Failed to submit review.');
-      return;
-    }
-    setText('');
-    setRating(5);
-    toast.success('Review submitted!');
-    onReviewAdded();
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="mb-8 bg-white dark:bg-gray-900 border border-muted rounded-xl p-4 flex flex-col gap-3">
-      <div className="flex items-center gap-2">
-        <span className="font-medium">Your Rating:</span>
-        {[1,2,3,4,5].map(star => (
-          <Star
-            key={star}
-            className={`w-5 h-5 cursor-pointer ${rating >= star ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
-            onClick={() => setRating(star)}
-          />
-        ))}
-      </div>
-      <textarea
-        value={text}
-        onChange={e => setText(e.target.value)}
-        placeholder={user ? 'Write your review...' : 'Log in to review'}
-        className="w-full p-2 border rounded min-h-[80px]"
-        disabled={loading}
-      />
-      <div className="flex items-center gap-2">
-        <Button type="submit" loading={loading} className="mt-1">Submit Review</Button>
-        {!user && (
-          <SignInButton mode="modal">
-            <span className="text-blue-600 underline cursor-pointer">Log in or Sign up to review</span>
-          </SignInButton>
-        )}
-      </div>
-    </form>
-  );
-}
+export default ToolDetailsPage;
