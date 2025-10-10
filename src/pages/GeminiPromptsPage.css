@@ -1,56 +1,162 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer utilities {
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
-
-/* Animation for copied popup */
-@keyframes fadeInOut {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, 0) scale(0.8);
-  }
-  20% {
-    opacity: 1;
-    transform: translate(-50%, -10px) scale(1);
-  }
-  80% {
-    opacity: 1;
-    transform: translate(-50%, -10px) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -20px) scale(0.9);
-  }
-}
+/* GeminiPromptsPage.css */
 
 .gemini-prompts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
+  width: 100%;
 }
 
-/* Heart animation */
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
+@media (max-width: 768px) {
+  .gemini-prompts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 
-.heart-pulse {
-  animation: pulse 0.3s ease-in-out;
+/* Card styling fixes */
+.gemini-prompts-grid > div {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Ensure cards take full height of grid items */
+.gemini-prompts-grid .card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Image container styling */
+.prompt-card-image-container {
+  position: relative;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.prompt-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.prompt-card-image:hover {
+  transform: scale(1.05);
+}
+
+/* Loading spinner positioning */
+.prompt-card-image-container .loading-spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+}
+
+/* Card content styling */
+.prompt-card-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1rem;
+}
+
+.prompt-card-text {
+  flex: 1;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #374151;
+  position: relative;
+}
+
+/* Read more button styling */
+.prompt-card-text .read-more-button {
+  color: #3b82f6;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  display: inline;
+  text-decoration: none;
+}
+
+.prompt-card-text .read-more-button:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.prompt-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Action button styling */
+.prompt-card-action-button {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.prompt-card-action-button:hover {
+  background-color: #f3f4f6;
+}
+
+.prompt-card-action-button.active {
+  color: #ef4444;
+}
+
+/* Category badge styling */
+.prompt-card-category {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Date badge styling */
+.prompt-card-date {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+/* Mobile view adjustments */
+@media (max-width: 768px) {
+  .prompt-card-content {
+    padding: 0.75rem;
+  }
+  
+  .prompt-card-text {
+    font-size: 0.8125rem;
+  }
+  
+  .prompt-card-action-button {
+    padding: 0.375rem;
+    font-size: 0.6875rem;
+  }
 }
