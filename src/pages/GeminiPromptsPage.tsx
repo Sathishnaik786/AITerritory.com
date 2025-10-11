@@ -1,9 +1,9 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
+﻿﻿import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog'; // Added Dialog components
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,7 @@ import { slugify } from '@/lib/slugify';
 import { useAuth } from '@/context/AuthContext';
 import { usePromptInteractions } from '../hooks/usePromptInteractions';
 import DynamicPromptCommentSection from '@/components/DynamicPromptCommentSection';
+import GoogleFormsPromptSubmit from '@/components/GoogleFormsPromptSubmit'; // Added import for GoogleFormsPromptSubmit
 
 // Add the required icons for social media platforms
 import { FaTwitter as FaXTwitter, FaLinkedin, FaFacebook, FaWhatsapp } from 'react-icons/fa6';
@@ -491,9 +492,6 @@ ${url}`);
       {/* Comment Section */}
       <Dialog open={isCommentSectionOpen} onOpenChange={setIsCommentSectionOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Comments</DialogTitle>
-          </DialogHeader>
           <div className="flex-1 overflow-y-auto">
             <DynamicPromptCommentSection promptId={prompt.id} />
           </div>
@@ -525,6 +523,7 @@ const GeminiPromptsPage: React.FC = () => {
   const [copiedPromptId, setCopiedPromptId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false); // Added state for upload modal
   const [categories, setCategories] = useState<Array<{id: string, name: string, icon: string, count: number}>>([
     { 
       id: 'all', 
@@ -702,7 +701,9 @@ const GeminiPromptsPage: React.FC = () => {
     // Create share data
     const shareData = {
       title: 'Check out this Gemini Prompt!',
-      text: `Here's an interesting Gemini prompt I found on AITerritory:\n\n${prompt.prompt}`,
+      text: `Here's an interesting Gemini prompt I found on AITerritory:
+
+${prompt.prompt}`,
       url: window.location.href
     };
     
@@ -713,11 +714,15 @@ const GeminiPromptsPage: React.FC = () => {
       } catch (shareError) {
         // User cancelled share or other share error
         // Fallback to clipboard copy
-        await navigator.clipboard.writeText(`${shareData.text}\n\n${shareData.url}`);
+        await navigator.clipboard.writeText(`${shareData.text}
+
+${shareData.url}`);
       }
     } else {
       // Fallback: copy to clipboard
-      await navigator.clipboard.writeText(`${shareData.text}\n\n${shareData.url}`);
+      await navigator.clipboard.writeText(`${shareData.text}
+
+${shareData.url}`);
     }
   }, []);
 
@@ -874,7 +879,7 @@ const GeminiPromptsPage: React.FC = () => {
               <button 
                 type="button"
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2"
-                onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSdQvaJryaAZhN9ppwm49w5w4MC1eBALYOH-a_kPqmhT2WcfrQ/viewform?usp=sharing&ouid=117733098512429548107', '_blank')}
+                onClick={() => setIsUploadModalOpen(true)} // Changed to open modal instead of Google Form
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -1049,6 +1054,13 @@ const GeminiPromptsPage: React.FC = () => {
         {/* Spacer to prevent content from being hidden behind fixed navbar */}
         <div className="h-16 md:hidden"></div>
       </div>
+      
+      {/* Upload Prompt Modal */}
+      <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <GoogleFormsPromptSubmit />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

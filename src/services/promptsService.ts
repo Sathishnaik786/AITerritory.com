@@ -6,8 +6,8 @@ export async function getPrompts() {
   return res.data;
 }
 
-export async function submitPrompt({ title, description, category, author }: { title: string; description: string; category: string; author?: string }) {
-  const res = await api.post('/prompts', { title, description, category, author });
+export async function submitPrompt({ title, description, category, author, image_url }: { title: string; description: string; category: string; author?: string; image_url?: string }) {
+  const res = await api.post('/prompts', { title, description, category, author, image_url });
   if (res.status !== 200 && res.status !== 201) throw new Error('Failed to submit prompt');
   return res.data;
-} 
+}

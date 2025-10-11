@@ -18,15 +18,43 @@ interface PromptInteractionStatus {
   shared: boolean;
 }
 
+// Utility function to validate UUID format
+const isValidUUID = (id: string): boolean => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(id);
+};
+
 // Fetch prompt interaction status
 const fetchPromptInteractionStatus = async (promptId: string, userId?: string): Promise<PromptInteractionStatus> => {
   try {
-    const [likes, shares, comments, hasLiked] = await Promise.all([
+    // For invalid UUIDs, return default values instead of making API calls
+    if (!isValidUUID(promptId)) {
+      return {
+        likeCount: 0,
+        shareCount: 0,
+        commentCount: 0,
+        liked: false,
+        shared: false,
+      };
+    }
+    
+    // Use Promise.allSettled to prevent one failure from breaking all requests
+    const [likesResult, sharesResult, commentsResult] = await Promise.allSettled([
       getPromptLikes(promptId),
       getPromptShares(promptId),
       getPromptComments(promptId),
-      userId ? checkUserLike(promptId, userId) : Promise.resolve(false),
     ]);
+    
+    // Extract data or use empty arrays for failed requests
+    const likes = likesResult.status === 'fulfilled' ? likesResult.value : [];
+    const shares = sharesResult.status === 'fulfilled' ? sharesResult.value : [];
+    const comments = commentsResult.status === 'fulfilled' ? commentsResult.value : [];
+    
+    // Check if user has liked (only if user is logged in)
+    let hasLiked = false;
+    if (userId && likesResult.status === 'fulfilled') {
+      hasLiked = likes.some((like: any) => like.user_id === userId);
+    }
     
     return {
       likeCount: likes.length,
@@ -37,6 +65,7 @@ const fetchPromptInteractionStatus = async (promptId: string, userId?: string): 
     };
   } catch (error) {
     console.error('Error fetching prompt interaction status:', error);
+    // Return default values instead of throwing error
     return {
       likeCount: 0,
       shareCount: 0,
@@ -50,6 +79,11 @@ const fetchPromptInteractionStatus = async (promptId: string, userId?: string): 
 // Check if user has liked a prompt
 const checkUserLike = async (promptId: string, userId: string): Promise<boolean> => {
   try {
+    // Validate UUID format before making request
+    if (!isValidUUID(promptId)) {
+      return false;
+    }
+    
     const likes = await getPromptLikes(promptId);
     return likes.some((like: any) => like.user_id === userId);
   } catch (error) {
@@ -61,6 +95,11 @@ const checkUserLike = async (promptId: string, userId: string): Promise<boolean>
 // Toggle like
 const toggleLike = async (promptId: string, userId: string): Promise<void> => {
   try {
+    // Validate UUID format before making requests
+    if (!isValidUUID(promptId)) {
+      throw new Error('Invalid prompt ID format');
+    }
+    
     const hasLiked = await checkUserLike(promptId, userId);
     if (hasLiked) {
       await removePromptLike(promptId, userId);
@@ -92,15 +131,31 @@ export const usePromptInteractions = (promptId: string) => {
   } = useQuery({
     queryKey,
     queryFn: () => fetchPromptInteractionStatus(promptId, user?.id),
-    enabled: !!promptId, // Allow all users to see counts, not just signed-in users
+    enabled: !!promptId, // Enable for all IDs, validation happens in fetch function
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1, // Only retry once to prevent excessive requests
+    retryDelay: 1000, // 1 second delay before retry
   });
 
   // Mutation for toggling like
   const toggleLikeMutation = useMutation({
-    mutationFn: () => toggleLike(promptId, user!.id),
+    mutationFn: () => {
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+      // Validate UUID before proceeding
+      if (!isValidUUID(promptId)) {
+        throw new Error('Invalid prompt ID format');
+      }
+      return toggleLike(promptId, user.id);
+    },
     onMutate: async () => {
+      // Only proceed with optimistic update if we have a valid UUID
+      if (!isValidUUID(promptId)) {
+        throw new Error('Invalid prompt ID format');
+      }
+      
       await queryClient.cancelQueries({ queryKey });
       const previousStatus = queryClient.getQueryData(queryKey);
 
@@ -136,7 +191,7 @@ export const usePromptInteractions = (promptId: string) => {
     shared: status.shared,
     isLoading: false, // Remove loading state
     error,
-    toggleLike: user ? toggleLikeMutation.mutate : undefined,
+    toggleLike: user && isValidUUID(promptId) ? toggleLikeMutation.mutate : undefined,
     isTogglingLike: toggleLikeMutation.isPending,
   };
 };

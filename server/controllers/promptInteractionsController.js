@@ -1,10 +1,33 @@
 const { supabase } = require('../lib/supabase');
 
+// Utility function to validate UUID format
+const isValidUUID = (id) => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(id);
+};
+
 // Get likes for a prompt
 exports.getPromptLikes = async (req, res) => {
   const { promptId } = req.params;
   
+  // Validate UUID format
+  if (!isValidUUID(promptId)) {
+    return res.status(400).json({ error: 'Invalid prompt ID format' });
+  }
+  
   try {
+    // First check if the prompt exists
+    const { data: promptExists, error: promptError } = await supabase
+      .from('gemini_prompts')
+      .select('id')
+      .eq('id', promptId)
+      .maybeSingle();
+    
+    // If prompt doesn't exist, return empty array instead of error
+    if (promptError || !promptExists) {
+      return res.json([]);
+    }
+    
     const { data, error } = await supabase
       .from('prompt_likes')
       .select('id, user_id, created_at')
@@ -24,23 +47,21 @@ exports.getPromptLikes = async (req, res) => {
 exports.addPromptLike = async (req, res) => {
   const { promptId, userId } = req.body;
   
+  // Validate UUID format
+  if (!isValidUUID(promptId)) {
+    return res.status(400).json({ error: 'Invalid prompt ID format' });
+  }
+  
   try {
-    console.log('🔍 Checking if prompt exists for like:', promptId);
-    // First, verify that the prompt exists
+    // First check if the prompt exists
     const { data: promptExists, error: promptError } = await supabase
       .from('gemini_prompts')
       .select('id')
       .eq('id', promptId)
       .maybeSingle();
     
-    if (promptError) {
-      console.warn('Error checking prompt existence:', promptError);
-    }
-    
-    console.log('🔍 Prompt existence check result for like:', { promptExists, promptError });
-    
-    if (!promptExists) {
-      console.log('❌ Prompt not found for like:', promptId);
+    // If prompt doesn't exist, return 404
+    if (promptError || !promptExists) {
       return res.status(404).json({ error: 'Prompt not found' });
     }
     
@@ -59,7 +80,6 @@ exports.addPromptLike = async (req, res) => {
       return res.json(existingLike);
     }
     
-    console.log('✅ Prompt found, inserting like');
     const { data, error } = await supabase
       .from('prompt_likes')
       .insert([{ prompt_id: promptId, user_id: userId }])
@@ -68,7 +88,6 @@ exports.addPromptLike = async (req, res) => {
       
     if (error) throw error;
     
-    console.log('✅ Like inserted successfully:', data);
     res.status(201).json(data);
   } catch (error) {
     console.error('Error adding prompt like:', error);
@@ -80,6 +99,11 @@ exports.addPromptLike = async (req, res) => {
 exports.removePromptLike = async (req, res) => {
   const { promptId } = req.params;
   const { userId } = req.body;
+  
+  // Validate UUID format
+  if (!isValidUUID(promptId)) {
+    return res.status(400).json({ error: 'Invalid prompt ID format' });
+  }
   
   try {
     const { data, error } = await supabase
@@ -103,24 +127,22 @@ exports.removePromptLike = async (req, res) => {
 exports.getPromptShares = async (req, res) => {
   const { promptId } = req.params;
   
+  // Validate UUID format
+  if (!isValidUUID(promptId)) {
+    return res.status(400).json({ error: 'Invalid prompt ID format' });
+  }
+  
   try {
-    console.log('🔍 Checking if prompt exists for shares:', promptId);
-    // First, verify that the prompt exists
+    // First check if the prompt exists
     const { data: promptExists, error: promptError } = await supabase
       .from('gemini_prompts')
       .select('id')
       .eq('id', promptId)
       .maybeSingle();
     
-    if (promptError) {
-      console.warn('Error checking prompt existence:', promptError);
-    }
-    
-    console.log('🔍 Prompt existence check result for shares:', { promptExists, promptError });
-    
-    if (!promptExists) {
-      console.log('❌ Prompt not found for shares:', promptId);
-      return res.status(404).json({ error: 'Prompt not found' });
+    // If prompt doesn't exist, return empty array instead of error
+    if (promptError || !promptExists) {
+      return res.json([]);
     }
     
     const { data, error } = await supabase
@@ -142,27 +164,24 @@ exports.getPromptShares = async (req, res) => {
 exports.addPromptShare = async (req, res) => {
   const { promptId, userId, platform } = req.body;
   
+  // Validate UUID format
+  if (!isValidUUID(promptId)) {
+    return res.status(400).json({ error: 'Invalid prompt ID format' });
+  }
+  
   try {
-    console.log('🔍 Checking if prompt exists for share:', promptId);
-    // First, verify that the prompt exists
+    // First check if the prompt exists
     const { data: promptExists, error: promptError } = await supabase
       .from('gemini_prompts')
       .select('id')
       .eq('id', promptId)
       .maybeSingle();
     
-    if (promptError) {
-      console.warn('Error checking prompt existence:', promptError);
-    }
-    
-    console.log('🔍 Prompt existence check result for share:', { promptExists, promptError });
-    
-    if (!promptExists) {
-      console.log('❌ Prompt not found for share:', promptId);
+    // If prompt doesn't exist, return 404
+    if (promptError || !promptExists) {
       return res.status(404).json({ error: 'Prompt not found' });
     }
     
-    console.log('✅ Prompt found, inserting share');
     const { data, error } = await supabase
       .from('prompt_shares')
       .insert([{ prompt_id: promptId, user_id: userId, platform }])
@@ -171,7 +190,6 @@ exports.addPromptShare = async (req, res) => {
       
     if (error) throw error;
     
-    console.log('✅ Share inserted successfully:', data);
     res.status(201).json(data);
   } catch (error) {
     console.error('Error adding prompt share:', error);
@@ -183,24 +201,22 @@ exports.addPromptShare = async (req, res) => {
 exports.getPromptComments = async (req, res) => {
   const { promptId } = req.params;
   
+  // Validate UUID format
+  if (!isValidUUID(promptId)) {
+    return res.status(400).json({ error: 'Invalid prompt ID format' });
+  }
+  
   try {
-    console.log('🔍 Checking if prompt exists for comments:', promptId);
-    // First, verify that the prompt exists
+    // First check if the prompt exists
     const { data: promptExists, error: promptError } = await supabase
       .from('gemini_prompts')
       .select('id')
       .eq('id', promptId)
       .maybeSingle();
     
-    if (promptError) {
-      console.warn('Error checking prompt existence:', promptError);
-    }
-    
-    console.log('🔍 Prompt existence check result for comments:', { promptExists, promptError });
-    
-    if (!promptExists) {
-      console.log('❌ Prompt not found for comments:', promptId);
-      return res.status(404).json({ error: 'Prompt not found' });
+    // If prompt doesn't exist, return empty array instead of error
+    if (promptError || !promptExists) {
+      return res.json([]);
     }
     
     const { data, error } = await supabase
@@ -222,25 +238,21 @@ exports.getPromptComments = async (req, res) => {
 exports.addPromptComment = async (req, res) => {
   const { promptId, userId, comment, parentId } = req.body;
   
+  // Validate UUID format
+  if (!isValidUUID(promptId)) {
+    return res.status(400).json({ error: 'Invalid prompt ID format' });
+  }
+  
   try {
-    // First, verify that the prompt exists (optional check)
-    // This helps provide better error messages
-    console.log('🔍 Checking if prompt exists:', promptId);
+    // First check if the prompt exists
     const { data: promptExists, error: promptError } = await supabase
       .from('gemini_prompts')
       .select('id')
       .eq('id', promptId)
       .maybeSingle();
     
-    if (promptError) {
-      console.warn('Error checking prompt existence:', promptError);
-      // We'll continue anyway as the foreign key constraint will handle this
-    }
-    
-    console.log('🔍 Prompt existence check result:', { promptExists, promptError });
-    
-    if (!promptExists) {
-      console.log('❌ Prompt not found:', promptId);
+    // If prompt doesn't exist, return 404
+    if (promptError || !promptExists) {
       return res.status(404).json({ error: 'Prompt not found' });
     }
     
@@ -262,7 +274,6 @@ exports.addPromptComment = async (req, res) => {
       }
     }
     
-    console.log('✅ Prompt found, inserting comment');
     const { data, error } = await supabase
       .from('prompt_comments')
       .insert([{ prompt_id: promptId, user_id: userId, comment, parent_id: parentId || null }])
@@ -271,7 +282,6 @@ exports.addPromptComment = async (req, res) => {
       
     if (error) throw error;
     
-    console.log('✅ Comment inserted successfully:', data);
     res.status(201).json(data);
   } catch (error) {
     console.error('Error adding prompt comment:', error);
@@ -300,6 +310,11 @@ exports.addPromptComment = async (req, res) => {
 exports.updatePromptComment = async (req, res) => {
   const { commentId } = req.params;
   const { userId, comment } = req.body;
+  
+  // Validate UUID format for commentId
+  if (!isValidUUID(commentId)) {
+    return res.status(400).json({ error: 'Invalid comment ID format' });
+  }
   
   try {
     // First, verify that the comment exists and belongs to the user
@@ -340,6 +355,11 @@ exports.updatePromptComment = async (req, res) => {
 exports.removePromptComment = async (req, res) => {
   const { commentId } = req.params;
   const { userId } = req.body;
+  
+  // Validate UUID format for commentId
+  if (!isValidUUID(commentId)) {
+    return res.status(400).json({ error: 'Invalid comment ID format' });
+  }
   
   try {
     // First, verify that the comment exists and belongs to the user

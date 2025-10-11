@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from './ui/dialog';
 import { useTheme } from 'next-themes';
-import { FaRegCommentDots, FaRegFileAlt, FaRegCopy, FaBars, FaArrowRight } from 'react-icons/fa';
+import { FaRegCommentDots, FaRegFileAlt, FaRegCopy, FaBars, FaArrowRight, FaPlus } from 'react-icons/fa'; // Added FaPlus icon
 import { getPrompts } from '../services/promptsService';
 import { useToast } from './ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
@@ -76,6 +76,7 @@ type Prompt = {
   description: string;
   category: string;
   author?: string;
+  image_url?: string; // Added image_url property
 };
 
 export default function Prompts() {
@@ -271,6 +272,12 @@ export default function Prompts() {
               Discover and share powerful AI prompts for various platforms
             </p>
           </div>
+          {/* Add Create Prompt button */}
+          <Link to="/prompts/create">
+            <Button className="flex items-center gap-2 bg-[#3b82f6] text-white px-4 py-2 rounded-full font-semibold transition-colors">
+              <FaPlus /> Create Prompt
+            </Button>
+          </Link>
         </div>
         {/* Mobile Sidebar Toggle */}
         <div className="md:hidden flex items-center px-4 py-2 border-b border-[#222]/20">
@@ -353,6 +360,16 @@ export default function Prompts() {
                             <Card className={`w-full ${cardBg} ${cardText} ${cardBorder} relative rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200`}>
                               <CardContent className="p-4 sm:p-5">
                                 <div className="flex flex-col h-full justify-between">
+                                  {/* Image preview */}
+                                  {prompt.image_url && (
+                                    <div className="mb-3">
+                                      <img
+                                        src={prompt.image_url}
+                                        alt={prompt.title}
+                                        className="w-full h-32 object-cover rounded-lg"
+                                      />
+                                    </div>
+                                  )}
                                   <div className="flex items-start justify-between mb-2 sm:mb-3">
                                     <div className="text-base sm:text-lg font-bold leading-tight">{prompt.title}</div>
                                     <div className="flex gap-1.5 sm:gap-2">
@@ -396,6 +413,16 @@ export default function Prompts() {
           <Dialog open={!!openPrompt} onOpenChange={() => setOpenPrompt(null)}>
             <DialogContent className={`${dialogBg} ${dialogText} max-w-lg w-[95vw] sm:w-auto`}>
               <DialogTitle className="text-lg sm:text-xl">{openPrompt.title}</DialogTitle>
+              {/* Image preview in dialog */}
+              {openPrompt.image_url && (
+                <div className="mt-4">
+                  <img
+                    src={openPrompt.image_url}
+                    alt={openPrompt.title}
+                    className="w-full max-h-60 object-cover rounded-lg"
+                  />
+                </div>
+              )}
               <div className="mt-4 text-sm sm:text-base whitespace-pre-line">{sanitizeText(openPrompt.description)}</div>
               <div className="mt-4 flex items-center gap-3 sm:gap-4">
                 <Button

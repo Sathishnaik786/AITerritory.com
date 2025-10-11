@@ -86,8 +86,8 @@ export default defineConfig(({ mode }) => ({
     }
   },
   server: {
-    port: 3009,
-    strictPort: false,
+    port: 3000,
+    strictPort: true,
     open: true,
     proxy: {
       // Proxy API requests to the backend server

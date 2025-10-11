@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { submitGeminiPrompt } from '@/services/geminiPromptsService';
+import { submitGeminiPrompt, submitPromptWithImage } from '@/services/geminiPromptsService'; // Updated import
 
 interface GoogleFormPromptData {
   prompt: string;
@@ -24,6 +24,9 @@ const GoogleFormsPromptSubmit = () => {
     submitter_email: ''
   });
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null); // Store the actual file
   const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -35,17 +38,33 @@ const GoogleFormsPromptSubmit = () => {
     setFormData(prev => ({ ...prev, category: value }));
   };
 
+  // Handle image file selection
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setSelectedImage(file);
+    
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    setFormData(prev => ({ ...prev, image_url: previewUrl }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      // Submit to your existing API
-      await submitGeminiPrompt({
-        prompt: formData.prompt,
-        category: formData.category,
-        image_url: formData.image_url || null
-      });
+      // Submit using the new function that handles file uploads
+      await submitPromptWithImage(
+        {
+          prompt: formData.prompt,
+          category: formData.category,
+          submitter_name: formData.submitter_name,
+          submitter_email: formData.submitter_email
+        },
+        selectedImage || undefined
+      );
       
       toast({
         title: 'Success',
@@ -60,6 +79,12 @@ const GoogleFormsPromptSubmit = () => {
         submitter_name: '',
         submitter_email: ''
       });
+      setSelectedImage(null);
+      
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (error) {
       console.error('Error submitting prompt:', error);
       toast({
@@ -109,17 +134,54 @@ const GoogleFormsPromptSubmit = () => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="image_url">Image URL (Optional)</Label>
-          <Input
-            id="image_url"
-            name="image_url"
-            value={formData.image_url}
-            onChange={handleChange}
-            placeholder="https://example.com/image.jpg"
-            type="url"
-          />
+          <Label htmlFor="image-upload">Upload Image (Optional)</Label>
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageSelect}
+              accept="image/*"
+              disabled={uploading}
+              className="hidden"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? 'Uploading...' : 'Choose Image'}
+            </Button>
+            {formData.image_url && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, image_url: '' }));
+                  setSelectedImage(null);
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                  }
+                }}
+              >
+                Remove
+              </Button>
+            )}
+          </div>
+          {uploading && (
+            <p className="text-sm text-blue-500">Uploading image...</p>
+          )}
+          {formData.image_url && (
+            <div className="mt-2">
+              <img
+                src={formData.image_url}
+                alt="Preview"
+                className="w-32 h-32 object-cover rounded-lg border"
+              />
+            </div>
+          )}
           <p className="text-sm text-muted-foreground">
-            Add an image URL to visualize your prompt (optional)
+            Add an image to visualize your prompt (optional)
           </p>
         </div>
         
@@ -151,7 +213,7 @@ const GoogleFormsPromptSubmit = () => {
         <div className="flex flex-col sm:flex-row gap-3 pt-4">
           <Button 
             type="submit" 
-            disabled={loading}
+            disabled={loading || uploading}
             className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
           >
             {loading ? 'Submitting...' : 'Submit Prompt'}

@@ -9,8 +9,8 @@ const API_BASE_URL = isProduction
   : '/api';  // Use proxy in development
 
 // Default timeout in milliseconds
-const DEFAULT_TIMEOUT = 15000; // Increased timeout to 15 seconds
-const MAX_RETRIES = 3; // Increased retries
+const DEFAULT_TIMEOUT = 30000; // Increased timeout to 30 seconds
+const MAX_RETRIES = 3; // Maximum number of retries
 
 // Create axios instance with default config
 const api = axios.create({
@@ -52,9 +52,10 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as any;
     
-    // If the error is a timeout, try to retry
-    if (error.code === 'ECONNABORTED' && !originalRequest?._retry) {
-      console.warn(`Request to ${originalRequest?.url} timed out, retrying...`);
+    // If the error is a timeout or network error, try to retry
+    if ((error.code === 'ECONNABORTED' || error.code === 'ENOTFOUND' || !error.response) && 
+        !originalRequest?._retry) {
+      console.warn(`Request to ${originalRequest?.url} failed, retrying...`, error.code);
       
       // Initialize retry count if not exists
       originalRequest._retry = originalRequest._retry || 0;
@@ -62,13 +63,16 @@ api.interceptors.response.use(
       if (originalRequest._retry < MAX_RETRIES) {
         originalRequest._retry++;
         
-        // Exponential backoff: wait 1s, then 2s, etc.
+        // Exponential backoff: wait 1s, then 2s, then 4s
         const backoffDelay = 1000 * Math.pow(2, originalRequest._retry - 1);
+        
+        // Add jitter to prevent thundering herd
+        const jitter = Math.random() * 1000;
         
         return new Promise(resolve => {
           setTimeout(() => {
             resolve(api(originalRequest));
-          }, backoffDelay);
+          }, backoffDelay + jitter);
         });
       }
     }
@@ -112,9 +116,13 @@ export const fetchWithRetry = async <T>(
     });
     return response.data;
   } catch (error) {
-    if (retries > 0 && axios.isAxiosError(error) && error.code !== 'ECONNABORTED') {
-      // Wait before retrying (exponential backoff)
-      await new Promise(resolve => setTimeout(resolve, 1000 * (MAX_RETRIES - retries + 1)));
+    if (retries > 0 && axios.isAxiosError(error) && 
+        (error.code !== 'ECONNABORTED' && error.code !== 'ENOTFOUND')) {
+      // Wait before retrying (exponential backoff with jitter)
+      const backoffDelay = 1000 * Math.pow(2, MAX_RETRIES - retries);
+      const jitter = Math.random() * 1000;
+      
+      await new Promise(resolve => setTimeout(resolve, backoffDelay + jitter));
       return fetchWithRetry<T>(url, config, retries - 1);
     }
     throw error;

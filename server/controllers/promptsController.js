@@ -30,15 +30,15 @@ exports.getAllPrompts = async (req, res) => {
 
 // POST /api/prompts
 exports.createPrompt = async (req, res) => {
-  const { title, description, category, author } = req.body;
+  const { title, description, category, author, image_url } = req.body;
   if (!title || !description || !category) {
     return res.status(400).json({ error: 'Title, description, and category are required.' });
   }
   const { data, error } = await supabase
     .from('prompts')
-    .insert([{ title, description, category, author }])
+    .insert([{ title, description, category, author, image_url }])
     .select()
     .single();
   if (error) return res.status(500).json({ error: error.message });
   res.status(201).json(deepStringify(data));
-}; 
+};

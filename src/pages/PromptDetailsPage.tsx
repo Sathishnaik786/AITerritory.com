@@ -1,111 +1,420 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Copy, 
-  Check, 
-  Star, 
-  MessageCircle, 
-  ThumbsUp, 
-  Share2,
-  AlertCircle,
-  Clock,
-  User,
-  Tag,
-  Bookmark
-} from 'lucide-react';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
-import { Skeleton } from '../components/ui/skeleton';
-import ThreadedComments from '../components/ThreadedComments';
-import { OptimizedImage } from '../components/OptimizedImage';
-import { Prompt } from '@/types/prompt';
-import { getPrompts } from '../services/promptsService';
+import { useToast } from '../components/ui/use-toast';
+import { useAuth } from '@/context/AuthContext';
+import { getGeminiPrompts, getSEOGeminiPromptById } from '@/services/geminiPromptsService'; // Reverted to getGeminiPrompts
 import { usePromptInteractions } from '../hooks/usePromptInteractions';
-import { trackEvent } from '@/lib/analytics';
-import { toast } from 'sonner';
+import DynamicPromptCommentSection from '@/components/DynamicPromptCommentSection';
+import { sanitizeText } from '@/lib/sanitizeHtml';
+import { FaArrowLeft, FaHeart, FaCopy } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import SEO from '../components/SEO';
+import PromptsSidebar from '../components/PromptsSidebar';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { AnimatePresence } from 'framer-motion';
+import { Heart, MessageCircle, Share2, Check, Link as LinkIcon } from 'lucide-react';
+import { FaTwitter as FaXTwitter, FaLinkedin, FaFacebook, FaWhatsapp } from 'react-icons/fa6';
+import { FiLink } from 'react-icons/fi';
 
-const PromptDetailsPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
-  const navigate = useNavigate();
+type Prompt = {
+  id: string;
+  prompt: string;
+  category: string;
+  image_url?: string;
+  created_at: string;
+  submitted_via?: string;
+  submitter_name?: string;
+  submitter_email?: string;
+  status?: string;
+};
+
+interface SEOPromptData {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  category: string;
+  created_at: string;
+  likes: number;
+  shares: number;
+  comments: number;
+  canonical_url: string;
+  prompt?: string; // Sometimes the prompt content is directly included
+}
+
+const PromptDetailsPage = () => {
+  const { category, id } = useParams<{ category: string; id: string }>();
   const [prompt, setPrompt] = useState<Prompt | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-
-  const {
-    likeCount,
-    liked,
-    isLoading: interactionsLoading,
-    error: interactionsError,
-    toggleLike,
-  } = usePromptInteractions(id || '');
-
-  // Fetch prompt details
+  const [error, setError] = useState('');
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  // Enhanced component states
+  const [isCopied, setIsCopied] = useState(false);
+  const [isCommentSectionOpen, setIsCommentSectionOpen] = useState(false);
+  const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
+  const shareDropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Extract the actual ID from the URL parameter (format: slug-ID)
+  // Improved ID extraction to handle full UUIDs
+  const actualId = id ? (() => {
+    console.log('ID extraction - raw id:', id);
+    
+    // Try different approaches to extract the UUID
+    // Approach 1: Look for a UUID pattern at the end of the string
+    const uuidRegex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidMatch = id.match(uuidRegex);
+    
+    if (uuidMatch && uuidMatch[0]) {
+      console.log('ID extraction - found UUID pattern:', uuidMatch[0]);
+      return uuidMatch[0];
+    }
+    
+    // Approach 2: Try to find UUID anywhere in the string
+    const uuidRegex2 = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+    const uuidMatch2 = id.match(uuidRegex2);
+    
+    if (uuidMatch2 && uuidMatch2[0]) {
+      console.log('ID extraction - found UUID anywhere in string:', uuidMatch2[0]);
+      return uuidMatch2[0];
+    }
+    
+    // Fallback to the original approach
+    const fallbackId = id.split('-').pop();
+    console.log('ID extraction - fallback ID:', fallbackId);
+    return fallbackId;
+  })() : undefined;
+  
+  // Add debugging to see what's happening
   useEffect(() => {
-    const fetchPromptDetails = async () => {
-      if (!id) return;
-      
+    console.log('PromptDetailsPage - URL params:', { category, id });
+    console.log('PromptDetailsPage - Extracted actualId:', actualId);
+  }, [category, id, actualId]);
+  
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareDropdownRef.current && !shareDropdownRef.current.contains(event.target as Node)) {
+        setIsShareDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
+  const { 
+    likeCount, 
+    liked, 
+    toggleLike,
+    shareCount,
+    commentCount
+  } = usePromptInteractions(actualId || '');
+
+  useEffect(() => {
+    const fetchPrompt = async () => {
       try {
         setLoading(true);
-        // This is a mock implementation - you'll need to implement the actual API call
-        const prompts = await getPrompts();
-        const promptData = prompts.find((p: any) => p.id === id) || null;
-        setPrompt(promptData);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching prompt details:', err);
-        setError('Failed to load prompt details. Please try again later.');
-        toast.error('Failed to load prompt details');
+        console.log('PromptDetailsPage - URL params:', { category, id });
+        console.log('PromptDetailsPage - Extracted actualId:', actualId);
+        
+        if (!actualId) {
+          throw new Error('Invalid prompt ID');
+        }
+        
+        // Log the ID we're trying to fetch
+        console.log('Fetching prompt with ID:', actualId);
+        
+        // First try to fetch the specific prompt by ID
+        try {
+          const promptData: SEOPromptData = await getSEOGeminiPromptById(actualId);
+          console.log('Prompt fetched by ID:', promptData);
+          
+          // Convert to the expected format
+          const formattedPrompt: Prompt = {
+            id: promptData.id,
+            prompt: promptData.prompt || promptData.description || '',
+            category: promptData.category || 'general',
+            image_url: promptData.image_url || undefined,
+            created_at: promptData.created_at || new Date().toISOString()
+          };
+          
+          setPrompt(formattedPrompt);
+          return;
+        } catch (specificError) {
+          console.log('Failed to fetch specific prompt, falling back to getAll approach', specificError);
+        }
+        
+        // Fallback to fetching all prompts and filtering
+        const prompts = await getGeminiPrompts();
+        console.log('All prompts fetched, count:', prompts.length);
+        
+        // Log all prompt IDs for debugging
+        console.log('All prompt IDs:', prompts.map((p: any) => p.id));
+        
+        const foundPrompt = prompts.find((p: any) => p.id === actualId);
+        console.log('Found prompt:', foundPrompt);
+        
+        if (foundPrompt) {
+          setPrompt(foundPrompt);
+        } else {
+          setError('Prompt not found');
+        }
+      } catch (err: any) {
+        console.error('Error fetching prompt:', err);
+        setError(err.message || 'Failed to load prompt');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPromptDetails();
-  }, [id]);
+    fetchPrompt();
+  }, [actualId, category, id]);
 
-  const handleCopyPrompt = () => {
-    if (prompt?.content) {
-      navigator.clipboard.writeText(prompt.content);
-      setCopied(true);
-      toast.success('Prompt copied to clipboard!');
-      setTimeout(() => setCopied(false), 2000);
-      
-      // Track copy event
-      trackEvent('like_prompt', {
-        prompt_id: prompt.id,
-        prompt_title: prompt.title,
-        prompt_category: prompt.category,
-        page_url: window.location.href,
-        user_id: user?.id,
-        event_type: 'like_prompt'
+  // This function is now handled by the enhanced copy button
+  // Keeping it for backward compatibility
+  const handleCopyPromptLegacy = () => {
+    if (!prompt) return;
+    
+    navigator.clipboard.writeText(prompt.prompt).then(() => {
+      toast({
+        title: 'Copied!',
+        description: 'Prompt copied to clipboard.'
+      });
+    }).catch(() => {
+      toast({
+        title: 'Error',
+        description: 'Failed to copy prompt.',
+        variant: 'destructive'
+      });
+    });
+  };
+  
+  const formatPromptDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+  
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareDropdownRef.current && !shareDropdownRef.current.contains(event.target as Node)) {
+        setIsShareDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
+  // Add debugging to see what's happening
+  useEffect(() => {
+    console.log('PromptDetailsPage - URL params:', { category, id });
+    console.log('PromptDetailsPage - Extracted actualId:', actualId);
+  }, [category, id, actualId]);
+
+  const handleSharePrompt = async () => {
+    if (!prompt) return;
+    
+    const shareData = {
+      title: `Prompt: ${prompt.category}`,
+      text: prompt.prompt,
+      url: window.location.href
+    };
+    
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // User cancelled share
+      }
+    } else {
+      // Fallback: copy to clipboard
+      await navigator.clipboard.writeText(`${shareData.title}
+
+${shareData.text}
+
+${shareData.url}`);
+      toast({
+        title: 'Shared!',
+        description: 'Link copied to clipboard'
       });
     }
   };
+  
+  // New function to handle sharing to specific platforms
+  const handlePlatformShare = async (platform: string) => {
+    if (!prompt) return;
+    
+    // Generate SEO title based on category
+    let seoTitle;
+    switch (prompt.category.toLowerCase()) {
+      case 'men':
+        seoTitle = `Gemini Men's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+        break;
+      case 'women':
+        seoTitle = `Gemini Women's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+        break;
+      case 'couple':
+        seoTitle = `Gemini Couple's Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+        break;
+      default:
+        seoTitle = `Gemini Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''}`;
+    }
+
+    // Truncate description for SEO (150 characters as requested)
+    const seoDescription = prompt.prompt.length > 150 
+      ? prompt.prompt.substring(0, 147) + '...' 
+      : prompt.prompt;
+
+    // Use prompt image, fallback to dynamic OG image, or default
+    const seoImage = prompt.image_url && prompt.image_url.trim() !== '' 
+      ? prompt.image_url 
+      : `https://aiterritory-com.onrender.com/api/og/prompts/${prompt.id}`;
+
+    // Generate canonical URL
+    const slug = prompt.prompt.substring(0, 50).toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '') || prompt.id;
+      
+    const canonicalUrl = `https://aiterritory.org/gemini-prompts/${prompt.category}/${slug}-${prompt.id}`;
+    
+    const title = seoTitle;
+    const text = seoDescription;
+    const url = canonicalUrl;
+    const imageUrl = seoImage;
+    
+    // Close the dropdown after selecting a platform
+    setIsShareDropdownOpen(false);
+    
+    try {
+      switch (platform) {
+        case 'whatsapp':
+          window.open(`https://wa.me/?text=${encodeURIComponent(`${title}
+
+${text}
+
+${url}`)}`, '_blank');
+          break;
+        case 'instagram':
+          // Instagram doesn't allow direct sharing, so we copy the link
+          await navigator.clipboard.writeText(url);
+          toast({
+            title: "Link Copied",
+            description: "Link copied to clipboard. You can now paste it in Instagram.",
+          });
+          break;
+        case 'linkedin':
+          window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(text)}`, '_blank');
+          break;
+        case 'snapchat':
+          // Snapchat doesn't have a web sharing API, so we copy the link
+          await navigator.clipboard.writeText(url);
+          toast({
+            title: "Link Copied",
+            description: "Link copied to clipboard. You can now paste it in Snapchat.",
+          });
+          break;
+        case 'facebook':
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(`${title}
+
+${text}`)}`, '_blank');
+          break;
+        case 'twitter':
+          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title}
+
+${text}`)}&url=${encodeURIComponent(url)}`, '_blank');
+          break;
+        case 'copy':
+          await navigator.clipboard.writeText(`${title}
+
+${text}
+
+${url}`);
+          setIsCopied(true);
+          // Reset copied state after 2 seconds
+          setTimeout(() => {
+            setIsCopied(false);
+          }, 2000);
+          toast({
+            title: "Copied!",
+            description: "Prompt details copied to clipboard",
+          });
+          break;
+        default:
+          // Fallback to general share
+          if (navigator.share) {
+            await navigator.share({ title, text, url });
+          } else {
+            await navigator.clipboard.writeText(`${title}
+
+${text}
+
+${url}`);
+            toast({
+              title: "Shared!",
+              description: "Link copied to clipboard",
+            });
+          }
+      }
+    } catch (error) {
+      console.error(`Error sharing to ${platform}:`, error);
+      toast({
+        title: "Error",
+        description: `Failed to share to ${platform}`,
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const handleCopyPrompt = async () => {
+    if (!prompt) return;
+    
+    try {
+      await navigator.clipboard.writeText(prompt.prompt);
+      setIsCopied(true);
+      // Reset copied state after 2 seconds
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+      toast({
+        title: 'Copied!',
+        description: 'Prompt copied to clipboard.'
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to copy prompt.',
+        variant: 'destructive'
+      });
+    }
+  };
+  
+  // Add debugging to see what's happening
+  useEffect(() => {
+    console.log('PromptDetailsPage - URL params:', { category, id });
+    console.log('PromptDetailsPage - Extracted actualId:', actualId);
+  }, [category, id, actualId]);
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <Skeleton className="h-12 w-32 mb-8" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <Skeleton className="h-8 w-64 mb-4" />
-              <Skeleton className="h-4 w-full mb-2" />
-              <Skeleton className="h-4 w-full mb-2" />
-              <Skeleton className="h-4 w-3/4 mb-6" />
-              <Skeleton className="h-32 w-full rounded-lg mb-6" />
-              <Skeleton className="h-64 w-full" />
-            </div>
-            <div>
-              <Skeleton className="h-64 w-full rounded-xl" />
-            </div>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Loading prompt...</p>
         </div>
       </div>
     );
@@ -113,269 +422,261 @@ const PromptDetailsPage: React.FC = () => {
 
   if (error || !prompt) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto text-center py-12">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Prompt Not Found</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">
-            {error || 'The prompt you are looking for does not exist or has been removed.'}
-          </p>
-          <Button onClick={() => navigate('/prompts')}>
-            Browse All Prompts
-          </Button>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-500 mb-4">Prompt Not Found</h1>
+          <p className="mb-6">{error || 'The prompt you are looking for does not exist.'}</p>
+          <Link to="/prompts">
+            <Button>Back to Prompts</Button>
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Back Button */}
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate(-1)}
-          className="mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </Button>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            {/* Header */}
-            <div className="mb-8">
-              <div className="flex flex-col sm:flex-row sm:items-start gap-6 mb-6">
-                {prompt.image && (
-                  <div className="flex-shrink-0">
-                    <OptimizedImage
-                      src={prompt.image}
-                      alt={prompt.title}
-                      className="w-24 h-24 rounded-xl object-cover shadow-lg"
-                      width={96}
-                      height={96}
-                    />
-                  </div>
-                )}
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <Badge variant="secondary">{prompt.category}</Badge>
-                    {prompt.isFree && <Badge variant="outline">Free</Badge>}
-                    {prompt.featured && <Badge>Featured</Badge>}
-                  </div>
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{prompt.title}</h1>
-                  <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">{prompt.description}</p>
-                  
-                  {/* Rating */}
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="flex items-center">
-                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                      <span className="ml-1 font-semibold">{prompt.rating?.toFixed(1) || 'N/A'}</span>
-                      <span className="text-gray-500 dark:text-gray-400 ml-1">
-                        ({prompt.reviewCount || 0} reviews)
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Tags */}
-                  {prompt.tags && prompt.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {prompt.tags.map((tag) => (
-                        <Badge key={tag} variant="outline">
-                          <Tag className="w-3 h-3 mr-1" />
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3 mb-8">
-                <Button 
-                  onClick={handleCopyPrompt}
-                  className="flex-1 min-w-[120px] bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4 mr-2" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy Prompt
-                    </>
-                  )}
-                </Button>
-                
-                {user ? (
-                  <Button 
-                    variant={liked ? "default" : "outline"}
-                    onClick={() => toggleLike()}
-                    disabled={interactionsLoading}
-                  >
-                    <ThumbsUp className={`w-4 h-4 mr-2 ${liked ? 'fill-current' : ''}`} />
-                    {liked ? 'Liked' : 'Like'}
-                  </Button>
-                ) : (
-                  <Button 
-                    variant="outline" 
-                    onClick={() => navigate('/login')}
-                  >
-                    <ThumbsUp className="w-4 h-4 mr-2" />
-                    Sign In to Interact
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            {/* Prompt Content */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Prompt Content</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-4">
-                  <pre className="whitespace-pre-wrap text-sm font-mono text-gray-800 dark:text-gray-200">
-                    {prompt.content}
-                  </pre>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Copy this prompt and use it with your preferred AI tool.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Usage Instructions */}
-            {prompt.usageInstructions && (
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle>Usage Instructions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose dark:prose-invert max-w-none">
-                    <div dangerouslySetInnerHTML={{ __html: prompt.usageInstructions }} />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Best Practices */}
-            {prompt.bestPractices && (
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle>Best Practices</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose dark:prose-invert max-w-none">
-                    <div dangerouslySetInnerHTML={{ __html: prompt.bestPractices }} />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Reviews Section */}
-            <div id="reviews-section">
-              <ThreadedComments resourceId={prompt.id} resourceType="prompt" />
-            </div>
+    <>
+      <SEO
+        title={`Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''} | AI Territory`}
+        description={prompt.prompt.substring(0, 160)}
+        canonical={`https://aiterritory.org/prompts/${prompt.category}/${id}`}
+      />
+      <div className="min-h-screen bg-background text-foreground">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-6">
+            <Link to="/prompts">
+              <Button variant="ghost" className="flex items-center gap-2">
+                <FaArrowLeft /> Back to Prompts
+              </Button>
+            </Link>
           </div>
-
-          {/* Sidebar */}
-          <div>
-            {/* Interaction Stats */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Engagement</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <ThumbsUp className="w-5 h-5 text-blue-500 mr-2" />
-                      <span className="text-gray-600 dark:text-gray-400">Likes</span>
-                    </div>
-                    <span className="font-semibold">{likeCount}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Bookmark className="w-5 h-5 text-purple-500 mr-2" />
-                      <span className="text-gray-600 dark:text-gray-400">Bookmarks</span>
-                    </div>
-                    <span className="font-semibold">{0}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <MessageCircle className="w-5 h-5 text-green-500 mr-2" />
-                      <span className="text-gray-600 dark:text-gray-400">Reviews</span>
-                    </div>
-                    <span className="font-semibold">{prompt.reviewCount || 0}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Prompt Info */}
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Prompt Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <User className="w-5 h-5 text-gray-500 mr-3" />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2">
+              <Card className="mb-6">
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start mb-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Author</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {prompt.author?.name || 'Anonymous'}
-                      </p>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                          {prompt.category}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          {formatPromptDate(prompt.created_at)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <Clock className="w-5 h-5 text-gray-500 mr-3" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Created</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {prompt.createdAt ? new Date(prompt.createdAt).toLocaleDateString() : 'N/A'}
-                      </p>
-                    </div>
+                  
+                  {/* Image preview */}
+                  {prompt.image_url && (
+                    <motion.div 
+                      className="mb-6 rounded-2xl overflow-hidden shadow-md"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <img
+                        src={prompt.image_url}
+                        alt="Prompt visualization"
+                        className="w-full h-auto object-contain"
+                        style={{ maxHeight: '500px' }}
+                      />
+                    </motion.div>
+                  )}
+                  
+                  <div className="prose max-w-none whitespace-pre-line mb-6">
+                    {sanitizeText(prompt.prompt)}
                   </div>
-                  <div className="flex items-center">
-                    <Clock className="w-5 h-5 text-gray-500 mr-3" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Last Updated</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {prompt.updatedAt ? new Date(prompt.updatedAt).toLocaleDateString() : 'N/A'}
-                      </p>
+                  
+                  {/* Enhanced Action Buttons */}
+                  <div className="flex items-center gap-2 mt-6 pt-4 border-t">
+                    {/* Like Button */}
+                    {user && toggleLike ? (
+                      <button
+                        type="button"
+                        className={`flex items-center gap-1 px-3 py-2 rounded-lg transition-all ${liked ? 'bg-red-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                        onClick={() => toggleLike()}
+                      >
+                        <Heart 
+                          className={`h-4 w-4 ${liked ? 'fill-current' : ''}`} 
+                        />
+                        <span className="text-sm">{likeCount}</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={() => navigate('/login')}
+                      >
+                        <Heart className="h-4 w-4" />
+                        <span className="text-sm">{likeCount}</span>
+                      </button>
+                    )}
+                    
+                    {/* Comment Button */}
+                    <button
+                      type="button"
+                      className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                      onClick={() => {
+                        // Check if user is authenticated before opening comment section
+                        if (!user) {
+                          navigate('/login');
+                          return;
+                        }
+                        setIsCommentSectionOpen(true);
+                      }}
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      <span className="text-sm">{commentCount}</span>
+                    </button>
+                    
+                    {/* Enhanced Share Button with Dropdown */}
+                    <div className="relative" ref={shareDropdownRef}>
+                      <button
+                        type="button"
+                        className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsShareDropdownOpen(!isShareDropdownOpen);
+                        }}
+                      >
+                        <Share2 className="h-4 w-4" />
+                        <span className="text-sm">{shareCount}</span>
+                      </button>
+                      
+                      {/* Social Media Sharing Pop-up */}
+                      <AnimatePresence>
+                        {isShareDropdownOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
+                            style={{ minWidth: '200px', maxWidth: 'calc(100vw - 32px)' }}
+                          >
+                            <div className="p-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePlatformShare('whatsapp');
+                                }}
+                                className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                              >
+                                <FaWhatsapp className="w-5 h-5 mr-3 text-green-500" />
+                                <span>WhatsApp</span>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePlatformShare('instagram');
+                                }}
+                                className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                              >
+                                <div className="w-5 h-5 mr-3 text-pink-500">
+                                  <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                  </svg>
+                                </div>
+                                <span>Instagram</span>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePlatformShare('linkedin');
+                                }}
+                                className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                              >
+                                <FaLinkedin className="w-5 h-5 mr-3 text-blue-700" />
+                                <span>LinkedIn</span>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePlatformShare('facebook');
+                                }}
+                                className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                              >
+                                <FaFacebook className="w-5 h-5 mr-3 text-blue-600" />
+                                <span>Facebook</span>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePlatformShare('twitter');
+                                }}
+                                className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                              >
+                                <FaXTwitter className="w-5 h-5 mr-3 text-blue-400" />
+                                <span>Twitter</span>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePlatformShare('copy');
+                                }}
+                                className="flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                              >
+                                <FiLink className="w-5 h-5 mr-3 text-gray-500" />
+                                <span>{isCopied ? 'Copied!' : 'Copy Link'}</span>
+                              </button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* AI Compatibility */}
-            {prompt.compatibleModels && prompt.compatibleModels.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Compatible AI Models</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {prompt.compatibleModels.map((model) => (
-                      <Badge key={model} variant="secondary">
-                        {model}
-                      </Badge>
-                    ))}
+                    
+                    {/* Copy Button */}
+                    <button
+                      type="button"
+                      className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 relative"
+                      onClick={handleCopyPrompt}
+                    >
+                      {isCopied ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <FaCopy className="h-4 w-4" />
+                      )}
+                      <span className="text-sm">{isCopied ? 'Copied' : 'Copy'}</span>
+                    </button>
                   </div>
                 </CardContent>
               </Card>
-            )}
+              
+              {/* Comments Section */}
+              <Card>
+                <CardContent className="p-6">
+                  <h2 className="text-xl font-bold mb-4">Comments ({commentCount})</h2>
+                  <DynamicPromptCommentSection promptId={prompt.id} />
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <PromptsSidebar 
+                currentPromptId={prompt.id} 
+                currentCategory={prompt.category}
+                onOpenNewsletter={() => {
+                  // Dispatch custom event to open newsletter modal
+                  window.dispatchEvent(new CustomEvent('openNewsletterModal'));
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      
+      {/* Comment Section Dialog */}
+      <Dialog open={isCommentSectionOpen} onOpenChange={setIsCommentSectionOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+          <div className="flex-1 overflow-y-auto">
+            <DynamicPromptCommentSection promptId={prompt.id} />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

@@ -83,6 +83,42 @@ export async function submitPromptViaGoogleForms(promptData: GeminiPromptSubmiss
   return res.data;
 }
 
+// New function to submit prompt with image file upload
+export async function submitPromptWithImage(promptData: Omit<GeminiPromptSubmission, 'image_url'>, imageFile?: File) {
+  // If no image file, submit normally
+  if (!imageFile) {
+    return await submitGeminiPrompt(promptData);
+  }
+
+  // If there's an image file, use the file upload endpoint
+  const formData = new FormData();
+  
+  // Append the image file
+  formData.append('image', imageFile);
+  
+  // Append other form fields
+  formData.append('Prompt Text', promptData.prompt || '');
+  formData.append('Category', promptData.category || 'all');
+  if (promptData.submitter_name) {
+    formData.append('Your Name', promptData.submitter_name);
+  }
+  if (promptData.submitter_email) {
+    formData.append('Email', promptData.submitter_email);
+  }
+
+  const res = await api.post('/google-forms/prompts-with-file', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  if (res.status !== 200 && res.status !== 201) {
+    throw new Error('Failed to submit prompt with image');
+  }
+  
+  return res.data;
+}
+
 // New function to fetch SEO data for a specific prompt
 export async function getSEOGeminiPromptById(id: string) {
   try {
@@ -92,6 +128,16 @@ export async function getSEOGeminiPromptById(id: string) {
     if (res.status !== 200) {
       console.error(`Failed to fetch SEO data for prompt. Status: ${res.status}`);
       throw new Error(`Failed to fetch SEO data for prompt. Status: ${res.status}`);
+    }
+
+    // Validate that the response data has the required properties
+    if (!res.data || typeof res.data !== 'object') {
+      throw new Error('Invalid response data format');
+    }
+
+    // Ensure required properties exist
+    if (!res.data.id || !res.data.prompt || !res.data.category || !res.data.created_at) {
+      console.warn('Warning: Prompt data is missing required properties', res.data);
     }
 
     return res.data;

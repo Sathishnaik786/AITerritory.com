@@ -8,6 +8,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<{ error: Error | null }>;
+  resetPassword: (email: string) => Promise<{ error: Error | null }>;
   loading: boolean;
 }
 
@@ -154,12 +155,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    if (!supabase) {
+      return { error: new Error('Supabase client not initialized') };
+    }
+
+    try {
+      console.log('AuthProvider: Attempting password reset', { email });
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      
+      if (error) {
+        console.error('❌ Password reset error:', error);
+        return { error };
+      }
+      
+      return { error: null };
+    } catch (err) {
+      console.error('❌ Password reset exception:', err);
+      return { error: err as Error };
+    }
+  };
+
   const value = {
     user,
     session,
     signIn,
     signUp,
     signOut,
+    resetPassword,
     loading,
   };
 

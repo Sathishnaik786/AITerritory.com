@@ -41,6 +41,13 @@ exports.getGeminiPromptById = async (req, res) => {
   const { id } = req.params;
   console.log(`Fetching Gemini prompt with ID: ${id}`);
   
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(id)) {
+    console.log('Invalid UUID format:', id);
+    return res.status(400).json({ error: 'Invalid prompt ID format' });
+  }
+  
   const { data, error } = await supabase
     .from('gemini_prompts')
     .select('*')
@@ -52,14 +59,25 @@ exports.getGeminiPromptById = async (req, res) => {
     return res.status(404).json({ error: 'Prompt not found' });
   }
   
+  if (!data) {
+    return res.status(404).json({ error: 'Prompt not found' });
+  }
+  
   // Send prompt data
   res.json(data);
 };
 
-// GET /api/seo/gemini-prompts/:id - get SEO data for a specific prompt
+// GET /api/gemini-prompts/seo/:id - get SEO data for a specific prompt
 exports.getSEOGeminiPromptById = async (req, res) => {
   const { id } = req.params;
   console.log(`Fetching SEO data for Gemini prompt with ID: ${id}`);
+  
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(id)) {
+    console.log('Invalid UUID format:', id);
+    return res.status(400).json({ error: 'Invalid prompt ID format' });
+  }
   
   // Fetch the prompt
   const { data: prompt, error: promptError } = await supabase
@@ -68,8 +86,8 @@ exports.getSEOGeminiPromptById = async (req, res) => {
     .eq('id', id)
     .single();
     
-  if (promptError) {
-    console.error('Supabase error:', promptError);
+  if (promptError || !prompt) {
+    console.error('Prompt not found:', promptError);
     return res.status(404).json({ error: 'Prompt not found' });
   }
   
@@ -221,6 +239,13 @@ exports.updateGeminiPrompt = async (req, res) => {
   const { image_url, prompt, category, status } = req.body;
   console.log('Updating Gemini prompt with ID:', id, { image_url, prompt, category, status });
   
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(id)) {
+    console.log('Invalid UUID format:', id);
+    return res.status(400).json({ error: 'Invalid prompt ID format' });
+  }
+  
   if (!prompt || !category) {
     console.log('Validation failed: prompt or category missing');
     return res.status(400).json({ error: 'Prompt and category are required.' });
@@ -269,6 +294,13 @@ exports.updateGeminiPrompt = async (req, res) => {
 exports.deleteGeminiPrompt = async (req, res) => {
   const { id } = req.params;
   console.log('Deleting Gemini prompt with ID:', id);
+  
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(id)) {
+    console.log('Invalid UUID format:', id);
+    return res.status(400).json({ error: 'Invalid prompt ID format' });
+  }
   
   const { error } = await supabase
     .from('gemini_prompts')

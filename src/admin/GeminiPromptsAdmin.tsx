@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from '@/hooks/use-toast';
 import { getGeminiPrompts, getGeminiPromptCategories, updateGeminiPrompt, deleteGeminiPrompt, submitGeminiPrompt } from '../services/geminiPromptsService';
 import { categoryService } from '../services/categoryService';
+import { supabase, uploadImageToSupabase } from '@/lib/supabaseClient'; // Added import for Supabase client and upload function
 
 interface GeminiPrompt {
   id: string;
@@ -50,6 +51,10 @@ const GeminiPromptsAdmin = () => {
   // State for image preview
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [showImagePreview, setShowImagePreview] = useState(false);
+  
+  // State for image upload
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchPrompts();
@@ -226,6 +231,72 @@ const GeminiPromptsAdmin = () => {
     }
   };
 
+  // Handle image upload for new prompt
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const imageUrl = await uploadImageToSupabase(file);
+      if (imageUrl) {
+        setAddForm(prev => ({ ...prev, image_url: imageUrl }));
+        toast({
+          title: 'Success',
+          description: 'Image uploaded successfully'
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to upload image',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to upload image: ' + (error instanceof Error ? error.message : 'Unknown error'),
+        variant: 'destructive'
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Handle image upload for editing prompt
+  const handleEditImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const imageUrl = await uploadImageToSupabase(file);
+      if (imageUrl) {
+        setEditForm(prev => ({ ...prev, image_url: imageUrl }));
+        toast({
+          title: 'Success',
+          description: 'Image uploaded successfully'
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to upload image',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to upload image: ' + (error instanceof Error ? error.message : 'Unknown error'),
+        variant: 'destructive'
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleAddPrompt = async () => {
     if (!addForm.prompt.trim() || !addForm.category) {
       toast({
@@ -313,6 +384,16 @@ const GeminiPromptsAdmin = () => {
         </p>
       </div>
 
+      {/* Hidden file input for image upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={handleImageUpload}
+        disabled={uploading}
+      />
+
       {/* Add Prompt Dialog */}
       <Dialog open={isAddingPrompt} onOpenChange={setIsAddingPrompt}>
         <DialogContent className="max-w-2xl">
@@ -334,13 +415,35 @@ const GeminiPromptsAdmin = () => {
               />
             </div>
             <div>
-              <Label htmlFor="add-image-url">Image URL</Label>
-              <Input
-                id="add-image-url"
-                placeholder="Enter image URL (optional)"
-                value={addForm.image_url}
-                onChange={(e) => setAddForm({...addForm, image_url: e.target.value})}
-              />
+              <Label htmlFor="add-image-upload">Image Upload</Label>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  {uploading ? 'Uploading...' : 'Upload Image'}
+                </Button>
+                {addForm.image_url && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setAddForm({...addForm, image_url: ''})}
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
+              {addForm.image_url && (
+                <div className="mt-2">
+                  <img
+                    src={addForm.image_url}
+                    alt="Preview"
+                    className="w-40 h-40 object-cover rounded-lg border"
+                  />
+                </div>
+              )}
             </div>
             <div>
               <Label htmlFor="add-category">Category *</Label>
@@ -499,184 +602,178 @@ const GeminiPromptsAdmin = () => {
           <CardContent>
             <h3 className="text-xl font-semibold mb-2">No prompts found</h3>
             <p className="text-muted-foreground">
-              {filterConfig.category !== 'all' || filterConfig.status !== 'all' || filterConfig.search 
-                ? 'No prompts match your filters. Try adjusting your filters.' 
-                : 'There are no Gemini prompts in the system yet.'}
+              Try adjusting your search or filter criteria
             </p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-6">
-          <div className="text-sm text-muted-foreground">
-            Showing {filteredPrompts.length} of {prompts.length} prompts
-          </div>
-          
-          <div className="border rounded-lg overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-muted">
-                <tr>
-                  <th 
-                    className="p-3 text-left cursor-pointer hover:bg-muted-foreground/10"
-                    onClick={() => handleSort('prompt')}
-                  >
-                    <div className="flex items-center">
-                      Prompt
-                      {sortConfig?.key === 'prompt' && (
-                        <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+          {filteredPrompts.map((prompt) => (
+            <Card key={prompt.id}>
+              <CardHeader>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <CardTitle className="text-xl mb-2">{prompt.prompt.substring(0, 60)}...</CardTitle>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="secondary">{prompt.category}</Badge>
+                      <Badge variant="outline">{prompt.status}</Badge>
+                      <Badge variant="outline">{formatDate(prompt.created_at)}</Badge>
+                      {prompt.submitter_name && (
+                        <Badge variant="outline">{prompt.submitter_name}</Badge>
                       )}
                     </div>
-                  </th>
-                  <th 
-                    className="p-3 text-left cursor-pointer hover:bg-muted-foreground/10"
-                    onClick={() => handleSort('category')}
-                  >
-                    <div className="flex items-center">
-                      Category
-                      {sortConfig?.key === 'category' && (
-                        <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                      )}
-                    </div>
-                  </th>
-                  <th 
-                    className="p-3 text-left cursor-pointer hover:bg-muted-foreground/10"
-                    onClick={() => handleSort('status')}
-                  >
-                    <div className="flex items-center">
-                      Status
-                      {sortConfig?.key === 'status' && (
-                        <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                      )}
-                    </div>
-                  </th>
-                  <th className="p-3 text-left">Image</th>
-                  <th 
-                    className="p-3 text-left cursor-pointer hover:bg-muted-foreground/10"
-                    onClick={() => handleSort('created_at')}
-                  >
-                    <div className="flex items-center">
-                      Created
-                      {sortConfig?.key === 'created_at' && (
-                        <span className="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                      )}
-                    </div>
-                  </th>
-                  <th className="p-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredPrompts.map((prompt) => (
-                  <tr key={prompt.id} className="border-b hover:bg-muted/50">
-                    <td className="p-3">
-                      {editingId === prompt.id ? (
-                        <Input
-                          value={editForm.prompt || ''}
-                          onChange={(e) => setEditForm({...editForm, prompt: e.target.value})}
-                          className="w-full"
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleEdit(prompt)}
+                      variant="outline"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      onClick={() => handleDelete(prompt.id)}
+                      variant="destructive"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold mb-1">Full Prompt:</h4>
+                    <p className="text-muted-foreground">{prompt.prompt}</p>
+                  </div>
+                  
+                  {prompt.image_url && (
+                    <div>
+                      <h4 className="font-semibold mb-1">Image:</h4>
+                      <div 
+                        className="cursor-pointer inline-block"
+                        onClick={() => handleImagePreview(prompt.image_url)}
+                      >
+                        <img 
+                          src={prompt.image_url} 
+                          alt="Prompt visualization" 
+                          className="max-w-xs rounded-lg border"
                         />
-                      ) : (
-                        <div className="max-w-xs truncate" title={prompt.prompt}>
-                          {prompt.prompt}
-                        </div>
-                      )}
-                    </td>
-                    <td className="p-3">
-                      {editingId === prompt.id ? (
-                        <Select 
-                          value={editForm.category || ''} 
-                          onValueChange={(value) => setEditForm({...editForm, category: value})}
-                        >
-                          <SelectTrigger className="w-[120px]">
-                            <SelectValue placeholder="Category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map((category, index) => (
-                              <SelectItem key={`edit-${category}-${index}`} value={category}>{category}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <Badge variant="secondary">{prompt.category}</Badge>
-                      )}
-                    </td>
-                    <td className="p-3">
-                      {editingId === prompt.id ? (
-                        <Select 
-                          value={editForm.status || ''} 
-                          onValueChange={(value) => setEditForm({...editForm, status: value})}
-                        >
-                          <SelectTrigger className="w-[120px]">
-                            <SelectValue placeholder="Status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem key="edit-draft" value="draft">Draft</SelectItem>
-                            <SelectItem key="edit-pending" value="pending_review">Pending Review</SelectItem>
-                            <SelectItem key="edit-published" value="published">Published</SelectItem>
-                            <SelectItem key="edit-rejected" value="rejected">Rejected</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <Badge variant="outline">{prompt.status || 'draft'}</Badge>
-                      )}
-                    </td>
-                    <td className="p-3">
-                      {editingId === prompt.id ? (
-                        <Input
-                          value={editForm.image_url || ''}
-                          onChange={(e) => setEditForm({...editForm, image_url: e.target.value})}
-                          placeholder="Image URL"
-                        />
-                      ) : prompt.image_url ? (
-                        <div 
-                          className="text-blue-500 hover:text-blue-700 cursor-pointer underline"
-                          onMouseEnter={() => handleImagePreview(prompt.image_url)}
-                          onMouseLeave={handleImagePreviewLeave}
-                        >
-                          View Image
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">No image</span>
-                      )}
-                    </td>
-                    <td className="p-3">
-                      <div className="text-sm text-muted-foreground">
-                        {formatDate(prompt.created_at)}
                       </div>
-                    </td>
-                    <td className="p-3 text-right">
-                      {editingId === prompt.id ? (
-                        <div className="flex justify-end gap-2">
-                          <Button size="sm" onClick={() => handleUpdate(prompt.id)}>
-                            Save
-                          </Button>
-                          <Button 
-                            size="sm"
-                            variant="outline" 
-                            onClick={() => setEditingId(null)}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex justify-end gap-2">
-                          <Button size="sm" onClick={() => handleEdit(prompt)}>
-                            Edit
-                          </Button>
-                          <Button 
-                            size="sm"
-                            variant="destructive" 
-                            onClick={() => handleDelete(prompt.id)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  )}
+                  
+                  {prompt.submitter_email && (
+                    <div>
+                      <h4 className="font-semibold mb-1">Submitter Contact:</h4>
+                      <p className="text-muted-foreground">{prompt.submitter_email}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
+      )}
+
+      {/* Edit Prompt Dialog */}
+      {editingId && (
+        <Dialog open={!!editingId} onOpenChange={() => setEditingId(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Edit Prompt</DialogTitle>
+              <DialogDescription>
+                Edit the Gemini prompt details
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="edit-prompt">Prompt *</Label>
+                <Textarea
+                  id="edit-prompt"
+                  placeholder="Enter the Gemini prompt"
+                  value={editForm.prompt || ''}
+                  onChange={(e) => setEditForm({...editForm, prompt: e.target.value})}
+                  className="min-h-[120px]"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-image-upload">Image Upload</Label>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      // Create a temporary file input to trigger the upload
+                      const tempInput = document.createElement('input');
+                      tempInput.type = 'file';
+                      tempInput.accept = 'image/*';
+                      tempInput.onchange = (e) => handleEditImageUpload(e as any);
+                      tempInput.click();
+                    }}
+                    disabled={uploading}
+                  >
+                    {uploading ? 'Uploading...' : 'Upload Image'}
+                  </Button>
+                  {editForm.image_url && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setEditForm({...editForm, image_url: null})}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </div>
+                {editForm.image_url && (
+                  <div className="mt-2">
+                    <img
+                      src={editForm.image_url as string}
+                      alt="Preview"
+                      className="w-40 h-40 object-cover rounded-lg border"
+                    />
+                  </div>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="edit-category">Category *</Label>
+                <Select 
+                  value={editForm.category || ''} 
+                  onValueChange={(value) => setEditForm({...editForm, category: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category, index) => (
+                      <SelectItem key={`edit-${category}-${index}`} value={category}>{category}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="edit-status">Status</Label>
+                <Select 
+                  value={editForm.status || ''} 
+                  onValueChange={(value) => setEditForm({...editForm, status: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="pending_review">Pending Review</SelectItem>
+                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setEditingId(null)}>Cancel</Button>
+                <Button onClick={() => handleUpdate(editingId)}>Update Prompt</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

@@ -22,6 +22,7 @@ import RequestFeaturePage from "./pages/RequestFeaturePage";
 
 import CreateAccountPage from "./pages/CreateAccountPage";
 import LoginPage from "./pages/LoginPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import ProductivityToolsPage from "./pages/ProductivityToolsPage";
@@ -62,6 +63,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Prompts from './components/Prompts';
 import GeminiPromptsPage from './pages/GeminiPromptsPage';
 import PromptDetailsPage from './pages/PromptDetailsPage';
+import CreatePromptPage from './pages/CreatePromptPage'; // Added import for CreatePromptPage
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import React, { Suspense } from 'react';
 import FeedbackAdmin from './admin/FeedbackAdmin';
@@ -206,13 +208,15 @@ function ThemedAppContent() {
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/ai-for-business" element={<AIBusiness />} />
                 <Route path="/prompts" element={<Prompts />} />
+                <Route path="/prompts/create" element={<CreatePromptPage />} /> {/* Added route for CreatePromptPage */}
                 <Route path="/gemini-prompts" element={<GeminiPromptsPage />} />
-                <Route path="/gemini-prompts/:category/:id" element={<PromptDetailsPage />} />
-                
+                <Route path="/gemini-prompts/:category/:id" element={<PromptDetailsPage />} /> {/* Updated route to use PromptDetailsPage for Gemini prompts */}
+                <Route path="/prompts/:category/:id" element={<PromptDetailsPage />} /> {/* Added route for regular prompts with category */}
                 
                 {/* Authentication Routes */}
                 <Route path="/signup" element={<CreateAccountPage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
                 
                 {/* Routes for Resources dropdown */}
                 <Route path="/resources" element={<Resources />} />
