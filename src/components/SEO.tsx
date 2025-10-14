@@ -313,6 +313,38 @@ const SEO: React.FC<SEOProps> = ({
           {JSON.stringify(generateBreadcrumbData())}
         </script>
       )}
+      
+      {/* Breadcrumb for prompt pages */}
+      {type === 'article' && canonical && canonical.includes('/gemini-prompts/') && (
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://aiterritory.org"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Gemini Prompts",
+                "item": "https://aiterritory.org/gemini-prompts"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": canonical.includes('/men/') ? "Men's Prompts" : 
+                        canonical.includes('/women/') ? "Women's Prompts" :
+                        canonical.includes('/couple/') ? "Couple's Prompts" : "Prompts",
+                "item": canonical.split('/').slice(0, -1).join('/')
+              }
+            ]
+          })}
+        </script>
+      )}
     </Helmet>
   );
 };

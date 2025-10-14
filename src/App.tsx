@@ -157,14 +157,14 @@ function SEO() {
       <link rel="prefetch" href="/categories/women" />
       <link rel="prefetch" href="/categories/couple" />
       {/* Defer Analytics or Chat Scripts */}
-      <script async defer src="https://www.googletagmanager.com/gtag/js?id=YOUR_GA_ID" />
+      <script async defer src={`https://www.googletagmanager.com/gtag/js?id=${import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-1NJDY2B92X'}`} />
       <script
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'YOUR_GA_ID');
+            gtag('config', '${import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-1NJDY2B92X'}');
           `,
         }}
       />

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React, { useState, useEffect, useRef } from 'react';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -437,9 +437,49 @@ ${url}`);
   return (
     <>
       <SEO
-        title={`Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''} | AI Territory`}
+        title={`Gemini ${prompt.category.charAt(0).toUpperCase() + prompt.category.slice(1)} Prompt: ${prompt.prompt.substring(0, 50)}${prompt.prompt.length > 50 ? '...' : ''} | AI Territory`}
         description={prompt.prompt.substring(0, 160)}
-        canonical={`https://aiterritory.org/prompts/${prompt.category}/${id}`}
+        canonical={`https://aiterritory.org/gemini-prompts/${prompt.category}/${id}`}
+        image={prompt.image_url || `https://aiterritory.org/api/og/prompts/${prompt.id}`}
+        type="article"
+        structuredData={{
+          "@type": "CreativeWork",
+          "name": `Gemini ${prompt.category} Prompt`,
+          "description": prompt.prompt,
+          "author": {
+            "@type": "Person",
+            "name": "AI Territory"
+          },
+          "interactionStatistic": [
+            {
+              "@type": "InteractionCounter",
+              "interactionType": "https://schema.org/LikeAction",
+              "userInteractionCount": likeCount
+            },
+            {
+              "@type": "InteractionCounter",
+              "interactionType": "https://schema.org/ShareAction", 
+              "userInteractionCount": shareCount
+            },
+            {
+              "@type": "InteractionCounter",
+              "interactionType": "https://schema.org/CommentAction",
+              "userInteractionCount": commentCount
+            }
+          ],
+          "genre": "AI Prompt",
+          "keywords": `gemini, ai, prompt, ${prompt.category}, artificial intelligence`
+        }}
+        additionalMetaTags={[
+          {
+            name: "robots",
+            content: "index, follow"
+          },
+          {
+            name: "googlebot", 
+            content: "index, follow"
+          }
+        ]}
       />
       <div className="min-h-screen bg-background text-foreground">
         <div className="container mx-auto px-4 py-8">
