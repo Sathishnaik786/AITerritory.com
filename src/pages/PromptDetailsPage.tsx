@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React, { useState, useEffect, useRef } from 'react';
+﻿﻿import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -6,6 +6,7 @@ import { useToast } from '../components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { getGeminiPrompts, getSEOGeminiPromptById } from '@/services/geminiPromptsService'; // Reverted to getGeminiPrompts
 import { usePromptInteractions } from '../hooks/usePromptInteractions';
+import { addPromptShare } from '../services/promptInteractionsService';
 import DynamicPromptCommentSection from '@/components/DynamicPromptCommentSection';
 import { sanitizeText } from '@/lib/sanitizeHtml';
 import { FaArrowLeft, FaHeart, FaCopy } from 'react-icons/fa';
@@ -115,7 +116,8 @@ const PromptDetailsPage = () => {
     liked, 
     toggleLike,
     shareCount,
-    commentCount
+    commentCount,
+    refetch: refetchInteractions
   } = usePromptInteractions(actualId || '');
 
   useEffect(() => {
@@ -214,6 +216,11 @@ const PromptDetailsPage = () => {
   // Toggle read more functionality
   const toggleReadMore = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  // Handle comment count refresh
+  const handleCommentAdded = () => {
+    refetchInteractions();
   };
   
   // Handle click outside to close dropdown
@@ -381,6 +388,14 @@ ${url}`);
               description: "Link copied to clipboard",
             });
           }
+      }
+      
+      // Track share count
+      try {
+        await addPromptShare(prompt.id, user?.id || 'anonymous');
+        refetchInteractions();
+      } catch (error) {
+        console.error('Error tracking share:', error);
       }
     } catch (error) {
       console.error(`Error sharing to ${platform}:`, error);
@@ -718,7 +733,7 @@ ${url}`);
               <Card>
                 <CardContent className="p-6">
                   <h2 className="text-xl font-bold mb-4">Comments ({commentCount})</h2>
-                  <DynamicPromptCommentSection promptId={prompt.id} />
+                  <DynamicPromptCommentSection promptId={prompt.id} onCommentAdded={handleCommentAdded} />
                 </CardContent>
               </Card>
             </div>
@@ -742,7 +757,7 @@ ${url}`);
       <Dialog open={isCommentSectionOpen} onOpenChange={setIsCommentSectionOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
           <div className="flex-1 overflow-y-auto">
-            <DynamicPromptCommentSection promptId={prompt.id} />
+            <DynamicPromptCommentSection promptId={prompt.id} onCommentAdded={handleCommentAdded} />
           </div>
         </DialogContent>
       </Dialog>

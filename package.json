@@ -26,6 +26,7 @@
     "submit:sitemap": "node scripts/submit-sitemap-to-gsc.js",
     "seo:full": "npm run generate:sitemap && npm run submit:sitemap",
     "seo:test": "node scripts/test-seo-implementation.js",
+    "test:comments": "node scripts/test-comment-functionality.js",
     "test:social-previews": "node test/scripts/test-social-previews.js",
     "analyze": "vite build --mode analyze",
     "start": "node static-server.js",

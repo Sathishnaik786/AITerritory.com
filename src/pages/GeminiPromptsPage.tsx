@@ -1,6 +1,6 @@
 ﻿﻿import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent } from '@/components/ui/dialog'; // Added Dialog components
@@ -15,6 +15,7 @@ import { getGeminiPrompts, getGeminiPromptCategories } from '@/services/geminiPr
 import { slugify } from '@/lib/slugify';
 import { useAuth } from '@/context/AuthContext';
 import { usePromptInteractions } from '../hooks/usePromptInteractions';
+import { addPromptShare } from '../services/promptInteractionsService';
 import DynamicPromptCommentSection from '@/components/DynamicPromptCommentSection';
 import GoogleFormsPromptSubmit from '@/components/GoogleFormsPromptSubmit'; // Added import for GoogleFormsPromptSubmit
 
@@ -113,12 +114,19 @@ const PromptCard = memo(({
     liked: rawLiked, 
     toggleLike,
     shareCount,
-    commentCount
+    commentCount,
+    refetch: refetchInteractions
   } = usePromptInteractions(prompt.id);
   
   // Ensure liked state is always false for unauthenticated users
   const liked = user ? rawLiked : false;
   const [isCommentSectionOpen, setIsCommentSectionOpen] = useState(false);
+  
+  // Handle comment count refresh
+  const handleCommentAdded = () => {
+    refetchInteractions();
+  };
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -270,6 +278,14 @@ ${url}`);
             });
           }
       }
+      
+      // Track share count
+      try {
+        await addPromptShare(prompt.id, user?.id || 'anonymous');
+        refetchInteractions();
+      } catch (error) {
+        console.error('Error tracking share:', error);
+      }
     } catch (error) {
       console.error(`Error sharing to ${platform}:`, error);
       showToast({
@@ -278,7 +294,7 @@ ${url}`);
         variant: "destructive",
       });
     }
-  }, [prompt, toast]);
+  }, [prompt, toast, user?.id, refetchInteractions]);
 
   return (
     <motion.div
@@ -363,7 +379,7 @@ ${url}`);
                 e.preventDefault();
                 // Check if user is authenticated before opening comment section
                 if (!user) {
-                  window.location.href = '/login';
+                  navigate('/login');
                   return;
                 }
                 setIsCommentSectionOpen(true);
@@ -494,7 +510,7 @@ ${url}`);
       <Dialog open={isCommentSectionOpen} onOpenChange={setIsCommentSectionOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
           <div className="flex-1 overflow-y-auto">
-            <DynamicPromptCommentSection promptId={prompt.id} />
+            <DynamicPromptCommentSection promptId={prompt.id} onCommentAdded={handleCommentAdded} />
           </div>
         </DialogContent>
       </Dialog>
@@ -516,6 +532,7 @@ ${url}`);
 
 const GeminiPromptsPage: React.FC = () => {
   const { user } = useAuth(); // Added Supabase authentication
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
   const [prompts, setPrompts] = useState<GeminiPrompt[]>([]);
   const [filteredPrompts, setFilteredPrompts] = useState<GeminiPrompt[]>([]);
