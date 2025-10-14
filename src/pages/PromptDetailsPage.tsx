@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React, { useState, useEffect, useRef } from 'react';
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -57,6 +57,7 @@ const PromptDetailsPage = () => {
   const [isCopied, setIsCopied] = useState(false);
   const [isCommentSectionOpen, setIsCommentSectionOpen] = useState(false);
   const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const shareDropdownRef = useRef<HTMLDivElement>(null);
   
   // Extract the actual ID from the URL parameter (format: slug-ID)
@@ -202,6 +203,17 @@ const PromptDetailsPage = () => {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  // Truncate function for read more functionality
+  const truncatePrompt = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + '...';
+  };
+
+  // Toggle read more functionality
+  const toggleReadMore = () => {
+    setIsExpanded(!isExpanded);
   };
   
   // Handle click outside to close dropdown
@@ -484,9 +496,9 @@ ${url}`);
       <div className="min-h-screen bg-background text-foreground">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-6">
-            <Link to="/prompts">
+            <Link to="/gemini-prompts">
               <Button variant="ghost" className="flex items-center gap-2">
-                <FaArrowLeft /> Back to Prompts
+                <FaArrowLeft /> Back to Gemini Prompts
               </Button>
             </Link>
           </div>
@@ -527,7 +539,25 @@ ${url}`);
                   )}
                   
                   <div className="prose max-w-none whitespace-pre-line mb-6">
-                    {sanitizeText(prompt.prompt)}
+                    {isExpanded ? sanitizeText(prompt.prompt) : sanitizeText(truncatePrompt(prompt.prompt, 300))}
+                    {!isExpanded && prompt.prompt.length > 300 && (
+                      <button
+                        type="button"
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium inline-block ml-1 mt-2"
+                        onClick={toggleReadMore}
+                      >
+                        ...read more
+                      </button>
+                    )}
+                    {isExpanded && prompt.prompt.length > 300 && (
+                      <button
+                        type="button"
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium inline-block ml-1 mt-2"
+                        onClick={toggleReadMore}
+                      >
+                        show less
+                      </button>
+                    )}
                   </div>
                   
                   {/* Enhanced Action Buttons */}
@@ -678,7 +708,7 @@ ${url}`);
                       ) : (
                         <FaCopy className="h-4 w-4" />
                       )}
-                      <span className="text-sm">{isCopied ? 'Copied' : 'Copy'}</span>
+                      <span className="text-sm">{isCopied ? 'Copied!' : 'Copy Prompt'}</span>
                     </button>
                   </div>
                 </CardContent>

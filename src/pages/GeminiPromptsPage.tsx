@@ -472,7 +472,7 @@ ${url}`);
             {/* Copy button */}
             <button
               type="button"
-              className="prompt-card-action-button relative"
+              className="prompt-card-action-button relative flex items-center gap-1 px-2 py-1 rounded text-sm"
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -484,6 +484,7 @@ ${url}`);
               ) : (
                 <Copy className="h-4 w-4 text-gray-500" />
               )}
+              <span className="text-xs">{isCopied ? 'Copied!' : 'Copy Prompt'}</span>
             </button>
           </div>
         </CardContent>
