@@ -79,6 +79,8 @@ import RedisDashboard from './pages/admin/redis-dashboard';
 import PromptSubmissionsAdmin from './admin/PromptSubmissionsAdmin';
 import CategoriesAdmin from './admin/CategoriesAdmin';
 import GeminiPromptsAdmin from './admin/GeminiPromptsAdmin';
+import { GoogleTagManagerProvider } from './components/GoogleTagManagerProvider';
+import { useGoogleTagManager } from './hooks/useGoogleTagManager';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -177,6 +179,9 @@ function ThemedAppContent() {
   const isLandingPro = location.pathname === '/';
   const isGeminiPromptsPage = location.pathname.startsWith('/gemini-prompts');
   const [newsletterOpen, setNewsletterOpen] = useState(false);
+  
+  // Initialize Google Tag Manager
+  useGoogleTagManager();
   
   // Listen for custom event to open newsletter modal
   useEffect(() => {
@@ -340,15 +345,15 @@ function ThemedAppContent() {
 };
 
 // Global Error Boundary
-class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any, errorInfo: any}> {
-  constructor(props: any) {
+class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: unknown, errorInfo: unknown}> {
+  constructor(props: {children: React.ReactNode}) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };
   }
-  static getDerivedStateFromError(error: any) {
+  static getDerivedStateFromError(error: unknown) {
     return { hasError: true, error, errorInfo: null };
   }
-  componentDidCatch(error: any, errorInfo: any) {
+  componentDidCatch(error: unknown, errorInfo: unknown) {
     console.error('GlobalErrorBoundary caught error:', error, errorInfo);
     this.setState({ errorInfo });
   }
@@ -358,7 +363,7 @@ class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {
         <div style={{ color: 'red', padding: 24 }}>
           <h1>Global App Error</h1>
           <pre>{String(this.state.error)}</pre>
-          {this.state.errorInfo && <pre>{this.state.errorInfo.componentStack}</pre>}
+          {this.state.errorInfo && <pre>{JSON.stringify(this.state.errorInfo, null, 2)}</pre>}
         </div>
       );
     }
@@ -374,28 +379,30 @@ function App() {
       enableSystem
       disableTransitionOnChange
     >
-      <BackgroundAnimation />
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true
-          }}
-        >
-          <TooltipProvider>
-            <HelmetProvider>
-              <ScrollToTop />
-              <Toaster position="top-right" richColors />
-              <GlobalErrorBoundary>
-                <Suspense fallback={<div>Loading...</div>}>
-                  <ThemedAppContent />
-                </Suspense>
-              </GlobalErrorBoundary>
-              <ReactQueryDevtools initialIsOpen={false} />
-            </HelmetProvider>
-          </TooltipProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
+      <GoogleTagManagerProvider>
+        <BackgroundAnimation />
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}
+          >
+            <TooltipProvider>
+              <HelmetProvider>
+                <ScrollToTop />
+                <Toaster position="top-right" richColors />
+                <GlobalErrorBoundary>
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <ThemedAppContent />
+                  </Suspense>
+                </GlobalErrorBoundary>
+                <ReactQueryDevtools initialIsOpen={false} />
+              </HelmetProvider>
+            </TooltipProvider>
+          </BrowserRouter>
+        </QueryClientProvider>
+      </GoogleTagManagerProvider>
     </ThemeProvider>
   );
 }
