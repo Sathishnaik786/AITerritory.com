@@ -13,8 +13,8 @@ export function GTMProvider({ children }: { children: React.ReactNode }) {
     window.dataLayer = window.dataLayer || [];
     
     // Only load GTM when VITE_GTM_ID is properly set
-    const gtmId = import.meta.env.VITE_GTM_ID;
-    if (!gtmId || gtmId === 'GT-MR295G72') {
+    const gtmId = import.meta.env.VITE_GTM_ID || 'GTM-NV3T6WDW';
+    if (!gtmId) {
       console.log('[AITerritory] GTM Skipped - ID not configured');
       return;
     }
