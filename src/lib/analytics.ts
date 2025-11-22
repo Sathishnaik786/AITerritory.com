@@ -2,6 +2,7 @@
 declare global {
   interface Window {
     gtag: (...args: unknown[]) => void;
+    plausible?: (eventName: string, options: { props: Record<string, unknown> }) => void;
   }
 }
 
@@ -41,6 +42,10 @@ interface BaseEventParams {
   page_url: string;
   user_id?: string;
   event_type: EventType;
+  // Add platform, timestamp, and referrer for all events
+  platform?: "web";
+  timestamp?: string;
+  referrer?: string | null;
   // Google Ads conversion tracking parameter
   gads_conversion?: {
     id: string;
@@ -71,7 +76,7 @@ interface PromptEventParams extends BaseEventParams {
 
 // Share event parameters
 interface ShareEventParams extends BaseEventParams {
-  platform: 'twitter' | 'facebook' | 'linkedin' | 'whatsapp' | 'copy';
+  share_platform: 'twitter' | 'facebook' | 'linkedin' | 'whatsapp' | 'copy';
   content_type: 'tool' | 'blog' | 'prompt';
   content_id: string;
   content_title?: string;
@@ -110,18 +115,57 @@ export const trackEvent = (eventName: EventType, params: EventParams): void => {
     // Ensure gtag is available
     if (isGtagAvailable()) {
       // Add common parameters
-      const eventParams = {
+      const enrichedParams = {
         ...params,
+        platform: "web" as const,
         timestamp: new Date().toISOString(),
+        referrer: document.referrer || null,
         user_agent: navigator.userAgent,
         screen_resolution: `${screen.width}x${screen.height}`,
         language: navigator.language,
       };
 
       // Send the event to GA4
-      window.gtag('event', eventName, eventParams);
+      window.gtag('event', eventName, enrichedParams);
       
-      console.log(`📊 GA4 Event tracked: ${eventName}`, eventParams);
+      // Add Google Ads conversion hint if applicable
+      if (import.meta.env.VITE_GADS_CONV_ID && 
+          (eventName === 'auth_action' || eventName === 'bookmark_tool' || eventName === 'bookmark_blog' || eventName === 'bookmark_prompt' || eventName === 'share_item')) {
+        // Determine the correct label based on event type
+        let label = '';
+        if (eventName === 'auth_action' && 'auth_action' in enrichedParams && enrichedParams.auth_action === 'sign_up') {
+          label = import.meta.env.VITE_GADS_LABEL_SIGNUP || '';
+        } else if (eventName.startsWith('bookmark_')) {
+          label = import.meta.env.VITE_GADS_LABEL_BOOKMARK || '';
+        } else if (eventName === 'share_item') {
+          label = import.meta.env.VITE_GADS_LABEL_SHARE || '';
+        }
+        
+        if (label) {
+          console.log(`[AITerritory] Google Ads Conversion Tracking: ${eventName}`, {
+            id: import.meta.env.VITE_GADS_CONV_ID,
+            label
+          });
+        }
+      }
+      
+      // Add Meta Pixel forwarding if applicable
+      if (import.meta.env.VITE_META_PIXEL_ID && window.dataLayer) {
+        window.dataLayer.push({
+          event: "fb_forward",
+          meta_event: eventName,
+          meta_payload: enrichedParams
+        });
+        console.log(`[AITerritory] Meta Pixel Forwarding: ${eventName}`, enrichedParams);
+      }
+      
+      // Add Plausible forwarding if applicable
+      if (window.plausible) {
+        window.plausible(eventName, { props: enrichedParams });
+        console.log(`[AITerritory] Plausible Forwarding: ${eventName}`, enrichedParams);
+      }
+      
+      console.log(`📊 GA4 Event tracked: ${eventName}`, enrichedParams);
     } else {
       console.warn('GA4 gtag not available - event not tracked:', eventName);
     }
@@ -289,7 +333,7 @@ export const trackShare = (
 ): void => {
   // Add Google Ads conversion tracking for share events
   const params: ShareEventParams = {
-    platform,
+    share_platform: platform,
     content_type: contentType,
     content_id: contentId,
     content_title: contentTitle,

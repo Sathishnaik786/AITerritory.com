@@ -2,12 +2,37 @@
 <html lang="en">
   <head>
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GT-MR295G72');</script>
+    <script>
+      if (import.meta.env.VITE_GTM_ID) { 
+        window.dataLayer = window.dataLayer || []; 
+        window.dataLayer.push({ 
+          "gtm.start": new Date().getTime(), 
+          event: "gtm.js" 
+        }); 
+      }
+    </script>
+    <script>
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer',import.meta.env.VITE_GTM_ID || 'GT-MR295G72');
+    </script>
     <!-- End Google Tag Manager -->
+    
+    <!-- Google AdSense -->
+    <script>
+      if (import.meta.env.VITE_ADSENSE_ID) {
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + import.meta.env.VITE_ADSENSE_ID;
+        script.crossOrigin = 'anonymous';
+        document.head.appendChild(script);
+        console.log('[AITerritory] AdSense Loaded:', !!import.meta.env.VITE_ADSENSE_ID);
+      }
+    </script>
+    <!-- End Google AdSense -->
+    
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -59,8 +84,14 @@
   </head>
   <body class="no-fouc">
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GT-MR295G72"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript>
+      <iframe 
+        src="https://www.googletagmanager.com/ns.html?id=VITE_GTM_ID" 
+        height="0" 
+        width="0" 
+        style="display:none;visibility:hidden">
+      </iframe>
+    </noscript>
     <!-- End Google Tag Manager (noscript) -->
     <div id="root">
       <!-- Loading indicator -->
@@ -81,6 +112,13 @@
       if (document.readyState === 'complete' || document.readyState === 'interactive') {
         document.body.classList.remove('no-fouc');
       }
+      
+      // Testing block
+      console.log("[AITerritory] GTM Loaded:", !!import.meta.env.VITE_GTM_ID);
+      console.log("[AITerritory] Google Ads Injection:", !!import.meta.env.VITE_GADS_CONV_ID);
+      console.log("[AITerritory] Meta Pixel Forwarding:", !!import.meta.env.VITE_META_PIXEL_ID);
+      console.log("[AITerritory] Clarity Detection:", !!import.meta.env.VITE_CLARITY_ID);
+      console.log("[AITerritory] AdSense Loaded:", !!import.meta.env.VITE_ADSENSE_ID);
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

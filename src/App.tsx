@@ -81,6 +81,7 @@ import CategoriesAdmin from './admin/CategoriesAdmin';
 import GeminiPromptsAdmin from './admin/GeminiPromptsAdmin';
 import { GoogleTagManagerProvider } from './components/GoogleTagManagerProvider';
 import { useGoogleTagManager } from './hooks/useGoogleTagManager';
+import { GTMProvider } from './providers/GTMProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -379,7 +380,7 @@ function App() {
       enableSystem
       disableTransitionOnChange
     >
-      <GoogleTagManagerProvider>
+      <GTMProvider>
         <BackgroundAnimation />
         <QueryClientProvider client={queryClient}>
           <BrowserRouter
@@ -402,7 +403,7 @@ function App() {
             </TooltipProvider>
           </BrowserRouter>
         </QueryClientProvider>
-      </GoogleTagManagerProvider>
+      </GTMProvider>
     </ThemeProvider>
   );
 }
