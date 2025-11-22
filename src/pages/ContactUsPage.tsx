@@ -44,7 +44,7 @@ const ContactUsPage: React.FC = () => {
     <>
       <SEO
         title="Contact Us | AI Territory"
-        description="Get in touch with the AI Territory team. We'd love to hear from you! Contact us for partnerships, tool submissions, advertising opportunities, or general inquiries."
+        description="Connect with the AI Territory team for partnerships, tool submissions, advertising opportunities, or general inquiries. We're here to help you navigate the world of AI tools and resources."
         canonical="https://aiterritory.org/company/contact-us"
         keywords="contact AI Territory, get in touch, partnerships, tool submissions, advertising, support"
       />

@@ -1,12 +1,19 @@
 // GA4 Analytics Utility
 declare global {
   interface Window {
-    gtag: (...args: any[]) => void;
+    gtag: (...args: unknown[]) => void;
   }
 }
 
 // GA4 Measurement ID
 const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-1NJDY2B92X';
+
+// Google Ads Conversion Tracking
+const GADS_CONV_ID = import.meta.env.VITE_GADS_CONV_ID;
+const GADS_LABEL_SIGNUP = import.meta.env.VITE_GADS_LABEL_SIGNUP;
+const GADS_LABEL_BOOKMARK = import.meta.env.VITE_GADS_LABEL_BOOKMARK;
+const GADS_LABEL_SHARE = import.meta.env.VITE_GADS_LABEL_SHARE;
+const GADS_LABEL_PURCHASE = import.meta.env.VITE_GADS_LABEL_PURCHASE;
 
 // Helper function to check if gtag is available
 const isGtagAvailable = (): boolean => {
@@ -34,6 +41,11 @@ interface BaseEventParams {
   page_url: string;
   user_id?: string;
   event_type: EventType;
+  // Google Ads conversion tracking parameter
+  gads_conversion?: {
+    id: string;
+    label: string;
+  };
 }
 
 // Tool-specific event parameters
@@ -146,14 +158,25 @@ export const trackToolBookmark = (
   toolCategory?: string,
   userId?: string
 ): void => {
-  trackEvent('bookmark_tool', {
+  // Add Google Ads conversion tracking for bookmark events
+  const params: ToolEventParams = {
     tool_id: toolId,
     tool_name: toolName,
     tool_category: toolCategory,
     page_url: window.location.href,
     user_id: userId,
     event_type: 'bookmark_tool'
-  });
+  };
+
+  // Add Google Ads conversion tracking if configured
+  if (GADS_CONV_ID && GADS_LABEL_BOOKMARK) {
+    params.gads_conversion = {
+      id: GADS_CONV_ID,
+      label: GADS_LABEL_BOOKMARK
+    };
+  }
+
+  trackEvent('bookmark_tool', params);
 };
 
 /**
@@ -184,14 +207,25 @@ export const trackBlogBookmark = (
   blogCategory?: string,
   userId?: string
 ): void => {
-  trackEvent('bookmark_blog', {
+  // Add Google Ads conversion tracking for bookmark events
+  const params: BlogEventParams = {
     blog_id: blogId,
     blog_title: blogTitle,
     blog_category: blogCategory,
     page_url: window.location.href,
     user_id: userId,
     event_type: 'bookmark_blog'
-  });
+  };
+
+  // Add Google Ads conversion tracking if configured
+  if (GADS_CONV_ID && GADS_LABEL_BOOKMARK) {
+    params.gads_conversion = {
+      id: GADS_CONV_ID,
+      label: GADS_LABEL_BOOKMARK
+    };
+  }
+
+  trackEvent('bookmark_blog', params);
 };
 
 /**
@@ -222,14 +256,25 @@ export const trackPromptBookmark = (
   promptCategory?: string,
   userId?: string
 ): void => {
-  trackEvent('bookmark_prompt', {
+  // Add Google Ads conversion tracking for bookmark events
+  const params: PromptEventParams = {
     prompt_id: promptId,
     prompt_title: promptTitle,
     prompt_category: promptCategory,
     page_url: window.location.href,
     user_id: userId,
     event_type: 'bookmark_prompt'
-  });
+  };
+
+  // Add Google Ads conversion tracking if configured
+  if (GADS_CONV_ID && GADS_LABEL_BOOKMARK) {
+    params.gads_conversion = {
+      id: GADS_CONV_ID,
+      label: GADS_LABEL_BOOKMARK
+    };
+  }
+
+  trackEvent('bookmark_prompt', params);
 };
 
 /**
@@ -242,7 +287,8 @@ export const trackShare = (
   contentTitle?: string,
   userId?: string
 ): void => {
-  trackEvent('share_item', {
+  // Add Google Ads conversion tracking for share events
+  const params: ShareEventParams = {
     platform,
     content_type: contentType,
     content_id: contentId,
@@ -250,7 +296,17 @@ export const trackShare = (
     page_url: window.location.href,
     user_id: userId,
     event_type: 'share_item'
-  });
+  };
+
+  // Add Google Ads conversion tracking if configured
+  if (GADS_CONV_ID && GADS_LABEL_SHARE) {
+    params.gads_conversion = {
+      id: GADS_CONV_ID,
+      label: GADS_LABEL_SHARE
+    };
+  }
+
+  trackEvent('share_item', params);
 };
 
 /**
@@ -282,13 +338,24 @@ export const trackAuthAction = (
   authMethod?: string,
   userId?: string
 ): void => {
-  trackEvent('auth_action', {
+  // Add Google Ads conversion tracking for sign up events
+  const params: AuthEventParams = {
     auth_action: authAction,
     auth_method: authMethod,
     page_url: window.location.href,
     user_id: userId,
     event_type: 'auth_action'
-  });
+  };
+
+  // Add Google Ads conversion tracking for sign up events
+  if (authAction === 'sign_up' && GADS_CONV_ID && GADS_LABEL_SIGNUP) {
+    params.gads_conversion = {
+      id: GADS_CONV_ID,
+      label: GADS_LABEL_SIGNUP
+    };
+  }
+
+  trackEvent('auth_action', params);
 };
 
 /**
@@ -322,7 +389,12 @@ export const pageview = (url: string) => {
 };
 
 // Event tracking
-export const event = ({ action, category, label, value }: any) => {
+export const event = ({ action, category, label, value }: { 
+  action: string; 
+  category?: string; 
+  label?: string; 
+  value?: number; 
+}) => {
   if (isGtagAvailable()) {
     window.gtag('event', action, {
       event_category: category,

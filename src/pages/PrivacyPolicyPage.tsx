@@ -6,7 +6,7 @@ const PrivacyPolicyPage: React.FC = () => {
     <>
       <SEO
         title="Privacy Policy | AI Territory - Protecting Your Personal Information"
-        description="Learn how AI Territory collects, uses, and protects your personal information. Our comprehensive privacy policy ensures transparency and security for all users."
+        description="Discover how AI Territory protects your privacy while delivering cutting-edge AI tools and resources. Learn about our data practices, security measures, and your rights."
         canonical="https://aiterritory.org/legal/privacy-policy"
         image="https://aiterritory.org/og-default.png"
       />
@@ -40,6 +40,9 @@ const PrivacyPolicyPage: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-3">Third-Party Services</h2>
           <p className="text-md text-muted-foreground mb-4">
             Our website may contain links to third-party websites and services. We are not responsible for the privacy practices or the content of these third-party sites. We encourage you to review the privacy policies of any third-party sites you visit.
+          </p>
+          <p className="text-md text-muted-foreground mb-4">
+            We use Google AdSense to display advertisements on our site. Google, as a third-party vendor, uses cookies to serve ads on our site. Google's use of the DART cookie enables it to serve ads to our users based on their visit to our site and other sites on the Internet. Users may opt out of the use of the DART cookie by visiting the Google ad and content network privacy policy.
           </p>
           
           <h2 className="text-2xl font-semibold mb-3">Cookies and Tracking Technologies</h2>
