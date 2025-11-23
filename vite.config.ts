@@ -101,7 +101,8 @@ export default defineConfig(({ mode }) => ({
       'Content-Security-Policy': [
         "default-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:*;",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* https://www.googletagmanager.com;",
-        "style-src 'self' 'unsafe-inline' http://localhost:* https://fonts.googleapis.com;",
+        "style-src 'self' 'unsafe-inline' http://localhost:* https://fonts.googleapis.com https://www.googletagmanager.com;",
+        "style-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com;",
         "img-src 'self' data: blob: http: https:;",
         "font-src 'self' data: http: https:;",
         "connect-src 'self' http://localhost:* https://www.google-analytics.com https://aiterritory-com.onrender.com https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co;",
@@ -112,7 +113,8 @@ export default defineConfig(({ mode }) => ({
       'Content-Security-Policy': [
         "default-src 'self';",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.googletagmanager.com;",
+        "style-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com;",
         "img-src 'self' data: blob: http: https:;",
         "font-src 'self' data: https://fonts.gstatic.com;",
         "connect-src 'self' https://www.google-analytics.com https://aiterritory-com.onrender.com https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co;",
@@ -128,7 +130,8 @@ export default defineConfig(({ mode }) => ({
       'Content-Security-Policy': [
         "default-src 'self';",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.googletagmanager.com;",
+        "style-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com;",
         "img-src 'self' data: blob: http: https:;",
         "font-src 'self' data: https://fonts.gstatic.com;",
         "connect-src 'self' https://www.google-analytics.com https://aiterritory-com.onrender.com https://ckahkadgnaxzcfhmsdaj.supabase.co wss://ckahkadgnaxzcfhmsdaj.supabase.co;",

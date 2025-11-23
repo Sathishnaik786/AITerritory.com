@@ -35,7 +35,8 @@ export type EventType =
   | 'like_blog'
   | 'bookmark_blog'
   | 'like_prompt'
-  | 'bookmark_prompt';
+  | 'bookmark_prompt'
+  | 'affiliate_click';
 
 // Base event parameters
 interface BaseEventParams {
@@ -96,6 +97,13 @@ interface AuthEventParams extends BaseEventParams {
   auth_method?: string;
 }
 
+// Affiliate event parameters
+interface AffiliateEventParams extends BaseEventParams {
+  affiliate_id: string;
+  link_url: string;
+  link_text?: string;
+}
+
 // Union type for all event parameters
 export type EventParams = 
   | ToolEventParams 
@@ -103,7 +111,8 @@ export type EventParams =
   | PromptEventParams 
   | ShareEventParams 
   | CommentEventParams 
-  | AuthEventParams;
+  | AuthEventParams
+  | AffiliateEventParams;
 
 /**
  * Track a custom GA4 event
@@ -130,7 +139,7 @@ export const trackEvent = (eventName: EventType, params: EventParams): void => {
       
       // Add Google Ads conversion hint if applicable
       if (import.meta.env.VITE_GADS_CONV_ID && 
-          (eventName === 'auth_action' || eventName === 'bookmark_tool' || eventName === 'bookmark_blog' || eventName === 'bookmark_prompt' || eventName === 'share_item')) {
+          (eventName === 'auth_action' || eventName === 'bookmark_tool' || eventName === 'bookmark_blog' || eventName === 'bookmark_prompt' || eventName === 'share_item' || eventName === 'affiliate_click')) {
         // Determine the correct label based on event type
         let label = '';
         if (eventName === 'auth_action' && 'auth_action' in enrichedParams && enrichedParams.auth_action === 'sign_up') {
@@ -139,6 +148,8 @@ export const trackEvent = (eventName: EventType, params: EventParams): void => {
           label = import.meta.env.VITE_GADS_LABEL_BOOKMARK || '';
         } else if (eventName === 'share_item') {
           label = import.meta.env.VITE_GADS_LABEL_SHARE || '';
+        } else if (eventName === 'affiliate_click') {
+          label = 'affiliate_click'; // This would need to be configured in env vars
         }
         
         if (label) {
@@ -400,6 +411,36 @@ export const trackAuthAction = (
   }
 
   trackEvent('auth_action', params);
+};
+
+/**
+ * Track affiliate click event
+ */
+export const trackAffiliateClick = (
+  affiliateId: string,
+  linkUrl: string,
+  linkText?: string,
+  userId?: string
+): void => {
+  // Add Google Ads conversion tracking for affiliate events
+  const params: AffiliateEventParams = {
+    affiliate_id: affiliateId,
+    link_url: linkUrl,
+    link_text: linkText,
+    page_url: window.location.href,
+    user_id: userId,
+    event_type: 'affiliate_click'
+  };
+
+  // Add Google Ads conversion tracking if configured
+  if (GADS_CONV_ID) {
+    params.gads_conversion = {
+      id: GADS_CONV_ID,
+      label: 'affiliate_click' // This would need to be configured in env vars
+    };
+  }
+
+  trackEvent('affiliate_click', params);
 };
 
 /**

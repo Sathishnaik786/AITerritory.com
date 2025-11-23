@@ -33,8 +33,6 @@
     "clear-cache": "node scripts/clear-cache.js"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^5.51.0",
-    "@clerk/shared": "^3.27.3",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@lexical/link": "^0.12.0",

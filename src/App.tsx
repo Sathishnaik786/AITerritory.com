@@ -159,18 +159,7 @@ function SEO() {
       <link rel="prefetch" href="/categories/men" />
       <link rel="prefetch" href="/categories/women" />
       <link rel="prefetch" href="/categories/couple" />
-      {/* Defer Analytics or Chat Scripts */}
-      <script async defer src={`https://www.googletagmanager.com/gtag/js?id=${import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-1NJDY2B92X'}`} />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-1NJDY2B92X'}');
-          `,
-        }}
-      />
+      {/* Analytics scripts are handled in main.tsx */}
     </Helmet>
   );
 }

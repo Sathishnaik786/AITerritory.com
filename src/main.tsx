@@ -8,8 +8,9 @@ import "./index.css"; // Ensure this is imported for global styles
 // Extend window interface for GA4
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dataLayer: any[];
-    gtag: (...args: any[]) => void;
+    gtag: (...args: unknown[]) => void;
   }
 }
 
@@ -35,15 +36,17 @@ if (GA_MEASUREMENT_ID) {
   script.onload = () => {
     // Initialize gtag
     window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      // @ts-ignore
-      window.dataLayer.push(arguments);
+    function gtag(...args: unknown[]) {
+      window.dataLayer.push(args);
     }
     window.gtag = gtag;
-    // @ts-ignore
+    // Configure GA4 with proper cookie settings to prevent expiration warnings
     gtag('js', new Date());
-    // @ts-ignore
-    gtag('config', GA_MEASUREMENT_ID);
+    gtag('config', GA_MEASUREMENT_ID, {
+      cookie_expires: 63072000, // 2 years in seconds
+      cookie_update: true,
+      cookie_flags: 'SameSite=None;Secure'
+    });
     
     console.log('GA4 initialized successfully');
   };
