@@ -118,7 +118,9 @@ path = "/ai-for-business*"
         https://s.ytimg.com;
       style-src 'self' 'unsafe-inline' 
         https://fonts.googleapis.com 
-        https://cdn.jsdelivr.net;
+        https://cdn.jsdelivr.net 
+        https://www.googletagmanager.com;
+      style-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com;
       font-src 'self' 
         https://fonts.gstatic.com 
         https://cdn.jsdelivr.net

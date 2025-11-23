@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from '@/hooks/use-toast';
 import { getGeminiPrompts, getGeminiPromptCategories, updateGeminiPrompt, deleteGeminiPrompt, submitGeminiPrompt } from '../services/geminiPromptsService';
 import { categoryService } from '../services/categoryService';
-import { supabase, uploadImageToSupabase } from '@/lib/supabaseClient'; // Added import for Supabase client and upload function
+import { supabase } from '@/services/supabaseClient';
+import { uploadImageToSupabase } from '@/utils/imageUpload';
 
 interface GeminiPrompt {
   id: string;

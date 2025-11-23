@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Label } from './ui/label';
 import { useToast } from './ui/use-toast';
 import { submitPrompt } from '../services/promptsService';
-import { uploadImageToSupabase } from '@/lib/supabaseClient';
+import { uploadImageToSupabase } from '@/utils/imageUpload';
 
 const promptCategories = [
   'Ethereum Developer',

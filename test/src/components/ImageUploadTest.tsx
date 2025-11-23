@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Card, CardContent } from '../../../src/components/ui/card';
 import { Button } from '../../../src/components/ui/button';
 import { useToast } from '../../../src/hooks/use-toast';
-import { uploadImageToSupabase } from '../../../src/lib/supabaseClient';
+import { uploadImageToSupabase } from '../../../src/utils/imageUpload';
 
 export default function ImageUploadTest() {
   const [uploading, setUploading] = useState(false);
