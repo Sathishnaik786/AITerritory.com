@@ -1,4 +1,4 @@
-const express = require('express');
+ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const csrf = require('csurf');
@@ -24,7 +24,21 @@ const cookieParser = require('cookie-parser');
  * ========================================
  */
 
-
+// Define CSP policy
+const cspPolicy = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://*.googletagmanager.com",
+  "style-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://fonts.googleapis.com",
+  "style-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com data:",
+  "img-src 'self' data: https: blob:",
+  "connect-src 'self' https://*.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
+  "frame-src 'self' https://*.google.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'"
+].join('; ');
 
 // Allowed origins for CORS
 const allowedOrigins = [

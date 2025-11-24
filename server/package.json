@@ -12,8 +12,8 @@
     "test-redis": "node ../test/server/scripts/test-redis-integration.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.50.2",
-    "canvas": "^2.11.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csurf": "^1.11.0",

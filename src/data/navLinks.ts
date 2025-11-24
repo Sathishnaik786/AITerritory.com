@@ -14,5 +14,7 @@ export const navLinks = [
       { label: "AI Automation", to: "/resources/ai-automation" },
       { label: "AI Innovation", to: "/resources/ai-innovation" },
     ],
-  }
+  },
+  { label: "AI Assistant", to: "/ai-assistant" },
+  { label: "AI Insights", to: "/ai-insights" },
 ];

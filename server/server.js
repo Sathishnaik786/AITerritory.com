@@ -72,6 +72,10 @@ const googleFormsRoutes = require('./routes/googleForms');
 const promptInteractionsRoutes = require('./routes/promptInteractions');
 const ogImageRoutes = require('./routes/ogImage');
 
+// Import the new AI Assistant route
+const aiAssistantRoutes = require('./routes/aiAssistant');
+const aiAnalyticsRoutes = require('./routes/aiAnalytics');
+
 // Enhanced Redis-powered routes
 const enhancedToolRoutes = require('./routes/enhancedTools');
 const enhancedCommentRoutes = require('./routes/enhancedComments');
@@ -145,6 +149,10 @@ app.use('/api/monitor/redis', redisMonitorDashboardRoutes);
 app.use('/api/gemini-prompts', geminiPromptsRoutes);
 app.use('/api/google-forms', googleFormsRoutes);
 app.use('/api/og', ogImageRoutes);
+
+// Register the new AI Assistant route
+app.use("/api/ai-assistant", aiAssistantRoutes);
+app.use("/api/ai-insights", aiAnalyticsRoutes);
 
 // Enhanced Redis-powered routes
 app.use('/api/enhanced/tools', enhancedToolRoutes);

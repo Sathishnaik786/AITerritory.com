@@ -83,6 +83,11 @@ import { GoogleTagManagerProvider } from './components/GoogleTagManagerProvider'
 import { useGoogleTagManager } from './hooks/useGoogleTagManager';
 import { GTMProvider } from './providers/GTMProvider';
 
+// Import the new AI Assistant page
+import AIAssistantPage from './pages/AIAssistantPage';
+import AIInsightsPage from './pages/AIInsightsPage';
+import { AIWidget } from './components/AIWidget';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -322,12 +327,17 @@ function ThemedAppContent() {
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogDetail />} />
 
+                {/* AI Assistant Route */}
+                <Route path="/ai-assistant" element={<AIAssistantPage />} />
+                <Route path="/ai-insights" element={<AIInsightsPage />} />
+
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
           </div>
         </div>
         <NavbarNewsletterModal isOpen={newsletterOpen} onClose={() => setNewsletterOpen(false)} />
+        <AIWidget />
         {!isGeminiPromptsPage && <Footer />}
       </HelmetProvider>
     </div>
