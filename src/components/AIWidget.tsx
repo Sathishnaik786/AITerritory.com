@@ -2,31 +2,15 @@ import { useState, useEffect, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Bot, X } from 'lucide-react';
-import { useChat } from '@/hooks/useChat';
 import { ChatWindow } from '@/components/ChatWindow';
 
 export function AIWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [inputValue, setInputValue] = useState('');
   
-  const { messages, isLoading, sendMessage } = useChat();
-
   const toggleWidget = () => {
     setIsAnimating(true);
     setIsOpen(!isOpen);
-  };
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (inputValue.trim() && !isLoading) {
-      sendMessage(inputValue);
-      setInputValue('');
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
   };
 
   // Reset animation state after animation completes
@@ -59,32 +43,8 @@ export function AIWidget() {
           </div>
           <CardContent className="flex-1 flex flex-col p-0">
             <div className="flex-1 overflow-hidden">
-              <ChatWindow 
-                messages={messages} 
-                isLoading={isLoading}
-                enableTypingAnimation={true}
-                typingSpeed={20}
-              />
+              <ChatWindow />
             </div>
-            <form 
-              onSubmit={handleSubmit} 
-              className="p-4 border-t flex gap-2"
-            >
-              <input
-                value={inputValue}
-                onChange={handleInputChange}
-                placeholder="Type your message..."
-                disabled={isLoading}
-                className="flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <Button 
-                type="submit" 
-                disabled={isLoading || !inputValue.trim()}
-                size="sm"
-              >
-                Send
-              </Button>
-            </form>
           </CardContent>
         </Card>
       ) : (

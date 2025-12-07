@@ -173,6 +173,7 @@ function ThemedAppContent() {
   const location = useLocation();
   const isLandingPro = location.pathname === '/';
   const isGeminiPromptsPage = location.pathname.startsWith('/gemini-prompts');
+  const isAIAssistantPage = location.pathname === '/ai-assistant';
   const [newsletterOpen, setNewsletterOpen] = useState(false);
   
   // Initialize Google Tag Manager
@@ -338,7 +339,7 @@ function ThemedAppContent() {
         </div>
         <NavbarNewsletterModal isOpen={newsletterOpen} onClose={() => setNewsletterOpen(false)} />
         <AIWidget />
-        {!isGeminiPromptsPage && <Footer />}
+        {!isGeminiPromptsPage && !isAIAssistantPage && <Footer />}
       </HelmetProvider>
     </div>
   );

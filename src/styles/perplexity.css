@@ -1,0 +1,135 @@
+/* Perplexity-style CSS */
+/* Page-scoped styles for the Perplexity layout components */
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Glassmorphism effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateZ(0); /* GPU acceleration */
+}
+
+.glass-panel-dark {
+  background: rgba(30, 30, 30, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transform: translateZ(0); /* GPU acceleration */
+}
+
+/* Shimmer effect for loading states */
+.shimmer {
+  animation: shimmer 2s infinite;
+  transform: translateZ(0); /* GPU acceleration */
+}
+
+.shimmer-bg {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateZ(0); /* GPU acceleration */
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition: all 0.2s ease-out;
+}
+
+/* Card lift effect on hover */
+.hover-lift {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  transform: translateZ(0); /* GPU acceleration */
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus states for accessibility */
+.focus-ring {
+  transition: box-shadow 0.2s ease-out;
+}
+
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .mobile-full-width {
+    width: 100vw;
+    margin-left: -1rem;
+    margin-right: -1rem;
+  }
+  
+  .mobile-padded {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Dark mode adjustments */
+.dark .glass-panel {
+  background: rgba(30, 30, 30, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Scrollbar styling */
+.perplexity-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.perplexity-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.perplexity-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 3px;
+}
+
+.perplexity-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+/* Animation utilities */
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  transform: translateZ(0); /* GPU acceleration */
+}
+
+/* GPU acceleration for common animated elements */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.will-change-all {
+  will-change: transform, opacity;
+}

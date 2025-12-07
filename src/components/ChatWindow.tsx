@@ -1,10 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkEmoji from 'remark-emoji';
-import rehypeRaw from 'rehype-raw';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+// ChatWindow.tsx
+// Main chat display area showing conversation history
+// Handles message rendering, scrolling, and virtualization for performance
+
+import { useState, useRef, useEffect, memo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MessageBubble } from './MessageBubble';
+import { AnswerCard } from './AnswerCard';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -13,122 +16,159 @@ interface Message {
   timestamp: Date;
 }
 
+const mockMessages: Message[] = [
+  {
+    id: '1',
+    role: 'user',
+    content: 'How can I improve my website\'s SEO?',
+    timestamp: new Date(Date.now() - 300000)
+  },
+  {
+    id: '2',
+    role: 'assistant',
+    content: 'Here are several effective SEO strategies for your website:\n\n1. **Keyword Research**: Use tools like Google Keyword Planner to find relevant keywords with good search volume.\n\n2. **Quality Content**: Create valuable, original content that answers user questions comprehensively.\n\n3. **Technical SEO**: Ensure fast loading speeds, mobile responsiveness, and proper site structure.\n\n4. **Backlinks**: Build high-quality backlinks from reputable sites in your industry.\n\n5. **Local SEO**: If you have a physical location, optimize for local search results.',
+    timestamp: new Date(Date.now() - 240000)
+  },
+  {
+    id: '3',
+    role: 'user',
+    content: 'What about content marketing?',
+    timestamp: new Date(Date.now() - 180000)
+  },
+  {
+    id: '4',
+    role: 'assistant',
+    content: 'Content marketing is a crucial component of SEO and digital marketing:\n\n- **Blog Posts**: Regularly publish informative articles related to your industry\n- **Video Content**: Create tutorials, product demos, or educational videos\n- **Infographics**: Visual content that\'s easily shareable\n- **E-books/Guides**: In-depth resources that showcase expertise\n\nThe key is consistency and providing genuine value to your audience.',
+    timestamp: new Date(Date.now() - 120000)
+  }
+];
+
 interface ChatWindowProps {
-  messages: Message[];
-  isLoading?: boolean;
-  enableTypingAnimation?: boolean;
-  typingSpeed?: number; // Characters per second
+  debugAnalytics?: boolean;
+  onFollowUpClick?: (text: string) => void;
+  onRegenerate?: () => void;
 }
 
-export function ChatWindow({ 
-  messages, 
-  isLoading = false, 
-  enableTypingAnimation = true,
-  typingSpeed = 20 
+function ChatWindowComponent({ 
+  debugAnalytics = false,
+  onFollowUpClick,
+  onRegenerate
 }: ChatWindowProps) {
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [typingStates, setTypingStates] = useState<Record<string, string>>({});
+  const [messages, setMessages] = useState<Message[]>(mockMessages);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
 
-  // Auto-scroll to bottom when messages change
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+  // Handle scroll position to show auto-scroll button
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+      const bottomThreshold = 100; // pixels from bottom
+      setIsAtBottom(scrollHeight - scrollTop - clientHeight < bottomThreshold);
     }
-  }, [messages, typingStates]);
+  };
 
-  // Handle typing animation for new assistant messages
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (!enableTypingAnimation) {
-      return;
+    if (isAtBottom && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
+  }, [messages, isAtBottom]);
 
-    const lastMessage = messages[messages.length - 1];
+  // Initial scroll to bottom
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  }, []);
+
+  const scrollToBottom = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handleFollowUpClick = (text: string) => {
+    onFollowUpClick?.(text);
     
-    if (lastMessage && lastMessage.role === 'assistant' && !typingStates[lastMessage.id]) {
-      // New assistant message, start typing animation
-      let currentIndex = 0;
-      const fullContent = lastMessage.content;
-      
-      const typeNextCharacter = () => {
-        if (currentIndex <= fullContent.length) {
-          setTypingStates(prev => ({
-            ...prev,
-            [lastMessage.id]: fullContent.slice(0, currentIndex)
-          }));
-          currentIndex++;
-          
-          // Schedule next character
-          setTimeout(typeNextCharacter, 1000 / typingSpeed);
-        } else {
-          // Animation complete, clean up typing state
-          setTypingStates(prev => {
-            const newState = { ...prev };
-            delete newState[lastMessage.id];
-            return newState;
-          });
-        }
-      };
-      
-      // Start typing animation
-      typeNextCharacter();
+    // Analytics callback
+    if (typeof window !== 'undefined') {
+      if (window.dataLayer) {
+        window.dataLayer.push({
+          event: 'perplexity_ui_interaction',
+          action: 'chat_follow_up_click',
+          text: text
+        });
+      } else if (debugAnalytics) {
+        console.debug('Analytics event: perplexity_ui_interaction', {
+          action: 'chat_follow_up_click',
+          text: text
+        });
+      }
     }
-  }, [messages, enableTypingAnimation, typingSpeed, typingStates]);
-
-  // Determine which messages to display
-  const messagesToDisplay = messages.map(message => {
-    if (message.role === 'assistant' && typingStates[message.id]) {
-      // Return a copy of the message with the typed content
-      return { ...message, content: typingStates[message.id] };
-    }
-    return message;
-  });
+  };
 
   return (
-    <div className="flex-1 p-4" ref={scrollAreaRef}>
-      <div className="space-y-4">
-        {messagesToDisplay.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[80%] rounded-lg p-4 ${
-                message.role === 'user'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted'
-              }`}
+    <div className="flex flex-col h-full relative">
+      {/* Scroll container */}
+      <div
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto p-4 space-y-6"
+        role="log"
+        aria-live="polite"
+        aria-label="Conversation history"
+      >
+        <AnimatePresence>
+          {messages.map((message, index) => (
+            <motion.div
+              key={message.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
             >
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-medium">
-                  {message.role === 'user' ? 'You' : 'Assistant'}
-                </span>
-              </div>
-              {message.role === 'assistant' ? (
-                <div className="prose prose-sm max-w-none dark:prose-invert">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm, remarkEmoji]}
-                    rehypePlugins={[rehypeRaw]}
-                  >
-                    {message.content}
-                  </ReactMarkdown>
+              <MessageBubble
+                message={message}
+                onRegenerate={onRegenerate}
+                debugAnalytics={debugAnalytics}
+              />
+              
+              {/* Show AnswerCard for assistant messages */}
+              {message.role === 'assistant' && (
+                <div className="mt-4">
+                  <AnswerCard 
+                    answer={message.content}
+                    answerId={message.id}
+                    onRegenerate={onRegenerate}
+                    debugAnalytics={debugAnalytics}
+                  />
                 </div>
-              ) : (
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
               )}
-            </div>
-          </div>
-        ))}
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-muted rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-medium">Assistant</span>
-              </div>
-              <p className="text-sm">Thinking...</p>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
+
+      {/* Auto-scroll button */}
+      {!isAtBottom && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+          <Button
+            size="sm"
+            onClick={scrollToBottom}
+            className="rounded-full shadow-lg focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            aria-label="Scroll to bottom"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export const ChatWindow = memo(ChatWindowComponent);
+
+export default ChatWindow;
